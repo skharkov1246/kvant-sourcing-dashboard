@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#0e1116">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#ffffff">
 <title>__TITLE__</title>
 <style>
   /* Самохостинг шрифтов (public/fonts, woff2, сабсеты cyr+lat) — ноль внешних запросов.
@@ -17,17 +17,45 @@
   @font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/ibm-plex-sans-var-cyr.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
   @font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/ibm-plex-sans-var-lat.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
 
+  /* Оформление (распоряжение владельца 29.10.2026: «фон белый»). Светлое — для всех по
+     умолчанию; тёмное — по кнопке «Тёмная тема», теми же переменными (portal-ui §1).
+     Цвета текста (--a, --a2, --b, --b2, --ok, --ok2, --warn, --warn2, --nr, --mut, --dim)
+     на белом и на --panel2 — не ниже 4.5:1 (WCAG AA); --f* — заливки столбцов и
+     сегментов, на которых нет текста: в светлой теме они ярче текстовых. */
   :root{
-    --bg:#0e1116;--panel:#161b22;--panel2:#1c232d;--line:#2a323d;
-    --ink:#e8edf2;--mut:#8b97a6;--dim:#5d6878;
-    --a:#f5a524;--a2:#ffcf6b;--b:#3aa6b9;--b2:#6fd0df;
-    --ok:#4ec98a;--ok2:#9ae6bd;--warn:#e5634d;--nr:#c4503e;--ip:#46566a;--new:#33414f;
+    color-scheme:light;
+    --bg:#ffffff;--panel:#ffffff;--panel2:#f6f8fa;--line:#d0d7de;--line2:#e6eaef;--ctl:#8c959f;
+    --ink:#1f2328;--ink2:#24292f;--strong:#0b0d10;--mut:#57606a;--dim:#626a73;
+    --a:#a65006;--a2:#92400e;--b:#0b6b85;--b2:#155e75;
+    --ok:#17733a;--ok2:#116329;--warn:#c01f2b;--warn2:#a40e26;--nr:#b42318;--ip:#8c959f;--new:#626a73;--oth:#9aa3ad;
+    --fa:#d97706;--fa2:#fbbf24;--fb2:#4fb8c9;--fok2:#56c288;--okd:#116329;--onA:#1f2328;
+    --hov:rgba(31,35,40,.04);--scrim:rgba(31,35,40,.32);--shc:rgba(31,35,40,.28);--shd:rgba(31,35,40,.16);
+    --glow:none;--minor-op:.9;--soft-op:1;
+    --amber:var(--a2);
     --mono:'IBM Plex Mono',ui-monospace,monospace;
   }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#0e1116;--panel:#161b22;--panel2:#1c232d;--line:#2a323d;--line2:rgba(42,50,61,.5);--ctl:#2a323d;
+    --ink:#e8edf2;--ink2:#cdd6e0;--strong:#fff;--mut:#8b97a6;--dim:#838e9d;
+    --a:#f5a524;--a2:#ffcf6b;--b:#3aa6b9;--b2:#6fd0df;
+    --ok:#4ec98a;--ok2:#9ae6bd;--warn:#e5634d;--warn2:#f0917f;--nr:#f07368;--ip:#46566a;--new:#33414f;--oth:#566;
+    --fa:#f5a524;--fa2:#ffcf6b;--fb2:#6fd0df;--fok2:#9ae6bd;--okd:#1c7a52;--onA:#0e1116;
+    --hov:rgba(255,255,255,.02);--scrim:rgba(8,11,15,.62);--shc:rgba(0,0,0,.7);--shd:rgba(0,0,0,.45);
+    --minor-op:.9;--soft-op:.85;
+    --glow:radial-gradient(1100px 420px at 80% -8%,rgba(245,165,36,.07),transparent 60%),radial-gradient(900px 380px at 6% 0%,rgba(58,166,185,.06),transparent 55%);
+  }
+  /* переключатель оформления: плавает справа от строки обновления, строка его обтекает */
+  .thtgl{float:right;display:inline-flex;align-items:center;gap:8px;min-height:38px;margin:0 0 10px 10px;padding:0 13px;border:1px solid var(--line);border-radius:11px;background:var(--panel);color:var(--mut);font:500 12px var(--mono);cursor:pointer;transition:color .12s,border-color .12s}
+  .thtgl::before{content:"";flex:none;width:26px;height:14px;border-radius:999px;border:1px solid var(--ctl);background:radial-gradient(circle at 6px 50%,var(--mut) 4px,transparent 4.5px) var(--panel2);transition:background .15s}
+  .thtgl[aria-pressed="true"]::before{border-color:var(--a);background:radial-gradient(circle at 18px 50%,var(--onA) 4px,transparent 4.5px) var(--fa2)}
+  .thtgl:hover{color:var(--ink);border-color:var(--a)}
+  .thtgl:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+  .thtgl~.tabs{clear:both}
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   body{padding:clamp(18px,3.5vw,34px) clamp(14px,2.8vw,30px) 60px;max-width:1180px;margin:0 auto;
-    background-image:radial-gradient(1100px 420px at 80% -8%,rgba(245,165,36,.07),transparent 60%),radial-gradient(900px 380px at 6% 0%,rgba(58,166,185,.06),transparent 55%);}
+    background-image:var(--glow);}
   .mono{font-family:var(--mono)}
   header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:24px}
   .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--a);font-weight:600}
@@ -50,11 +78,11 @@
   .secttl::after{content:"";flex:1;height:1px;background:var(--line)}
   .grid{display:grid;grid-template-columns:1.6fr 1fr;gap:22px;align-items:start}
   .grid,.grid>div{min-width:0} /* колонки могут ужиматься — скролл остаётся внутри карточек */
-  section.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px 22px;margin-bottom:22px;box-shadow:0 12px 30px -24px rgba(0,0,0,.7)}
+  section.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px 22px;margin-bottom:22px;box-shadow:0 12px 30px -24px var(--shc)}
   .card h2{font-family:'Archivo';font-size:16px;font-weight:700;display:flex;align-items:center;gap:10px}
   .tag{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px;letter-spacing:.04em}
-  .tag.a{background:rgba(245,165,36,.14);color:var(--a2);border:1px solid rgba(245,165,36,.3)}
-  .tag.b{background:rgba(58,166,185,.14);color:var(--b2);border:1px solid rgba(58,166,185,.3)}
+  .tag.a{background:color-mix(in srgb,var(--fa) 14%,transparent);color:var(--a2);border:1px solid color-mix(in srgb,var(--fa) 30%,transparent)}
+  .tag.b{background:color-mix(in srgb,var(--b) 14%,transparent);color:var(--b2);border:1px solid color-mix(in srgb,var(--b) 30%,transparent)}
   .card .note{color:var(--mut);font-size:12.5px;margin-top:5px;line-height:1.5}
   .subtotal{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--mut)}.subtotal b{color:var(--ink);font-size:16px}
 
@@ -65,27 +93,27 @@
   .nm{font-weight:600;font-size:13.5px}.nm small{color:var(--dim);font-weight:500;font-size:11px;margin-left:7px;font-family:var(--mono)}
   .ct{font-family:'Archivo';font-weight:800;font-size:16px}.ct small{font-family:var(--mono);font-weight:500;font-size:11px;color:var(--mut);margin-left:6px}
   .track{height:9px;background:var(--panel2);border-radius:6px;overflow:hidden}
-  .fill{height:100%;border-radius:6px}.fillA{background:linear-gradient(90deg,var(--a),var(--a2))}
+  .fill{height:100%;border-radius:6px}.fillA{background:linear-gradient(90deg,var(--fa),var(--fa2))}
 
   table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
   th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);font-weight:600;padding:0 7px 9px;border-bottom:1px solid var(--line)}
   th.r,td.r{text-align:right}
-  td{padding:8px 7px;border-bottom:1px solid rgba(42,50,61,.5)}
+  td{padding:8px 7px;border-bottom:1px solid var(--line2)}
   td .who{font-weight:600}td .dep{color:var(--dim);font-size:11px;font-family:var(--mono)}
   td.num{font-family:var(--mono);font-weight:600}
-  tr:hover td{background:rgba(255,255,255,.02)}
+  tr:hover td{background:var(--hov)}
   .q{color:var(--ok)}.nrc{color:var(--nr)}.dimv{color:var(--dim)}
 
   .stack{display:flex;height:13px;border-radius:5px;overflow:hidden;background:var(--panel2)}
   .stack i{height:100%;transition:width .8s cubic-bezier(.2,.7,.2,1)}
-  .snew{background:var(--new)}.ssent{background:var(--b)}.sdlg{background:var(--b2)}.spaw{background:var(--a2)}.ssel{background:var(--ok)}.snot{background:var(--ok2)}.sref{background:var(--a)}.snr{background:var(--nr)}.soth{background:#566}
+  .snew{background:var(--new)}.ssent{background:var(--b)}.sdlg{background:var(--fb2)}.spaw{background:var(--fa2)}.ssel{background:var(--ok)}.snot{background:var(--fok2)}.sref{background:var(--fa)}.snr{background:var(--nr)}.soth{background:var(--oth)}
   .legendrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:11px;color:var(--mut)}
   .legendrow span{display:flex;align-items:center;gap:5px}.sw{width:10px;height:10px;border-radius:3px;display:inline-block}
 
   .spd{font-family:var(--mono);font-weight:600;padding:2px 7px;border-radius:5px;font-size:12px}
-  .spd.f{background:rgba(78,201,138,.15);color:var(--ok2)}
-  .spd.m{background:rgba(245,165,36,.15);color:var(--a2)}
-  .spd.s{background:rgba(196,80,62,.18);color:#f0917f}
+  .spd.f{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok2)}
+  .spd.m{background:color-mix(in srgb,var(--fa) 15%,transparent);color:var(--a2)}
+  .spd.s{background:color-mix(in srgb,var(--nr) 18%,transparent);color:var(--warn2)}
 
   .split{display:flex;flex-direction:column;align-items:center;gap:13px}
   .legend{width:100%;display:flex;flex-direction:column;gap:8px;margin-top:2px}
@@ -94,10 +122,10 @@
   .leg .v{margin-left:auto;font-family:'Archivo';font-weight:800;font-size:15px}
   .leg .p{font-family:var(--mono);color:var(--mut);font-size:11.5px;width:40px;text-align:right}
 
-  .insight{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--a);border-radius:11px;padding:15px 17px;font-size:13px;line-height:1.55;color:#cdd6e0}
+  .insight{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--a);border-radius:11px;padding:15px 17px;font-size:13px;line-height:1.55;color:var(--ink2)}
   .insight h3{font-family:'Archivo';font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--a2);margin-bottom:9px}
-  .insight b{color:#fff}.insight .flag{color:var(--warn);font-weight:600}.insight .good{color:var(--ok);font-weight:600}
-  .insight.bot{border-left-color:var(--warn)}.insight.bot h3{color:#f0917f}
+  .insight b{color:var(--strong)}.insight .flag{color:var(--warn);font-weight:600}.insight .good{color:var(--ok);font-weight:600}
+  .insight.bot{border-left-color:var(--warn)}.insight.bot h3{color:var(--warn2)}
 
   /* столбчатые графики: резиновые столбцы (ужимаются под ширину, потолок 26px) —
      не вылезают за карточку при большом числе недель/месяцев */
@@ -105,9 +133,9 @@
   .wkcol{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
   .wkbars{display:flex;gap:4px;align-items:flex-end;height:100%;width:100%;justify-content:center}
   .wkbar{flex:1 1 0;max-width:26px;min-width:4px;border-radius:5px 5px 0 0;position:relative;display:flex;justify-content:center;transition:height .9s cubic-bezier(.2,.7,.2,1)}
-  .wkbar.a{background:linear-gradient(180deg,var(--a2),var(--a))}.wkbar.b{background:linear-gradient(180deg,var(--b2),var(--b))}
-  .wkbar.k{background:linear-gradient(180deg,var(--ok),#1c7a52)}
-  .wkbar.ka{background:linear-gradient(180deg,var(--ok2),var(--ok))}
+  .wkbar.a{background:linear-gradient(180deg,var(--fa2),var(--fa))}.wkbar.b{background:linear-gradient(180deg,var(--fb2),var(--b))}
+  .wkbar.k{background:linear-gradient(180deg,var(--ok),var(--okd))}
+  .wkbar.ka{background:linear-gradient(180deg,var(--fok2),var(--ok))}
   .wkbar span{position:absolute;top:-16px;font-family:var(--mono);font-size:10.5px;font-weight:600;line-height:1}
   .wkbar.a span{color:var(--a2)}.wkbar.b span{color:var(--b2)}.wkbar.k span{color:var(--ok)}.wkbar.ka span{color:var(--ok2)}
   .wklbl{font-size:10.5px;color:var(--mut);text-align:center;font-family:var(--mono);white-space:nowrap}
@@ -119,7 +147,7 @@
   .distbar i{height:100%;cursor:pointer;transition:filter .12s;min-width:2px}
   .distbar i:hover{filter:brightness(1.25)}
   .cohbar{display:flex;align-items:center;gap:14px;padding:8px 6px;cursor:pointer;border-radius:8px;transition:background .12s}
-  .cohbar:hover{background:rgba(245,165,36,.05)}
+  .cohbar:hover{background:color-mix(in srgb,var(--fa) 5%,transparent)}
   .cohlbl{min-width:170px}.cohlbl b{display:block;font-family:'IBM Plex Sans';font-weight:600}
   .cohconv{min-width:70px;text-align:right;font-family:var(--mono);font-weight:700;color:var(--ok)}
   .cohconv small{display:block;font-weight:600;font-size:11px;color:var(--a2)}
@@ -129,14 +157,14 @@
   .cohbars .distbar{height:13px;flex:1}
 
   .spark{display:flex;gap:3px;align-items:flex-end;height:26px}
-  .spark i{width:8px;background:var(--a);border-radius:2px 2px 0 0;opacity:.85}
+  .spark i{width:8px;background:var(--fa);border-radius:2px 2px 0 0;opacity:.85}
   /* неделя вне окна работы человека: до приёма или после ухода — не ноль, а «не работал» */
   .spark i.off{height:2px!important;background:none;border-top:2px dotted var(--ip);opacity:1}
   .spark i.aft{background:var(--nr)}
   /* состав отдела: ушёл / новичок, темп и окно работы */
   .gone,.newb{display:inline-block;margin-left:7px;padding:0 6px;border-radius:5px;font:600 10.5px var(--mono);vertical-align:1px}
-  .gone{color:var(--warn);border:1px solid rgba(229,99,77,.45)}
-  .newb{color:var(--ok);border:1px solid rgba(78,201,138,.45)}
+  .gone{color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 45%,transparent)}
+  .newb{color:var(--ok);border:1px solid color-mix(in srgb,var(--ok) 45%,transparent)}
   .sub2{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:4px;line-height:1.45}
   .sub2 .up{color:var(--ok)}.sub2 .dn{color:var(--warn)}
   .rowsep{margin:8px 0 0 33px;padding-top:10px;border-top:1px dashed var(--line);font-size:12px;color:var(--mut)}
@@ -144,11 +172,12 @@
   #rowsA .top{gap:8px}#rowsA .nm{min-width:0}#rowsA .ct{white-space:nowrap}
   .wklbl i{display:block;font-style:normal;color:var(--dim);font-size:10px}
   /* неполная последняя неделя — бледнее и с подписью, чтобы не читалась как обвал */
-  .wkcol.part .wkbar{opacity:.45}
+  /* бледность — дымкой фона поверх столбца, а не opacity: число над столбцом остаётся читаемым */
+  .wkcol.part .wkbar::after{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--bg);opacity:.55;pointer-events:none}
   .wklbl i.wkpart{color:var(--a2)}
   .spark i.part{opacity:.4}
   /* воронка пресейла */
-  .psflag{display:inline-block;margin:0 4px 2px 0;padding:0 6px;border-radius:5px;font:600 10.5px var(--mono);border:1px solid rgba(229,99,77,.45);color:var(--warn);white-space:nowrap}
+  .psflag{display:inline-block;margin:0 4px 2px 0;padding:0 6px;border-radius:5px;font:600 10.5px var(--mono);border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);color:var(--warn);white-space:nowrap}
   .psflag.soft{border-color:var(--line);color:var(--mut)}
   .pswrap{overflow-x:auto}
   .pswrap table{min-width:640px}
@@ -158,50 +187,50 @@
   footer b{color:var(--mut)}
   .barlist{margin-top:14px;display:flex;flex-direction:column;gap:10px}
   .blrow .blt{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}.blrow .blt b{font-family:var(--mono)}
-  .bltrack{height:8px;background:var(--panel2);border-radius:5px;overflow:hidden}.bltrack i{display:block;height:100%;background:linear-gradient(90deg,var(--b),var(--b2));border-radius:5px}
+  .bltrack{height:8px;background:var(--panel2);border-radius:5px;overflow:hidden}.bltrack i{display:block;height:100%;background:linear-gradient(90deg,var(--b),var(--fb2));border-radius:5px}
 
   /* статус-бар обновления данных */
   .updbar{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin-bottom:18px;font-family:var(--mono);font-size:12.5px;color:var(--mut)}
   .updbar b{font-weight:600;color:var(--ink)}
   .updbar .ub-sep{color:var(--dim)}
   .updbar .ub-dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--dim)}
-  .updbar.is-ok{border-color:rgba(78,201,138,.35)}
+  .updbar.is-ok{border-color:color-mix(in srgb,var(--ok) 35%,transparent)}
   .updbar.is-ok .ub-dot{background:var(--ok);animation:ubpulse 2s infinite}
   .updbar.is-ok .ub-next b{color:var(--ok2)}
-  .updbar.is-warn{border-color:rgba(245,165,36,.42)}
+  .updbar.is-warn{border-color:color-mix(in srgb,var(--fa) 42%,transparent)}
   .updbar.is-warn .ub-dot{background:var(--a)}.updbar.is-warn .ub-next{color:var(--a2)}
-  .updbar.is-late{border-color:rgba(229,99,77,.55);background:rgba(229,99,77,.09)}
-  .updbar.is-late .ub-dot{background:var(--warn);box-shadow:0 0 9px rgba(229,99,77,.7)}
-  .updbar.is-late .ub-next{color:#f0917f;font-weight:600}
-  @keyframes ubpulse{0%{box-shadow:0 0 0 0 rgba(78,201,138,.5)}70%{box-shadow:0 0 0 6px rgba(78,201,138,0)}100%{box-shadow:0 0 0 0 rgba(78,201,138,0)}}
+  .updbar.is-late{border-color:color-mix(in srgb,var(--warn) 55%,transparent);background:color-mix(in srgb,var(--warn) 9%,transparent)}
+  .updbar.is-late .ub-dot{background:var(--warn);box-shadow:0 0 9px color-mix(in srgb,var(--warn) 70%,transparent)}
+  .updbar.is-late .ub-next{color:var(--warn2);font-weight:600}
+  @keyframes ubpulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 50%,transparent)}70%{box-shadow:0 0 0 6px color-mix(in srgb,var(--ok) 0%,transparent)}100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 0%,transparent)}}
 
   /* кликабельные строки сорсеров + выезжающая панель «кому/какие» */
   tr.clickrow,.row.clickrow,.drill{cursor:pointer}
-  tr.clickrow:hover td,tr.drill:hover td{background:rgba(245,165,36,.06)}
-  .row.clickrow:hover{background:rgba(245,165,36,.05);border-radius:8px}
+  tr.clickrow:hover td,tr.drill:hover td{background:color-mix(in srgb,var(--fa) 6%,transparent)}
+  .row.clickrow:hover{background:color-mix(in srgb,var(--fa) 5%,transparent);border-radius:8px}
   /* кликабельные элементы (строки сорсеров, отраслевые вкладки, владельцы) */
   .clickrow .who::after,.clickrow .nm::after,tr.drill .who::after,.ownrow .who::after{content:" ›";color:var(--a);font-weight:700}
   .kpi.drill{transition:border-color .12s,transform .12s}
   .kpi.drill:hover{border-color:var(--a);transform:translateY(-1px)}
   .kpi.drill .lbl::after{content:" ›";color:var(--a)}
   .blrow.drill{border-radius:8px;transition:background .12s}
-  .blrow.drill:hover{background:rgba(245,165,36,.05)}
+  .blrow.drill:hover{background:color-mix(in srgb,var(--fa) 5%,transparent)}
   .req .rm .amt{margin-left:auto;color:var(--ok)}
   /* интерактивные графики «Пульса» */
   .wkcol.drill:hover .wkbar{filter:brightness(1.25)}
-  td.cell.drill:hover{background:rgba(245,165,36,.12)!important;color:var(--ink)}
+  td.cell.drill:hover{background:color-mix(in srgb,var(--fa) 12%,transparent)!important;color:var(--ink)}
   .flowbox.drill{cursor:pointer;transition:transform .12s}
   .flowbox.drill:hover{transform:translateY(-2px)}
   .ownlist{display:flex;flex-direction:column;gap:2px}
   .ownrow{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:8px;cursor:pointer;transition:background .12s}
-  .ownrow:hover{background:rgba(245,165,36,.06)}
+  .ownrow:hover{background:color-mix(in srgb,var(--fa) 6%,transparent)}
   .ownrow .onm{font-size:12.5px;color:var(--ink)}
   .ownrow .obar{flex:1;height:6px;border-radius:3px;background:var(--panel2);overflow:hidden}
-  .ownrow .obar i{display:block;height:100%;background:linear-gradient(90deg,var(--a),var(--a2))}
+  .ownrow .obar i{display:block;height:100%;background:linear-gradient(90deg,var(--fa),var(--fa2))}
   .ownrow .ocnt{font-family:var(--mono);font-size:12px;color:var(--a2);min-width:74px;text-align:right}
   /* вкладка «Контракты» */
   .ctools{margin:0 0 12px}
-  .search{width:100%;max-width:520px;padding:9px 13px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);font-size:13px;font-family:inherit}
+  .search{width:100%;max-width:520px;padding:9px 13px;border-radius:9px;border:1px solid var(--ctl);background:var(--panel2);color:var(--ink);font-size:13px;font-family:inherit}
   .search:focus{outline:none;border-color:var(--a)}
   th.sortable{cursor:pointer;user-select:none;transition:color .12s}
   th.sortable:hover{color:var(--a2)}
@@ -224,22 +253,22 @@
   .lgrow small{font-family:var(--mono);color:var(--mut);min-width:34px;text-align:right}
   /* бейдж «как считается» + методика в дровере */
   .qq{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--line);color:var(--mut);font-size:10px;font-family:var(--mono);cursor:pointer;margin-left:8px;vertical-align:middle;transition:.12s;user-select:none;flex-shrink:0}
-  .qq:hover{border-color:var(--a);color:var(--a);background:rgba(245,165,36,.08)}
+  .qq:hover{border-color:var(--a);color:var(--a);background:color-mix(in srgb,var(--fa) 8%,transparent)}
   .secttl .qq{margin-left:10px}
   .kpi .qq{position:absolute;top:7px;right:8px;margin:0}
   h2 .qq{font-weight:400}
   .drw .mblk{margin:4px 0 14px;font-size:12.5px;line-height:1.55;color:var(--ink)}
-  .drw .mrow{display:flex;gap:10px;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(42,50,61,.4)}
+  .drw .mrow{display:flex;gap:10px;padding:5px 0;font-size:12px;border-bottom:1px solid var(--line2)}
   .drw .mrow .k{color:var(--mut);font-family:var(--mono);min-width:84px;flex-shrink:0;text-transform:uppercase;font-size:10.5px;letter-spacing:.05em;padding-top:1px}
   .drw .mrow .v{color:var(--ink)}
   .drw .mrow .v code{font-family:var(--mono);font-size:11px;background:var(--panel2);padding:1px 5px;border-radius:4px;color:var(--a2)}
   .drw .mlist{margin:2px 0 0;padding-left:0;list-style:none}
-  .drw .mlist li{padding:5px 0;border-bottom:1px solid rgba(42,50,61,.4);font-size:12px;line-height:1.5}
+  .drw .mlist li{padding:5px 0;border-bottom:1px solid var(--line2);font-size:12px;line-height:1.5}
   .drw .mlist li b{color:var(--ink)}
-  .ovl{position:fixed;inset:0;background:rgba(8,11,15,.62);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+  .ovl{position:fixed;inset:0;background:var(--scrim);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
   .ovl.on{opacity:1;pointer-events:auto}
-  .drw{position:fixed;top:0;right:0;height:100%;width:min(560px,94vw);background:var(--panel);border-left:1px solid var(--line);box-shadow:-20px 0 50px rgba(0,0,0,.45);transform:translateX(100%);transition:transform .25s cubic-bezier(.2,.7,.2,1);z-index:41;display:flex;flex-direction:column}
-  .drw.on{transform:none}
+  .drw{position:fixed;top:0;right:0;height:100%;width:min(560px,94vw);background:var(--panel);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .25s cubic-bezier(.2,.7,.2,1);z-index:41;display:flex;flex-direction:column}
+  .drw.on{transform:none;box-shadow:-20px 0 50px var(--shd)} /* тень — только у открытой: у спрятанной за краем она ложилась серой полосой на белый фон */
   .drw>header{padding:17px 22px;border-bottom:1px solid var(--line);margin:0;display:flex;align-items:flex-start;gap:12px}
   .drw h3{font-family:'Archivo';font-size:18px;font-weight:800}
   .drw .sub2{color:var(--mut);font-size:12px;margin-top:4px;font-family:var(--mono)}
@@ -247,9 +276,9 @@
   .drw .x:hover{color:var(--ink)}
   .drw .body{padding:14px 22px 28px;overflow:auto}
   .drw .h{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin:16px 0 8px}
-  .suprow{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px solid rgba(42,50,61,.5)}
+  .suprow{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--line2)}
   .suprow b{font-family:var(--mono);color:var(--a2)}
-  .req{padding:11px 0;border-bottom:1px solid rgba(42,50,61,.5)}
+  .req{padding:11px 0;border-bottom:1px solid var(--line2)}
   .req .rt{font-size:12.5px;color:var(--ink);line-height:1.45}
   /* хронологический список отправок сорсера: тема · получатель · превью · вложение */
   .req .subj{font-size:13px;font-weight:600;color:var(--ink);line-height:1.4;display:flex;gap:6px;align-items:baseline}
@@ -265,20 +294,20 @@
   .req .rm .nomail{color:var(--nr)}
   .req .rm .dt{margin-left:auto;color:var(--mut)}
   .req .pill{font-size:9.5px;padding:1px 6px;border-radius:5px;background:var(--panel2);color:var(--mut)}
-  .req .pill.p-selected{color:var(--ok);background:rgba(46,191,127,.14)}
-  .req .pill.p-refused{color:var(--a);background:rgba(245,165,36,.12)}
-  .req .pill.p-no_answer{color:var(--nr);background:rgba(229,72,77,.12)}
-  .req .pill.p-dialog{color:var(--b2)}.req .pill.p-sent{color:var(--b)}.req .pill.p-new{color:var(--new)}
-  .req .pill.p-paw{color:var(--a2);background:rgba(255,207,107,.12)}.req .pill.p-notsel{color:var(--ok2)}
+  .req .pill.p-selected{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+  .req .pill.p-refused{color:var(--a);background:color-mix(in srgb,var(--fa) 12%,transparent)}
+  .req .pill.p-no_answer{color:var(--nr);background:color-mix(in srgb,var(--warn) 12%,transparent)}
+  .req .pill.p-dialog{color:var(--b2)}.req .pill.p-sent{color:var(--b)}.req .pill.p-new{color:var(--mut)}
+  .req .pill.p-paw{color:var(--a2);background:color-mix(in srgb,var(--fa2) 12%,transparent)}.req .pill.p-notsel{color:var(--ok2)}
   /* легенда-фильтр статусов в дровере сорсера */
   tr.clickrow .stack{cursor:pointer}
   .statleg{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}
   .stchip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--mut);cursor:pointer;transition:.12s;user-select:none}
   .stchip:hover{border-color:var(--a);color:var(--ink)}
-  .stchip.on{background:rgba(245,165,36,.12);border-color:var(--a);color:var(--ink)}
+  .stchip.on{background:color-mix(in srgb,var(--fa) 12%,transparent);border-color:var(--a);color:var(--ink)}
   .stchip b{font-family:var(--mono);color:var(--ink);margin-left:1px}
   .stchip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-  .dot.snew{background:var(--new)}.dot.ssent{background:var(--b)}.dot.sdlg{background:var(--b2)}.dot.spaw{background:var(--a2)}.dot.ssel{background:var(--ok)}.dot.snot{background:var(--ok2)}.dot.sref{background:var(--a)}.dot.snr{background:var(--nr)}.dot.soth{background:#566}
+  .dot.snew{background:var(--new)}.dot.ssent{background:var(--b)}.dot.sdlg{background:var(--fb2)}.dot.spaw{background:var(--fa2)}.dot.ssel{background:var(--ok)}.dot.snot{background:var(--fok2)}.dot.sref{background:var(--fa)}.dot.snr{background:var(--nr)}.dot.soth{background:var(--oth)}
   .kprule{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0 14px}
   .kprule .cell{border:1px solid var(--line);border-radius:10px;padding:9px 11px}
   .kprule .cell b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
@@ -291,13 +320,13 @@
   .sortbar .sortlab{font:600 9px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-right:2px}
   .sortt{font-family:var(--mono);font-size:11px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--mut);cursor:pointer;transition:.12s;user-select:none}
   .sortt:hover{border-color:var(--a);color:var(--ink)}
-  .sortt.on{background:rgba(245,165,36,.12);border-color:var(--a);color:var(--ink);font-weight:600}
+  .sortt.on{background:color-mix(in srgb,var(--fa) 12%,transparent);border-color:var(--a);color:var(--ink);font-weight:600}
   .req .rm .dt{color:var(--mut)}
   /* распределение срока выхода в реализацию (квантиль TTR) */
   .ttrrow{display:flex;align-items:center;gap:12px;padding:5px 0}
   .ttrlbl{min-width:74px;font-family:var(--mono);font-size:12px;color:var(--ink)}
   .ttrtrack{flex:1;height:16px;border-radius:6px;background:var(--panel2);overflow:hidden}
-  .ttrtrack i{display:block;height:100%;background:linear-gradient(90deg,var(--ok),var(--ok2));border-radius:6px;transition:width .8s cubic-bezier(.2,.7,.2,1)}
+  .ttrtrack i{display:block;height:100%;background:linear-gradient(90deg,var(--ok),var(--fok2));border-radius:6px;transition:width .8s cubic-bezier(.2,.7,.2,1)}
   .ttrpct{min-width:108px;text-align:right;font-family:var(--mono);font-size:12px}
   .ttrpct b{color:var(--ok)}.ttrpct .dimv{font-size:11px}
   .pcards{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0 14px}
@@ -308,58 +337,58 @@
   .subnav{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 16px}
   .snb{font-family:var(--mono);font-size:13px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--mut);cursor:pointer;transition:.12s}
   .snb:hover{border-color:var(--a);color:var(--ink)}
-  .snb.on{background:var(--a);border-color:var(--a);color:#1a1206;font-weight:600}
+  .snb.on{background:var(--fa);border-color:var(--fa);color:var(--onA);font-weight:600}
   .rmrow{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;padding:4px 0}
   .rmon{display:inline-flex;flex-direction:column;align-items:center;gap:5px;width:52px}
   .rmbars{display:flex;align-items:flex-end;gap:3px;height:104px}
   .rmbars i{width:14px;border-radius:3px 3px 0 0;display:block;min-height:2px}
-  .rmc{background:linear-gradient(180deg,var(--b2),var(--b))}.rmr{background:var(--ok)}
+  .rmc{background:linear-gradient(180deg,var(--fb2),var(--b))}.rmr{background:var(--ok)}
   .rmlbl{font:11px/1 var(--mono);color:var(--mut)}.rmv{font:11px/1 var(--mono);color:var(--ink)}
   .tabs{display:flex;gap:8px;margin:0 -2px 18px;padding:8px 2px;position:sticky;top:0;z-index:30;background:var(--bg);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
   .tabs::-webkit-scrollbar{display:none}
   .tab{font-family:var(--mono);font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid var(--line);color:var(--mut);background:var(--panel);cursor:pointer;white-space:nowrap;flex:none;transition:color .12s,border-color .12s}
   .tab:hover{color:var(--ink);border-color:var(--a)}
-  .tab.act{color:#0e1116;background:var(--a2);border-color:var(--a2);font-weight:700}
+  .tab.act{color:var(--onA);background:var(--fa2);border-color:var(--fa2);font-weight:700}
   /* четыре функции управления — крупно; остальное — после «ещё» (решение владельца 19.10.2026) */
   .tabsep{align-self:center;flex:none;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:0 0 0 12px;margin-left:4px;border-left:1px solid var(--line)}
   .tabsep:last-child{display:none}
-  .tab.minor{font-size:11px;padding:6px 11px;opacity:.78}
+  .tab.minor{font-size:11px;padding:6px 11px;opacity:var(--minor-op)}
   .tab.minor.act{opacity:1}
   .flow{display:flex;gap:10px;margin-top:12px}
   .flowbox{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
   .flowbox .n{font-family:'Archivo';font-weight:800;font-size:22px}.flowbox .l{font-size:11px;color:var(--mut);margin-top:3px}
 
   /* вкладка «Реализация»: подсветка замедленных, бейджи источника закупки, таймлайн */
-  tr.slowrow td{background:rgba(196,80,62,.08)}
-  tr.slowrow:hover td{background:rgba(196,80,62,.14)}
+  tr.slowrow td{background:color-mix(in srgb,var(--nr) 8%,transparent)}
+  tr.slowrow:hover td{background:color-mix(in srgb,var(--nr) 14%,transparent)}
   .srcb{font-size:9px;padding:1px 5px;border-radius:4px;background:var(--panel2);color:var(--mut);font-family:var(--mono);white-space:nowrap}
-  .srcb.econ{color:var(--b2);background:rgba(58,166,185,.13)}
-  .srcb.none{color:var(--nr);background:rgba(196,80,62,.13)}
-  .srcb.disc{color:var(--a2);background:rgba(245,165,36,.13)}
+  .srcb.econ{color:var(--b2);background:color-mix(in srgb,var(--b) 13%,transparent)}
+  .srcb.none{color:var(--warn2);background:color-mix(in srgb,var(--nr) 13%,transparent)}
+  .srcb.disc{color:var(--a2);background:color-mix(in srgb,var(--fa) 13%,transparent)}
   .stgcell b{font-weight:600;font-size:12px}
   .stgcell .dep{margin-top:1px}
   .blrow .dep{color:var(--dim);font-size:11px}
   .stgd{font-family:var(--mono);font-weight:600}
   .stgd.bad{color:var(--nr)}
-  .tlrow{display:flex;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(42,50,61,.4);font-size:12px}
+  .tlrow{display:flex;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line2);font-size:12px}
   .tlrow .tld{font-family:var(--mono);color:var(--mut);flex:none;width:104px}
   .tlrow .tln{color:var(--ink);flex:1;min-width:0}
   .tlrow .tldur{font-family:var(--mono);color:var(--a2);flex:none}
   .tlrow.cur .tln{font-weight:600}
   /* сверка источников закупки (заказы · поля экономики · файл экономики) */
-  .srccmp{display:grid;grid-template-columns:minmax(118px,168px) 1fr 72px 70px;gap:8px;align-items:center;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(42,50,61,.4)}
+  .srccmp{display:grid;grid-template-columns:minmax(118px,168px) 1fr 72px 70px;gap:8px;align-items:center;font-size:12px;padding:4px 0;border-bottom:1px solid var(--line2)}
   .srccmp .sl{color:var(--mut);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .srccmp.used .sl{color:var(--ink);font-weight:600}
   .srccmp .sb{height:8px;border-radius:4px;background:var(--panel2);overflow:hidden}
-  .srccmp .sb i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--b),var(--b2))}
-  .srccmp.used .sb i{background:linear-gradient(90deg,var(--a),var(--a2))}
+  .srccmp .sb i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--b),var(--fb2))}
+  .srccmp.used .sb i{background:linear-gradient(90deg,var(--fa),var(--fa2))}
   .srccmp .sv{font-family:var(--mono);text-align:right;white-space:nowrap}
   .srccmp .sd{font-family:var(--mono);text-align:right;font-size:11px;white-space:nowrap}
   /* разделы роли (КАМы, продукт-оунеры): пояснение справа длинное — переносится, а не
      раздвигает страницу вбок на планшете и ноутбуке */
   .pfit .srccmp .sd{white-space:normal;overflow-wrap:anywhere;min-width:0}
   .sd.ok{color:var(--ok)} .sd.mid{color:var(--a2)} .sd.bad{color:var(--nr)} .sd.dim{color:var(--dim)}
-  .srcb.chk{color:var(--ok);background:rgba(63,167,102,.13)}
+  .srcb.chk{color:var(--ok2);background:color-mix(in srgb,var(--ok) 13%,transparent)}
 
   /* ---- таблица контрактов: скроллится внутри карточки, а не ломает её ---- */
   .tscroll{overflow-x:auto;overscroll-behavior-x:contain;margin-top:12px}
@@ -382,7 +411,7 @@
   /* ---- экономика сделки: своя рамка + цепочка «продали → косты → прибыль» ---- */
   .drw .ecard{border:1px solid var(--line);border-radius:13px;background:var(--panel2);
        padding:13px 14px;margin:8px 0 6px}
-  .drw .ecard.bad{border-color:var(--nr);box-shadow:inset 0 0 0 1px rgba(196,80,62,.25)}
+  .drw .ecard.bad{border-color:var(--nr);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--nr) 25%,transparent)}
   .drw .h2e{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);
        font-weight:600;margin:14px 0 6px}
   .chain{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px}
@@ -391,7 +420,7 @@
   .chain .cstep .cl{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);line-height:1.3}
   .chain .cstep .cv{font-family:var(--mono);font-size:15px;font-weight:700;margin-top:4px;color:var(--ink)}
   .chain .cstep.minus .cv{color:var(--a2)}
-  .chain .cstep.res{border-color:rgba(63,167,102,.4)}
+  .chain .cstep.res{border-color:color-mix(in srgb,var(--ok) 40%,transparent)}
   .chain .cstep.res .cv{color:var(--ok)}
   .chain .cstep.res.bad{border-color:var(--nr)}
   .chain .cstep.res.bad .cv{color:var(--nr)}
@@ -402,12 +431,12 @@
 
   /* ---- сверка трёх источников заработка ---- */
   .thr{display:grid;grid-template-columns:minmax(120px,1fr) 82px 92px 108px;gap:8px;align-items:baseline;
-       padding:6px 0;border-bottom:1px solid rgba(42,50,61,.4);font-size:12px}
+       padding:6px 0;border-bottom:1px solid var(--line2);font-size:12px}
   .thr .tl{color:var(--ink);min-width:0}
   .thr .tv{font-family:var(--mono);text-align:right;white-space:nowrap}
   .thr.thead{font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);border-bottom-color:var(--line)}
   .thr.thead .tv{font-family:inherit}
-  .thr.best{background:rgba(63,167,102,.07);border-radius:6px;padding-left:6px;padding-right:6px}
+  .thr.best{background:color-mix(in srgb,var(--ok) 7%,transparent);border-radius:6px;padding-left:6px;padding-right:6px}
   @media(max-width:720px){.thr{grid-template-columns:1fr 70px 78px 92px;gap:5px;font-size:11px}}
 
   /* ---- плитки «требует решения»: клик = фильтр таблицы ---- */
@@ -439,8 +468,8 @@
   .lft .hot{color:var(--nr);font-weight:600}
   .otd{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;align-items:end;height:130px;margin-top:10px}
   .otd .c{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:10px;color:var(--dim);gap:2px;min-width:0}
-  .otd .c i{display:block;width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--ok),var(--a2))}
-  .otd .c i.low{background:linear-gradient(180deg,var(--nr),var(--a2))}
+  .otd .c i{display:block;width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--ok),var(--fa2))}
+  .otd .c i.low{background:linear-gradient(180deg,var(--nr),var(--fa2))}
   .otd .c .mono{font-size:9.5px}
   /* ---- воронка реализации ---- */
   .fnl{display:flex;flex-direction:column;gap:10px}
@@ -452,8 +481,8 @@
   .fnb{height:20px;border-radius:6px;background:var(--panel2);display:flex;overflow:hidden;
        flex:none;max-width:calc(100% - 76px)}
   .fnb i{display:block;height:100%}
-  .fnb .okp{background:linear-gradient(90deg,var(--a),var(--a2))}
-  .fnb .late{background:linear-gradient(90deg,var(--nr),#d9744f)}
+  .fnb .okp{background:linear-gradient(90deg,var(--fa),var(--fa2))}
+  .fnb .late{background:linear-gradient(90deg,var(--nr),var(--warn))}
   .fnv{font-family:var(--mono);font-size:11.5px;color:var(--ink);white-space:nowrap;flex:none;
        width:66px;text-align:right}
 
@@ -474,7 +503,7 @@
   /* «Реализация»: вкладка отдельного направления (решение владельца 25.10.2026) */
   .ctsub{margin:0 0 14px}
   .ctsub .snb{min-height:32px;max-width:100%;white-space:normal;text-align:left}
-  .ctsubn{font-weight:400;opacity:.85}
+  .ctsubn{font-weight:400;opacity:var(--soft-op)}
   [role=tabpanel]:focus-visible{outline:2px solid var(--a);outline-offset:4px;border-radius:6px}
   /* «Реализация» по регламенту ОРК: подвкладки, направление, плитки W/M/Q, ведомость, очередь */
   .ctbar{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:flex-start;margin:0 0 6px}
@@ -667,8 +696,30 @@
     *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
   }
 </style>
+<script>
+/* Оформление: светлое для всех по умолчанию; «Тёмная тема» — выбор человека, помнится
+   в этом браузере (localStorage может быть закрыт — тогда просто светлая) */
+(function(){
+  var d=document.documentElement, KEY='kvant-theme';
+  function apply(t){
+    d.setAttribute('data-theme',t==='dark'?'dark':'light');
+    var m=document.querySelector('meta[name="theme-color"]');
+    if(m){ try{ m.setAttribute('content',getComputedStyle(d).getPropertyValue('--bg').trim()||'#ffffff'); }catch(e){} }
+    var b=document.getElementById('themeTgl'); if(b) b.setAttribute('aria-pressed',t==='dark'?'true':'false');
+  }
+  var t=null; try{ t=localStorage.getItem(KEY); }catch(e){}
+  apply(t);
+  document.addEventListener('DOMContentLoaded',function(){ apply(d.getAttribute('data-theme')); });
+  document.addEventListener('click',function(e){
+    var b=e.target&&e.target.closest&&e.target.closest('#themeTgl'); if(!b) return;
+    var nt=d.getAttribute('data-theme')==='dark'?'light':'dark';
+    apply(nt); try{ localStorage.setItem(KEY,nt); }catch(e){}
+  });
+})();
+</script>
 </head>
 <body>
+<button type="button" class="thtgl" id="themeTgl" aria-pressed="false" title="Переключить оформление страницы">Тёмная тема</button>
 <div id="updstatus" class="updbar"><span class="ub-dot"></span><span class="ub-main">Обновление…</span></div>
 <div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="contracts">Реализация</button><button class="tab" data-tab="reps">Key-аккаунты и продукты</button><button class="tab" data-tab="company">Пульс компании</button><span class="tabsep">ещё</span><button class="tab minor" data-tab="suppliers">Поставщики</button><button class="tab minor" data-tab="cohorts">Когорты</button><button class="tab minor" data-tab="advisor">Советы знатока</button><button class="tab minor" data-tab="eng">Инжиниринг</button></div>
 <div id="tab-sourcing">
@@ -690,7 +741,7 @@
       <b>КП с итогом</b> — карточки на Selected или «не выбран» (Not Selected, «Не прошли по цене», «Не подошло по технике»), по стадии, без проверки файла. Это два независимых счёта: разница столбцов — не число КП без итога, она бывает и отрицательной (Selected без файла её уменьшают, файл на стадии до КП или при отказе — увеличивает).<br>
       Оба последних столбца датированы по <b>последнему движению карточки</b>: ни у файла, ни у стадии отдельной даты выдача не отдаёт. Для карточки, которая после получения КП больше не двигалась, это и есть неделя получения; для остальных — неделя последнего движения.</div>
       <div class="wkchart" id="wkchart"></div>
-      <div class="legendrow"><span><i class="sw" style="background:var(--a)"></i>Отдел Гринёва (A)</span><span><i class="sw" style="background:var(--b)"></i>Вне отдела (B)</span><span><i class="sw" style="background:var(--ok)"></i>КП засчитано</span><span><i class="sw" style="background:var(--ok2)"></i>КП с итогом</span><span>под неделей — сорсеров в отделе</span></div>
+      <div class="legendrow"><span><i class="sw" style="background:var(--fa)"></i>Отдел Гринёва (A)</span><span><i class="sw" style="background:var(--b)"></i>Вне отдела (B)</span><span><i class="sw" style="background:var(--ok)"></i>КП засчитано</span><span><i class="sw" style="background:var(--fok2)"></i>КП с итогом</span><span>под неделей — сорсеров в отделе</span></div>
     </section>
     <section class="card">
       <h2><span class="tag a">БЛОК A</span> Темп сорсеров <span class="subtotal">итого <b id="loadTotal"></b></span></h2>
@@ -1385,13 +1436,13 @@ if (M.send && M.send.rows){
 // ---- разнообразие поставщиков (пай-чарт + поставщиков на сорсера)
 {
   const SM=M.supplierMix, pie=document.getElementById('supPie');
-  const PAL=['#f5a524','#2ebf7f','#3b82f6','#a855f7','#ec4899','#14b8a6','#eab308','#ef4444','#8b5cf6','#06b6d4','#f97316','#84cc16'];
+  const PAL=['#f5a524','#2ebf7f','#3b82f6','#a855f7','#ec4899','#14b8a6','#ca8a04','#ef4444','#8b5cf6','#06b6d4','#f97316','#65a30d'];
   if(pie&&SM&&SM.top&&SM.top.length){
     const R=52,SW=22,Ccirc=2*Math.PI*R,tot=SM.total||1; let off=0,circ='';
     SM.top.forEach((s,i)=>{const len=s.n/tot*Ccirc; circ+=`<circle r="${R}" cx="80" cy="80" fill="none" stroke="${PAL[i%PAL.length]}" stroke-width="${SW}" stroke-dasharray="${len.toFixed(2)} ${(Ccirc-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 80 80)"><title>${_esc(s.sup)}: ${s.n} (${s.p}%)</title></circle>`; off+=len;});
-    if(SM.other>0){const len=SM.other/tot*Ccirc; circ+=`<circle r="${R}" cx="80" cy="80" fill="none" stroke="#3a4250" stroke-width="${SW}" stroke-dasharray="${len.toFixed(2)} ${(Ccirc-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 80 80)"><title>прочие: ${SM.other}</title></circle>`;}
+    if(SM.other>0){const len=SM.other/tot*Ccirc; circ+=`<circle r="${R}" cx="80" cy="80" fill="none" style="stroke:var(--oth)" stroke-width="${SW}" stroke-dasharray="${len.toFixed(2)} ${(Ccirc-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 80 80)"><title>прочие: ${SM.other}</title></circle>`;}
     const svg=`<svg viewBox="0 0 160 160" width="150" height="150">${circ}<text x="80" y="76" text-anchor="middle" class="pieC">${SM.distinct}</text><text x="80" y="94" text-anchor="middle" class="pieL">поставщиков</text></svg>`;
-    const leg=SM.top.map((s,i)=>`<div class="lgrow"><i class="dot" style="background:${PAL[i%PAL.length]}"></i><span class="lnm" title="${_esc(s.sup)}">${_esc(s.sup)}</span><b>${s.n}</b><small>${s.p}%</small></div>`).join('')+(SM.other>0?`<div class="lgrow"><i class="dot" style="background:#3a4250"></i><span class="lnm dimv">прочие (${Math.max(0,SM.distinct-SM.top.length)})</span><b>${SM.other}</b><small></small></div>`:'');
+    const leg=SM.top.map((s,i)=>`<div class="lgrow"><i class="dot" style="background:${PAL[i%PAL.length]}"></i><span class="lnm" title="${_esc(s.sup)}">${_esc(s.sup)}</span><b>${s.n}</b><small>${s.p}%</small></div>`).join('')+(SM.other>0?`<div class="lgrow"><i class="dot" style="background:var(--oth)"></i><span class="lnm dimv">прочие (${Math.max(0,SM.distinct-SM.top.length)})</span><b>${SM.other}</b><small></small></div>`:'');
     pie.innerHTML=`<div class="piewrap"><div class="piesvg">${svg}</div><div class="pielegend">${leg}</div></div>`+(SM.unknown?`<div class="note" style="margin-top:8px">Без указания поставщика: ${SM.unknown} запросов.</div>`:'');
   } else if(pie){ pie.innerHTML='<div class="note">нет данных по поставщикам</div>'; }
   const ps=document.getElementById('supPerSorcer');
@@ -1442,7 +1493,7 @@ if (M.send && M.send.rows){
    +proc.map(s=>`<div class="blrow"><div class="blt"><span>${_esc(s.name)} <span class="dimv">· мяч: ${BL[s.ball]||''}</span> <span class="dimv mono">${s.n?`${s.med??'—'} · ${s.max??'—'} дн`:''}</span>${s.stale?` <span class="psflag">${s.stale} стоят</span>`:''}</span><b>${s.n}</b></div><div class="bltrack"><i style="width:${(s.n/mx*100).toFixed(0)}%"></i></div></div>`).join('')
    +`</div><div class="note" style="margin-top:8px">Закрыто отказом: <b>${H.lost}</b>${H.otherStage?` · вне справочника стадий: ${H.otherStage}`:''}. Выигрыш здесь не виден: выигранная сделка уходит в сделку реализации.</div></section>`
    +`<section class="card"><h2>Почему отказ</h2><div class="note">Стадия отказа — единственная причина, которую портал хранит машинно.</div><div class="barlist">`
-   +((P.lost||[]).map(x=>`<div class="blrow"><div class="blt"><span>${_esc(x.name)}</span><b class="nrc">${x.n}</b></div><div class="bltrack"><i style="width:${(x.n/lmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join('')||'<div class="dimv">отказов нет</div>')
+   +((P.lost||[]).map(x=>`<div class="blrow"><div class="blt"><span>${_esc(x.name)}</span><b class="nrc">${x.n}</b></div><div class="bltrack"><i style="width:${(x.n/lmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),var(--fa2))"></i></div></div>`).join('')||'<div class="dimv">отказов нет</div>')
    +`</div><div class="note" style="margin-top:10px">Заведено по неделям (Пн–Вс): ${(P.weeks||[]).map(w=>`${_dm(w.from)} <b>${w.n}</b>${w.lost?` <span class="nrc">−${w.lost}</span>`:''}`).join(' · ')}</div></section></div>`;
   // по сорсеру сделки
   h+=`<h2 style="margin-top:16px">По сорсеру сделки</h2><div class="note">Кто записан «Сорсером» в сделке пресейла: что открыто, сколько запросов ушло поставщикам и сколько КП пришло файлом.</div>`
@@ -1462,9 +1513,9 @@ if (M.send && M.send.rows){
 // по истории стадий: TKP_HIDDEN. Числа остаются в данных (M.chain, sourcersA.tkpP).
 
 // ---- donut helper
-function donut(el,parts,top,bot){let off=0;parts.forEach(p=>{const c=document.createElementNS(NS,'circle');c.setAttribute('cx',21);c.setAttribute('cy',21);c.setAttribute('r',15.915);c.setAttribute('fill','transparent');c.setAttribute('stroke',cs.getPropertyValue(p.col).trim());c.setAttribute('stroke-width',5);c.setAttribute('stroke-dasharray',`${p.pct} ${100-p.pct}`);c.setAttribute('stroke-dashoffset',-off);c.setAttribute('transform','rotate(-90 21 21)');el.appendChild(c);off+=p.pct;});
- const t1=document.createElementNS(NS,'text');t1.setAttribute('x',21);t1.setAttribute('y',20.4);t1.setAttribute('text-anchor','middle');t1.setAttribute('fill','#e8edf2');t1.setAttribute('font-size','6');t1.setAttribute('font-family','Archivo');t1.setAttribute('font-weight','800');t1.textContent=top;el.appendChild(t1);
- const t2=document.createElementNS(NS,'text');t2.setAttribute('x',21);t2.setAttribute('y',25);t2.setAttribute('text-anchor','middle');t2.setAttribute('fill','#8b97a6');t2.setAttribute('font-size','2.7');t2.setAttribute('font-family','IBM Plex Mono');t2.textContent=bot;el.appendChild(t2);}
+function donut(el,parts,top,bot){let off=0;parts.forEach(p=>{const c=document.createElementNS(NS,'circle');c.setAttribute('cx',21);c.setAttribute('cy',21);c.setAttribute('r',15.915);c.setAttribute('fill','transparent');c.style.stroke='var('+p.col+')';c.setAttribute('stroke-width',5);c.setAttribute('stroke-dasharray',`${p.pct} ${100-p.pct}`);c.setAttribute('stroke-dashoffset',-off);c.setAttribute('transform','rotate(-90 21 21)');el.appendChild(c);off+=p.pct;});
+ const t1=document.createElementNS(NS,'text');t1.setAttribute('x',21);t1.setAttribute('y',20.4);t1.setAttribute('text-anchor','middle');t1.style.fill='var(--ink)';t1.setAttribute('font-size','6');t1.setAttribute('font-family','Archivo');t1.setAttribute('font-weight','800');t1.textContent=top;el.appendChild(t1);
+ const t2=document.createElementNS(NS,'text');t2.setAttribute('x',21);t2.setAttribute('y',25);t2.setAttribute('text-anchor','middle');t2.style.fill='var(--mut)';t2.setAttribute('font-size','2.7');t2.setAttribute('font-family','IBM Plex Mono');t2.textContent=bot;el.appendChild(t2);}
 
 // ---- categories fed by sourcing
 const cats=M.catList, catMax=Math.max(1,...cats.map(c=>c.v));
@@ -1576,7 +1627,7 @@ document.getElementById('kpisCov').innerHTML=[
 
 // ---- coverage histogram
 const hist=cov.hist, hMax=Math.max(1,...hist.map(x=>x.v));
-document.getElementById('histchart').innerHTML=hist.map(x=>`<div class="wkcol"><div class="wkbars"><div class="wkbar" style="background:linear-gradient(180deg,var(--b2),var(--b))" data-h="${x.v/hMax*100}"><span style="color:var(--b2)">${x.v}</span></div></div><div class="wklbl">${x.l}</div></div>`).join('');
+document.getElementById('histchart').innerHTML=hist.map(x=>`<div class="wkcol"><div class="wkbars"><div class="wkbar" style="background:linear-gradient(180deg,var(--fb2),var(--b))" data-h="${x.v/hMax*100}"><span style="color:var(--b2)">${x.v}</span></div></div><div class="wklbl">${x.l}</div></div>`).join('');
 
 // ---- coverage donut + legend
 donut(document.getElementById('donutCov'),[{pct:cov.covPct,col:'--ok'},{pct:100-cov.covPct,col:'--warn'}],String(cov.deals),'сделок');
@@ -2008,7 +2059,7 @@ function renderDir(D, elId, opt){
   let h=opt.noHead?'':`<header><div class="eyebrow">${opt.eyebrow}</div><h1>${opt.title}</h1><div class="sub"><span>Период: <b>${D.label}</b></span><span>Источник: <b>Bitrix24 · сделки + Заказы (СП-172)</b></span><span class="dimv">↳ клик по карточке, группе или человеку — детализация</span></div></header>`;
   h+=`<div class="kpis" style="grid-template-columns:repeat(3,1fr)">${D.kpis.map(p=>`<div class="kpi ${p.clz}${p.drill?' drill':''}"${p.drill?` data-drill="kpi:${p.drill}"`:''}><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div>${qmark('d.kpi')}</div>`).join('')}</div>`;
   h+=`<div class="secttl"><b>${_n(1)}</b> · ${opt.sec1}${qmark('d.groups')}</div><section class="card"><h2>Продажи → закупка → маржа</h2><div class="note">«Пайплайн» — Σ открытых сделок (продажа, €). «Контрактов» — сделок с заказами поставщикам. «Продажи» — Σ сумм этих сделок (выручка, €). «Закупка» — Σ заказов поставщикам СП-172 (€). «Маржа» = продажи − закупка — только по контрактам с внесённой закупкой (без неё маржа контракта была бы 100 %); такие контракты — счётчиком «без закупки» в итоге. Суммы — к базовой € по курсам Bitrix.</div><table><thead><tr><th>${opt.unit}</th><th class="r">сделок</th><th class="r">пайплайн</th><th class="r">контрактов</th><th class="r">продажи</th><th class="r">закупка</th><th class="r">маржа</th></tr></thead><tbody>${D.rows.map(row).join('')}</tbody><tfoot><tr style="border-top:2px solid var(--line)"><td><b>Итого</b></td><td class="r num">${t.deals}</td><td class="r num">${t.pipeline}</td><td class="r num" style="color:var(--ok2)">${t.contracts}</td><td class="r num">${t.sales}</td><td class="r num" style="color:var(--a)">${t.buy}</td><td class="r num" style="color:var(--ok)">${t.margin} <small class="dimv">${t.marginPct}%</small>${t.noBuy?`<div class="dimv" style="font-size:12px">без закупки ${t.noBuy}</div>`:''}</td></tr></tfoot></table></section>`;
-  h+=`<div class="secttl"><b>${_n(2)}</b> · Выручка по ${opt.sec2}${qmark('d.rev')}</div><section class="card"><div class="barlist">${D.byRevenue.map(x=>`<div class="blrow drill" data-drill="grp:${_esc(x.group)}"><div class="blt"><span>${_esc(x.group)}</span><b>${x.label}</b></div><div class="bltrack"><i style="width:${(x.v/rmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--ok),var(--ok2))"></i></div></div>`).join('')}</div></section>`;
+  h+=`<div class="secttl"><b>${_n(2)}</b> · Выручка по ${opt.sec2}${qmark('d.rev')}</div><section class="card"><div class="barlist">${D.byRevenue.map(x=>`<div class="blrow drill" data-drill="grp:${_esc(x.group)}"><div class="blt"><span>${_esc(x.group)}</span><b>${x.label}</b></div><div class="bltrack"><i style="width:${(x.v/rmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--ok),var(--fok2))"></i></div></div>`).join('')}</div></section>`;
   if(D.people&&D.people.length){
     h+=`<div class="secttl"><b>${_n(3)}</b> · До человека${qmark('d.people')}</div><section class="card"><table><thead><tr><th>Сотрудник</th><th>направление</th><th class="r">сделок</th><th class="r">контрактов</th><th class="r">продажи</th><th class="r">закупка</th><th class="r">маржа</th></tr></thead><tbody>`+D.people.map(p=>`<tr class="drill" data-drill="own:${_esc(p.uid)}"><td><div class="who">${_esc(p.name)}</div></td><td class="dep">${_esc(p.grp)}</td><td class="num r">${p.deals}</td><td class="num r" style="color:var(--ok2)">${p.contracts}</td><td class="num r">${p.sales}</td><td class="num r" style="color:var(--a)">${p.buy}</td><td class="num r">${mcol(p)}</td></tr>`).join('')+`</tbody></table></section>`;
   }
@@ -3790,7 +3841,7 @@ function _ctPanel(X,el,opt){
   // ---------- 5. РАЗБОРЫ (свёрнуто) ----------
   const dp=dl.depth||{}, mxd=Math.max(1,...Object.values(dp));
   const depthBars=[['<30','до 30 дн'],['30-90','30–90 дн'],['90-180','90–180 дн'],['>180','больше 180 дн']]
-    .map(([k,lb])=>`<div class="blrow"><div class="blt"><span>${lb}</span><b>${dp[k]||0}</b></div><div class="bltrack"><i style="width:${((dp[k]||0)/mxd*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join('');
+    .map(([k,lb])=>`<div class="blrow"><div class="blt"><span>${lb}</span><b>${dp[k]||0}</b></div><div class="bltrack"><i style="width:${((dp[k]||0)/mxd*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),var(--fa2))"></i></div></div>`).join('');
   h+=`<details class="sect"><summary>Глубина просрочки и здоровье данных${qmark('ct.dl')}</summary><div class="in"><div class="grid">`
    +`<section class="card"><h2>Глубина просрочки</h2><div class="note">Сколько живых заказов и насколько перешли обещанную клиенту дату (поле «${_esc(dl.field||'')}»). Это то же поле, по которому снабжение ведёт «Контроль дедлайнов», — цифры сопоставимы напрямую.</div><div class="barlist">${depthBars}</div></section>`
    +`<section class="card"><h2>Здоровье данных</h2><div class="note">Пробелы, из-за которых часть картины не считается.</div>`
@@ -3971,13 +4022,13 @@ function renderAdvisor(A){
   const F=A.forecast;
   h+=`<div class="secttl"><b>1</b> · Сколько денег будет${qmark('a.forecast')}</div><div class="grid"><section class="card"><h2>Взвешенный прогноз по месяцам закрытия</h2><div class="note">Открытые сделки (${F.openN}) по ожидаемому месяцу закрытия. Плановая дата стоит в карточке у <b>${F.planN||0}</b>, у остальных <b>${F.estN||0}</b> месяц <b>оценён</b>: дата создания + медианный срок сделки (${F.ttwMed||'—'} дн, отдельная медиана у ${F.ttwCats||0} воронок). Оценка считается по сделкам, выигранным в этом году, — длинные в медиану не попали, поэтому сроки скорее оптимистичны. Серым — сырая сумма, янтарным — взвешенная (вероятность: до ТКП ${F.pBase}%, ТКП+ ${F.pTkp}%).</div><div class="barlist">`;
   const fmax=Math.max(1,...(F.byMonth||[]).map(x=>x.raw));
-  h+=(F.byMonth||[]).map(x=>`<div class="blrow"><div class="blt"><span>${x.label} <span class="dimv mono">${x.n} сд.</span> <span class="dimv">${x.plan?('план '+x.plan):''}${x.plan&&x.est?' · ':''}${x.est?('оценка '+x.est):''}</span></span><b><span class="dimv">${x.rawLbl}</span> → <span style="color:var(--a2)">${x.wgtLbl}</span></b></div><div class="bltrack" style="position:relative"><i style="width:${(x.raw/fmax*100).toFixed(0)}%;background:var(--panel2);outline:1px solid var(--line)"></i><i style="position:absolute;left:0;top:0;width:${(x.wgt/fmax*100).toFixed(0)}%;background:linear-gradient(90deg,var(--a),var(--a2))"></i></div></div>`).join('')||'<div class="dimv">нет открытых сделок</div>';
+  h+=(F.byMonth||[]).map(x=>`<div class="blrow"><div class="blt"><span>${x.label} <span class="dimv mono">${x.n} сд.</span> <span class="dimv">${x.plan?('план '+x.plan):''}${x.plan&&x.est?' · ':''}${x.est?('оценка '+x.est):''}</span></span><b><span class="dimv">${x.rawLbl}</span> → <span style="color:var(--a2)">${x.wgtLbl}</span></b></div><div class="bltrack" style="position:relative"><i style="width:${(x.raw/fmax*100).toFixed(0)}%;background:var(--line);outline:1px solid var(--line)"></i><i style="position:absolute;left:0;top:0;width:${(x.wgt/fmax*100).toFixed(0)}%;background:linear-gradient(90deg,var(--fa),var(--fa2))"></i></div></div>`).join('')||'<div class="dimv">нет открытых сделок</div>';
   h+=`</div>${F.noDate&&F.noDate.n?`<div class="note" style="margin-top:10px">Ни даты, ни даты создания: <b>${F.noDate.n}</b> сделок, ${F.noDate.rawLbl} (взвешенно ${F.noDate.wgtLbl}) — вне помесячного прогноза.</div>`:''}</section>`;
   h+=`<section class="card"><h2>Покрытие факта</h2><div class="note">Взвешенный пайплайн ÷ средний месячный факт реализации. Норма ≥ 3× — тогда план следующего квартала обеспечен воронкой.</div><div class="pcards"><div class="pcard"><div class="pv">${F.wgtLbl}</div><div class="pl">взвешенный прогноз</div></div><div class="pcard"><div class="pv">${F.rawLbl}</div><div class="pl">сырой пайплайн</div></div><div class="pcard"><div class="pv" style="color:${(F.coverage||0)>=3?'var(--ok)':'var(--warn)'}">${F.coverage!=null?F.coverage+'×':'—'}</div><div class="pl">покрытие (мес. факт ${F.avgRealLbl||'—'})</div></div></div></section></div>`;
   // 2 · где теряем
   const L=A.lost, lmax=Math.max(1,...(L.reasons||[]).map(r=>r.n));
   h+=`<div class="secttl"><b>2</b> · Где теряем${qmark('a.lost')}</div><div class="grid"><section class="card"><h2>Причины проигрышей <span class="subtotal">${L.n} сд. · <b>${L.sumLbl}</b></span></h2><div class="note">Проигранные YTD по финальной стадии.${L.oneStagePct>=80?' <span class="flag">⚠ Почти всё в одной стадии — причины в CRM не заполняются.</span>':''}</div><div class="barlist">`;
-  h+=(L.reasons||[]).map(r=>`<div class="blrow"><div class="blt"><span>${_esc(r.name)}</span><b>${r.n} · ${r.pct}% <span class="dimv">${r.sumLbl}</span></b></div><div class="bltrack"><i style="width:${(r.n/lmax*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),#e5634d)"></i></div></div>`).join('')||'<div class="dimv">нет проигранных сделок</div>';
+  h+=(L.reasons||[]).map(r=>`<div class="blrow"><div class="blt"><span>${_esc(r.name)}</span><b>${r.n} · ${r.pct}% <span class="dimv">${r.sumLbl}</span></b></div><div class="bltrack"><i style="width:${(r.n/lmax*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),var(--warn))"></i></div></div>`).join('')||'<div class="dimv">нет проигранных сделок</div>';
   h+=`</div></section><section class="card"><h2>Sales velocity по менеджерам${qmark('a.velocity')}</h2><div class="note">Открытые × ср. чек × win-rate ÷ цикл → €/мес. Сортировка по velocity; ≥5 сделок за год.</div><table data-xl-cap="14"><thead><tr><th>Менеджер</th><th class="r">открыто</th><th class="r">win-rate</th><th class="r">цикл, дн</th><th class="r">ср. чек</th><th class="r">velocity</th></tr></thead><tbody>`;
   h+=(A.velocity||[]).map(v=>`<tr><td><div class="who">${_esc(v.n)}</div><div class="dep">${v.created} сд. · продажи ${v.sales}</div></td><td class="num r">${v.open}<small class="dimv"> · ${v.pipe}</small></td><td class="num r">${v.wr}%</td><td class="num r">${v.cyc!=null?v.cyc:'—'}</td><td class="num r">${v.check}</td><td class="num r" style="color:var(--a2)"><b>${v.velLbl}</b></td></tr>`).join('');
   h+=`</tbody></table></section></div>`;
@@ -4222,7 +4273,7 @@ function renderPeople(P,role,elId,opt){
   // 2 — воронки и стадии
   const fmax=Math.max(1,...R.funnels.map(f=>f.n));
   h+=`<div class="secttl"><b>3</b> · Где стоят сделки${qmark('p.funnel')}</div><section class="card"><h2>Воронки</h2><div class="barlist">`
-    +R.funnels.map(f=>`<div class="blrow drill" data-pcat="${_esc(f.catId)}"><div class="blt"><span>${_esc(f.cat)}</span><b>${f.n}</b></div><div class="bltrack"><i style="width:${(f.n/fmax*100).toFixed(0)}%;background:linear-gradient(90deg,var(--a2),var(--ok))"></i></div></div>`).join('')
+    +R.funnels.map(f=>`<div class="blrow drill" data-pcat="${_esc(f.catId)}"><div class="blt"><span>${_esc(f.cat)}</span><b>${f.n}</b></div><div class="bltrack"><i style="width:${(f.n/fmax*100).toFixed(0)}%;background:linear-gradient(90deg,var(--fa2),var(--ok))"></i></div></div>`).join('')
     +`</div><h2 style="margin-top:14px">Стадии — топ-20</h2><table data-xl-cap="20"><thead><tr><th>Стадия</th><th>воронка</th><th class="r">сделок</th></tr></thead><tbody>`
     +R.stages.map(s=>`<tr><td>${_esc(s.stage)}</td><td class="dep">${_esc(s.cat)}</td><td class="num r">${s.n}</td></tr>`).join('')
     +`</tbody></table></section>`;
@@ -4270,7 +4321,7 @@ function renderPeople(P,role,elId,opt){
   h+=`<div class="secttl"><b>6</b> · Кто закреплён, а кто нет${qmark('p.cover')}</div><section class="card pfit">`
     +`<div class="srccmp"><span class="sl">Закреплено за ролью</span><div class="sb"><i style="width:${_pshare(T.open,RC.openTotal||1)}%"></i></div><span class="sv">${T.open}</span><span class="sd mid">из ${RC.openTotal||0} открытых сделок портала</span></div>`
     +`<div class="srccmp"><span class="sl">Из них полем в карточке</span><div class="sb"><i style="width:${_pshare(T.byField,T.open||1)}%"></i></div><span class="sv">${T.byField}</span><span class="sd dim">остальное — по ответственному</span></div>`
-    +`<div class="srccmp"><span class="sl">Роль не закреплена</span><div class="sb"><i style="width:${_pshare(R.uncovered.n,RC.openTotal||1)}%;background:var(--a)"></i></div><span class="sv">${R.uncovered.n}</span><span class="sd dim">ни КАМа, ни продукт-оунера</span></div>`
+    +`<div class="srccmp"><span class="sl">Роль не закреплена</span><div class="sb"><i style="width:${_pshare(R.uncovered.n,RC.openTotal||1)}%;background:var(--fa)"></i></div><span class="sv">${R.uncovered.n}</span><span class="sd dim">ни КАМа, ни продукт-оунера</span></div>`
     +`<div class="note" style="margin-top:8px">Сверка портфеля: всего открытых <b>${RC.openTotal||0}</b> · за КАМами <b>${RC.kam||0}</b> · за продукт-оунерами <b>${RC.prod||0}</b> · и там, и там <b>${RC.both||0}</b> · ни за кем <b>${RC.none||0}</b> · на уволенных <b>${RC.orphan||0}</b>${RC.inSrc?` · в пресейле, мяч у сорсинга <b>${RC.inSrc}</b> (в счёт ролей не входят)`:''}. Роли пересекаются: на одной сделке бывает и КАМ, и продукт-оунер, поэтому сходится не сумма, а покрытие. Технические воронки (тест, адаптация, реклама) исключены: ${RC.tech||0} карточек.</div>`
     +(OR.rows.length?`<h2 style="margin-top:14px">Сделки уволенных — их сегодня не ведёт никто</h2><table><thead><tr><th>Бывший сотрудник</th><th class="r">открытых</th><th class="r">в реализации</th><th class="r">просроч.</th><th class="r">стоит ${PR.stale}+</th></tr></thead><tbody>`
       +OR.rows.map(p=>`<tr class="drill" data-pown="${_esc(p.uid)}"><td><div class="who">${_esc(p.name)}</div><div class="dep">${_esc(p.pos)}</div></td><td class="num r">${p.open}</td><td class="num r" style="color:var(--ok2)">${p.real}</td><td class="num r" style="color:var(--nr)">${p.late}</td><td class="num r" style="color:var(--a)">${p.stale}</td></tr>`).join('')
