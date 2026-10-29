@@ -694,6 +694,126 @@
     .flowbox{flex:1 1 100%}
   }
 
+  /* ==== «Реализация»: шрифтовая система вкладки (R3, 29.10.2026) ====
+     Действует только в #tab-contracts и в выдвижной панели, пока она показывает «Реализацию»
+     (класс rz — _rzDrw). Прочие вкладки и шапка не меняются.
+     Урок: Archivo в файле — только латиница, запасного семейства нет — кириллица заголовков
+     падала в Times («газета»). Здесь одно семейство — IBM Plex Sans (кириллица, 400–600),
+     заголовки 600; моно — только номера (.mono, .rzid); подписи, шапки таблиц, фишки,
+     подвкладки — строчными, без разрядки; текста мельче 12px нет (подписи осей — 11px).
+     Вес селекторов — :where(): #tab-contracts (1,0,0) и .drw.rz (0,2,0) перебивают общие
+     правила, но уступают любому правилу блока вкладки (#tab-contracts .класс, .drw .od…). */
+  #tab-contracts,.drw.rz{
+    --rz-xs:12px;--rz-sm:13px;--rz-md:14px;--rz-lg:16px;--rz-xl:20px;--rz-2xl:26px;--rz-kpi:30px;
+    --rz-lh:1.5;--rz-sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    font-family:var(--rz-sans);font-size:var(--rz-md);line-height:var(--rz-lh);
+    font-variant-numeric:tabular-nums lining-nums;
+  }
+  #tab-contracts :where(*),.drw.rz :where(*){font-family:var(--rz-sans);letter-spacing:0}
+  #tab-contracts :where(.mono,.rzid,code),.drw.rz :where(.mono,.rzid,code){font-family:var(--mono);font-weight:500}
+  #tab-contracts :where(svg text),.drw.rz :where(svg text){font-family:var(--rz-sans)!important}
+  /* встроенные style="font-size:…" мельче 12px (карточка сделки, таблица сделок) */
+  #tab-contracts [style*="font-size:9"],#tab-contracts [style*="font-size:10"],#tab-contracts [style*="font-size:11px"],#tab-contracts [style*="font-size:11.5px"],
+  .drw.rz [style*="font-size:9"],.drw.rz [style*="font-size:10"],.drw.rz [style*="font-size:11px"],.drw.rz [style*="font-size:11.5px"]{font-size:var(--rz-xs)!important}
+  /* заголовки */
+  #tab-contracts :where(h1){font-weight:600;font-size:var(--rz-2xl);line-height:1.25;letter-spacing:-.005em;margin-top:6px}
+  #tab-contracts :where(.eyebrow){font-size:var(--rz-sm);font-weight:500;text-transform:none;color:var(--mut)}
+  #tab-contracts :where(header .sub){font-size:var(--rz-md);line-height:1.5;gap:6px 18px}
+  #tab-contracts :where(.secttl){font-size:var(--rz-xl);font-weight:600;text-transform:none;color:var(--ink);line-height:1.3;margin:32px 0 12px}
+  #tab-contracts :where(.secttl b){font-weight:600}
+  #tab-contracts :where(.card h2,.orkh3),.drw.rz :where(h2){font-size:var(--rz-lg);font-weight:600;line-height:1.35}
+  .drw.rz h3{font-family:var(--rz-sans);font-size:var(--rz-xl);font-weight:600;line-height:1.3}
+  .drw.rz .sub2{font-family:var(--rz-sans);font-size:var(--rz-sm);color:var(--mut);letter-spacing:0;margin-top:4px;line-height:1.45}
+  .drw.rz .x{min-width:32px;min-height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;line-height:1}
+  .drw.rz .x:hover{background:var(--hov)}
+  .drw.rz :where(.h){font-size:var(--rz-md);font-weight:600;text-transform:none;color:var(--ink);margin:22px 0 8px;line-height:1.4}
+  .drw.rz :where(.h2e){font-size:var(--rz-sm);font-weight:600;text-transform:none;color:var(--mut);margin:16px 0 6px}
+  #tab-contracts :where(.insight h3),.drw.rz :where(.insight h3){font-size:var(--rz-md);font-weight:600;text-transform:none}
+  /* текст, пояснения, подписи */
+  #tab-contracts :where(.note,.orktrust,.ctsepnote,.insight,.rules,.orkjn,.orknc),.drw.rz :where(.note,.mblk,.rules){font-size:var(--rz-sm);line-height:1.55}
+  .drw.rz :where(.note){color:var(--mut)}
+  #tab-contracts :where(.orktrust,.ctsepnote){font-size:var(--rz-md)}
+  #tab-contracts :where(.dep,.sub2,.orkpart,.orkm,.fm,.cell span,.pl,.legendrow,.lgrow),.drw.rz :where(.dep,.orkpart,.cell span,.pl){font-size:var(--rz-sm);line-height:1.45}
+  #tab-contracts :where(.sub2),.drw.rz :where(.sub2){color:var(--mut)}
+  #tab-contracts :where(.tag,.srcb,.pill,.gone,.newb,.psflag),.drw.rz :where(.tag,.srcb,.pill,.gone,.newb,.psflag){font-size:var(--rz-xs);font-weight:600;letter-spacing:0;text-transform:none}
+  /* таблицы: шапка — строчными, ячейка — 14px, числа — табличные */
+  #tab-contracts :where(table),.drw.rz :where(table){font-size:var(--rz-md)}
+  #tab-contracts :where(th),.drw.rz :where(th){font-size:var(--rz-sm);font-weight:600;text-transform:none;letter-spacing:0;color:var(--mut);line-height:1.35;vertical-align:bottom}
+  #tab-contracts :where(td),.drw.rz :where(td){font-size:var(--rz-md);line-height:1.45}
+  #tab-contracts :where(.lft td){padding:8px 6px}
+  #tab-contracts :where(.ctab td){font-size:var(--rz-sm)}
+  #tab-contracts :where(.dt),.drw.rz :where(.dt){font-size:var(--rz-sm)}
+  #tab-contracts :where(.dt small),.drw.rz :where(.dt small){font-size:var(--rz-xs);text-transform:none}
+  #tab-contracts :where(.stgcell b){font-size:var(--rz-md)}
+  #tab-contracts :where(.ctab .amt1){font-size:15px;font-weight:600;font-family:var(--rz-sans)}
+  /* плитки и KPI: подпись — строчными, число — крупно и без засечек */
+  #tab-contracts :where(.actile .t,.kpi .lbl),.drw.rz :where(.actile .t,.kpi .lbl){font-size:var(--rz-sm);font-weight:600;text-transform:none;color:var(--mut);line-height:1.35}
+  #tab-contracts :where(.actile .v,.kpi .val),.drw.rz :where(.actile .v,.kpi .val){font-weight:600;font-size:var(--rz-kpi);line-height:1.1;margin-top:6px;letter-spacing:-.01em}
+  #tab-contracts :where(.actile .m,.kpi .meta),.drw.rz :where(.actile .m,.kpi .meta){font-size:var(--rz-sm);line-height:1.45;color:var(--mut);margin-top:4px}
+  #tab-contracts :where(.actile .orkwho){color:var(--a2);font-weight:500}
+  #tab-contracts :where(.actile){padding:14px 16px;gap:2px}
+  #tab-contracts :where(.flowbox .n,.pcard .pv,.kprule .cell b,.ct,.leg .v),.drw.rz :where(.pcard .pv,.kprule .cell b){font-weight:600}
+  #tab-contracts :where(.flowbox .l,.pcard .pl,.kprule .cell span,.leg,.leg .p,.ct small,.nm small),.drw.rz :where(.pcard .pl,.kprule .cell span){font-size:var(--rz-sm)}
+  /* фишки, кнопки, отборы */
+  #tab-contracts :where(.stchip),.drw.rz :where(.stchip){font-size:var(--rz-sm);min-height:28px;padding:3px 10px;gap:6px}
+  #tab-contracts :where(.stchip b),.drw.rz :where(.stchip b){font-weight:600;color:var(--ink)}
+  #tab-contracts :where(.sortbar .sortlab),.drw.rz :where(.sortbar .sortlab){font-size:var(--rz-xs);text-transform:none}
+  #tab-contracts :where(.sortt),.drw.rz :where(.sortt){font-size:var(--rz-sm)}
+  #tab-contracts :where(.xlbtn),.drw.rz :where(.xlbtn){font-size:var(--rz-xs);font-weight:600;min-height:28px}
+  #tab-contracts :where(.qq),.drw.rz :where(.qq){width:18px;height:18px;font-size:var(--rz-xs);font-weight:600}
+  #tab-contracts :where(.search,select),.drw.rz :where(.search,select){font-size:var(--rz-md)}
+  #tab-contracts :where(.orkfil label){font-size:var(--rz-sm);text-transform:none;font-weight:600}
+  #tab-contracts :where(.orkfil label.orkchk){font-weight:400}
+  #tab-contracts :where(details.sect>summary){font-size:var(--rz-md);padding:13px 16px}
+  #tab-contracts :where(details.sect>summary)::before{font-size:var(--rz-xs)}
+  /* подвкладки — вкладки с подчёркиванием, направление — переключатель-сегмент */
+  #tab-contracts :where(.ctbar){align-items:flex-end;gap:10px 24px;margin:4px 0 18px;border-bottom:1px solid var(--line)}
+  #tab-contracts :where(.ctbar .ctsub:not(.ctdir)){margin:0 0 -1px;gap:2px;flex-wrap:wrap}
+  #tab-contracts :where(.ctsub:not(.ctdir) .snb){border:0;border-bottom:2px solid transparent;border-radius:6px 6px 0 0;background:none;color:var(--mut);font-size:var(--rz-md);font-weight:500;line-height:1.3;padding:10px 12px 9px;min-height:42px;white-space:nowrap;text-align:center;flex:none;max-width:none}
+  #tab-contracts :where(.ctsub:not(.ctdir) .snb:hover){color:var(--ink);background:var(--hov)}
+  #tab-contracts :where(.ctsub:not(.ctdir) .snb.on){color:var(--ink);font-weight:600;border-bottom-color:var(--a);background:none}
+  #tab-contracts :where(.ctbar .ctdir){margin:0 0 7px auto;padding:3px;gap:2px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);flex-wrap:nowrap}
+  #tab-contracts :where(.ctdir .snb){border:0;border-radius:7px;background:none;color:var(--mut);font-size:var(--rz-sm);font-weight:500;line-height:1.3;padding:6px 12px;min-height:32px;white-space:nowrap}
+  #tab-contracts :where(.ctdir .snb:hover){color:var(--ink)}
+  #tab-contracts :where(.ctdir .snb.on){background:var(--panel);color:var(--ink);font-weight:600;box-shadow:0 0 0 1px var(--line),0 1px 2px var(--shd)}
+  #tab-contracts :where(.ctsubn){font-weight:400;color:inherit;opacity:1}
+  /* графики, цепочка экономики, сверки — подписи ≥ 12px */
+  #tab-contracts :where(.otd .c,.otd .c .mono){font-size:var(--rz-xs)}
+  #tab-contracts :where(.fnr .fn){font-size:var(--rz-md)}
+  #tab-contracts :where(.fnv){font-size:var(--rz-sm);width:72px}
+  #tab-contracts :where(.srccmp,.thr),.drw.rz :where(.srccmp,.thr){font-size:var(--rz-sm)}
+  #tab-contracts :where(.srccmp .sd),.drw.rz :where(.srccmp .sd){font-size:var(--rz-xs)}
+  #tab-contracts :where(.thr.thead),.drw.rz :where(.thr.thead){font-size:var(--rz-xs);font-weight:600;text-transform:none}
+  .drw.rz .chain .cstep .cl{font-size:var(--rz-xs);text-transform:none;letter-spacing:0;line-height:1.35}
+  .drw.rz .chain .cstep .cv{font-family:var(--rz-sans);font-size:var(--rz-lg);font-weight:600}
+  .drw.rz :where(.ewarn){font-size:var(--rz-sm)}
+  .drw.rz :where(.tlrow){font-size:var(--rz-sm)}
+  .drw.rz .tlrow .tld{width:124px}
+  .drw.rz .mrow .k{font-family:var(--rz-sans);font-size:var(--rz-xs);text-transform:none;letter-spacing:0;min-width:96px}
+  .drw.rz :where(.mrow){font-size:var(--rz-sm)}
+  .drw.rz :where(.mlist li){font-size:var(--rz-sm)}
+  .drw.rz .mrow .v code{font-size:var(--rz-xs)}
+  .drw.rz :where(.suprow){font-size:var(--rz-md)}
+  .drw.rz :where(.req .rt){font-size:var(--rz-md)}
+  .drw.rz :where(.req .rm,.req .to,.req .prev){font-size:var(--rz-sm)}
+  .drw.rz :where(.req .rm .mono){font-size:var(--rz-xs)}
+  @media(max-width:720px){
+    #tab-contracts :where(.ctbar){flex-direction:column;align-items:stretch;gap:10px;border-bottom:0}
+    #tab-contracts :where(.ctbar .ctsub:not(.ctdir)){flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);margin:0;min-width:0;max-width:100%;padding-right:32px;
+      -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent)}  /* край гаснет — вкладки дальше, листаются */
+    #tab-contracts :where(.ctbar .ctdir){margin:0;align-self:flex-start}
+    #tab-contracts :where(.actile .v,.kpi .val){font-size:26px}
+    #tab-contracts :where(.secttl){font-size:18px}
+    .drw.rz :where(.thr){font-size:var(--rz-xs)}
+  }
+  @media(max-width:560px){
+    #tab-contracts :where(h1){font-size:22px}
+    #tab-contracts :where(td){font-size:var(--rz-sm)}
+    #tab-contracts table.lft td,#tab-contracts table.lft th{font-size:var(--rz-sm)}
+    #tab-contracts table.orkhow td,#tab-contracts table.orkhow th,#tab-contracts table.orkfld td,#tab-contracts table.orkfld th{font-size:var(--rz-xs)}
+    .drw.rz h3{font-size:18px}
+  }
+
   /* ---- perf/удобство: отключаем анимации по системной настройке ---- */
   @media(prefers-reduced-motion:reduce){
     *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
@@ -1676,6 +1796,7 @@ const _wk=i=>(i>=0&&M.weekly[i])?`${M.weekly[i].w} (${M.weekly[i].d})`:'—';
 // карточка «до правил» — только без нарушений (как в счёте violPre)
 const _onlyPre=d=>!!(d.flp&&d.flp.length)&&!(d.fl&&d.fl.length);
 function openDrw(uid,startFilter){
+  if(typeof _rzDrw==='function') _rzDrw(false);   // панель другой вкладки — без шкалы «Реализации»
   const s=_byId[String(uid)];if(!s)return;
   document.getElementById('drwName').textContent=s.n;
   document.getElementById('drwSub').textContent=`${s.c} запросов · ${s.perDay??'—'} в раб. день (окно ${_dm(s.from)}–${_dm(s.pto||s.to)}, ${s.wdp??s.wd} раб.дн)`
@@ -1864,6 +1985,7 @@ const _hasMoney=list=>(list||[]).some(d=>typeof d.raw==='number');
 const _INC_NOMONEY='Сумм здесь нет: деньги на вкладке — только у сделок, сверенных файлом экономики, в подменю «Доход» (решение владельца 25.10.2026).';
 const _noAmtCols=(cols,on)=>on?cols:cols.filter(c=>c.k!=='amt').map((c,i)=>i===0?Object.assign({},c,{def:true}):Object.assign({},c,{def:false}));
 function openDeals(list,title,sub){
+  if(typeof _rzDrw==='function') _rzDrw(false);   // панель другой вкладки — без шкалы «Реализации»
   list=(list||[]).slice();
   const sum=list.reduce((a,d)=>a+(d.raw||0),0), $=_hasMoney(list);
   const cnt={early:0,real:0,lost:0}; list.forEach(d=>{if(cnt[d.cls]!=null)cnt[d.cls]++;});
@@ -1879,6 +2001,7 @@ function openDeals(list,title,sub){
 }
 // ---- список сделок без запросов поставщикам (покрытие сорсинга)
 function openUncovered(rows,subLbl){
+  if(typeof _rzDrw==='function') _rzDrw(false);   // панель другой вкладки — без шкалы «Реализации»
   rows=(rows||[]).slice();
   const sum=rows.reduce((a,d)=>a+(d.raw||0),0);
   document.getElementById('drwName').textContent='Сделки без запросов поставщикам';
@@ -1990,6 +2113,9 @@ function _methBody(o){
 }
 function openMeth(key){
   const o=METH[key]; if(!o)return;
+  // методика из «Реализации» (бейдж «?» вкладки или карточки сделки) — в её шкале шрифтов
+  if(typeof _rzDrw==='function'){ const ct=document.getElementById('tab-contracts');
+    _rzDrw(!!(ct&&!ct.hidden)||(_drw.classList.contains('rz')&&_drw.classList.contains('on'))); }
   document.getElementById('drwName').textContent=o.t||'Как считается';
   document.getElementById('drwSub').textContent='Методика расчёта · Bitrix24';
   document.getElementById('drwBody').innerHTML=_methBody(o);
@@ -2017,6 +2143,7 @@ function injectMeth(){
   const sh=document.querySelector('#tab-sourcing header h1'); if(sh) add(sh,'s.kpi');
 }
 function openDir(D,opt,spec){
+  if(typeof _rzDrw==='function') _rzDrw(false);   // панель другой вкладки — без шкалы «Реализации»
   const i=spec.indexOf(':'),kind=spec.slice(0,i),key=spec.slice(i+1);
   let deals=[],orders=[],title='',sub='';
   if(kind==='grp'){deals=D.deals.filter(x=>x.grp===key);orders=D.orders.filter(x=>x.grp===key);title=key;sub=opt.unit;}
@@ -2538,7 +2665,12 @@ function _unpack(x){
   return x.r.map(a=>{const o={};x.f.forEach((k,i)=>{const v=a[i];if(v!==null&&v!==undefined)o[k]=v;});return o;});
 }
 const _stShort=n=>String(n||'').split(' | ')[0];   // короткое имя стадии (до « | »)
+// ---- «Реализация»: выдвижная панель в шрифтовой системе вкладки (R3, 29.10.2026) ----
+// Класс rz у #drw — пока панель показывает «Реализацию» (список заказов, путь заказа, карточка
+// сделки); панели других вкладок его снимают. Стили — блок «шрифтовая система вкладки».
+function _rzDrw(on){const d=document.getElementById('drw'); if(d) d.classList.toggle('rz',!!on);}
 function openContract(x){
+  if(typeof _rzDrw==='function') _rzDrw(true);
   document.getElementById('drwName').textContent=(x.seq?`№${x.seq} · `:'')+(x.customer!=='—'?x.customer:x.title.slice(0,40));
   document.getElementById('drwSub').textContent=`${x.title.slice(0,60)} · продажа ${x.saleLbl} · заказов ${x.norders}`;
   let h='';
@@ -4078,6 +4210,7 @@ function _pshare(v,t){return t?Math.round(v/t*100):0;}
 function _pflag(n,cls){return n?`<span style="color:var(--${cls})">${n}</span>`:'<span class="dimv">0</span>';}
 // список сделок человека/среза — в выдвижной панели
 function openPeopleDeals(list,title,sub){
+  if(typeof _rzDrw==='function') _rzDrw(false);   // панель другой вкладки — без шкалы «Реализации»
   list=(list||[]).slice();
   const sum=list.reduce((a,d)=>a+(d.raw||0),0), $=_hasMoney(list);
   const real=list.filter(d=>d.state==='real'), pre=list.filter(d=>d.state!=='real');
