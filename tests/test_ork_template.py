@@ -40,8 +40,10 @@ const box = {document, window: {__ORKMONTH__: inp.orkMonth, __DEALCTX__: inp.dc 
   location: {hash: ''}, console, JSON, Math, Object, Array, String, Number, Set, Map, RegExp,
   qmark: () => '', openContract() {}};
 vm.createContext(box);
-vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + (inp.dcCode || 'function _dcData(){return null;}') + '\n' + inp.code
-  + '\nthis._orkWeek=_orkWeek; this._orkMonth=_orkMonth; this._orkHow=_orkHow;', box);
+vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + inp.unpack + '\n' + (inp.dcCode || 'function _dcData(){return null;}') + '\n' + inp.code
+  + '\nthis._orkWeek=_orkWeek; this._orkMonth=_orkMonth; this._orkHow=_orkHow;'
+  + ' this._orkJData=_orkJData; this._orkJPick=_orkJPick; this._orkJRow=_orkJRow; this._orkJEmpty=_orkJEmpty;'
+  + ' this._orkJNote=_orkJNote;', box);
 const out = {};
 for (const [k, X] of Object.entries(inp.views)) {
   const el = node();
@@ -68,8 +70,8 @@ def _fn(name: str) -> str:
 
 def _render(views: dict, ork_month, dc: dict | None = None) -> dict:
     code = TPL[TPL.index(START):TPL.index(END)]
-    inp = {"code": code, "esc": _line("const _esc="), "ctN": _line("const _ctN="), "views": views,
-           "orkMonth": ork_month}
+    inp = {"code": code, "esc": _line("const _esc="), "ctN": _line("const _ctN="), "unpack": _fn("_unpack"),
+           "views": views, "orkMonth": ork_month}
     if dc is not None:
         # закрытая часть (право «договоры и деньги»): настоящие _dcData и списки «главного»
         inp["dc"] = dc
@@ -437,3 +439,94 @@ process.stdout.write(JSON.stringify(out));
     assert out["нет"] == {"any": False, "people": False, "contracts": False}
     assert out["кам"] == {"any": True, "people": True, "contracts": False}
     assert out["реал"] == {"any": True, "people": False, "contracts": True}
+
+
+# ── «Журнал шагов» «Месяца» (просьба владельца 29.10.2026) ─────────────────────────────────
+JHARNESS = r"""
+const vm = require('node:vm');
+const fs = require('node:fs');
+const inp = JSON.parse(fs.readFileSync(0, 'utf8'));
+const box = {window: {__ORKMONTH__: inp.orkMonth}, console, JSON, Math, Object, Array, String, Number, Set,
+  Map, RegExp, qmark: () => '', openContract() {}, document: {getElementById: () => null}};
+vm.createContext(box);
+vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + inp.unpack + '\nfunction _dcData(){return null;}\n' + inp.code, box);
+vm.runInContext(`
+const J=_orkJData(window.__ORKMONTH__.main), cust=d=>'Заказчик '+d, out={};
+const F0={seg:'S1',m:'',over:true,all:false};
+const P=_orkJPick(J.rows,F0);
+out.def={n:P.R.length,k:P.k,segs:[...new Set(P.R.map(r=>r.seg))],overs:P.R.map(r=>r.over),
+  html:P.R.map(r=>_orkJRow(r,cust)).join(''),note:_orkJNote(J,F0)};
+const FA={seg:'',m:'',over:false,all:true}, PA=_orkJPick(J.rows,FA);
+out.all={n:PA.R.length,base:PA.base.length,note:_orkJNote(J,FA)};
+const FM={seg:'S1',m:J.months[1],over:true,all:false}, PM=_orkJPick(J.rows,FM);
+out.mon={n:PM.R.length,m:J.months[1]};
+const E={rows:[],segs:J.segs,months:J.months,since:J.since,label:J.label};
+out.empty=_orkJEmpty(E,F0,_orkJPick([],F0));
+const F6={seg:'S6',m:'08.2026',over:true,all:false};
+out.noSeg=_orkJEmpty(J,F6,_orkJPick(J.rows,F6));
+const ok=J.rows.filter(r=>r.measurable&&!(r.over>0)).slice(0,1);
+out.allOk=_orkJEmpty(J,F0,{base:ok,meas:ok,R:[]});
+const hid=J.rows.find(r=>r.ownerHidden); out.hidRow=hid?_orkJRow(hid,cust):'';
+this.out=out;`, box);
+process.stdout.write(JSON.stringify(box.out));
+"""
+
+
+def _jrun(ork_month) -> dict:
+    code = TPL[TPL.index(START):TPL.index(END)]
+    inp = {"code": code, "esc": _line("const _esc="), "ctN": _line("const _ctN="), "unpack": _fn("_unpack"),
+           "orkMonth": ork_month}
+    r = subprocess.run(["node", "-e", JHARNESS], input=json.dumps(inp, ensure_ascii=False, default=str),
+                       capture_output=True, text=True, timeout=120)
+    assert r.returncode == 0, r.stderr[-2000:]
+    return json.loads(r.stdout)
+
+
+def test_журнал_шагов_в_месяце_под_правом(built):
+    """«Месяц» с правом — блок «Журнал шагов» с отбором (шаг S1 — по умолчанию, месяц, «только
+    сверх нормы» включено, «показывать неизмеримые» выключено), таблицей из 11 столбцов и
+    пояснением, откуда срок; без права — ни блока, ни строк (весь «Месяц» — «нет доступа»)."""
+    ct = copy.deepcopy(built["contracts"])
+    с = _render({"main": ct}, built["ork_month"])["main"]["month"]
+    assert "Журнал шагов: срок каждого заказа" in с and 'data-xl-name="Журнал шагов"' in с
+    assert '<option value="S1" selected>S1 · шаг 1 Приёмка сделки — норма 1 р.д.</option>' in с
+    assert '<input type="checkbox" id="orkJOver" checked>' in с and '<input type="checkbox" id="orkJAll">' in с
+    for m in built["ork_month"]["main"]["journal"]["months"]:
+        assert f'<option value="{m}">{m}</option>' in с
+    for th in ("Сделка", "Заказ", "Шаг", "Начало", "Конец", "Р.д.", "Норма", "Сверх нормы на", "Отметки",
+               "Хозяин", "Месяц"):
+        assert f">{th}</th>" in с, th
+    assert "по датам переходов стадий заказа в Битриксе" in с and "производственному календарю РФ" in с
+    assert "«пачкой»" in с and "срок не дают" in с
+    assert с.index("Своевременность шагов по месяцам") < с.index("Журнал шагов") < с.index("По менеджерам ОРК")
+    без = _render({"main": ct}, {"__kvNoData": True})["main"]["month"]
+    assert "Журнал шагов" not in без and "orkJb" not in без
+    # массив «Месяца» без журнала (сборка старше) — «Нет данных» и откуда придёт
+    om = copy.deepcopy(built["ork_month"])
+    om["main"].pop("journal")
+    нет = _render({"main": ct}, om)["main"]["month"]
+    assert "Нет данных: журнала шагов в сборке нет" in нет and "orkJb" not in нет
+
+
+def test_журнал_отбор_строки_и_пусто(built):
+    """Отбор по умолчанию — случай владельца: приёмка (S1) дольше нормы, только измеримые, по
+    убыванию превышения; строка ведёт в карточку сделки (data-ct). Пустой отбор — «Нет данных» и
+    что не нашлось; все в норме — известный ноль, не «нет данных»."""
+    om = built["ork_month"]
+    rows = om["main"]["journal"]["rows"]
+    s1 = [r for r in rows if r["seg"] == "S1" and r["measurable"] and (r["over"] or 0) > 0]
+    out = _jrun(om)
+    d = out["def"]
+    assert d["n"] == d["k"] == len(s1) > 0 and d["segs"] == ["S1"]
+    assert d["overs"] == sorted(d["overs"], reverse=True)
+    for r in s1:
+        assert f'data-ct="{r["deal"]}"' in d["html"] and f'>{r["over"]}</td>' in d["html"]
+    assert d["html"].count("<tr ") == len(s1) and 'class="dep orkm"' in d["html"]
+    assert d["note"].startswith("Отбор: шаг S1 Приёмка сделки · все месяцы окна · только сверх нормы · без неизмеримых")
+    assert out["all"]["n"] == out["all"]["base"] == len(rows) and "все шаги" in out["all"]["note"]
+    assert out["mon"]["n"] == sum(1 for r in s1 if r["m"] == out["mon"]["m"]) > 0
+    assert out["empty"].startswith("Нет данных: в окне «Месяца» нет законченных отрезков")
+    assert out["noSeg"].startswith("Нет данных: отрезков S6 Подготовка к отгрузке от поставщика, закончившихся в 08.2026, нет")
+    assert out["allOk"].startswith("Сверх нормы — никого: все 1 отрезков")
+    # имя скрыто воротами людей — «скрыто» и причина, а не имя
+    assert "скрыто" in out["hidRow"] and "раскрыл бы человека" in out["hidRow"]

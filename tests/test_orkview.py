@@ -145,12 +145,12 @@ def test_показатели_менеджеров_отдельно_от_вкл�
             continue
         assert "month" not in view, key
         mo = ct["orkMonth"][key]
-        assert set(mo) == {"month", "people", "how"} and mo["month"]["rows"], key
+        assert set(mo) == {"month", "people", "how", "journal"} and mo["month"]["rows"], key
     P = ct["orkMonth"]["main"]["people"]
     assert P and all("who" in m for m in P)
     assert all(set(m) >= {"who", "live", "M1", "M2"} and "score" not in m for m in P)
     публичный = json.dumps({k: v for k, v in ct.items() if k != "orkMonth"}, ensure_ascii=False, default=str)
-    for слово in ('"loadDev"', '"an4"', '"outBand"', '"S2+S3+S6"'):
+    for слово in ('"loadDev"', '"an4"', '"outBand"', '"S2+S3+S6"', '"journal"', '"stepName"', '"ownerWhy"'):
         assert слово not in публичный, слово
 
 
@@ -732,11 +732,11 @@ def test_месяц_отдела_по_людям():
         return {"id": str(i), "created": dt.date(2026, 9, 1), "resp": who, "orkMgr": who, "respOrk": True,
                 "stage": "Оплата поставщику / агенту", "_segs": {"segs": {"S2": seg}},
                 "_reach": {5: "2026-10-10T10:00:00+03:00", 6: "2026-10-10T10:00:00+03:00"}, "art": {"po": True}}
-    один, _ = orkview._month([era(i, "Илья") for i in range(12)], [], T, None, {})
+    один, _, _j = orkview._month([era(i, "Илья") for i in range(12)], [], T, None, {})
     s2 = один["rows"][0]["M1"]["S2"]
     assert s2["state"] == "hidden" and "k" not in s2 and s2["value"] is None and "раскрыл бы человека" in s2["why"]
     assert один["rows"][0]["M2"]["state"] == "hidden" and "have" not in один["rows"][0]["M2"]
-    трое, _ = orkview._month([era(i, ("Илья", "Пётр", "Олег")[i % 3]) for i in range(12)], [], T, None, {})
+    трое, _, _j = orkview._month([era(i, ("Илья", "Пётр", "Олег")[i % 3]) for i in range(12)], [], T, None, {})
     s2 = трое["rows"][0]["M1"]["S2"]
     assert s2["state"] == "prelim" and s2["value"] == 100 and s2["k"] == 12 and s2["people"] == 3
 
@@ -753,7 +753,7 @@ def test_месяц_заголовок_последний_полный():
                 "stage": "Оплата поставщику / агенту", "_segs": {"segs": {"S2": seg}}, "_reach": {}, "art": {}}
     orders = [era(i, ("Илья", "Пётр", "Олег")[i % 3], "2026-09-15T10:00:00+03:00") for i in range(9)]
     orders += [era(100 + i, "Илья", "2026-10-15T10:00:00+03:00") for i in range(2)]
-    month, mp = orkview._month(orders, [], T, None, {})
+    month, mp, _j = orkview._month(orders, [], T, None, {})
     rows = month["rows"]
     assert month["head"] == 1 and rows[1]["m"] == "09.2026" and not rows[1]["partial"]
     assert rows[0]["m"] == "10.2026" and rows[0]["partial"] is True
@@ -844,7 +844,7 @@ def test_месяц_вычитание_не_раскрывает_скрытую_
     orders = [era(i, w, "S2") for i, w in enumerate(("Анна", "Борис", "Вера"))]
     orders += [era(9, "Анна", "S3")]
     orders += [era(i, w, "S6") for i, w in enumerate(("Борис", "Вера", "Гриша"))]
-    month, _ = orkview._month(orders, [], T, None, {})
+    month, _, _j = orkview._month(orders, [], T, None, {})
     m = month["rows"][1]["M1"]
     assert m["S2"]["state"] == "prelim" and m["S6"]["state"] == "prelim"
     assert m["S3"]["state"] == "hidden" and not ({"n", "ended", "people", "k", "excluded", "skipped"} & set(m["S3"]))
@@ -859,13 +859,13 @@ def test_месяц_приёмка_вне_реализации_не_в_счёт�
         seg = {**_seg(5, end="2026-09-15T10:00:00+03:00", norm=1), "skip": False}
         return {"id": str(i), "deal": deal, "created": dt.date(2026, 9, 1), "resp": "Р", "orkMgr": "Р",
                 "respOrk": True, "_segs": {"segs": {"S1": seg}}, "_reach": {}, "art": {}}
-    month, _ = orkview._month([era(1, "D1"), era(2, "D9")], [], T, None, {}, deal_ok_all={"D1": True, "D9": False})
+    month, _, _j = orkview._month([era(1, "D1"), era(2, "D9")], [], T, None, {}, deal_ok_all={"D1": True, "D9": False})
     assert month["rows"][1]["M1"]["S1"]["n"] == 1
 
 
 def test_первый_месяц_эпохи_неполный():
     T = dt.date(2026, 10, 26)
-    month, _ = orkview._month([], [], T, None, {})
+    month, _, _j = orkview._month([], [], T, None, {})
     by = {r["m"]: r for r in month["rows"]}
     assert by["08.2026"]["eraPartial"] is True and by["09.2026"]["eraPartial"] is False
 
