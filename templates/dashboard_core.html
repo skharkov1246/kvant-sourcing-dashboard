@@ -958,25 +958,134 @@
   .actile[data-od]{cursor:pointer}
   .actile[data-od]:hover{border-color:var(--a)}
   button.stchip{font:inherit;font-size:11px;background:none;min-height:24px}
-  .drw .odrow{display:flex;width:100%;justify-content:space-between;gap:10px;background:none;border:0;border-bottom:1px solid var(--line2);color:var(--ink);font:inherit;font-size:12.5px;padding:6px 2px;cursor:pointer;text-align:left}
-  .drw .odrow:hover,.drw .odrow.on{background:color-mix(in srgb,var(--fa) 8%,transparent)}
-  .drw .odrow.on span{color:var(--a2)}
-  .drw .odq{margin:2px 0 6px}
-  .drw .odback{margin:0 0 10px}
-  .drw .odt{margin-top:4px}
-  .drw .odt td{font-size:12px;padding:6px 5px}
-  .drw .odt th{padding:0 5px 6px}
+  /* «Разбор числа» — список заказов за числом «Реализации» (решение владельца 29.10.2026): что
+     считает число → что делать и кто → заказы, худшие сверху → разрезы. Только в дровере вкладки
+     (.drw.rz, список — .odwide): один шрифт без капители, шкала --rz-*, цифры табличные, цвета —
+     переменные портала, статус — всегда словами */
   .drw .odm{display:none}
   .drw .odm::before{content:attr(data-odm)}
-  .drw .odhw{color:var(--mut)}
-  /* список заказов — девять столбцов: дровер шире дровера сорсера */
-  .drw.odwide{width:min(1080px,96vw)}
-  .drw .odt td.stp .dep{max-width:150px}
+  .drw .odback{margin:0 0 10px}
+  .drw.odwide{width:min(1200px,100vw)}
+  .drw.rz.odwide{--od-f:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+  .drw.rz.odwide>header{padding:18px 24px 14px;align-items:center}
+  .drw.rz.odwide h3{font-family:var(--od-f);font-size:var(--rz-xl,20px);font-weight:600;line-height:1.3;letter-spacing:0;color:var(--ink)}
+  .drw.rz.odwide .sub2{font-family:var(--od-f);font-size:var(--rz-sm,13px);color:var(--mut);margin-top:3px;font-variant-numeric:tabular-nums lining-nums}
+  .drw.rz.odwide .x{font-family:var(--od-f);display:inline-flex;align-items:center;justify-content:center;min-width:40px;min-height:40px;border-radius:8px;font-size:26px;line-height:1}
+  .drw.rz.odwide .x:hover{background:var(--panel2)}
+  .drw.rz.odwide .x:focus-visible{outline:2px solid var(--a);outline-offset:0}
+  .drw.rz.odwide .body{padding:18px 24px 32px;font-family:var(--od-f);font-size:var(--rz-md,14px);line-height:1.5;color:var(--ink);font-variant-numeric:tabular-nums lining-nums}
+  .drw.rz .odlede{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin:0 0 18px}
+  .drw.rz .oddef{margin:0;max-width:75ch;color:var(--ink2);font-size:var(--rz-md,14px);line-height:1.55}
+  .drw.rz .odq,.drw.rz .odmore,.drw.rz .odlink{font:inherit;font-size:var(--rz-sm,13px);font-weight:500;color:var(--b2);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;min-height:32px;cursor:pointer;letter-spacing:0}
+  .drw.rz .odq{flex:none}
+  .drw.rz .odq:hover,.drw.rz .odmore:hover,.drw.rz .odlink:hover{border-color:var(--b);background:var(--panel2)}
+  .drw.rz .odmore{margin-top:8px}
+  .drw.rz .odh{font-size:var(--rz-lg,16px);font-weight:600;line-height:1.35;color:var(--ink);margin:0 0 10px;letter-spacing:0;text-transform:none;font-family:inherit}
+  .drw.rz .odh2{font-size:var(--rz-sm,13px);font-weight:500;color:var(--mut);margin:0 0 6px;letter-spacing:0;text-transform:none}
+  .drw.rz .odsec{margin:0 0 20px}
+  .drw.rz .odacts{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+  .drw.rz .odact{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:start;text-align:left;font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--odc,var(--ctl));border-radius:8px;padding:10px 12px;min-height:48px;cursor:pointer;transition:background .12s,border-color .12s}
+  .drw.rz .odact.hi{--odc:var(--nr)}
+  .drw.rz .odact.md{--odc:var(--a)}
+  .drw.rz .odact.lo{--odc:var(--b)}
+  .drw.rz .odact.st{--odc:var(--ctl)}
+  .drw.rz .odact:hover{background:var(--panel2)}
+  .drw.rz .odact.on{background:color-mix(in srgb,var(--odc) 9%,var(--panel));border-color:var(--odc);box-shadow:inset 0 0 0 1px var(--odc)}
+  .drw.rz .odact-t{font-size:var(--rz-md,14px);font-weight:600;line-height:1.35}
+  .drw.rz .odact-n{grid-column:2;grid-row:1/3;font-size:var(--rz-xl,20px);font-weight:600;line-height:1.15}
+  .drw.rz .odact-m{font-size:var(--rz-sm,13px);color:var(--mut);line-height:1.4}
+  .drw.rz .odact-m .amb{color:var(--a2);font-weight:500}
+  .drw.rz .odsel.odstepsel{display:none}
+  .drw.rz .odcust{font-size:var(--rz-sm,13px);color:var(--ink2)}
+  .drw.rz.odwide .xlbar{margin:0 0 6px}
+  .drw.rz.odwide .xlbtn{font-family:var(--od-f);font-size:var(--rz-xs,12px);min-height:28px}
+  .drw.rz .odtools{background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:12px 14px;margin:0 0 20px}
+  .drw.rz .odstack{height:8px;border-radius:4px;margin:0 0 10px}
+  .drw.rz .odsteps{margin:0 0 4px;gap:6px}
+  .drw.rz .stchip{font-family:inherit;font-size:var(--rz-sm,13px);color:var(--ink2);background:var(--panel);padding:4px 10px;min-height:30px;letter-spacing:0;text-transform:none;text-align:left}
+  .drw.rz .stchip b{font-family:inherit;font-weight:600;font-variant-numeric:tabular-nums}
+  .drw.rz .stchip.on{background:color-mix(in srgb,var(--fa) 14%,var(--panel));border-color:var(--a);color:var(--ink)}
+  .drw.rz .stchip:focus-visible,.drw.rz .odq:focus-visible,.drw.rz .odmore:focus-visible,.drw.rz .odlink:focus-visible,.drw.rz .odact:focus-visible,.drw.rz .odrow:focus-visible,.drw.rz .odcuts summary:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+  .drw.rz .odfl{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:flex-end;margin-top:12px}
+  .drw.rz .odsel,.drw.rz .odsrch{display:flex;flex-direction:column;gap:4px;font-size:var(--rz-xs,12px);font-weight:500;color:var(--mut);min-width:0;flex:0 1 220px}
+  .drw.rz .odsrch{flex:1 1 240px}
+  .drw.rz .odsel select,.drw.rz .odsrch input{font:inherit;font-size:var(--rz-md,14px);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-height:36px;width:100%;min-width:0}
+  .drw.rz .odsel select:focus-visible,.drw.rz .odsrch input:focus-visible{outline:2px solid var(--a);outline-offset:1px;border-color:var(--a)}
+  .drw.rz .odsrch input::placeholder{color:var(--dim)}
+  .drw.rz .odlisth{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin:0 0 8px}
+  .drw.rz .odlisth .odh{margin:0}
+  .drw.rz .odcnt{color:var(--mut);font-weight:500}
+  .drw.rz .odsorted{font-size:var(--rz-sm,13px);color:var(--mut)}
+  .drw.rz .odactive{margin:0 0 10px}
+  .drw.rz .odempty{font-size:var(--rz-md,14px);color:var(--ink2);padding:14px 0}
+  .drw.rz .odwrap{overflow:visible}
+  .drw.rz .odt{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;margin:0}
+  .drw.rz .odt th{position:sticky;top:0;z-index:2;background:var(--panel);padding:0;border-bottom:1px solid var(--line);font-family:inherit;text-transform:none;letter-spacing:0}
+  .drw.rz .odt th.odc1{width:21%}
+  .drw.rz .odt th.odc2{width:25%}
+  .drw.rz .odt th.odc3{width:15%}
+  .drw.rz .odt th.odc4{width:25%}
+  .drw.rz .odsort{display:flex;align-items:center;gap:6px;width:100%;min-height:36px;padding:8px 12px;background:none;border:0;font:inherit;font-size:var(--rz-sm,13px);font-weight:500;color:var(--mut);text-align:left;cursor:pointer;letter-spacing:0;text-transform:none}
+  .drw.rz .odsort:hover,.drw.rz .odsort.on{color:var(--ink)}
+  .drw.rz .odsort:focus-visible{outline:2px solid var(--a);outline-offset:-2px;border-radius:4px}
+  .drw.rz .odarr{font-size:var(--rz-xs,12px);color:var(--dim)}
+  .drw.rz .odsort.on .odarr{color:var(--ink)}
+  .drw.rz .odt td{padding:12px;vertical-align:top;border-top:0;border-bottom:1px solid var(--line2);font-size:var(--rz-md,14px);line-height:1.45;overflow-wrap:anywhere;color:var(--ink)}
+  .drw.rz .odt tbody tr{cursor:pointer}
+  .drw.rz .odt tbody tr:hover td{background:var(--panel2)}
+  .drw.rz .odt tbody tr:focus-visible{outline:2px solid var(--a);outline-offset:-2px}
+  .drw.rz .odt td .dep{font-family:inherit;font-size:var(--rz-sm,13px);color:var(--mut);margin-top:3px;line-height:1.4}
+  .drw.rz .odt td .dep.hot{color:var(--nr);font-weight:500}
+  .drw.rz .odt td .dep.amb{color:var(--a2);font-weight:500}
+  .drw.rz .odno{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+  .drw.rz .odno b{font-size:var(--rz-lg,16px);font-weight:600;color:var(--ink)}
+  .drw.rz .odno b::after{content:" ›";font-family:var(--od-f);color:var(--mut);font-weight:500}
+  .drw.rz .oddeal{font-size:var(--rz-sm,13px);color:var(--ink2);margin-top:2px}
+  .drw.rz .odbx{font-size:var(--rz-xs,12px);font-weight:500;color:var(--b2);white-space:nowrap;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--b2) 45%,transparent);text-underline-offset:2px;display:inline-block;padding:5px 2px;margin:-5px 0;line-height:1.2}
+  .drw.rz .odbx:hover{text-decoration-color:currentColor}
+  .drw.rz .odbx:focus-visible{outline:2px solid var(--a);outline-offset:1px;border-radius:2px}
+  .drw.rz .odtag{display:inline-block;margin-top:6px;font-size:var(--rz-xs,12px);font-weight:500;padding:1px 8px;border-radius:999px;background:var(--panel2);border:1px solid var(--line2);color:var(--ink2)}
+  .drw.rz .odhw{color:var(--mut)}
+  .drw.rz .odstep{font-weight:500}
+  .drw.rz .odsn{font-weight:600}
+  .drw.rz .oddays{margin-top:4px}
+  .drw.rz .oddays b{font-weight:600}
+  .drw.rz .oddays b.hot{color:var(--nr)}
+  .drw.rz .oddays b.amb{color:var(--a2)}
+  .drw.rz .odbar{display:block;position:relative;height:6px;max-width:180px;margin:6px 0 2px;border-radius:3px;background:var(--line2)}
+  .drw.rz .odbar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--b)}
+  .drw.rz .odbar.over i{background:var(--nr)}
+  .drw.rz .odbar s{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:var(--ink);border-radius:1px}
+  .drw.rz .oddl{font-weight:500}
+  .drw.rz .odbadge{display:inline-block;margin-top:5px;padding:2px 8px;border-radius:999px;font-size:var(--rz-xs,12px);font-weight:600;line-height:1.45;white-space:nowrap}
+  .drw.rz .odb-late{color:var(--nr);background:color-mix(in srgb,var(--nr) 11%,var(--panel))}
+  .drw.rz .odb-soon{color:var(--a2);background:color-mix(in srgb,var(--fa) 14%,var(--panel))}
+  .drw.rz .odb-ok{color:var(--ok2);background:color-mix(in srgb,var(--ok) 11%,var(--panel))}
+  .drw.rz .odwhat{font-weight:600;line-height:1.4}
+  .drw.rz .odwho{font-size:var(--rz-sm,13px);color:var(--ink2);margin-top:3px}
+  .drw.rz .odwho .amb{color:var(--a2);font-weight:500}
+  .drw.rz .odfoot{font-size:var(--rz-sm,13px);color:var(--mut);margin:10px 0 0;line-height:1.5}
+  .drw.rz .odcuts{margin-top:22px;border-top:1px solid var(--line);padding-top:10px}
+  .drw.rz .odcuts summary{display:flex;align-items:center;gap:8px;min-height:36px;cursor:pointer;font-size:var(--rz-md,14px);font-weight:600;color:var(--ink);list-style:none}
+  .drw.rz .odcuts summary::-webkit-details-marker{display:none}
+  .drw.rz .odcuts summary::before{content:"›";display:inline-block;width:14px;color:var(--mut);font-size:18px;line-height:1;transition:transform .15s}
+  .drw.rz .odcuts[open] summary::before{transform:rotate(90deg)}
+  .drw.rz .odcutg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px 28px;margin-top:10px}
+  .drw.rz .odrow{display:flex;width:100%;justify-content:space-between;gap:12px;background:none;border:0;border-bottom:1px solid var(--line2);color:var(--ink);font:inherit;font-size:var(--rz-md,14px);padding:8px 6px;min-height:36px;cursor:pointer;text-align:left;border-radius:4px}
+  .drw.rz .odrow b{font-weight:600;font-variant-numeric:tabular-nums}
+  .drw.rz .odrow:hover{background:var(--panel2)}
+  .drw.rz .odrow.on{background:color-mix(in srgb,var(--fa) 12%,var(--panel))}
+  .drw.rz .odrow.on span{color:var(--a2);font-weight:500}
   .orkpulse td .gone{margin-left:4px}
   .orkpulse td.r{white-space:nowrap}
+  /* планшет: поставщик — строкой под заказом (столбец скрыт; в выгрузке — столбцом) */
   @media(max-width:900px){
-    .drw .odt th:nth-child(3),.drw .odt td:nth-child(3),.drw .odt th:nth-child(4),.drw .odt td:nth-child(4){display:none}
-    .drw .odm{display:block}
+    .drw.rz .odt .odsupc{display:none}
+    .drw.rz .odm{display:block}
+    .drw.rz .odt th.odc1{width:25%}
+    .drw.rz .odt th.odc2{width:28%}
+    .drw.rz .odt th.odc3{width:19%}
+    .drw.rz .odt th.odc4{width:28%}
   }
   @media(max-width:720px){.drw.odwide{width:100vw}}
   /* ---- «Неделя руководителя ОРК» (владелец 29.10.2026: «шрифты плохо читаемы… чтобы логика
@@ -1217,13 +1326,22 @@
   @media(max-width:560px){
     .drw .body{padding:12px 14px 24px}
     .drw>header{padding:14px 16px}
-    .drw .odt thead{display:none}
-    .drw .odt,.drw .odt tbody{display:block}
-    .drw .odt tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;padding:10px 2px;border-top:1px solid var(--line)}
-    .drw .odt td{display:block;border:0;padding:0;text-align:left;min-width:0}
-    .drw .odt td[data-l]::before{content:attr(data-l);display:block;font:600 9px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:1px}
-    .drw .odt td:nth-child(9){grid-column:1/-1}
-    .drw .odt td.stp .dep{max-width:none}
+    .drw.rz.odwide>header{padding:14px 16px}
+    .drw.rz.odwide .body{padding:14px 16px 24px}
+    .drw.rz .odlede{flex-direction:column;gap:10px}
+    .drw.rz .odacts{grid-template-columns:minmax(0,1fr)}
+    .drw.rz .odsel{flex:1 1 calc(50% - 6px)}
+    .drw.rz .odsel.odstepsel{display:flex}
+    .drw.rz .odsteps{display:none}
+    .drw.rz .odt tbody tr:hover td{background:none}
+    .drw.rz .odt tbody tr:hover{background:var(--panel2)}
+    .drw.rz .odt thead{display:none}
+    .drw.rz .odt,.drw.rz .odt tbody{display:block}
+    .drw.rz .odt tr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 14px;padding:14px 2px;border-bottom:1px solid var(--line)}
+    .drw.rz .odt td{display:block;border:0;padding:0;min-width:0}
+    .drw.rz .odt td.odc1,.drw.rz .odt td.odc4{grid-column:1/-1}
+    .drw.rz .odt td[data-l]::before{content:attr(data-l);display:block;font-size:var(--rz-xs,12px);font-weight:500;color:var(--mut);margin-bottom:2px}
+    .drw.rz .odt td.odc1::before{display:none}
     #tab-contracts .orkpulse th:nth-child(4),#tab-contracts .orkpulse td:nth-child(4),
     #tab-contracts .orkpulse th:nth-child(5),#tab-contracts .orkpulse td:nth-child(5){display:none}
   }
@@ -4575,94 +4693,271 @@ function _odModel(X,O,spec){
     return {k,r,d:B.deals.get(String(r.deal||''))||null,tag:R.t&&R.t[i]!=null?String(R.t[i]):'',dq:dq[k]||[]};
   });
   const pre=spec.pre||(/^([wqm]):/.exec(String(spec.id||''))||[])[1]||'w';
-  return {title:R.h||spec.title||'Заказы за числом',sub:spec.sub||'',items,pre,queue:spec.queue||null,queueLbl:spec.queueLbl||'',F0:spec.F||null,X,O};
+  return {title:R.h||spec.title||'Заказы за числом',sub:spec.sub||'',id:spec.id||'',def:spec.def||'',items,pre,queue:spec.queue||null,queueLbl:spec.queueLbl||'',F0:spec.F||null,X,O};
 }
 function _odLB(X){return Object.assign({},((X&&X.life)||{}).labels||{},(_dcData()||{}).labels||{});}
 function _odIsDeal(x){return String(x.k).slice(0,2)==='d:';}
-// шапка: строк, заказов, сделок, заказчиков — как «N запросов» у сорсера
+// ссылки в Битрикс: сделка и заказ (смарт-процесс 172), новая вкладка; в выгрузку не идут (data-xlv="")
+const _OD_BX='https://kvantpro.bitrix24.ru/crm/';
+function _odBx(kind,id,lbl){
+  if(!id) return '';
+  const u=kind==='deal'?`${_OD_BX}deal/details/${encodeURIComponent(id)}/`:`${_OD_BX}type/172/details/${encodeURIComponent(id)}/`;
+  return `<a class="odbx" href="${u}" target="_blank" rel="noopener" data-xlv="" aria-label="${_esc(lbl+' в Битриксе, новая вкладка')}">в Битриксе ↗</a>`;
+}
+// дата «ГГГГ-ММ-ДД» или «ДД.ММ.ГГГГ» → сутки (UTC, мс); нет даты — null
+function _odDay(v){
+  const s=String(v||''); let m=/^(\d{4})-(\d\d)-(\d\d)/.exec(s);
+  if(m) return Date.UTC(+m[1],+m[2]-1,+m[3]);
+  m=/^(\d\d)\.(\d\d)\.(\d{4})/.exec(s); return m?Date.UTC(+m[3],+m[2]-1,+m[1]):null;
+}
+const _odDM=t=>{const d=new Date(t), p=n=>String(n).padStart(2,'0'); return `${p(d.getUTCDate())}.${p(d.getUTCMonth()+1)}.${d.getUTCFullYear()}`;};
+const _odCap=t=>{t=String(t||''); return t?t[0].toUpperCase()+t.slice(1):t;};
+// разбор строк один раз на список: следующее действие и его хозяин (пункт очереди с наивысшей
+// важностью: life.queue и закрытая часть; без пункта — шаг ОРК и его исполнитель), срок клиента
+// (просрочен или сколько осталось — на дату данных), превышение нормы, строка поиска
+function _odPrep(M){
+  if(M.P) return M.P;
+  const X=M.X||{}, L=X.life||{}, LB=_odLB(X), DC=_dcData();
+  const SN=Object.fromEntries((((M.O||{}).week||{}).ledger||[]).map(s=>[s.no,s]));
+  let t0=_odDay(L.asOf); if(t0==null) t0=_odDay((M.O||{}).asOf);
+  if(t0==null){const d=new Date(); t0=Date.UTC(d.getFullYear(),d.getMonth(),d.getDate());}
+  const QI=new Map();
+  (L.queue||[]).concat(DC?(DC.queue||[]).filter(q=>!!q.seg===!!X.seg):[]).forEach(q=>{
+    const k=(q.order?String(q.order):'d:'+q.deal)+'|'+q.code; if(!QI.has(k)) QI.set(k,q);});
+  M.items.forEach(x=>{
+    const r=x.r, d=x.d||{}, isD=_odIsDeal(x), codes=[...new Set((r.q||[]).concat(x.dq||[]))];
+    if(isD&&r.kind==='dealClose'&&!codes.includes('dealClose')) codes.push('dealClose');
+    if(isD&&r.kind==='noOrder'&&r.over&&!codes.includes('noOrder')) codes.push('noOrder');
+    const qs=codes.map(c=>{const q=QI.get(x.k+'|'+c)||QI.get('d:'+(r.deal||'')+'|'+c)||{}; return {c,q,sev:q.sev!=null?+q.sev:50};})
+      .sort((a,b)=>a.sev-b.sev);
+    let a;
+    if(qs.length){const t=qs[0], q=t.q;
+      a={key:'c:'+t.c,txt:_odCap(q.act||LB[t.c]||t.c),role:q.roleName||_OD_ROLE[q.role]||'',who:q.who||'',sev:t.sev,
+        days:q.days!=null?q.days:null,unit:q.inWd?'р.д.':'дн',why:qs.map(z=>LB[z.c]||z.c)};}
+    else if(r.closed) a={key:'closed',txt:'Заказ закрыт — действий нет',role:'',who:'',sev:99,days:null,unit:'',why:[]};
+    else if(r.step!=null){const s=SN[r.step];
+      a={key:'s:'+r.step,txt:`Держать срок шага ${r.step}${s?' «'+s.name+'»':''}`,role:(s&&s.roleName)||_OD_ROLE[r.ownR]||'',who:r.own||'',sev:60,
+        days:r.wd!=null?r.wd:r.cd!=null?r.cd:null,unit:r.wd!=null?'р.д.':'дн',why:[]};}
+    else a={key:'none',txt:r.missing?'Найти заказ в Битриксе: в данных вкладки его нет':isD?'Разобрать сделку':'Сверить стадию заказа с таблицей шагов',
+      role:'менеджер ОРК',who:r.mgr&&!_OD_GROUP(r.mgr)?r.mgr:'',sev:90,days:null,unit:'',why:[]};
+    // срок клиента: «просрочен» — по пункту «late» (строки «Недели»); у строк без пунктов — срок
+    // прошёл, заказ не закрыт и не дальше шага 10 (доставка ещё не согласована)
+    const dl=_odDay(r.dl||r.dlTxt), fc=_odDay(r.fc), trust=M.pre==='w'&&r.dlTxt===undefined;
+    const open=!r.closed&&!codes.includes('late')&&(r.step==null||+r.step<=10)&&!isD;
+    const late=dl!=null&&dl<t0&&(codes.includes('late')||(!trust&&open))?Math.round((t0-dl)/864e5):null;
+    const left=late==null&&dl!=null&&dl>=t0&&open?Math.round((dl-t0)/864e5):null;
+    Object.assign(x,{a,dl,fc,late,left,ratio:r.wd!=null&&r.norm?r.wd/r.norm:0,sd:r.wd!=null?r.wd:r.cd!=null?r.cd:0,
+      s:[r.no,x.k,r.seq||d.seq?'№'+(r.seq||d.seq):'',d.customer,r.sup].filter(Boolean).join(' ').toLowerCase()});
+  });
+  const G=new Map();
+  M.items.forEach(x=>{const a=x.a; let g=G.get(a.key);
+    if(!g){g={key:a.key,txt:a.txt,sev:a.sev,n:0,none:0,worst:null,unit:a.unit,roles:new Map()}; G.set(a.key,g);}
+    g.n++; if(a.who==='не назначен') g.none++;
+    if(a.days!=null&&(g.worst==null||a.days>g.worst)){g.worst=a.days; g.unit=a.unit;}
+    if(a.role) g.roles.set(a.role,(g.roles.get(a.role)||0)+1);});
+  const tier=k=>k.slice(0,2)==='c:'?0:k.slice(0,2)==='s:'?1:k==='none'?2:3;
+  const groups=[...G.values()].map(g=>Object.assign(g,{role:[...g.roles.entries()].sort((a,b)=>b[1]-a[1]).slice(0,2).map(e=>e[0]).join(', ')}))
+    .sort((a,b)=>tier(a.key)-tier(b.key)||(tier(a.key)===0?a.sev-b.sev:0)||b.n-a.n||a.txt.localeCompare(b.txt,'ru'));
+  groups.forEach((g,i)=>{g.i=i;});
+  const gi=Object.fromEntries(groups.map(g=>[g.key,g.i]));
+  M.items.forEach(x=>{x.ai=gi[x.a.key];});
+  M.P={LB,SN,t0,groups};
+  return M.P;
+}
+// что считает число — одной фразой (подвкладка задаёт свою: data-oddef у числа или плитки)
+function _odDef(M){
+  if(M.def) return M.def;
+  const id=String(M.id||''), O=M.O||{}, RU=((M.X||{}).life||{}).rules||{}, NW=(O.how||{}).norms||{};
+  const m=/^w:(.+)$/.exec(id); if(!m) return '';
+  const p=m[1].split('/'), SN=_odPrep(M).SN;
+  switch(p[0]){
+    case 'W1': return `Заказы на приёмке сделки (шаг 1) дольше нормы${NW[1]!=null?' '+NW[1]+' р.д.':''} и сделки в «Реализации» без заказа поставщику.`;
+    case 'W2': return 'Заказы дольше нормы своего шага регламента ОРК (шаги 1, 4, 5, 8) — работа менеджеров ОРК.';
+    case 'W3': return `Заказы, у которых срок клиента прошёл, до него${RU.riskDays!=null?' ≤ '+RU.riskDays+' дн.':' мало дней'} без отгрузки или прогноз доставки позже срока.`;
+    case 'W5': return 'Заказы с контрольной точкой на этой неделе по датам производства и отгрузки.';
+    case 'W1recent': return 'Законченные приёмки сделок за 20 рабочих дней: в норме и сверх нормы.';
+    case 'live': return 'Все живые заказы вида — те, что сейчас в работе.';
+    case 'mapped': return 'Живые заказы, стадия которых стоит на шаге регламента ОРК.';
+    case 'unk': return 'Живые заказы, стадии которых нет в таблице шагов: стадию нужно сверить.';
+    case 'waitUtd': return 'Доставленные заказы без подписанного УПД дольше нормы шага 12: ждём клиента.';
+    case 'p80': return 'Заказы в производстве дольше, чем 80 % заказов за квартал, — сигнал, не норма.';
+    case 'adj': return `Заказы на шагах, где мяч у смежника: ${_ORK_ADJ[p[1]]||p[1]}.`;
+    case 'who': return 'Заказы человека сверх нормы своего шага и «ждём УПД от клиента».';
+    case 'hyg': return 'Карточки заказов, которые требуют порядка: стадия позади фактов, брошенная карточка, старая доставка без УПД, нет менеджера ОРК.';
+    case 'noOrder': case 'noOrderOver': return 'Сделки в «Реализации» без заказа поставщику.';
+    case 'step': {
+      const s=SN[p[1]], nm=s?`шаг ${p[1]} «${s.name}»`:'шаг '+p[1];
+      return {now:`Заказы, которые сейчас на шаге: ${nm}${s?', исполнитель — '+s.roleName:''}.`,
+        over:`Заказы дольше нормы шага${s&&s.norm!=null?' ('+s.norm+' р.д.)':''}: ${nm}.`,
+        unk:`Заказы, у которых срок шага не посчитать — нет даты входа в шаг или года в календаре: ${nm}.`,
+        nc:`Заказы на шаге, но не в счёте «сверх нормы» — гигиена карточки или приёмка вне «Реализации»: ${nm}.`,
+        wait:'Доставленные заказы без подписанного УПД дольше нормы шага 12: ждём клиента.',
+        closed:'Живые заказы закрытых выигранных сделок, доставленные без УПД.',
+        close:'Сделки на стадии «Оплата получена», которые ещё не закрыты.',
+        p80:'Заказы в производстве дольше, чем 80 % заказов за квартал, — сигнал, не норма.',
+        art:`Заказы, у которых нет документа шага в карточке: ${nm}.`}[p[2]]||'';
+    }
+  }
+  return '';
+}
+// шапка: заказов, сделок, заказчиков
 function _odSub(M){
   const it=M.items, od=it.filter(x=>!_odIsDeal(x)), uo=new Set(od.map(x=>x.k)).size;
   if(!it.length) return 'заказов нет';
   const dk=k=>it.filter(x=>_odIsDeal(x)&&(x.r.kind===k||(k==='deal'&&x.r.kind!=='noOrder'&&x.r.kind!=='dealClose'))).length;
   const dl=new Set(it.map(x=>String(x.r.deal||'')).filter(Boolean)).size;
   const cu=new Set(it.map(x=>(x.d||{}).customer).filter(c=>c&&c!=='—')).size;
-  return [od.length?(od.length===uo?_ctN(uo,'заказ','заказа','заказов'):`строк ${od.length} · заказов ${uo}`):'',
-    dk('noOrder')?`сделок без заказа ${dk('noOrder')}`:'',dk('dealClose')?`сделок к закрытию ${dk('dealClose')}`:'',
-    dk('deal')?`пунктов уровня сделки ${dk('deal')}`:'',`сделок ${dl}`,`заказчиков ${cu}`].filter(Boolean).join(' · ');
+  const n=(v,a,b,c)=>v?_ctN(v,a,b,c):'';
+  return [od.length?(od.length===uo?_ctN(uo,'заказ','заказа','заказов'):`строк ${od.length} · ${_ctN(uo,'заказ','заказа','заказов')}`):'',
+    n(dk('noOrder'),'сделка без заказа','сделки без заказа','сделок без заказа'),n(dk('dealClose'),'сделка к закрытию','сделки к закрытию','сделок к закрытию'),
+    n(dk('deal'),'пункт уровня сделки','пункта уровня сделки','пунктов уровня сделки'),
+    _ctN(dl,'сделка','сделки','сделок'),_ctN(cu,'заказчик','заказчика','заказчиков')].filter(Boolean).join(' · ');
 }
-function _odTr(x,SN,LB){
-  const r=x.r, d=x.d||{}, isD=_odIsDeal(x), s=r.step!=null?SN[r.step]:null;
-  const dd=v=>{const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(String(v||'')); return m?`${m[3]}.${m[2]}.${m[1]}`:String(v||'');};
-  const cust=d.customer&&d.customer!=='—'?d.customer:'';
+// строка заказа: заказ (номер, сделка, заказчик, Битрикс) · где застрял · срок клиента · что сделать
+// и кто · поставщик. Ярлыки для карточки на телефоне — data-l (::before: в выгрузку не идут)
+function _odTr(x,P,withSup){
+  const r=x.r, d=x.d||{}, isD=_odIsDeal(x), LB=P.LB, s=r.step!=null?P.SN[r.step]:null, a=x.a;
+  const cust=d.customer&&d.customer!=='—'?d.customer:'', seq=r.seq||d.seq||'', did=r.deal||'';
   const no=isD?(r.kind==='dealClose'?'сделка: закрыть':r.kind==='noOrder'?'сделка без заказа':'сделка'):(r.no||'id '+x.k);
-  // «с 14.10 (назначение)» — от какого дня считаны р.д. шага, как у пункта очереди (orkview: since)
-  const days=r.wd!=null?`<span class="${r.over?'hot':r.wu?'amb':''}">${r.wd}${r.norm!=null?' / '+r.norm:''} р.д.</span><div class="dep">${r.over?'сверх нормы · ':r.wu?'ждём УПД от клиента · ':''}без пауз</div>${r.since?`<div class="dep">${_esc(r.since)}</div>`:''}`
-    :r.tu?'<span class="dimv">срок неизвестен</span>'
-    :r.cd!=null?`${r.cd} дн<div class="dep">${r.norm==null?'шаг не нормируется':''}</div>`:'<span class="dimv">—</span>';
-  const dl=r.dl?dd(r.dl):(r.dlTxt||'');
-  const codes=(r.q||[]).concat(x.dq||[]).map(c=>_esc(LB[c]||c)).join('<br>');
   const hy=(r.hyg||[]).map(k=>(_ORK_HYG[k]||k).split(' — ')[0]);
-  const odm=[r.stage,r.sup].filter(Boolean).join(' · ');
-  return `<tr class="drill" data-odct="${_esc(r.deal||'')}" tabindex="0">`
-    // гигиена — вид и почему (hw); дубль «стадия · поставщик» для узкого экрана — сгенерированным
-    // текстом (data-odm): в выгрузку и в textContent ячейки он не попадает
-    +`<td><b class="mono">${_esc(no)}</b>${x.tag?`<div class="dep">${_esc(LB[x.tag]||x.tag)}</div>`:''}${hy.length?`<div class="dep amb">${_esc(hy.join('; '))}</div>${r.hw&&!hy.some(h=>r.hw.indexOf(h)===0)?`<div class="dep odhw">${_esc(r.hw)}</div>`:''}`:''}${r.missing?'<div class="dep dimv">заказа нет в данных вкладки</div>':''}${odm?`<div class="dep odm" data-odm="${_esc(odm)}"></div>`:''}</td>`
-    +`<td data-l="Сделка · заказчик"><b class="mono">№${r.seq||d.seq||'—'}</b>${cust?`<div class="dep">${_esc(cust)}</div>`:''}</td>`
-    +`<td>${r.sup?_esc(r.sup):'<span class="dimv">—</span>'}</td>`
-    +`<td>${r.stage?_esc(r.stage):'<span class="dimv">—</span>'}</td>`
-    +`<td class="stp" data-l="Шаг">${r.step!=null?`<b class="mono">${r.step}</b>${s?`<div class="dep">${_esc(s.name)}</div>`:''}`:`<span class="dimv">${r.closed?'заказ закрыт':isD||r.missing?'—':'не из таблицы'}</span>`}${r.waits&&_ORK_ADJ[r.waits]?`<div class="dep">ждёт: ${_esc(_ORK_ADJ[r.waits])}</div>`:''}</td>`
-    +`<td class="r mono" data-l="Р.д. на шаге / норма">${days}${r.nc?'<div class="dep">не в счёте: гигиена или приёмка вне «Реализации»</div>':''}</td>`
-    +`<td class="mono" data-l="Срок клиента · прогноз">${dl?_esc(dl):'<span class="dimv">—</span>'}${r.fc?`<div class="dep">прогноз ${_esc(dd(r.fc))}</div>`:''}</td>`
-    +`<td data-l="Хозяин">${r.own?`${_orkWho(r.own)}${r.ownR?`<div class="dep">${_esc(_OD_ROLE[r.ownR]||r.ownR)}</div>`:''}`:'<span class="dimv">—</span>'}${!r.mgr||r.mgr===r.own||r.mgr==='не назначен'?'':r.mgr==='ответственный вне ОРК'?'<div class="dep">ответственный заказа — не из ОРК</div>':`<div class="dep">менеджер ОРК: ${_orkWho(r.mgr)}${r.gone?' · ушёл':''}</div>`}${r.kam&&r.kam!==r.own?`<div class="dep">КАМ: ${_orkWho(r.kam)}</div>`:''}</td>`
-    +`<td data-l="Пункты очереди">${codes||'<span class="dimv">—</span>'}</td></tr>`;
+  const c1=`<td class="odc1" data-l="Заказ"><div class="odno"><b${isD?'':' class="mono"'}>${_esc(no)}</b>${!isD&&!r.missing?' '+_odBx('order',x.k,'Заказ '+no):''}</div>`
+    +`<div class="oddeal">${seq?`сделка <span class="mono">№${_esc(seq)}</span>`:'сделка —'}${did?' '+_odBx('deal',did,'Сделка №'+(seq||did)):''}</div>`
+    +(cust?`<div class="odcust">${_esc(cust)}</div>`:'')
+    // подпись числа (код пункта, «в срок · 12 дн») — если она не повторяет «почему» действия
+    +(x.tag&&!a.why.includes(LB[x.tag]||x.tag)?`<div class="odtag">${_esc(LB[x.tag]||x.tag)}</div>`:'')
+    // гигиена — вид и почему (hw)
+    +(hy.length?`<div class="dep amb">${_esc(hy.join('; '))}</div>${r.hw&&!hy.some(h=>r.hw.indexOf(h)===0)?`<div class="dep odhw">${_esc(r.hw)}</div>`:''}`:'')
+    +(r.missing?'<div class="dep dimv">заказа нет в данных вкладки</div>':'')
+    // поставщик для узкого экрана (столбец скрыт) — сгенерированным текстом: не в выгрузке
+    +(withSup&&r.sup?`<div class="dep odm" data-odm="${_esc('поставщик: '+r.sup)}"></div>`:'')+`</td>`;
+  let dy='';
+  if(r.wd!=null){const nm=r.norm, mx=Math.max(r.wd,nm||0)||1;
+    dy=`<div class="oddays"><b class="${r.over?'hot':r.wu?'amb':''}">${r.wd} р.д.</b>${nm!=null?` при норме ${nm}`:' на шаге'}</div>`
+      +(nm!=null?`<span class="odbar${r.over?' over':''}" aria-hidden="true"><i style="width:${Math.round(r.wd/mx*100)}%"></i><s style="left:${Math.round(nm/mx*100)}%"></s></span>`:'')
+      +(r.over?'<div class="dep hot">сверх нормы</div>':r.wu?'<div class="dep amb">ждём УПД от клиента</div>':'');}
+  else if(r.tu) dy='<div class="oddays dimv">срок шага неизвестен</div>';
+  else if(r.cd!=null) dy=`<div class="oddays"><b>${r.cd} дн</b> на шаге${r.norm==null?' · шаг не нормируется':''}</div>`;
+  const c2=`<td class="odc2" data-l="Где застрял">`
+    +(r.step!=null?`<div class="odstep"><span class="odsn">Шаг ${r.step}</span>${s?' · '+_esc(s.name):''}</div>`
+      :`<div class="odstep dimv">${r.closed?'заказ закрыт':isD||r.missing?'шаг не определён':'стадия не из таблицы шагов'}</div>`)
+    +dy+(r.since?`<div class="dep">${_esc(r.since)}</div>`:'')
+    +(r.waits&&_ORK_ADJ[r.waits]?`<div class="dep">ждёт: ${_esc(_ORK_ADJ[r.waits])}</div>`:'')
+    +(r.nc?'<div class="dep">не в счёте: гигиена или приёмка вне «Реализации»</div>':'')
+    +(r.stage?`<div class="dep odstage">стадия: ${_esc(r.stage)}</div>`:'')+`</td>`;
+  const c3=`<td class="odc3" data-l="Срок клиента">${x.dl!=null?`<div class="oddl">${_odDM(x.dl)}</div>`:'<div class="dimv">срока нет</div>'}`
+    +(x.late!=null?`<span class="odbadge odb-late">${x.late?`просрочен на ${x.late} дн`:'срок сегодня'}</span>`
+      :x.left!=null?`<span class="odbadge ${x.left<=14?'odb-soon':'odb-ok'}">${x.left?`осталось ${x.left} дн`:'срок сегодня'}</span>`:'')
+    +(x.fc!=null?`<div class="dep${x.dl!=null&&x.fc>x.dl?' hot':''}">прогноз ${_odDM(x.fc)}</div>`:'')+`</td>`;
+  const gone=w=>/ \(уволен\)$/.test(String(w||''));
+  const who=a.who==='не назначен'?`<span class="amb">${_esc(a.role||'исполнитель')} не назначен</span>`
+    :a.who?`${_orkWho(a.who)}${gone(a.who)?' · ушёл':''}${a.role?' · '+_esc(a.role):''}`:_esc(a.role||'');
+  const c4=`<td class="odc4" data-l="Что сделать"><div class="odwhat">${_esc(a.txt)}</div>${who?`<div class="odwho">${who}</div>`:''}`
+    +(a.why.length?`<div class="dep">почему: ${_esc(a.why.join('; '))}</div>`:'')
+    +(!r.mgr||r.mgr===a.who||r.mgr==='не назначен'?'':r.mgr==='ответственный вне ОРК'?'<div class="dep">ответственный заказа — не из ОРК</div>':`<div class="dep">менеджер ОРК: ${_orkWho(r.mgr)}${r.gone?' · ушёл':''}</div>`)
+    +(r.kam&&r.kam!==a.who?`<div class="dep">КАМ: ${_orkWho(r.kam)}</div>`:'')+`</td>`;
+  const c5=withSup?`<td class="odsupc" data-l="Поставщик">${r.sup?_esc(r.sup):'<span class="dimv">—</span>'}</td>`:'';
+  return `<tr class="drill" data-odk="${_esc(x.k)}" data-odct="${_esc(did)}" tabindex="0">${c1}${c2}${c3}${c4}${c5}</tr>`;
+}
+// порядок строк: по умолчанию сначала худшие — просрочка срока клиента, превышение нормы, дни на шаге
+const _OD_DIR={no:1,stay:-1,dl:1,act:1,sup:1};
+function _odSort(rows,F){
+  const cmpNo=(a,b)=>String(a.r.no||a.k).localeCompare(String(b.r.no||b.k),'ru',{numeric:true});
+  const worst=(a,b)=>(b.late||0)-(a.late||0)||b.ratio-a.ratio||b.sd-a.sd
+    ||((a.left==null?1e9:a.left)-(b.left==null?1e9:b.left))||cmpNo(a,b);
+  const by={no:cmpNo,stay:(a,b)=>a.ratio-b.ratio||a.sd-b.sd,dl:(a,b)=>(a.dl==null?9e15:a.dl)-(b.dl==null?9e15:b.dl),
+    act:(a,b)=>a.ai-b.ai,sup:(a,b)=>String(a.r.sup||'\uffff').localeCompare(String(b.r.sup||'\uffff'),'ru')};
+  const k=F.sort, d=F.dir||_OD_DIR[k]||1;
+  return rows.slice().sort(k&&by[k]?(a,b)=>d*by[k](a,b)||worst(a,b):worst);
 }
 function _odHtml(M,F){
-  const LB=_odLB(M.X), SN=Object.fromEntries((((M.O||{}).week||{}).ledger||[]).map(s=>[s.no,s]));
-  const it=M.items, N=it.length;
+  const P=_odPrep(M), LB=P.LB, SN=P.SN, it=M.items, N=it.length, def=_odDef(M);
   let h='';
-  if(M.queue) h+=`<div class="odq"><button type="button" class="stchip" data-odq="1">${_esc(M.queueLbl||'Пункты в очереди')} →</button></div>`;
+  const q=M.queue?`<button type="button" class="odq" data-odq="1">${_esc(M.queueLbl||'Пункты в очереди')} →</button>`:'';
+  if(def||q) h+=`<div class="odlede">${def?`<p class="oddef">${_esc(def)}</p>`:''}${q}</div>`;
   // за числом заказов нет (ноль у плитки или строки) — так и сказать, без «по этому отбору»: отбора нет
-  if(!N) return h+'<div class="note">За этим числом заказов нет.</div>';
+  if(!N) return h+'<div class="note odempty">За этим числом заказов нет.</div>';
   // закрытый заказ («Месяц», «Квартал») — своей корзиной, а не «стадия не из таблицы»
   const stepOf=x=>x.r.closed?'x':x.r.step==null?'?':String(x.r.step);
   const supOf=x=>_odIsDeal(x)?'':(x.r.sup||'поставщик не указан');
   const mgrOf=x=>x.r.mgr||'не назначен';
-  // «По менеджерам ОРК» — только где менеджер есть в строках («Квартал» — без людей: строки без mgr)
+  // менеджеры ОРК — только где менеджер есть в строках («Квартал» — без людей: строки без mgr)
   const withMgr=M.pre!=='q'&&it.some(x=>x.r.mgr);
-  // класс подписи — до « · » («в срок», «позже», «в норме», «P50», код пункта): по нему — фишки
+  // класс подписи — до « · » («в срок», «позже», «в норме», «P50», код пункта): по нему — «Проблема»
   const tagOf=x=>{const t=LB[x.tag]||x.tag, i=t.indexOf(' · '); return i>0?t.slice(0,i):t;};
   const cnt=f=>{const c=new Map(); it.forEach(x=>{const v=f(x); if(v!=='') c.set(v,(c.get(v)||0)+1);}); return c;};
   const bs=cnt(stepOf), bsup=cnt(supOf), bm=withMgr?cnt(mgrOf):new Map(), bt=cnt(tagOf);
-  const pass=x=>(F.step==null||stepOf(x)===F.step)&&(!F.sup||supOf(x)===F.sup)&&(!F.mgr||mgrOf(x)===F.mgr)&&(!F.tag||tagOf(x)===F.tag);
-  const rows=it.filter(pass);
+  const qq=String(F.q||'').trim().toLowerCase();
+  const pass=x=>(F.step==null||stepOf(x)===F.step)&&(!F.sup||supOf(x)===F.sup)&&(!F.mgr||mgrOf(x)===F.mgr)
+    &&(!F.tag||tagOf(x)===F.tag)&&(!F.act||x.a.key===F.act)&&(!qq||x.s.indexOf(qq)>=0);
+  const rows=_odSort(it.filter(pass),F);
   const ord=s=>s==='?'?2:s==='x'?1:0;
   const steps=[...bs.keys()].sort((a,b)=>ord(a)-ord(b)||(+a)-(+b));
   const stepLbl=s=>s==='?'?'стадия не из таблицы':s==='x'?'заказ закрыт':`шаг ${s}${SN[s]?' · '+SN[s].name:''}`;
   const chip=(f,on,body)=>`<button type="button" class="stchip${on?' on':''}" data-odf="${_esc(f)}" aria-pressed="${on?'true':'false'}">${body}</button>`;
-  h+=`<div class="h">Распределение по шагам ОРК · клик — фильтр</div>`
-    +`<div class="stack" style="height:16px;margin:2px 0 9px">`+steps.map(s=>`<i class="${_OD_CL[s]||'snr'}" style="width:${(bs.get(s)/(N||1)*100).toFixed(1)}%" title="${_esc(stepLbl(s))}: ${bs.get(s)}"></i>`).join('')+`</div>`
-    +`<div class="statleg">${chip('step:',F.step==null,`Все <b>${N}</b>`)}`+steps.map(s=>chip('step:'+s,F.step===s,`<i class="dot ${_OD_CL[s]||'snr'}"></i>${_esc(stepLbl(s))} <b>${bs.get(s)}</b>`)).join('')+`</div>`;
-  if(bt.size>1&&bt.size<=8) h+=`<div class="h">Что за числом · клик — фильтр</div><div class="statleg">`+[...bt.entries()].map(([t,n])=>chip('tag:'+t,F.tag===t,`${_esc(t)} <b>${n}</b>`)).join('')+`</div>`;
-  const list=(ttl,m,key,cur,sorter)=>{const L=[...m.entries()].sort(sorter); if(!L.length) return '';
-    return `<div class="h">${ttl} (${L.length})</div>`+L.slice(0,12).map(([s,n])=>`<button type="button" class="odrow${cur===s?' on':''}" data-odf="${_esc(key+':'+s)}" aria-pressed="${cur===s?'true':'false'}"><span>${_esc(key==='mgr'?_orkWhoT(s)+(/ \(уволен\)$/.test(s)?' — ушёл':''):s)}</span><b class="mono">${n}</b></button>`).join('')
-      +(L.length>12?`<div class="suprow"><span class="dimv">…ещё ${L.length-12}</span><b></b></div>`:'');};
-  h+=list('По поставщикам',bsup,'sup',F.sup,(a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'ru'));
-  if(withMgr) h+=list('По менеджерам ОРК',bm,'mgr',F.mgr,(a,b)=>(_OD_GROUP(a[0])-_OD_GROUP(b[0]))||a[0].localeCompare(b[0],'ru'));
-  const act=[F.step!=null?['step',stepLbl(F.step)]:null,F.tag?['tag',F.tag]:null,F.sup?['sup','поставщик: '+F.sup]:null,F.mgr?['mgr','менеджер ОРК: '+_orkWhoT(F.mgr)]:null].filter(Boolean);
-  h+=`<div class="h" id="odListH">${act.length?'Отобрано':'Заказы'} (${rows.length}${rows.length!==N?' из '+N:''})</div>`;
-  if(act.length) h+=`<div class="statleg">`+act.map(([k,l])=>`<button type="button" class="stchip on" data-odf="rm:${k}" aria-label="${_esc('Снять отбор: '+l)}">${_esc(l)} ×</button>`).join('')+chip('reset',false,'Сбросить')+`</div>`;
-  if(!rows.length) return h+`<div class="note">${act.length>1?'По этому сочетанию отборов пусто.':'По этому отбору пусто.'} ${chip('reset',false,'Сбросить')}</div>`;
-  return h+`<div class="twrap"><table class="lft odt" id="odTable" data-xl-name="${_esc(M.title)}"${M.xlSub?` data-xl-sub="${_esc(M.xlSub)}"`:''}><thead><tr><th>Заказ</th><th>Сделка · заказчик</th><th>Поставщик</th><th>Стадия</th><th>Шаг</th><th class="r">Р.д. на шаге / норма</th><th>Срок клиента · прогноз</th><th>Хозяин</th><th>Пункты очереди</th></tr></thead><tbody>`
-    +rows.map(x=>_odTr(x,SN,LB)).join('')+`</tbody></table></div><div class="note">Строка — карточка сделки. Р.д. — рабочие дни по календарю РФ, «без пауз»: паузы в Битриксе не ведутся.</div>`;
+  const mgrLbl=s=>_orkWhoT(s)+(/ \(уволен\)$/.test(s)?' — ушёл':'');
+  // 1. что делать и кто: группы по следующему действию (клик — отбор таблицы, повторный — снять)
+  const GS=P.groups, fold=GS.length>6&&!F.more, show=fold?GS.slice(0,6).concat(GS.slice(6).filter(g=>g.key===F.act)):GS;
+  const lvl=g=>g.key.slice(0,2)==='c:'?(g.sev<=3?'hi':g.sev<=6?'md':'lo'):g.key.slice(0,2)==='s:'?'st':'lo';
+  h+=`<section class="odsec" aria-labelledby="odActH"><h4 class="odh" id="odActH">Что делать</h4><div class="odacts">`
+    +show.map(g=>{const on=F.act===g.key;
+      const meta=[g.role?_esc(g.role):'',g.none?`<span class="amb">не назначен у ${g.none}</span>`:'',g.worst>0?`макс. ${g.worst} ${g.unit}`:''].filter(Boolean).join(' · ');
+      return `<button type="button" class="odact ${lvl(g)}${on?' on':''}" data-odf="${_esc('act:'+g.key)}" aria-pressed="${on}" aria-label="${_esc(`${g.txt}: ${g.n}${g.role?', '+g.role:''}`)}">`
+        +`<span class="odact-t">${_esc(g.txt)}</span><span class="odact-n">${g.n}</span>`
+        +(meta?`<span class="odact-m">${meta}</span>`:'')+`</button>`;}).join('')
+    +`</div>${GS.length>6?`<button type="button" class="odmore" data-odf="more" aria-expanded="${!fold}">${fold?`Ещё ${_ctN(GS.length-6,'действие','действия','действий')}`:'Свернуть'}</button>`:''}</section>`;
+  // 2. отбор: шаги ОРК (полоса и фишки), поставщик, менеджер ОРК, проблема, поиск
+  const opt=(m,cur,all,fmt,sorter)=>`<option value="">${all}</option>`+[...m.entries()].sort(sorter||((a,b)=>b[1]-a[1]||String(a[0]).localeCompare(String(b[0]),'ru')))
+    .map(([v,n])=>`<option value="${_esc(v)}"${cur===v?' selected':''}>${_esc(fmt?fmt(v):v)} — ${n}</option>`).join('');
+  h+=`<section class="odtools" aria-label="Отбор заказов"><div class="odh2">Шаги ОРК</div>`
+    +`<div class="stack odstack" aria-hidden="true">`+steps.map(s=>`<i class="${_OD_CL[s]||'snr'}" style="width:${(bs.get(s)/(N||1)*100).toFixed(1)}%" title="${_esc(stepLbl(s))}: ${bs.get(s)}"></i>`).join('')+`</div>`
+    +`<div class="statleg odsteps">${chip('step:',F.step==null,`Все <b>${N}</b>`)}`+steps.map(s=>chip('step:'+s,F.step===s,`<i class="dot ${_OD_CL[s]||'snr'}"></i>${_esc(stepLbl(s))} <b>${bs.get(s)}</b>`)).join('')+`</div>`
+    +`<div class="odfl">`
+    // телефон: шаги — списком выбора вместо фишек (фишки там скрыты)
+    +`<label class="odsel odstepsel"><span>Шаг ОРК</span><select data-odsel="step"><option value="">Все шаги — ${N}</option>`
+    +steps.map(s=>`<option value="${_esc(s)}"${F.step===s?' selected':''}>${_esc(stepLbl(s))} — ${bs.get(s)}</option>`).join('')+`</select></label>`
+    +(bsup.size?`<label class="odsel"><span>Поставщик</span><select data-odsel="sup">${opt(bsup,F.sup,'Все поставщики')}</select></label>`:'')
+    +(withMgr?`<label class="odsel"><span>Менеджер ОРК</span><select data-odsel="mgr">${opt(bm,F.mgr,'Все менеджеры',mgrLbl,(a,b)=>(_OD_GROUP(a[0])-_OD_GROUP(b[0]))||a[0].localeCompare(b[0],'ru'))}</select></label>`:'')
+    +(bt.size>1?`<label class="odsel"><span>Проблема</span><select data-odsel="tag">${opt(bt,F.tag,'Все')}</select></label>`:'')
+    +`<label class="odsrch"><span>Поиск</span><input type="search" data-odsearch value="${_esc(F.q||'')}" placeholder="Заказ, сделка, заказчик, поставщик" autocomplete="off" spellcheck="false"></label>`
+    +`</div></section>`;
+  // 3. заказы: активные отборы — снимаемые фишки; сначала худшие
+  const actG=F.act?GS.find(g=>g.key===F.act):null;
+  const act=[F.act?['act',actG?actG.txt:F.act]:null,F.step!=null?['step',stepLbl(F.step)]:null,F.tag?['tag','проблема: '+F.tag]:null,
+    F.sup?['sup','поставщик: '+F.sup]:null,F.mgr?['mgr','менеджер ОРК: '+_orkWhoT(F.mgr)]:null,qq?['q',`поиск: «${String(F.q).trim()}»`]:null].filter(Boolean);
+  h+=`<div class="odlisth"><h4 class="odh" id="odListH">${act.length?'Отобрано':'Заказы'} <span class="odcnt">${rows.length}${rows.length!==N?' из '+N:''}</span></h4>`
+    +(F.sort?`<button type="button" class="odlink" data-odf="sort:">Сначала худшие</button>`:'<span class="odsorted">сначала худшие: просрочка срока клиента, затем превышение нормы шага</span>')+`</div>`;
+  if(act.length) h+=`<div class="statleg odactive">`+act.map(([k,l])=>`<button type="button" class="stchip on" data-odf="rm:${k}" aria-label="${_esc('Снять отбор: '+l)}">${_esc(l)} ×</button>`).join('')+chip('reset',false,'Сбросить')+`</div>`;
+  if(!rows.length) return h+`<div class="note odempty">${act.length>1?'По этому сочетанию отборов пусто.':'По этому отбору пусто.'} ${chip('reset',false,'Сбросить')}</div>`;
+  const withSup=it.some(x=>!_odIsDeal(x)&&x.r.sup);
+  const th=(k,l,cls)=>{const on=F.sort===k, d=F.dir||_OD_DIR[k];
+    return `<th${cls?` class="${cls}"`:''} data-xlv="${_esc(l)}"${on?` aria-sort="${d>0?'ascending':'descending'}"`:''}><button type="button" class="odsort${on?' on':''}" data-odsort="${k}">${_esc(l)}<span class="odarr" aria-hidden="true">${on?(d>0?'↑':'↓'):'↕'}</span></button></th>`;};
+  h+=`<div class="twrap odwrap"><table class="lft odt" id="odTable" data-xl-name="${_esc(M.title)}"${M.xlSub?` data-xl-sub="${_esc(M.xlSub)}"`:''}><thead><tr>`
+    +th('no','Заказ','odc1')+th('stay','Где застрял','odc2')+th('dl','Срок клиента','odc3')+th('act','Что сделать','odc4')+(withSup?th('sup','Поставщик','odsupc'):'')
+    +`</tr></thead><tbody>`+rows.map(x=>_odTr(x,P,withSup)).join('')+`</tbody></table></div>`
+    +`<p class="odfoot">${typeof _opOpen==='function'?'Строка — путь заказа по шагам ОРК, у сделки без заказа — карточка сделки.':'Строка — карточка сделки.'} Р.д. — рабочие дни по календарю РФ, без пауз: паузы в Битриксе не ведутся.</p>`;
+  // 4. разрезы — под таблицей, свёрнуты
+  const list=(ttl,m,key,cur,sorter,fmt)=>{const L=[...m.entries()].sort(sorter); if(!L.length) return '';
+    return `<div class="odcut"><div class="odh2">${ttl} (${L.length})</div>`+L.map(([s,n])=>`<button type="button" class="odrow${cur===s?' on':''}" data-odf="${_esc(key+':'+s)}" aria-pressed="${cur===s?'true':'false'}"><span>${_esc(fmt?fmt(s):s)}</span><b>${n}</b></button>`).join('')+`</div>`;};
+  h+=`<details class="odcuts"${F.cuts?' open':''}><summary>Разрезы: по поставщикам${withMgr?' и менеджерам ОРК':''}</summary><div class="odcutg">`
+    +list('По поставщикам',bsup,'sup',F.sup,(a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'ru'))
+    +(withMgr?list('По менеджерам ОРК',bm,'mgr',F.mgr,(a,b)=>(_OD_GROUP(a[0])-_OD_GROUP(b[0]))||a[0].localeCompare(b[0],'ru'),mgrLbl):'')
+    +`</div></details>`;
+  return h;
 }
 // ТОЧКА ВЫЗОВА выгрузки таблиц в Excel (кнопка «Excel» над каждой таблицей — параллельная правка,
 // функция _xlMark(root): идемпотентна, ставит кнопку над каждой таблицей внутри root). Зовётся после
 // каждой отрисовки списка; функции нет — ничего не делаем. Таблица списка — простая (data-xl-name —
-// заголовок списка), дубль «стадия · поставщик» для телефона — не в тексте ячеек.
+// заголовок списка); шапка — data-xlv (кнопки сортировки в выгрузку не идут), ссылки в Битрикс и
+// поставщик для телефона — не в тексте ячеек.
 function _odExcelHook(root){try{if(typeof _xlMark==='function') _xlMark(root);}catch(e){console.error('Excel-хук списка заказов:',e);}}
+// дровер показывает содержимое «Реализации» — класс rz (шрифт и шкала вкладки, _rzDrw — общая
+// правка вёрстки; до неё — сам класс)
+function _odRz(on){const d=document.getElementById('drw'); if(!d) return;
+  if(typeof _rzDrw==='function') _rzDrw(on); else d.classList.toggle('rz',!!on);}
 function _odShow(){
   const M=_OD.M, body=document.getElementById('drwBody'); if(!M||!body) return;
   document.getElementById('drw').classList.add('odwide');
+  _odRz(true);
   document.getElementById('drwName').textContent=M.title;
   document.getElementById('drwSub').textContent=M.sub||_odSub(M);
   body.innerHTML=_odHtml(M,_OD.F);
@@ -4674,7 +4969,7 @@ const _OD_ARIA=['role','aria-modal','aria-labelledby'];
 function _odClose(ret){
   const drw=document.getElementById('drw'), ovl=document.getElementById('ovl');
   if(ovl) ovl.classList.remove('on');
-  if(drw){drw.classList.remove('on','odwide'); drw.setAttribute('aria-hidden','true'); delete drw.dataset.od;
+  if(drw){drw.classList.remove('on','odwide'); _odRz(false); drw.setAttribute('aria-hidden','true'); delete drw.dataset.od;
     const A=_OD.aria||{}; _OD_ARIA.forEach(a=>{if(A[a]==null) drw.removeAttribute(a); else drw.setAttribute(a,A[a]);}); _OD.aria=null;}
   const t=_OD.trigger; _OD.trigger=null;
   if(ret&&t&&t.isConnected&&t.focus) t.focus();
@@ -4688,15 +4983,30 @@ function _odToQ(t){
     try{f.focus({preventScroll:true});}catch(e){f.focus();}}
   const a=document.activeElement, d=document.getElementById('drw'); if(d&&a&&d.contains(a)&&a.blur) a.blur();
 }
+const _OD_F0={step:null,sup:'',mgr:'',tag:'',act:'',q:'',sort:'',dir:0,more:false,cuts:false};
+// перерисовка списка с тем же положением прокрутки; фокус — на тот же элемент (sel), иначе на запасной
+function _odRe(sel,alt){
+  const body=document.getElementById('drwBody'), st=body?body.scrollTop:0;
+  _odShow(); if(body) body.scrollTop=st;
+  const b=(sel&&body&&body.querySelector(sel))||(alt&&body&&body.querySelector(alt))||(body&&body.querySelector('[data-odf]'));
+  if(b&&b.focus){try{b.focus({preventScroll:true});}catch(e){b.focus();}}
+  return b;
+}
+const _odSel=v=>`[data-odf="${String(v).replace(/["\\]/g,'\\$&')}"]`;
 function _odFilt(v){
-  const F=_OD.F, keep=v;
-  if(v==='reset') Object.assign(F,{step:null,sup:'',mgr:'',tag:''});
-  else if(v.slice(0,3)==='rm:'){const k=v.slice(3); F[k]=k==='step'?null:'';}
-  else {const i=v.indexOf(':'), k=v.slice(0,i), val=v.slice(i+1);
-    if(k==='step') F.step=(val===''||F.step===val)?null:val; else F[k]=F[k]===val?'':val;}
-  _odShow();
-  const b=[...document.querySelectorAll('#drwBody [data-odf]')].find(x=>x.dataset.odf===keep)||document.querySelector('#drwBody [data-odf]');
-  if(b&&b.focus) b.focus();
+  const F=_OD.F;
+  if(v==='reset'){Object.assign(F,{step:null,sup:'',mgr:'',tag:'',act:'',q:'',sort:'',dir:0}); _odRe('[data-odf="step:"]'); return;}
+  if(v==='more'){F.more=!F.more; _odRe(_odSel('more')); return;}
+  if(v==='sort:'){F.sort=''; F.dir=0; _odRe('[data-odsort="no"]'); return;}
+  if(v.slice(0,3)==='rm:'){const k=v.slice(3); F[k]=k==='step'?null:''; _odRe('[data-odf^="rm:"]','[data-odf="step:"]'); return;}
+  const i=v.indexOf(':'), k=v.slice(0,i), val=v.slice(i+1);
+  if(k==='step') F.step=(val===''||F.step===val)?null:val; else F[k]=F[k]===val?'':val;
+  _odRe(_odSel(v));
+}
+function _odSortBy(k){
+  const F=_OD.F;
+  if(F.sort===k) F.dir=-(F.dir||_OD_DIR[k]||1); else {F.sort=k; F.dir=_OD_DIR[k]||1;}
+  _odRe(`[data-odsort="${k}"]`);
 }
 function _odCard(did){
   const x=_odBase().deals.get(String(did)); if(!x||typeof openContract!=='function') return;
@@ -4708,21 +5018,37 @@ function _odCard(did){
   body.scrollTop=0;
   const b=body.querySelector('[data-odback]'); if(b) b.focus();
 }
+// строка: заказ — путь по шагам ОРК (_opOpen, когда он есть), сделка без заказа — карточка сделки
+function _odGo(tr){
+  const k=tr.dataset.odk, x=((_OD.M||{}).items||[]).find(i=>i.k===k);
+  const body=document.getElementById('drwBody'); _OD.scroll=body?body.scrollTop:0;
+  if(x&&!_odIsDeal(x)&&!x.r.missing&&typeof _opOpen==='function'){_opOpen(k); return;}
+  _odCard(tr.dataset.odct);
+}
 function _odWire(){
   if(_OD.wired) return; _OD.wired=1;
   const drw=document.getElementById('drw'), body=document.getElementById('drwBody'), ovl=document.getElementById('ovl'), x=document.getElementById('drwX');
   const on=()=>!!drw&&drw.dataset.od==='1';
   body.addEventListener('click',e=>{if(!on()) return;
-    const b=e.target.closest('[data-odback]'), q=e.target.closest('[data-odq]'), f=e.target.closest('[data-odf]'), c=e.target.closest('tr[data-odct]');
-    if(b){_odShow(); body.scrollTop=_OD.scroll||0; const t=body.querySelector('[data-odf]'); if(t) t.focus(); return;}
+    if(e.target.closest('a[href]')) return;                       // ссылка в Битрикс — своя
+    const b=e.target.closest('[data-odback]'), q=e.target.closest('[data-odq]'), f=e.target.closest('[data-odf]'),
+      s=e.target.closest('[data-odsort]'), c=e.target.closest('tr[data-odk]');
+    if(b){_odShow(); body.scrollTop=_OD.scroll||0; const t=body.querySelector('[data-odf]'); if(t) try{t.focus({preventScroll:true});}catch(er){t.focus();} return;}
     if(q){const fn=_OD.M&&_OD.M.queue; _odClose(false); _odToQ(fn?fn():null); return;}
     if(f){_odFilt(f.dataset.odf); return;}
-    if(c) _odCard(c.dataset.odct);});
-  body.addEventListener('keydown',e=>{if(!on()||(e.key!=='Enter'&&e.key!==' ')) return; const c=e.target.closest('tr[data-odct]'); if(!c||c!==e.target) return; e.preventDefault(); _odCard(c.dataset.odct);});
+    if(s){_odSortBy(s.dataset.odsort); return;}
+    if(c) _odGo(c);});
+  body.addEventListener('change',e=>{if(!on()) return; const s=e.target.closest('select[data-odsel]'); if(!s) return;
+    const k=s.dataset.odsel; _OD.F[k]=k==='step'?(s.value===''?null:s.value):s.value; _odRe(`select[data-odsel="${s.dataset.odsel}"]`);});
+  body.addEventListener('input',e=>{if(!on()) return; const s=e.target.closest('input[data-odsearch]'); if(!s) return;
+    _OD.F.q=s.value; const i=_odRe('input[data-odsearch]'); if(i&&i.setSelectionRange){const n=i.value.length; try{i.setSelectionRange(n,n);}catch(er){}}});
+  // «Разрезы» открыты — остаются открытыми после перерисовки (toggle не всплывает: ловим на погружении)
+  body.addEventListener('toggle',e=>{if(on()&&e.target.matches&&e.target.matches('details.odcuts')&&_OD.F) _OD.F.cuts=e.target.open;},true);
+  body.addEventListener('keydown',e=>{if(!on()||(e.key!=='Enter'&&e.key!==' ')) return; const c=e.target.closest('tr[data-odk]'); if(!c||c!==e.target) return; e.preventDefault(); _odGo(c);});
   document.addEventListener('keydown',e=>{if(!on()) return;
     if(e.key==='Escape'){_odClose(true); return;}
     if(e.key!=='Tab') return;
-    const fs=[...drw.querySelectorAll('button,[href],select,input,[tabindex]:not([tabindex="-1"])')].filter(el=>!el.disabled&&el.getClientRects().length);
+    const fs=[...drw.querySelectorAll('button,[href],select,input,summary,[tabindex]:not([tabindex="-1"])')].filter(el=>!el.disabled&&el.getClientRects().length);
     if(!fs.length) return;
     const a=fs[0], z=fs[fs.length-1], cur=document.activeElement;
     if(!drw.contains(cur)){e.preventDefault(); a.focus();}
@@ -4731,17 +5057,19 @@ function _odWire(){
   if(ovl) ovl.addEventListener('click',()=>{if(on()) _odClose(true);});
   if(x) x.addEventListener('click',()=>{if(on()) _odClose(true);});
 }
-// spec: {id: «w:…» | «q:…» | «m:…», title, sub, F: начальный отбор, queue: () => отбор очереди} или
-// {keys: {k, t}, pre: 'w'} — список, собранный страницей (очередь «Списком заказов»)
+// spec: {id: «w:…» | «q:…» | «m:…», title, sub, def, F: начальный отбор, queue: () => отбор очереди} или
+// {keys: {k, t}, pre: 'w'} — список, собранный страницей (очередь «Списком заказов»). def — что
+// считает число (иначе data-oddef у числа или плитки, иначе фраза по id — _odDef)
 function _odOpen(X,O,spec,trigger){
+  const tr0=trigger||document.activeElement;
+  if(!spec.def&&tr0&&tr0.dataset&&tr0.dataset.oddef) spec=Object.assign({},spec,{def:tr0.dataset.oddef});
   const M=_odModel(X,O,spec), drw=document.getElementById('drw'), ovl=document.getElementById('ovl');
   if(!M||!drw||!ovl) return false;
   // раздел для имени файла Excel — подвкладка и направление числа («Неделя руководителя ОРК Залив»):
   // список в дровере вне панели вкладки, свой раздел он берёт у числа
-  const tr0=trigger||document.activeElement;
   M.xlSub=typeof _xlSub==='function'&&tr0&&tr0.closest&&tr0.closest('[id^="tab-"]')?_xlSub(tr0):'';
   if(drw.dataset.od!=='1') _OD.aria=Object.fromEntries(_OD_ARIA.map(a=>[a,drw.getAttribute(a)]));
-  Object.assign(_OD,{M,F:Object.assign({step:null,sup:'',mgr:'',tag:''},M.F0||{}),trigger:trigger||document.activeElement});
+  Object.assign(_OD,{M,F:Object.assign({},_OD_F0,M.F0||{}),trigger:trigger||document.activeElement});
   _odShow();
   ovl.classList.add('on'); drw.classList.add('on'); drw.setAttribute('aria-hidden','false');
   drw.setAttribute('role','dialog'); drw.setAttribute('aria-modal','true'); drw.setAttribute('aria-labelledby','drwName');

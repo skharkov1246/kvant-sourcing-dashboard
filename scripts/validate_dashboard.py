@@ -363,6 +363,9 @@ def _with_tabs_opened(path: Path) -> Path:
               "var R=document.querySelectorAll('#drwBody table.odt tbody tr').length;"
               "if(!D||!D.classList.contains('on'))kvFail('Реализация: число '+b.dataset.od+' не открыло список заказов');"
               "else if(R!==n)kvFail('Реализация: число '+b.dataset.od+' = '+n+', а в списке строк '+R);"
+              # строка списка открывается (путь заказа или карточка сделки): у каждой — ключ заказа
+              "else if(document.querySelector('#drwBody table.odt tbody tr:not([data-odk])'))"
+              "kvFail('Реализация: число '+b.dataset.od+' — в списке строка без ключа заказа (data-odk)');"
               "var X2=document.getElementById('drwX');if(X2)X2.click()});"
               "var MS2=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"main\"]');if(MS2)MS2.click()}}"
               "catch(e){kvFail('Реализация, списки заказов за числами: '+e)}"

@@ -43,7 +43,8 @@ const box = {document, window: {__ORKMONTH__: inp.orkMonth, __CONTRACTS__: inp.c
 vm.createContext(box);
 vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + inp.unpack + '\nfunction _dcData(){return null;}\n' + inp.code
   + '\nthis._orkWeek=_orkWeek; this._orkMonth=_orkMonth; this._orkQuarter=_orkQuarter; this._odModel=_odModel;'
-  + ' this._odHtml=_odHtml; this._orkQEmpty=_orkQEmpty; this._orkPulse=_orkPulse; this._odSub=_odSub;', box);
+  + ' this._odHtml=_odHtml; this._orkQEmpty=_orkQEmpty; this._orkPulse=_orkPulse; this._odSub=_odSub;'
+  + ' this._odPrep=_odPrep; this._odDef=_odDef;', box);
 const unesc = s => String(s).replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 const attr = (tag, a) => { const m = new RegExp(' ' + a + '="([^"]*)"').exec(tag); return m ? unesc(m[1]) : null; };
 const F0 = {step: null, sup: '', mgr: '', tag: ''};
@@ -76,7 +77,7 @@ for (const [k, X] of Object.entries(inp.views)) {
       const M = box._odModel(X, X.ork, {id, F: step != null ? {step} : null});
       const html = M ? box._odHtml(M, Object.assign({}, F0, M.F0 || {})) : '';
       found.push({sub, el, id, step, cls: attr(tag, 'class'), text,
-                  items: M ? M.items.length : null, rows: (html.match(/<tr class="drill" data-odct=/g) || []).length});
+                  items: M ? M.items.length : null, rows: (html.match(/<tr class="drill" data-odk="[^"]*" data-odct=/g) || []).length});
     }
   }
   const extra = {};
@@ -88,7 +89,7 @@ for (const [k, X] of Object.entries(inp.views)) {
   const s0 = steps[0];
   extra.live = box._odHtml(M, Object.assign({}, F0));
   extra.filter = {step: s0, want: steps.filter(s => s === s0).length,
-    rows: (box._odHtml(M, Object.assign({}, F0, {step: s0})).match(/<tr class="drill" data-odct=/g) || []).length,
+    rows: (box._odHtml(M, Object.assign({}, F0, {step: s0})).match(/<tr class="drill" data-odk="[^"]*" data-odct=/g) || []).length,
     combo: box._odHtml(M, Object.assign({}, F0, {step: s0, sup: 'нет такого поставщика'})),
     one: box._odHtml(M, Object.assign({}, F0, {sup: 'нет такого поставщика'}))};
   // все заказы «Квартала» одним списком: закрытые — своей корзиной, менеджеров ОРК нет
@@ -98,6 +99,20 @@ for (const [k, X] of Object.entries(inp.views)) {
   extra.empty = box._odHtml(box._odModel(X, X.ork, {keys: {k: [], t: null}, pre: 'w', title: 'пусто'}), Object.assign({}, F0));
   const MH = box._odModel(X, X.ork, {id: 'w:hyg/all'});
   extra.hyg = MH ? box._odHtml(MH, Object.assign({}, F0)) : '';
+  // «Разбор числа» W3: «Что делать» (группы по следующему действию), худшие сверху, отбор по
+  // действию, поиск, сортировка по номеру, ссылки в Битрикс, шапка для выгрузки
+  const M3 = box._odModel(X, X.ork, {id: 'w:W3'});
+  if (M3 && M3.items.length) {
+    const P3 = box._odPrep(M3), keys = h => [...h.matchAll(/<tr class="drill" data-odk="([^"]*)"/g)].map(m => unesc(m[1]));
+    const h3 = box._odHtml(M3, Object.assign({}, F0)), g0 = P3.groups[0], q0 = String(M3.items[0].r.no);
+    extra.w3 = {n: M3.items.length, html: h3, order: keys(h3), def: box._odDef(M3),
+      groups: P3.groups.map(g => ({key: g.key, n: g.n, txt: g.txt, role: g.role})),
+      items: M3.items.map(x => ({k: x.k, no: x.r.no || '', late: x.late, deal: x.r.deal || '', isD: x.k.startsWith('d:'),
+        missing: !!x.r.missing, act: x.a.key})),
+      g0: keys(box._odHtml(M3, Object.assign({}, F0, {act: g0.key}))),
+      q: q0, qrows: keys(box._odHtml(M3, Object.assign({}, F0, {q: q0}))),
+      sortNo: keys(box._odHtml(M3, Object.assign({}, F0, {sort: 'no', dir: 1})))};
+  }
   out[k] = {found, extra};
 }
 out.fallback = box._odHtml(box._odModel(inp.views.main, inp.views.main.ork,
@@ -297,3 +312,40 @@ def test_строка_списка_номер_заказа_и_день_отсч�
     live = out["main"]["extra"]["live"]
     for x in rows:
         assert f'<div class="dep">{htmlmod.escape(x["since"], quote=True)}</div>' in live, (x["k"], x["since"])
+
+
+def test_разбор_числа_что_делать_худшие_сверху_битрикс(run):
+    """«Разбор числа» (отзыв владельца 29.10.2026: «как понимать, что дальше», «провалиться, где
+    зависло»): что считает число — фразой; «Что делать» — группы по следующему действию, сумма
+    групп — все строки числа, отбор по группе даёт ровно её строки; строки — сначала худшие
+    (просрочка срока клиента по убыванию); поиск по номеру находит заказ; сортировка по номеру;
+    у каждой строки — ссылки в Битрикс на заказ и сделку, в выгрузку они не идут (data-xlv="");
+    шапка таблицы — data-xlv (кнопки сортировки в файл не попадают); разрезы — под таблицей."""
+    import re
+    _r, out = run
+    w = out["main"]["extra"]["w3"]
+    assert w["def"].startswith("Заказы, у которых срок клиента прошёл")
+    g = w["groups"]
+    assert sum(x["n"] for x in g) == w["n"] == len(w["order"])
+    assert g[0]["key"] == "c:late", "первым — самое важное действие (пункт «late»)"
+    assert all(x["txt"] and x["role"] for x in g if x["key"].startswith("c:")), "у действия — хозяин"
+    assert sorted(w["g0"]) == sorted(x["k"] for x in w["items"] if x["act"] == g[0]["key"])
+    it = {x["k"]: x for x in w["items"]}
+    late = [it[k]["late"] or 0 for k in w["order"]]
+    assert late == sorted(late, reverse=True) and late[0] > 0, "сначала худшие"
+    assert w["q"] and w["qrows"] and all(w["q"].lower() in it[k]["no"].lower() for k in w["qrows"])
+    nat = lambda s: [int(p) if p.isdigit() else p for p in re.split(r"(\d+)", s)]  # noqa: E731
+    nos = [it[k]["no"] or k for k in w["sortNo"]]
+    assert nos == sorted(nos, key=nat) and sorted(w["sortNo"]) == sorted(w["order"])
+    h = w["html"]
+    for x in w["items"]:
+        if not x["isD"] and not x["missing"]:
+            assert f'crm/type/172/details/{x["k"]}/"' in h, x["k"]
+        assert f'crm/deal/details/{x["deal"]}/"' in h, x["deal"]
+    links = re.findall(r'<a class="odbx"[^>]*>', h)
+    assert links and all('target="_blank"' in a and 'rel="noopener"' in a and 'data-xlv=""' in a for a in links)
+    for t in ("Заказ", "Где застрял", "Срок клиента", "Что сделать", "Поставщик"):
+        assert f'data-xlv="{t}"' in h, t
+    assert "клик — фильтр" not in h and "Что делать" in h
+    assert h.index("<table") < h.index("По поставщикам") and '<details class="odcuts"' in h
+    assert "просрочен на " in h

@@ -198,6 +198,8 @@ def test_клавиатура_карточка_и_отборы_в_списке(b
     pg, errs = _open(browser, page_url)
     # точка выгрузки в Excel: функция _xlMark параллельной правки зовётся с телом списка
     pg.evaluate("window.__xl=[]; window._xlMark=r=>window.__xl.push(r&&r.id)")
+    # строка — карточка сделки, когда пути заказа нет (_opOpen); путь — test_разбор_числа_…
+    pg.evaluate("window._opOpen=undefined; 0")
     row = pg.locator("#orkPulseB tr[data-od]").nth(1)
     row.focus()
     pg.keyboard.press("Enter")
@@ -273,4 +275,88 @@ def test_телефон_390_без_сдвига_вбок(browser, page_url):
     assert pg.evaluate("Math.round(document.getElementById('drw').getBoundingClientRect().width)") == 390
     # строки — карточками: таблица не шире дровера
     assert pg.evaluate("document.querySelector('#odTable').scrollWidth<=document.getElementById('drwBody').clientWidth")
+    # шаги на телефоне — списком выбора (фишки скрыты), отбор им — столько строк, сколько в шаге
+    sel = pg.locator("#drwBody select[data-odsel='step']")
+    assert sel.is_visible() and not pg.locator("#drwBody .odsteps").is_visible()
+    v = sel.locator("option").nth(1).get_attribute("value")
+    want = pg.evaluate("v=>[...document.querySelectorAll('#drwBody .odsteps [data-odf]')].find(b=>b.dataset.odf==='step:'+v).querySelector('b').textContent", v)
+    sel.select_option(v)
+    assert pg.locator(ROWS).count() == int(want)
+    assert not errs, errs
+
+
+@pytest.mark.parametrize("width", [1280, 1920])
+def test_разбор_числа_что_делать_отборы_сортировка_путь(browser, page_url, width):
+    """«Разбор числа» (отзыв владельца 29.10.2026): «Что делать» — группа отбирает свои строки
+    (aria-pressed), повторный клик снимает; поставщик — списком выбора; поиск не теряет фокус;
+    сортировка — кнопкой в шапке с aria-sort; «Разрезы» под таблицей и не закрываются при
+    отборе; строка заказа — путь заказа (_opOpen, когда он есть), ссылка в Битрикс — своя;
+    дровер min(1200px, 100vw), ничего не обрезано справа."""
+    pg, errs = _open(browser, page_url, width=width)
+    pg.evaluate("window.__op=[]; window._opOpen=k=>window.__op.push(k); 0")   # 0: функцию evaluate вызвал бы сам
+    tile = pg.locator("#ctPanel-main .actile[data-of='w3']")
+    total = int(tile.locator(".v").inner_text())
+    _clicked_rows(pg, tile)
+    assert pg.evaluate("Math.round(document.getElementById('drw').getBoundingClientRect().width)") == min(1200, width)
+    assert pg.evaluate("(()=>{const b=document.getElementById('drwBody'), r=b.getBoundingClientRect();"
+                       "return b.scrollWidth<=b.clientWidth&&[...b.querySelectorAll('#odTable th,#odTable td')]"
+                       ".every(c=>c.getBoundingClientRect().right<=r.right+0.5)})()"), "обрезано справа"
+    assert pg.locator("#drwBody .oddef").inner_text().startswith("Заказы, у которых срок клиента прошёл")
+    # что делать: группы — все строки числа; клик — отбор, повторный — снять
+    acts = pg.locator("#drwBody .odact")
+    ns = [int(acts.nth(i).locator(".odact-n").inner_text()) for i in range(acts.count())]
+    assert sum(ns) == total and pg.locator("#drwBody .odmore").count() == 0
+    acts.first.click()
+    assert pg.locator(ROWS).count() == ns[0]
+    assert pg.locator("#drwBody .odact").first.get_attribute("aria-pressed") == "true"
+    assert pg.evaluate("document.activeElement.classList.contains('odact')"), "фокус остался на группе"
+    pg.locator("#drwBody .odact").first.click()
+    assert pg.locator(ROWS).count() == total
+    # «Разрезы» открыты — остаются открытыми после отбора; отбор из разреза — снимаемой фишкой
+    pg.locator("#drwBody details.odcuts summary").click()
+    row = pg.locator("#drwBody details.odcuts .odrow").first
+    n = int(row.locator("b").inner_text())
+    row.click()
+    assert pg.locator(ROWS).count() == n and pg.locator("#drwBody details.odcuts[open]").count() == 1
+    pg.locator("#drwBody [data-odf='reset']").first.click()
+    assert pg.locator(ROWS).count() == total
+    # поставщик — списком выбора
+    sel = pg.locator("#drwBody select[data-odsel='sup']")
+    opt = sel.locator("option").nth(1)
+    want = int(opt.inner_text().rsplit("—", 1)[1])
+    sel.select_option(opt.get_attribute("value"))
+    assert pg.locator(ROWS).count() == want and pg.locator("#drwBody [data-odf='rm:sup']").count() == 1
+    pg.locator("#drwBody [data-odf='rm:sup']").click()
+    assert pg.locator(ROWS).count() == total
+    # поиск: по номеру заказа, фокус в поле
+    no = pg.locator(ROWS).first.locator(".odno b").inner_text().strip()
+    box = pg.locator("#drwBody input[data-odsearch]")
+    box.click()
+    pg.keyboard.type(no)
+    assert pg.evaluate("document.activeElement.matches('input[data-odsearch]')")
+    assert 1 <= pg.locator(ROWS).count() < total or total == 1
+    assert all(no in pg.locator(ROWS).nth(i).locator(".odno b").inner_text() for i in range(pg.locator(ROWS).count()))
+    pg.locator("#drwBody [data-odf='rm:q']").click()
+    assert pg.locator(ROWS).count() == total
+    # сортировка: кнопка в шапке, aria-sort, повторный клик — обратный порядок
+    pg.locator("#drwBody th button[data-odsort='no']").click()
+    th = pg.locator("#drwBody th:has(button[data-odsort='no'])")
+    assert th.get_attribute("aria-sort") == "ascending"
+    first = pg.locator(ROWS).first.get_attribute("data-odk")
+    pg.locator("#drwBody th button[data-odsort='no']").click()
+    assert th.get_attribute("aria-sort") == "descending" and pg.locator(ROWS).last.get_attribute("data-odk") == first
+    # ссылки в Битрикс: новая вкладка; клик по ссылке строку не открывает
+    a = pg.locator(ROWS).first.locator("a.odbx").first
+    assert a.get_attribute("target") == "_blank" and "noopener" in a.get_attribute("rel")
+    assert pg.evaluate("window.__op.length") == 0, "строка открылась до ссылки"
+    pg.evaluate("document.querySelector('#drwBody tr[data-odk] a.odbx').addEventListener('click',e=>e.preventDefault(),{once:true})")
+    pg.locator("#drwBody tr[data-odk] a.odbx").first.click()
+    assert pg.evaluate("window.__op.length") == 0 and pg.locator(ROWS).count() == total
+    # строка заказа — путь заказа: _opOpen(ключ заказа)
+    r0 = pg.locator(ROWS).first
+    k = r0.get_attribute("data-odk")
+    r0.focus()
+    pg.keyboard.press("Enter")
+    assert pg.evaluate("window.__op") == [k]
+    pg.keyboard.press("Escape")
     assert not errs, errs
