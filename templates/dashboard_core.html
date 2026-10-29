@@ -1008,7 +1008,9 @@ function _xlVal(s){
   if(!isFinite(v)) return {s};
   if(m[1]) v=-v;
   if(Object.is(v,-0)) v=0;
-  if(m[5]) return {n:v/100,pct:Math.min(fr.length,2)};
+  // доля — из десятичной записи с порядком («13.7e-2»): ближайшее к 0,137 число, без хвоста
+  // двоичной дроби, который давало деление (13.7/100 = 0.13699999999999998)
+  if(m[5]){let n=Number((m[1]?'-':'')+int+(fr?'.'+fr:'')+'e-2'); if(Object.is(n,-0)) n=0; return {n,pct:Math.min(fr.length,2)};}
   return {n:v};
 }
 function _xlSheetName(s){
@@ -1194,6 +1196,7 @@ function _xlTabName(el){
 }
 // раздел: выбранные подвкладки (role=tab) этой вкладки; «Основное» направление — без пометки
 function _xlSub(el){
+  const own=el&&el.closest?el.closest('[data-xl-sub]'):null; if(own) return own.dataset.xlSub;
   const p=el&&el.closest?el.closest('[id^="tab-"]'):null; if(!p) return '';
   return [...p.querySelectorAll('[role="tab"][aria-selected="true"]')].map(b=>_xlLabel(b.textContent))
     .filter(x=>x&&x!=='Основное').join(' ');
@@ -3512,8 +3515,10 @@ function _odBase(){
   if(_OD.base&&_OD.baseOf===R) return _OD.base;
   const deals=new Map(), orders=new Map();
   R.forEach(r=>{deals.set(String(r.deal),r);
-    (r.orders||[]).forEach(o=>{const m=/^\s*(\d{1,5}(?:\/\d+)?)\./.exec(o.title||'');
-      orders.set(String(o.id),{k:String(o.id),no:m?m[1]:'#'+o.id,deal:String(r.deal),seq:r.seq,sup:o.sup&&o.sup!=='—'?o.sup:'',stage:o.stageName||'',
+    // номер — подпись заказа из данных (contracts: lbl = ork.order_label, тот же, что у очереди
+    // и строк «Недели»): «900/1» или «id 7001»; дата в начале названия — не номер
+    (r.orders||[]).forEach(o=>{
+      orders.set(String(o.id),{k:String(o.id),no:o.lbl||'id '+o.id,deal:String(r.deal),seq:r.seq,sup:o.sup&&o.sup!=='—'?o.sup:'',stage:o.stageName||'',
         step:o.step==null?null:o.step,wd:o.stepWd,norm:o.stepNorm,over:o.stepOver===true,wu:!!o.stepWaitUtd,own:o.stepWho||'',ownR:o.stepRole||'',dlTxt:o.dl||'',closed:!o.live});});});
   _OD.base={deals,orders}; _OD.baseOf=R; return _OD.base;
 }
@@ -3548,8 +3553,9 @@ function _odTr(x,SN,LB){
   const r=x.r, d=x.d||{}, isD=_odIsDeal(x), s=r.step!=null?SN[r.step]:null;
   const dd=v=>{const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(String(v||'')); return m?`${m[3]}.${m[2]}.${m[1]}`:String(v||'');};
   const cust=d.customer&&d.customer!=='—'?d.customer:'';
-  const no=isD?(r.kind==='dealClose'?'сделка: закрыть':r.kind==='noOrder'?'сделка без заказа':'сделка'):(r.no||'#'+x.k);
-  const days=r.wd!=null?`<span class="${r.over?'hot':r.wu?'amb':''}">${r.wd}${r.norm!=null?' / '+r.norm:''} р.д.</span><div class="dep">${r.over?'сверх нормы · ':r.wu?'ждём УПД от клиента · ':''}без пауз</div>`
+  const no=isD?(r.kind==='dealClose'?'сделка: закрыть':r.kind==='noOrder'?'сделка без заказа':'сделка'):(r.no||'id '+x.k);
+  // «с 14.10 (назначение)» — от какого дня считаны р.д. шага, как у пункта очереди (orkview: since)
+  const days=r.wd!=null?`<span class="${r.over?'hot':r.wu?'amb':''}">${r.wd}${r.norm!=null?' / '+r.norm:''} р.д.</span><div class="dep">${r.over?'сверх нормы · ':r.wu?'ждём УПД от клиента · ':''}без пауз</div>${r.since?`<div class="dep">${_esc(r.since)}</div>`:''}`
     :r.tu?'<span class="dimv">срок неизвестен</span>'
     :r.cd!=null?`${r.cd} дн<div class="dep">${r.norm==null?'шаг не нормируется':''}</div>`:'<span class="dimv">—</span>';
   const dl=r.dl?dd(r.dl):(r.dlTxt||'');
@@ -3605,7 +3611,7 @@ function _odHtml(M,F){
   h+=`<div class="h" id="odListH">${act.length?'Отобрано':'Заказы'} (${rows.length}${rows.length!==N?' из '+N:''})</div>`;
   if(act.length) h+=`<div class="statleg">`+act.map(([k,l])=>`<button type="button" class="stchip on" data-odf="rm:${k}" aria-label="${_esc('Снять отбор: '+l)}">${_esc(l)} ×</button>`).join('')+chip('reset',false,'Сбросить')+`</div>`;
   if(!rows.length) return h+`<div class="note">${act.length>1?'По этому сочетанию отборов пусто.':'По этому отбору пусто.'} ${chip('reset',false,'Сбросить')}</div>`;
-  return h+`<div class="twrap"><table class="lft odt" id="odTable" data-xl-name="${_esc(M.title)}"><thead><tr><th>Заказ</th><th>Сделка · заказчик</th><th>Поставщик</th><th>Стадия</th><th>Шаг</th><th class="r">Р.д. на шаге / норма</th><th>Срок клиента · прогноз</th><th>Хозяин</th><th>Пункты очереди</th></tr></thead><tbody>`
+  return h+`<div class="twrap"><table class="lft odt" id="odTable" data-xl-name="${_esc(M.title)}"${M.xlSub?` data-xl-sub="${_esc(M.xlSub)}"`:''}><thead><tr><th>Заказ</th><th>Сделка · заказчик</th><th>Поставщик</th><th>Стадия</th><th>Шаг</th><th class="r">Р.д. на шаге / норма</th><th>Срок клиента · прогноз</th><th>Хозяин</th><th>Пункты очереди</th></tr></thead><tbody>`
     +rows.map(x=>_odTr(x,SN,LB)).join('')+`</tbody></table></div><div class="note">Строка — карточка сделки. Р.д. — рабочие дни по календарю РФ, «без пауз»: паузы в Битриксе не ведутся.</div>`;
 }
 // ТОЧКА ВЫЗОВА выгрузки таблиц в Excel (кнопка «Excel» над каждой таблицей — параллельная правка,
@@ -3689,6 +3695,10 @@ function _odWire(){
 function _odOpen(X,O,spec,trigger){
   const M=_odModel(X,O,spec), drw=document.getElementById('drw'), ovl=document.getElementById('ovl');
   if(!M||!drw||!ovl) return false;
+  // раздел для имени файла Excel — подвкладка и направление числа («Неделя руководителя ОРК Залив»):
+  // список в дровере вне панели вкладки, свой раздел он берёт у числа
+  const tr0=trigger||document.activeElement;
+  M.xlSub=typeof _xlSub==='function'&&tr0&&tr0.closest&&tr0.closest('[id^="tab-"]')?_xlSub(tr0):'';
   if(drw.dataset.od!=='1') _OD.aria=Object.fromEntries(_OD_ARIA.map(a=>[a,drw.getAttribute(a)]));
   Object.assign(_OD,{M,F:Object.assign({step:null,sup:'',mgr:'',tag:''},M.F0||{}),trigger:trigger||document.activeElement});
   _odShow();

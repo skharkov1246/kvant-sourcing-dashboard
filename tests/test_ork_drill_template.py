@@ -48,6 +48,11 @@ const unesc = s => String(s).replace(/&quot;/g, '"').replace(/&lt;/g, '<').repla
 const attr = (tag, a) => { const m = new RegExp(' ' + a + '="([^"]*)"').exec(tag); return m ? unesc(m[1]) : null; };
 const F0 = {step: null, sup: '', mgr: '', tag: ''};
 const out = {};
+// запасная строка (_odBase: заказ не из строк части — закрытый заказ пункта «оплата»): номер — lbl
+// из данных (ork.order_label), а не разбор названия: дата в начале названия — не номер
+const R0 = box.window.__CONTRACTS__.rows[0];
+R0.orders = (R0.orders || []).concat([{id: '79001', title: '29.10 доп. поставка', lbl: 'id 79001', live: false, sup: 'Компания 9'},
+  {id: '79002', title: '905 / 2 Поставка', lbl: '905/2', live: false, sup: 'Компания 9'}]);
 for (const [k, X] of Object.entries(inp.views)) {
   const el = node();
   box._orkWeek(X, X.ork, el, '');
@@ -81,6 +86,7 @@ for (const [k, X] of Object.entries(inp.views)) {
   const M = box._odModel(X, X.ork, {id: 'w:live'});
   const steps = M.items.map(x => x.r.step == null ? '?' : String(x.r.step));
   const s0 = steps[0];
+  extra.live = box._odHtml(M, Object.assign({}, F0));
   extra.filter = {step: s0, want: steps.filter(s => s === s0).length,
     rows: (box._odHtml(M, Object.assign({}, F0, {step: s0})).match(/<tr class="drill" data-odct=/g) || []).length,
     combo: box._odHtml(M, Object.assign({}, F0, {step: s0, sup: 'нет такого поставщика'})),
@@ -94,6 +100,8 @@ for (const [k, X] of Object.entries(inp.views)) {
   extra.hyg = MH ? box._odHtml(MH, Object.assign({}, F0)) : '';
   out[k] = {found, extra};
 }
+out.fallback = box._odHtml(box._odModel(inp.views.main, inp.views.main.ork,
+  {keys: {k: ['79001', '79002', '79999'], t: null}, pre: 'w', title: 'запасные'}), Object.assign({}, F0));
 out.qempty = {two: box._orkQEmpty({codeLbl: 'a', stepLbl: 'b'}), one: box._orkQEmpty({codeLbl: 'a'}), none: box._orkQEmpty({})};
 const W = JSON.parse(JSON.stringify(inp.views.main.ork.week));
 W.pulse.rows[0].gone = true; W.pulse.rows[0].who = W.pulse.rows[0].who + ' (уволен)';
@@ -268,3 +276,24 @@ def test_закрытые_пусто_гигиена_и_дубль_для_тел�
     assert hw and htmlmod.escape(hw[0], quote=False) in ex["hyg"].replace("&quot;", '"')
     assert re.search(r'class="dep odm" data-odm="[^"]+"></div>', ex["hyg"])
     assert "По менеджерам ОРК" in ex["hyg"], "«Неделя»: менеджеры ОРК в списке есть"
+
+
+def test_строка_списка_номер_заказа_и_день_отсчёта(run):
+    """Ревизия сведения 29.10.2026. Номер в запасной строке (заказа нет в строках части — закрытый
+    заказ пункта «оплата») — подпись из данных (lbl, ork.order_label), как у очереди: «id 79001», а
+    не «29» из даты в начале названия и не «#79001»; заказа нет и в таблице сделок — «id <ключ>».
+    У строки с посчитанными р.д. — от какого дня они считаны («с 14.08 (вход в шаг)»), как у
+    пункта очереди о сроке шага."""
+    import orkview
+    r, out = run
+    fb = out["fallback"]
+    for no in ("id 79001", "905/2", "id 79999"):
+        assert f'<b class="mono">{no}</b>' in fb, no
+    assert '<b class="mono">29</b>' not in fb and "#79" not in fb
+    assert "заказа нет в данных вкладки" in fb, "ключ без строки — помечен"
+    w = r["contracts"]["ork"]["week"]
+    rows = [x for x in orkview.unpack(w["orders"], w["strs"]) if x.get("wd") is not None]
+    assert rows and all(x.get("since") for x in rows)
+    live = out["main"]["extra"]["live"]
+    for x in rows:
+        assert f'<div class="dep">{htmlmod.escape(x["since"], quote=True)}</div>' in live, (x["k"], x["since"])

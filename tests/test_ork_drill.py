@@ -111,6 +111,30 @@ def test_коды_очереди_и_прогноз_у_строки_как_в_о�
         assert checked
 
 
+def test_день_отсчёта_у_строки_как_у_пункта_очереди(built):
+    """Строка списка говорит, от какого дня считаны р.д. шага, — «с 14.08 (вход в шаг)», «с 13.09
+    (доставка)», — тем же текстом, что пункт очереди о сроке шага (s1Over…s6Over, noUtd: ref,
+    lifecycle.order_ref): ревизия сведения 29.10.2026 — в списке за числом «Р.д. на шаге / норма»
+    были без основания, которое очередь выпуска 1 показывает. У строки без посчитанных р.д.
+    основания нет."""
+    term = set(ork.TERM_CODE.values())
+    checked = 0
+    for name, v in _views(built["contracts"]):
+        rows = {r["k"]: r for r in _rows(v["ork"]["week"])}
+        for r in rows.values():
+            if r.get("wd") is not None:
+                assert re.fullmatch(r"с \d\d\.\d\d(\.\d{4})? \((вход в шаг|назначение|доставка|создан заказ|"
+                                    r"вход в реализацию)\)", r.get("since", "")), (name, r["k"], r.get("since"))
+            else:
+                assert "since" not in r, (name, r["k"])
+        for q in v["life"]["queue"]:
+            r = rows.get(str(q.get("order") or ""))
+            if r and q["code"] in term:
+                assert r["since"] == q["ref"], (name, q["code"], q["order"])
+                checked += 1
+    assert checked >= 5, "корпус: пункты о сроке шага на живых заказах недели"
+
+
 def test_каждое_число_недели_и_его_заказы(built):
     """Число ↔ ключи: плитки W1–W3, W5, ведомость (сейчас, сверх нормы, ждём УПД, срок
     неизвестен, не в счёте, нет артефактов, закрытые сделки, дольше P80, к закрытию), ждут

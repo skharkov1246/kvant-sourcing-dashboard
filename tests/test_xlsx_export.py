@@ -95,15 +95,20 @@ NAMES = {
     "long": ["Реализация", "Неделя руководителя ОРК", "Что делать — очередь по исполнителю шага " * 6],
 }
 SHEETS = ["a[b]:c*d?e/f\\g" + "х" * 40, "", "'Кавычки'", "History", "Журнал шагов"]
+# доля с дробью — ровно то число, что написано: 13,7 % → 0.137, а не 0.13699999999999998
+# (деление на 100 в двоичной дроби давало хвост; ревизия сведения 29.10.2026, «Пульс ОРК»)
+PCT_EXACT = {"13,7 %": "0.137", "14,3 %": "0.143", "57,1 %": "0.571", "0,7 %": "0.007", "33.3%": "0.333",
+             "−28,6 %": "-0.286", "99,9 %": "0.999", "45 %": "0.45", "100%": "1"}
+PCT = {"sheet": "Доли", "head": ["Доля"], "rows": [[t] for t in PCT_EXACT]}
 
 
 @pytest.fixture(scope="module")
 def built():
     if shutil.which("node") is None:
         pytest.skip("нет node")
-    inp = {"core": CORE, "books": {"basic": BASIC, "big": BIG, "foot": FOOT,
+    inp = {"core": CORE, "books": {"basic": BASIC, "big": BIG, "foot": FOOT, "pct": PCT,
                                    "empty": {"sheet": "", "head": ["А", "Б"], "rows": []}},
-           "vals": list(VALS), "names": NAMES, "sheets": SHEETS}
+           "vals": list(VALS) + list(PCT_EXACT), "names": NAMES, "sheets": SHEETS}
     # ensure_ascii — одиночная половинка суррогатной пары доезжает до node как есть
     r = subprocess.run(["node", "-e", HARNESS], input=json.dumps(inp), capture_output=True, text=True,
                        timeout=120, encoding="utf-8")
@@ -208,6 +213,19 @@ def test_число_или_текст(built):
             assert got["n"] == pytest.approx(exp[1]) and got["pct"] == exp[2], (text, got)
 
 
+def test_доля_точно_без_хвоста_двоичной_дроби(built):
+    """Видимая доля «13,7 %» — в файле 0.137 (формат 0.0%), а не 0.13699999999999998: значение
+    ячейки, которое видно в строке формул Excel и уходит в формулы, — то, что на странице."""
+    for text, want in PCT_EXACT.items():
+        got = built["vals"][text]
+        assert got["n"] == float(want), (text, got)
+    xml = zipfile.ZipFile(io.BytesIO(_book(built, "pct"))).read("xl/worksheets/sheet1.xml").decode()
+    vs = re.findall(r"<v>([^<]*)</v>", xml)
+    assert vs == list(PCT_EXACT.values()), vs
+    ws = _wb(_book(built, "pct")).active
+    assert [ws.cell(i + 2, 1).value for i in range(len(PCT_EXACT))] == [float(v) for v in PCT_EXACT.values()]
+
+
 def test_имя_файла_и_листа(built):
     """КВАНТ_<вкладка>_<раздел>_<таблица>_<дата>.xlsx: без знаков, запрещённых Windows, ≤ 120;
     лист ≤ 31 знака без []:*?/\\."""
@@ -255,6 +273,12 @@ try{
   document.querySelector('#tab-contracts [role="tab"][data-sub="week"]').click();
   snap(document.getElementById('orkQb').closest('table'),'queue');
   snap(document.getElementById('orkLed').closest('table'),'ledger');
+  // список за числом (дровер): в имени файла — подвкладка и направление числа, как у таблиц вкладки
+  var od=function(sel,key){var b=document.querySelector(sel+' button[data-od="w:live"]'); b.click();
+    var t=document.getElementById('odTable'); snap(t,key); out[key].trs=t.tBodies[0].rows.length; out[key].n=+b.textContent;
+    _odClose(false);};
+  od('#ctPanel-main','odMain');
+  var sd=document.getElementById('ctDir-sep'); if(sd){sd.click(); od('#ctPanel-sep','odSep'); document.getElementById('ctDir-main').click();}
   document.querySelector('#tab-contracts [role="tab"][data-sub="main"]').click();
   snap(document.getElementById('ctBody').closest('table'),'deals');
 }catch(e){out.err=String(e&&e.stack||e);}
@@ -336,6 +360,22 @@ def test_число_со_списком_заказов_идёт_в_файл(page
     for row, s in zip(rows, L):
         assert str(row[2]).split(" · ")[0] == str(s["now"] or 0), (s["no"], row[2])
     assert rows[-1][0] == "Итого сейчас" and rows[-1][2] == sum(s["now"] or 0 for s in L)
+
+
+def test_список_за_числом_имя_файла_с_подвкладкой_и_направлением(page_run):
+    """Ревизия сведения 29.10.2026: список за числом в дровере выгружался как
+    «КВАНТ_Реализация_Живые заказы вида_…» и из «Основного», и из второго направления — два разных
+    списка под одним именем. Теперь раздел — подвкладка и направление числа, с которого открыт
+    список; строк в файле — столько, сколько в списке и в числе."""
+    out, r, _m = page_run
+    a, b = out["odMain"], out["odSep"]
+    sep = r["contracts"]["sep"]
+    assert a["file"] == "КВАНТ_Реализация_Неделя руководителя ОРК_Живые заказы вида_2026-10-29.xlsx", a["file"]
+    name = r["contracts"]["head"]["sep"]["name"]                # название второго направления вкладки
+    assert b["file"] == f"КВАНТ_Реализация_Неделя руководителя ОРК {name}_Живые заказы вида_2026-10-29.xlsx", b["file"]
+    for x, v in ((a, r["contracts"]), (b, sep)):
+        assert x["rows"] == x["trs"] == x["n"] == v["ork"]["week"]["live"] > 0
+        assert len(_rows(x["b64"])) == 1 + x["rows"]
 
 
 def test_таблица_сделок_как_на_странице(page_run):

@@ -1100,6 +1100,10 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
              "own": own.get("who") or "", "ownR": own.get("role") or "", "kam": _nm(d.get("kam")),
              "dl": _iso(o.get("dl")), "fc": _iso(lifecycle.forecast(o, today, med, sup_slip)),
              "q": codes_of.get(str(oid), []),
+             # от какого дня считаны р.д. шага — «с 14.10 (назначение)», как у пункта очереди
+             # (lifecycle.order_ref → since_text, тот же ork.judged): список и очередь говорят одно
+             "since": lifecycle.since_text(v.get("since"), v.get("sinceBy") or "", o, today)
+             if v.get("wd") is not None else "",
              # срок шага (judged): сверх нормы, ждём УПД, срок неизвестен, не в счёте (гигиена,
              # приёмка вне «Реализации»); гигиена — виды и почему
              "over": v.get("over") is True, "wu": bool(v.get("waitUtd")), "tu": bool(v.get("termUnknown")),
