@@ -69,6 +69,10 @@ BASIC = {
     ],
     "tail": ["выгружено 4 из 9: остальные строки в страницу не переданы"],
 }
+# итоги tfoot — под автофильтром (nData — строк данных); {t, txt} — ячейка только текстом (цифры
+# собраны из разных элементов страницы); «_x0041_» — подчёркивание экранировано, Excel не прочтёт код знака
+FOOT = {"sheet": "Итоги", "head": ["А", "Б"], "nData": 2,
+        "rows": [["_x0041_ и a_x00e9_b", "1"], [{"t": "5 100%", "txt": True}, "2"], ["Итого", "3"]]}
 BIG = {"sheet": "Большая", "head": ["№", "Количество", "Текст"],
        "rows": [[f"№{i}", f"{i * 1000:,}".replace(",", " "), f"строка {i}"] for i in range(1, 2001)]}
 # видимый текст → ожидание: ("n", число) | ("pct", доля, знаков) | ("s",)
@@ -81,6 +85,8 @@ VALS = {
     "01.10": ("s",), "28.10": ("s",), "10.2026": ("s",), "28.10.2026": ("s",), "2024–2027": ("s",),
     "45 % в срок": ("s",), "5 дн": ("s",), "€12K": ("s",), "+5": ("s",), "1 23": ("s",), "12:30": ("s",),
     "": ("s",), "—": ("s",), "1,234.5": ("s",), "№933": ("s",),
+    # счёт и доля рядом («3» и «<small>100%</small>»): разряды тысяч у процента — текстом, а не 3100 %
+    "3 100%": ("s",), "36 100%": ("s",), "1 100 %": ("s",), "5\u00a0100%": ("s",),
 }
 NAMES = {
     "journal": ["Реализация", "Месяц", "Журнал шагов"],
@@ -95,7 +101,8 @@ SHEETS = ["a[b]:c*d?e/f\\g" + "х" * 40, "", "'Кавычки'", "History", "Ж�
 def built():
     if shutil.which("node") is None:
         pytest.skip("нет node")
-    inp = {"core": CORE, "books": {"basic": BASIC, "big": BIG, "empty": {"sheet": "", "head": ["А", "Б"], "rows": []}},
+    inp = {"core": CORE, "books": {"basic": BASIC, "big": BIG, "foot": FOOT,
+                                   "empty": {"sheet": "", "head": ["А", "Б"], "rows": []}},
            "vals": list(VALS), "names": NAMES, "sheets": SHEETS}
     # ensure_ascii — одиночная половинка суррогатной пары доезжает до node как есть
     r = subprocess.run(["node", "-e", HARNESS], input=json.dumps(inp), capture_output=True, text=True,
@@ -117,7 +124,7 @@ def test_пакет_zip_и_xml_целы(built):
     """ZIP без сжатия с верными CRC, шесть частей пакета, каждая — корректный XML; CRC32 —
     стандартный (контрольное значение «123456789» → CBF43926)."""
     assert built["crc"] == 0xCBF43926
-    for key in ("basic", "big", "empty"):
+    for key in ("basic", "big", "empty", "foot"):
         z = zipfile.ZipFile(io.BytesIO(_book(built, key)))
         assert z.testzip() is None, key
         assert z.namelist() == PARTS
@@ -170,6 +177,21 @@ def test_две_тысячи_строк(built):
     assert all(isinstance(v, int) for v in vals) and sum(vals) == 1000 * 2000 * 2001 // 2
 
 
+def test_итоги_под_фильтром_текст_по_разметке_и_x_коды(built):
+    """Строки tfoot («Итого») — ниже автофильтра: сортировка в Excel их с данными не смешает.
+    Ячейка, сложенная страницей из разных элементов ({t, txt}), — текстом, даже если похожа на
+    число. «_xHHHH_» в тексте — с экранированным подчёркиванием (_x005F_), иначе Excel покажет
+    вместо «_x0041_» букву «A»."""
+    data = _book(built, "foot")
+    ws = _wb(data).active
+    assert ws.auto_filter.ref == "A1:B3"
+    assert ws["A3"].value == "5 100%" and ws["B3"].value == 2 and ws["A4"].value == "Итого" and ws["B4"].value == 3
+    z = zipfile.ZipFile(io.BytesIO(data))
+    assert "&apos;Итоги&apos;!$A$1:$B$3" in z.read("xl/workbook.xml").decode("utf-8")
+    sheet = z.read("xl/worksheets/sheet1.xml").decode("utf-8")
+    assert "_x005F_x0041_ и a_x005F_x00e9_b" in sheet and ">_x0041_" not in sheet
+
+
 def test_пустая_таблица_только_шапка(built):
     ws = _wb(_book(built, "empty")).active
     assert ws.title == "Таблица" and ws.max_row == 1 and [c.value for c in ws[1]] == ["А", "Б"]
@@ -206,17 +228,27 @@ PROBE = r"""<script>(function(){
 var out={};
 function b64(u){var s='';for(var i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s);}
 function snap(t,key){var S=_xlSnap(t),cap=_xlCaption(t),tab=_xlTabName(t),sub=_xlSub(t);
-  out[key]={head:S.head,rows:S.rows.length,shown:S.shown,full:S.full,tail:S.tail,
+  out[key]={head:S.head,rows:S.rows.length,shown:S.shown,full:S.full,tail:S.tail,nData:S.nData,
     file:_xlFileName([tab,sub,cap],'2026-10-29'),
-    b64:b64(_xlBuild({sheet:cap||sub||tab,head:S.head,rows:S.rows,tail:S.tail}))};}
+    b64:b64(_xlBuild({sheet:cap||sub||tab,head:S.head,rows:S.rows,tail:S.tail,nData:S.nData}))};}
 try{
+  snap(document.getElementById('tbConv').closest('table'),'conv');
+  var syn=document.createElement('div');
+  syn.innerHTML='<h2>Проба склейки</h2><table><thead><tr><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th></tr></thead><tbody>'
+    +'<tr><td class="num r"><span class="q">5</span> <small class="dimv">100%</small></td><td>1<br>234</td><td>3<div>100</div></td>'
+    +'<td><b>1 234</b></td><td>Имя<span class="gone">ушёл 10.07</span></td><td><b>№1</b><div class="dep">Компания 9</div></td>'
+    +'<td>Марка® ™ © \u{1F6A9}</td></tr></tbody><tfoot><tr><td>Итого</td><td>7</td></tr></tfoot></table>'
+    +'<table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td colspan="2" class="dimv">Нет данных: проба пустого отбора</td></tr></tbody></table>';
+  document.getElementById('tab-sourcing').appendChild(syn);
+  var st=syn.querySelectorAll('table');
+  snap(st[0],'mixed'); snap(st[1],'emptyState');
   var CT=[].slice.call(document.querySelectorAll('.tabs .tab')).filter(function(x){return x.dataset.tab==='contracts'})[0];
   CT.click();
   document.querySelector('#tab-contracts [role="tab"][data-sub="month"]').click();
   var tj=document.querySelector('#orkJ table');
   out.jbar=!!(tj&&tj.dataset.xlOn&&document.querySelector('#orkJ .xlbar .xlbtn'));
   snap(tj,'journal');
-  var st=document.getElementById('orkJStep');st.value='';st.dispatchEvent(new Event('change'));
+  var sj=document.getElementById('orkJStep');sj.value='';sj.dispatchEvent(new Event('change'));
   var ov=document.getElementById('orkJOver');ov.checked=false;ov.dispatchEvent(new Event('change'));
   var al=document.getElementById('orkJAll');al.checked=true;al.dispatchEvent(new Event('change'));
   snap(tj,'journalAll');
@@ -239,6 +271,8 @@ def page_run(tmp_path_factory):
     from tests import fixture
     r = fixture.build_realization()
     m = fixture.build_metrics()
+    # у первого сорсера КП по каждому запросу: в ячейке «КП засчитано» — «56» и «<small>100%</small>»
+    m["sourcersA"][0]["quotes"] = m["sourcersA"][0]["c"]
     d = tmp_path_factory.mktemp("xlsx_page")
     page = dashboard.write(m, {"source": "rules", "items": []}, d / "index.html", **r)
     page.write_text(page.read_text(encoding="utf-8").replace("</body>", PROBE + "</body>", 1), encoding="utf-8")
@@ -247,7 +281,7 @@ def page_run(tmp_path_factory):
     assert mm, "страница не отдала результат пробы: " + log[-500:]
     out = json.loads(html.unescape(mm.group(1)))
     assert "err" not in out, out.get("err")
-    return out, r
+    return out, r, m
 
 
 def _rows(b64: str) -> list[list]:
@@ -259,7 +293,7 @@ def test_журнал_шагов_в_excel_как_на_странице(page_run)
     """Случай владельца: шаг S1, «только сверх нормы» (по умолчанию) — в файле ровно заказы, где
     приёмка дольше 1 р.д., столько же, сколько в данных журнала; шапка — 11 столбцов таблицы;
     под таблицей — какой отбор выгружен. Все шаги с неизмеримыми — все строки журнала."""
-    out, r = page_run
+    out, r, _m = page_run
     J = r["ork_month"]["main"]["journal"]["rows"]
     s1_over = [x for x in J if x["seg"] == "S1" and x["measurable"] and (x["over"] or 0) > 0]
     j = out["journal"]
@@ -281,7 +315,7 @@ def test_журнал_шагов_в_excel_как_на_странице(page_run)
 def test_очередь_недели_все_строки_а_не_первые_40(page_run):
     """Очередь «Что делать» показывает первые 40 и «Показать все»; кнопка выгружает весь отбор —
     в файле столько строк, сколько пунктов в очереди вида."""
-    out, r = page_run
+    out, r, _m = page_run
     q = out["queue"]
     assert q["shown"] == 40 and q["full"] and q["rows"] > 40
     assert q["file"].startswith("КВАНТ_Реализация_Неделя руководителя ОРК_Что делать") and "(" not in q["file"]
@@ -289,9 +323,46 @@ def test_очередь_недели_все_строки_а_не_первые_40
 
 
 def test_таблица_сделок_как_на_странице(page_run):
-    out, r = page_run
+    out, r, _m = page_run
     d = out["deals"]
     assert d["rows"] == d["shown"] > 0 and not d["full"]
     assert d["head"][0] == "№" and "Сумма сделки" in d["head"]
     first = _rows(d["b64"])[1]
     assert isinstance(first[0], int), "№ сделки — числом"
+
+
+def test_счёт_и_доля_в_одной_ячейке_не_склеиваются(page_run):
+    """Находка ревизии: «КП засчитано» — счёт и доля в одной ячейке; при доле 100 % текст «56 100%»
+    читался как 56 100 % (561 с форматом %). Ячейка строки и итог отдела — текстом «N (P%)»
+    (data-xlv), и любая ячейка, где цифры стоят в разных элементах, — текстом, а не числом."""
+    out, _r, m = page_run
+    A = m["sourcersA"]
+    rows = _rows(out["conv"]["b64"])
+    assert rows[0][2] == "КП" or "КП" in rows[0][2]
+    body = rows[1:1 + len(A)]
+    for row, a in zip(body, A):
+        q, c = a["quotes"], a["c"]
+        assert row[2] == f"{q} ({round(q / c * 100)}%)", (row[2], q, c)
+    assert body[0][2] == f"{A[0]['c']} (100%)"
+    tq, tc = sum(a["quotes"] for a in A), sum(a["c"] for a in A)
+    total = rows[1 + len(A)]
+    assert total[0].startswith("Отдел, итого") and total[2] == f"{tq} ({round(tq / tc * 100)}%)"
+    assert out["conv"]["nData"] == len(A)
+    ws = _wb(base64.b64decode(out["conv"]["b64"])).active
+    assert ws.auto_filter.ref == f"A1:J{1 + len(A)}", "итог отдела — под автофильтром"
+    # разметка: «5 <small>100%</small>», «1<br>234», «3<div>100</div>» — текст; одно число в одном
+    # элементе — число; плашка «ушёл» — отдельным словом; блоки — через « · »; ©®™ — остаются
+    mx = _rows(out["mixed"]["b64"])
+    assert mx[1] == ["5 100%", "1 · 234", "3 · 100", 1234, "Имя ушёл 10.07", "№1 · Компания 9", "Марка® ™ ©"]
+    assert mx[2][:2] == ["Итого", 7]
+    assert _wb(base64.b64decode(out["mixed"]["b64"])).active.auto_filter.ref == "A1:G2"
+
+
+def test_пустое_состояние_под_таблицей_а_не_строкой_данных(page_run):
+    """Одна строка на всю ширину («Нет данных: …») — не строка данных: в файле 0 строк и пояснение
+    под таблицей."""
+    out, _r, _m = page_run
+    e = out["emptyState"]
+    assert e["rows"] == 0 and e["tail"] == ["Нет данных: проба пустого отбора"]
+    rows = _rows(e["b64"])
+    assert rows[0] == ["A", "B"] and rows[-1][0] == "Нет данных: проба пустого отбора" and len(rows) == 3

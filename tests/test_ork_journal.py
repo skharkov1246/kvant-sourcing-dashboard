@@ -252,6 +252,15 @@ def test_отметки_вне_воронки_ворота_и_порядок(mon
     assert tail == sorted(tail)
 
 
+def test_хозяин_приёмки_без_имени_руководителя():
+    """Имени руководителя ОРК в справочнике нет — имя пустое, роль — в ownerRole (в ячейке и в
+    Excel — «руководитель ОРК» один раз, а не «руководитель ОРК руководитель ОРК»)."""
+    _month, _mp, J = orkview._month(_corpus(), [], T, None, {}, deal_ok_all={"D1": True, "D9": False})
+    s1 = [r for r in J["rows"] if r["seg"] == "S1"]
+    assert s1 and all(r["owner"] == "" and r["ownerRole"] == "руководитель ОРК" for r in s1)
+    assert all(r["owner"] for r in J["rows"] if r["seg"] != "S1" and not r["ownerHidden"])
+
+
 def test_пустое_окно():
     month, _mp, J = orkview._month([], [], T, None, {})
     assert J["rows"] == [] and len(J["months"]) == ork.MONTHS_BACK and len(J["segs"]) == 4
@@ -310,9 +319,17 @@ def test_резка_воркера_и_гейта_убирает_журнал_б�
     """Журнал — внутри ORKMONTH: строка массива режется целиком (public/_worker.js, access/acl.js
     — право ork_heads; access/gate.js — только админ). Без права в странице нет ни ключей журнала,
     ни названий заказов из него."""
-    html, r = page
-    rows = r["ork_month"]["main"]["journal"]["rows"]
+    import copy
+    import dashboard
+    _html, r = page
+    # заказ, который есть только в журнале (в CONTRACTS его нет): без права его названия в странице
+    # быть не должно — у fixture все названия журнала есть и в CONTRACTS, проверка была бы пустой
+    om = copy.deepcopy(r["ork_month"])
+    rows = om["main"]["journal"]["rows"]
+    rows.append(dict(rows[0], order="ZJ-1", title="Заказ только журнала ЖШ-0417", sup="Поставщик ЖШ-0417"))
+    html = dashboard.render({}, {}, contracts=r["contracts"], dealctx=r["dealctx"], ork_month=om)
     only_journal = {x["title"] for x in rows} - {o["title"] for d in r["contracts"]["rows"] for o in d["orders"]}
+    assert "Заказ только журнала ЖШ-0417" in only_journal and "Заказ только журнала ЖШ-0417" in html
     p = subprocess.run(["node", "-e", CUT, (ROOT / "access" / "acl.js").as_uri(), (ROOT / "access" / "gate.js").as_uri()],
                        input=html, capture_output=True, text=True, timeout=120, encoding="utf-8")
     assert p.returncode == 0, p.stderr[-2000:]
@@ -321,5 +338,7 @@ def test_резка_воркера_и_гейта_убирает_журнал_б�
         assert '"stepName"' not in out[k] and '"ownerWhy"' not in out[k] and '"journal"' not in out[k], k
         assert "window.__ORKMONTH__ = __kvNoData();" in out[k], k
         assert not [t for t in only_journal if t and t in out[k]], k
+    for k in ("noRight", "gateUser"):
+        assert "ЖШ-0417" not in out[k], k
     for k in ("heads", "admin", "gateAdmin"):
-        assert '"stepName"' in out[k] and '"journal"' in out[k], k
+        assert '"stepName"' in out[k] and '"journal"' in out[k] and "Заказ только журнала ЖШ-0417" in out[k], k

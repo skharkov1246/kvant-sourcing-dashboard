@@ -499,6 +499,7 @@
   .orkfil{display:flex;flex-wrap:wrap;gap:8px 14px;margin:8px 0 4px}
   .orkfil label{display:flex;flex-direction:column;gap:3px;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);font-weight:600;min-width:0;flex:1 1 180px;max-width:320px}
   .orkfil select{min-height:32px;width:100%;text-transform:none;letter-spacing:0}
+  .orkfil label.orkjstep{flex:2 1 300px;max-width:460px}
   .orkchips .stchip,.orkmore,.orkreset{min-height:24px}
   .orkmore{margin-top:8px}
   .orkreset{margin-left:8px}
@@ -884,17 +885,21 @@ const _xlClean=s=>String(s==null?'':s).replace(_XL_BAD,'');
 const _xlX=s=>_xlClean(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'})[c]);
 // в ячейке Excel не больше 32 767 знаков
 const _xlCut=s=>{s=_xlClean(s); return s.length>32767?_xlClean(s.slice(0,32766))+'…':s;};
+// «_x0041_» в тексте Excel читает как код знака (ST_Xstring) — подчёркивание пишется как _x005F_
+const _xlEscX=s=>s.replace(/_(?=x[0-9A-Fa-f]{4}_)/g,'_x005F_');
 function _xlCol(i){let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26);}return s;}
 // Число — только если видимый текст чистое число в русской или простой записи: тысячи через
 // пробел или неразрывный пробел, дробь через запятую или точку, минус «−» или дефис; процент без
 // слов — числом с форматом %. Остальное — текстом как есть: даты (дд.мм, мм.гггг), коды с
-// ведущим нулём, строки из 12 и больше цифр (номера), проценты со словами.
+// ведущим нулём, строки из 12 и больше цифр (номера), проценты со словами, процент с разрядами
+// тысяч («3 100%» — это почти всегда счёт «3» и доля «100%» рядом, а не 3100 %).
 const _XL_NUM=/^([-−])?(\d{1,3}(?:[    ]\d{3})+|\d+)(?:([.,])(\d+))?(\s?%)?$/;
 function _xlVal(s){
   s=String(s==null?'':s).trim();
   const m=_XL_NUM.exec(s);
   if(!m) return {s};
   const int=m[2].replace(/[    ]/g,''), fr=m[4]||'';
+  if(m[5]&&int!==m[2]) return {s};
   if(int.length>1&&int[0]==='0') return {s};
   if(int.length>=12) return {s};
   if(m[3]==='.'&&!m[1]&&!m[5]&&int.length<=2){
@@ -932,18 +937,21 @@ function _xlBuild(o){
   let nc=Math.max(1,head.length);
   for(const r of rows) if(r.length>nc) nc=r.length;
   const w=new Array(nc).fill(6), xml=[];
+  // v — текст ячейки или {t, txt:true}: txt — только текстом (цифры собраны из разных элементов)
   const cell=(ref,v,c,hdr)=>{
-    const t=String(v==null?'':v); if(t==='') return '';
+    const o=v!==null&&typeof v==='object', t=String(o?(v.t==null?'':v.t):(v==null?'':v)); if(t==='') return '';
     if(c<nc) w[c]=Math.max(w[c],Math.min(60,Math.ceil(t.length*1.1)+2));
-    if(!hdr){const x=_xlVal(t); if(x.n!=null) return `<c r="${ref}"${x.pct!=null?` s="${2+x.pct}"`:''}><v>${x.n}</v></c>`;}
-    return `<c r="${ref}" t="inlineStr"${hdr?' s="1"':''}><is><t xml:space="preserve">${_xlX(_xlCut(t))}</t></is></c>`;
+    if(!hdr&&!(o&&v.txt)){const x=_xlVal(t); if(x.n!=null) return `<c r="${ref}"${x.pct!=null?` s="${2+x.pct}"`:''}><v>${x.n}</v></c>`;}
+    return `<c r="${ref}" t="inlineStr"${hdr?' s="1"':''}><is><t xml:space="preserve">${_xlX(_xlEscX(_xlCut(t)))}</t></is></c>`;
   };
   const row=(r,vals,hdr)=>`<row r="${r}">${vals.map((v,c)=>cell(_xlCol(c)+r,v,c,hdr)).join('')}</row>`;
   xml.push(row(1,head,true));
   rows.forEach((r,i)=>xml.push(row(i+2,r,false)));
   const last=1+rows.length;
   tail.forEach((t,i)=>xml.push(`<row r="${last+2+i}">${cell('A'+(last+2+i),t,nc,true).replace(' s="1"','')}</row>`));
-  const L=_xlCol(nc-1), dim=`A1:${L}${tail.length?last+1+tail.length:last}`, flt=`A1:${L}${last}`;
+  // автофильтр — шапка и строки данных; итоги (tfoot) — под фильтром, сортировка их не смешает
+  const fl=1+Math.max(0,Math.min(rows.length,o.nData!=null?+o.nData:rows.length));
+  const L=_xlCol(nc-1), dim=`A1:${L}${tail.length?last+1+tail.length:last}`, flt=`A1:${L}${fl}`;
   const S='http://schemas.openxmlformats.org/spreadsheetml/2006/main', R='http://schemas.openxmlformats.org/officeDocument/2006/relationships';
   const P='http://schemas.openxmlformats.org/package/2006/relationships', H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
   const sh=H+`<worksheet xmlns="${S}" xmlns:r="${R}"><dimension ref="${dim}"/>`
@@ -951,7 +959,7 @@ function _xlBuild(o){
     +`<sheetFormatPr defaultRowHeight="15"/><cols>${w.map((x,i)=>`<col min="${i+1}" max="${i+1}" width="${x}" customWidth="1"/>`).join('')}</cols>`
     +`<sheetData>${xml.join('')}</sheetData><autoFilter ref="${flt}"/></worksheet>`;
   const wb=H+`<workbook xmlns="${S}" xmlns:r="${R}"><bookViews><workbookView/></bookViews><sheets><sheet name="${_xlX(sheet)}" sheetId="1" r:id="rId1"/></sheets>`
-    +`<definedNames><definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">${_xlX("'"+sheet.replace(/'/g,"''")+"'!$A$1:$"+L+"$"+last)}</definedName></definedNames></workbook>`;
+    +`<definedNames><definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">${_xlX("'"+sheet.replace(/'/g,"''")+"'!$A$1:$"+L+"$"+fl)}</definedName></definedNames></workbook>`;
   const st=H+`<styleSheet xmlns="${S}"><numFmts count="1"><numFmt numFmtId="164" formatCode="0.0%"/></numFmts>`
     +`<fonts count="2"><font><sz val="11"/><name val="Calibri"/><family val="2"/></font><font><b/><sz val="11"/><name val="Calibri"/><family val="2"/></font></fonts>`
     +`<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>`
@@ -980,23 +988,32 @@ function _xlBuild(o){
 const _XL_BLOCK=new Set(['DIV','P','LI','UL','OL','TABLE','TR','SECTION','H1','H2','H3','H4','DETAILS','SUMMARY','HEADER','FOOTER']);
 // .orkm — дубль столбцов для телефона (тот же текст есть в своих ячейках)
 const _XL_SKIP='.qq,.xlbar,.xlbtn,button,input,select,textarea,svg,script,style,template,[hidden],[aria-hidden="true"],.orkm,.sortbar';
-// значки-эмодзи (🚩, ⚠, 🔴…) — не текст ячейки: смысл остаётся в словах рядом
-const _XL_PIC=/\p{Extended_Pictographic}\uFE0F?/gu;
-function _xlText(el,more){
+// значки-эмодзи (🚩, ⚠, 🔴…) — не текст ячейки: смысл остаётся в словах рядом; ©, ®, ™ — текст
+// (часть названия, их тоже числит Extended_Pictographic)
+const _XL_PIC=/(?![©®™])\p{Extended_Pictographic}\uFE0F?/gu;
+// плашки внутри строки («ушёл 10.07», «новый», теги) — отдельным словом, а не слитно с именем
+const _XL_WORD='.gone,.newb,.tag,.pill';
+const _XL_BR='\u241E';                  // граница блока в ячейке: в файле части — через « · »
+// st — {dn: 0} для ячейки таблицы: число отдельных кусков текста с цифрами. Два и больше — ячейка
+// сложена из разных элементов («5» и «<small>100%</small>», «1<br>234»), числом её не читать:
+// разряды тысяч не склеиваются через границу элемента
+function _xlText(el,more,st){
   if(el.dataset&&el.dataset.xlv!=null) return String(el.dataset.xlv).replace(/\s+/g,' ').trim();
-  const skip=more?_XL_SKIP+','+more:_XL_SKIP;
-  let s='';
+  const skip=more?_XL_SKIP+','+more:_XL_SKIP, blk=st?_XL_BR:' ';
+  let s='', prev=null;
+  const dig=(t,node)=>{ if(st&&/\d/.test(t)){ if(!(node&&prev&&node.previousSibling===prev)) st.dn++; prev=node; } };
   (function walk(n){
     for(const c of n.childNodes){
-      if(c.nodeType===3){ s+=c.nodeValue; continue; }
+      if(c.nodeType===3){ dig(c.nodeValue,c); s+=c.nodeValue; continue; }
       if(c.nodeType!==1||c.matches(skip)||(c.style&&c.style.display==='none')) continue;
-      if(c.dataset&&c.dataset.xlv!=null){ s+=' '+c.dataset.xlv+' '; continue; }
-      if(c.tagName==='BR'){ s+=' '; continue; }
-      const b=_XL_BLOCK.has(c.tagName); if(b) s+=' ';
-      walk(c); if(b) s+=' ';
+      if(c.dataset&&c.dataset.xlv!=null){ dig(c.dataset.xlv,null); s+=' '+c.dataset.xlv+' '; continue; }
+      if(c.tagName==='BR'){ s+=blk; continue; }
+      const b=_XL_BLOCK.has(c.tagName)?blk:(c.matches(_XL_WORD)?' ':''); s+=b;
+      walk(c); s+=b;
     }
   })(el);
-  return s.replace(_XL_PIC,'').replace(/\s+/g,' ').trim();
+  const tidy=x=>x.replace(_XL_PIC,'').replace(/\s+/g,' ').trim();
+  return st?s.split(_XL_BR).map(tidy).filter(Boolean).join(' · '):tidy(s);
 }
 const _xlHidden=tr=>tr.hidden||tr.style.display==='none'||(tr.dataset&&tr.dataset.xlSkip!=null)
   ||(tr.isConnected&&getComputedStyle(tr).display==='none');
@@ -1010,9 +1027,11 @@ function _xlGrid(trs,hdr){
     const skip=()=>{while(carry[c]&&carry[c].left>0){row[c]=hdr?carry[c].t:'';carry[c].left--;c++;}};
     for(const cell of tr.cells){
       skip();
-      let t=_xlText(cell); if(hdr) t=t.replace(_XL_HEADICON,'').trim();
+      const st=hdr?null:{dn:0};
+      let t=_xlText(cell,null,st); if(hdr) t=t.replace(_XL_HEADICON,'').trim();
+      const v=st&&st.dn>1?{t,txt:true}:t;            // цифры из разных элементов — только текстом
       const cs=Math.max(1,Math.min(200,cell.colSpan||1)), rs=Math.max(1,Math.min(5000,cell.rowSpan||1));
-      for(let j=0;j<cs;j++){ row[c+j]=hdr||j===0?t:''; if(rs>1) carry[c+j]={left:rs-1,t}; }
+      for(let j=0;j<cs;j++){ row[c+j]=hdr||j===0?v:''; if(rs>1) carry[c+j]={left:rs-1,t}; }
       c+=cs;
     }
     for(let k=c;k<carry.length;k++) if(carry[k]&&carry[k].left>0&&row[k]===undefined){row[k]=hdr?carry[k].t:'';carry[k].left--;}
@@ -1020,33 +1039,38 @@ function _xlGrid(trs,hdr){
   }
   return grid;
 }
-// {head, rows, tail, shown}: шапка из thead (два ряда — «верх · низ»), строки тела без скрытых;
-// тело, которое страница показывает частью (первые N и «Показать все»), даёт ВСЕ строки своего
-// отбора через tbody._xlAll(); строк в странице меньше, чем в источнике, — строка «выгружено N из M»
+// {head, rows, tail, shown, nData}: шапка из thead (два ряда — «верх · низ»), строки тела без
+// скрытых; тело, которое страница показывает частью (первые N и «Показать все»), даёт ВСЕ строки
+// своего отбора через tbody._xlAll(); строк в странице меньше, чем в источнике, — строка «выгружено
+// N из M»; пустое состояние (одна строка на всю ширину: «Нет данных: …») — под таблицей, не данными
 function _xlSnap(table){
   let hr=table.tHead?[...table.tHead.rows]:[], first=null;
   if(!hr.length){const r0=table.rows[0]; if(r0&&r0.cells.length&&[...r0.cells].every(c=>c.tagName==='TH')){hr=[r0];first=r0;}}
   const hg=_xlGrid(hr,true), nh=hg.reduce((a,r)=>Math.max(a,r.length),0);
   const head=Array.from({length:nh},(_,c)=>{const o=[];for(const r of hg){const v=r[c]||''; if(v&&o[o.length-1]!==v)o.push(v);} return o.join(' · ');});
-  const rows=[]; let shown=0, full=false;
-  const add=trs=>{for(const r of _xlGrid(trs.filter(tr=>tr!==first&&!_xlHidden(tr)),false)) if(r.some(v=>v!=='')) rows.push(r);};
+  const rows=[], body=[]; let shown=0, full=false;
+  const vis=trs=>trs.filter(tr=>tr!==first&&!_xlHidden(tr));
+  const add=trs=>{for(const r of _xlGrid(trs,false)) if(r.some(v=>v!=='')) rows.push(r);};
   for(const tb of table.tBodies){
     let trs=[...tb.rows];
-    shown+=trs.filter(tr=>tr!==first&&!_xlHidden(tr)).length;
+    shown+=vis(trs).length;
     if(typeof tb._xlAll==='function'){
       const h=tb._xlAll();
       if(typeof h==='string'&&h){const t=document.createElement('table'); t.innerHTML='<tbody>'+h+'</tbody>'; trs=[...t.tBodies[0].rows]; full=true;}
     }
-    add(trs);
+    body.push(...vis(trs));
   }
+  const tail=[], b0=body.length===1&&body[0].cells.length===1?body[0].cells[0]:null;
+  if(b0&&(b0.colSpan||1)>=Math.max(2,nh)){ const e=_xlText(b0); if(e) tail.push(e); body.length=0; }
+  add(body);
   const nData=rows.length;                    // строки тела — без итогов tfoot
-  if(table.tFoot) add([...table.tFoot.rows]);
-  const tail=[], of=+(table.dataset.xlOf||0), cap=+(table.dataset.xlCap||0);
+  if(table.tFoot) add(vis([...table.tFoot.rows]));
+  const of=+(table.dataset.xlOf||0), cap=+(table.dataset.xlCap||0);
   if(of&&of>nData) tail.push(`выгружено ${nData} из ${of}: остальные строки в страницу не переданы`);
-  if(cap&&nData>=cap) tail.push(`в страницу переданы первые ${cap} строк — так их отдаёт сборка; полного списка в странице нет`);
+  if(cap&&nData>=cap) tail.push(`строк ${nData}: сборка передаёт в страницу не больше ${cap} — полный список может быть длиннее, в странице его нет`);
   const note=typeof table._xlNote==='function'?table._xlNote():table._xlNote;
   if(note) tail.push(...[].concat(note));
-  return {head,rows,tail,shown,full};
+  return {head,rows,tail,shown,full,nData};
 }
 // подпись таблицы: data-xl-name, иначе ближайший заголовок перед ней в той же вкладке
 const _xlLabel=t=>String(t||'').replace(/^[^·]{0,4}·\s*/,'').replace(/\s*\(\d[\d\s]*(?:из\s*\d[\d\s]*)?\)/g,'')
@@ -1083,10 +1107,12 @@ function _xlSave(bytes,name){
   setTimeout(()=>{URL.revokeObjectURL(url); a.remove();},4000);
 }
 function _xlTitle(t){
-  let s='Скачать таблицу в Excel';
+  const cap=t?_xlCaption(t):'';
+  let s=cap?`Скачать таблицу «${cap}» в Excel`:'Скачать таблицу в Excel';
   if(t&&t.tBodies&&[...t.tBodies].some(b=>typeof b._xlAll==='function')) s+=' — все строки отбора, а не только показанные';
-  const of=t&&t.dataset?+(t.dataset.xlOf||0):0;
+  const of=t&&t.dataset?+(t.dataset.xlOf||0):0, lim=t&&t.dataset?+(t.dataset.xlCap||0):0;
   if(of) s+=` — в странице не все строки источника (их ${of}): число выгруженных будет в файле`;
+  if(lim) s+=` — сборка передаёт в страницу не больше ${lim} строк: полного списка может не быть, оговорка будет в файле`;
   return s;
 }
 // одна кнопка — и для таблицы (b._xlT), и для списка выдвижной панели (b._xlGet → {head, rows, …})
@@ -1106,7 +1132,7 @@ function _xlGo(b){
   try{
     const t=b._xlT, S=t?_xlSnap(t):b._xlGet(), at=t||b;
     const tab=_xlTabName(at), sub=S.sub!=null?S.sub:_xlSub(at), cap=S.name||(t?_xlCaption(t):'');
-    _xlSave(_xlBuild({sheet:cap||sub||tab,head:S.head,rows:S.rows,tail:S.tail}),_xlFileName([tab,sub,cap],_xlDay()));
+    _xlSave(_xlBuild({sheet:cap||sub||tab,head:S.head,rows:S.rows,tail:S.tail,nData:S.nData}),_xlFileName([tab,sub,cap],_xlDay()));
   }catch(e){
     console.error('Excel:',e);
     if(bar){const m=document.createElement('span'); m.className='xlst dimv'; m.setAttribute('role','status');
@@ -1276,12 +1302,13 @@ document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=
  const n=(v,clz)=> v>0?`<span class="${clz||''}">${v}</span>`:`<span class="dimv">0</span>`;
  const q=r.quotes||0, vn=r.violN||0;
  return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who">${_esc(r.n)}${_tag(r)}</div><div class="dep">${r.c} запр. · закрыто ${r.closed}</div></td><td data-xlv="${_esc(KPB.filter(([k])=>b[k]).map(([k])=>`${KPBL[k]} ${b[k]}`).join(' · '))}">${stack}</td>`
- + `<td class="num r" title="Файл в «Offer from supplier»: ${q} из ${r.c} запросов">${n(q,'q')}${q?pc(q):''}</td>`
+ // счёт и доля — два значения в одной ячейке: в Excel текстом «3 (100%)», а не склейкой «3 100%» = 3100 %
+ + `<td class="num r" title="Файл в «Offer from supplier»: ${q} из ${r.c} запросов"${q&&r.c?` data-xlv="${q} (${Math.round(q/r.c*100)}%)"`:''}>${n(q,'q')}${q?pc(q):''}</td>`
  + `<td class="num r">${n(b.paw||0)}</td><td class="num r">${n(b.selected||0,'q')}</td><td class="num r">${n(b.notsel||0)}</td>`
  + `<td class="num r">${n(r.refusedCol)}</td><td class="num r">${n(r.noAnswer,'nrc')}</td>`
  + `<td class="num r" title="${_esc(_violTip(r.viol))}${r.violPre?`\nдо правил 19.10 (наследие, не нарушение): ${r.violPre}`:''}">${n(vn,'nrc')}</td><td class="r">${avgCell}</td></tr>`;}).join('');
 const tot=A.reduce((t,r)=>({c:t.c+r.c,q:t.q+(r.quotes||0),paw:t.paw+(r.buckets.paw||0),sel:t.sel+(r.buckets.selected||0),ns:t.ns+(r.buckets.notsel||0),ref:t.ref+r.refusedCol,nr:t.nr+r.noAnswer,v:t.v+(r.violN||0)}),{c:0,q:0,paw:0,sel:0,ns:0,ref:0,nr:0,v:0});
-document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b><div class="dep">${tot.c} запр.</div></td><td></td><td class="r num q">${tot.q} <small class="dimv">${pctOf(tot.q,tot.c)}%</small></td><td class="r num">${tot.paw}</td><td class="r num q">${tot.sel}</td><td class="r num">${tot.ns}</td><td class="r num">${tot.ref}</td><td class="r num nrc">${tot.nr}</td><td class="r num nrc">${tot.v}</td><td class="r"></td></tr>`;
+document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b><div class="dep">${tot.c} запр.</div></td><td></td><td class="r num q" data-xlv="${tot.q} (${pctOf(tot.q,tot.c)}%)">${tot.q} <small class="dimv">${pctOf(tot.q,tot.c)}%</small></td><td class="r num">${tot.paw}</td><td class="r num q">${tot.sel}</td><td class="r num">${tot.ns}</td><td class="r num">${tot.ref}</td><td class="r num nrc">${tot.nr}</td><td class="r num nrc">${tot.v}</td><td class="r"></td></tr>`;
 
 // ---- правила отметки КП: нарушения и «Экономика готова»
 (function(){
@@ -1454,7 +1481,7 @@ document.getElementById('originDept').innerHTML=(ORG.byDept||[]).map(d=>
    if(_how.length) h += '<div class="note">Чем определён исполнитель: '
      + _how.map(x=>`${_esc(x.how)} — ${x.n} (${x.pct}%)`).join(' · ') + '</div>';
    h += _to.length
-     ? '<table class="tb" style="margin-top:8px" data-xl-cap="30"><thead><tr><th>Кому засчитано</th><th>Подразделение</th><th class="r">Карточек</th></tr></thead><tbody>'
+     ? '<table class="tb" style="margin-top:8px" data-xl-cap="30" data-xl-name="Служебные записи — кому засчитано"><thead><tr><th>Кому засчитано</th><th>Подразделение</th><th class="r">Карточек</th></tr></thead><tbody>'
        + _to.map(c=>`<tr><td><div class="who">${_esc(c.name)}</div></td>`
          + `<td class="${c.src?'':'dimv'}">${_esc(c.dept)}</td><td class="num r">${c.n}</td></tr>`).join('')
        + '</tbody></table>'
@@ -1586,9 +1613,9 @@ function openDrw(uid,startFilter){
         +(d.flp&&d.flp.length?`<div class="rm"><span class="dimv">до правил 19.10: ${d.flp.map(f=>_esc(KPL[f]||f)).join(' · ')}</span></div>`:'')+`</div>`;
     }).join('')||'<div class="dimv">нет запросов в этом статусе</div>';
     body.innerHTML=h;
-    _xlListBtn(body.querySelector('[data-xls="sup"]'),()=>({head:['Поставщик','Запросов'],rows:sup.map(x=>[x.sup,String(x.n)]),
+    if(typeof _xlListBtn==='function') _xlListBtn(body.querySelector('[data-xls="sup"]'),()=>({head:['Поставщик','Запросов'],rows:sup.map(x=>[x.sup,String(x.n)]),
       tail:[],name:'По поставщикам',sub:s.n}),'Скачать список в Excel — все поставщики, а не первые 12');
-    _xlListBtn(body.querySelector('[data-xls="req"]'),()=>({head:['Тема','Кому','Начало письма','Статус','Писем','Дата','Нарушения правил КП','До правил 19.10'],
+    if(typeof _xlListBtn==='function') _xlListBtn(body.querySelector('[data-xls="req"]'),()=>({head:['Тема','Кому','Начало письма','Статус','Писем','Дата','Нарушения правил КП','До правил 19.10'],
       rows:det.map(d=>[d.mailSubj||d.subj||'—',d.to||d.sup||'—',d.body||'',STG[d.st]||d.st||'',d.mailN!=null?String(d.mailN):'',d.mailDt||d.dt||'',
         (d.fl||[]).map(f=>KPL[f]||f).join(' · '),(d.flp||[]).map(f=>KPL[f]||f).join(' · ')]),
       tail:filter?['Отбор: '+(filter==='viol'?'нарушения правил КП':(filter==='pre'?'до правил 19.10':STG[filter]))]:[],name:'Отправки',sub:s.n}));
@@ -1703,7 +1730,7 @@ function _drwSortable(head, sections){
   function draw(){
     const vis=sections.filter(s=>s.items.length);
     body.innerHTML=(head||'')+(vis.length?vis.map(seg).join(''):'<div class="dimv">нет записей</div>');
-    vis.forEach(s=>{ if(s.xl) _xlListBtn(body.querySelector('[data-xls="'+s.key+'"]'),()=>({
+    vis.forEach(s=>{ if(s.xl&&typeof _xlListBtn==='function') _xlListBtn(body.querySelector('[data-xls="'+s.key+'"]'),()=>({
       head:s.xl.map(c=>c[0]), rows:sorted(s).map(d=>s.xl.map(c=>{const v=c[1](d); return v==null?'':String(v);})),
       tail:[], name:s.h, sub:document.getElementById('drwName').textContent})); });
     vis.forEach(s=>{
@@ -2146,6 +2173,9 @@ function _incDraw(el,H,M){
         +`<td>${d.cls==='A'?'<b>A</b> · сверено файлом':`<span class="dimv">C · ${why(d.why||'')}</span>`}${d.cls==='A'&&!d.rk?`<div class="dep">результата нет: ${why(d.why||'')}</div>`:''}</td>`
         +(M?`<td class="r mono">${md?_fmtE(md.s):''}</td><td class="r mono">${md&&md.r!=null?_fmtE(md.r):''}</td>`:'')+`</tr>`;};
     IB._xlAll=()=>r.map(dealRow).join('');           // Excel — весь отбор, не первые 100
+    { const tbl=IB.closest&&IB.closest('table'), sel=(row!==null?`строка «${nm(cut,row)}»`:'все строки')
+        +(bf?` · ${{paidQ:'получено в квартале',due:'к получению',risk:'под угрозой',won:'выигрыши квартала',pipe:'пайплайн'}[bf]||bf}`:'');
+      if(tbl) tbl._xlNote=()=>`Отбор: ${sel}.`; }
     IB.innerHTML=shown.map(dealRow).join('')
       ||`<tr><td colspan="${M?8:6}" class="dimv" style="padding:14px">Нет данных: по этому отбору сделок нет</td></tr>`;
     el.querySelector('#incMore').innerHTML=(!all&&r.length>100)?`<span class="stchip" data-iall="1" tabindex="0" role="button" style="margin-top:8px;display:inline-block">Показать все ${r.length}</span>`:'';
@@ -2383,7 +2413,7 @@ function renderReps(R){
         ? {noHead:1,base:6,eyebrow:'',title:'КАМы — клиентские направления',sec1:'Клиентские направления (деньги по холдингам)',sec2:'направлениям',unit:'Направление'}
         : {noHead:1,base:6,eyebrow:'',title:'Продукт-оунеры — линейки оборудования',sec1:'Продуктовые линии (деньги по оборудованию)',sec2:'линиям',unit:'Линия'});
     }
-    _xlMark(el);                          // кнопки «Excel» таблиц раздела — сразу после рендера
+    if(typeof _xlMark==='function') _xlMark(el);   // кнопки «Excel» таблиц раздела — сразу после рендера
     if(!isRole&&sel!=='all'){ const r=byUid(sel);
       el.querySelectorAll('[data-lvl]').forEach(n=>n.addEventListener('click',()=>{ const lv=n.dataset.lvl;
         let list, title;
@@ -2707,7 +2737,7 @@ function renderContracts(){
     const panel=document.getElementById(pid);
     panel.setAttribute('aria-labelledby','ctTab-'+sub+(SH?' ctDir-'+dir:''));
     draw(dir,sub,panel,opt);
-    _xlMark(panel);                       // кнопки «Excel» таблиц подвкладки — сразу после рендера
+    if(typeof _xlMark==='function') _xlMark(panel);   // кнопки «Excel» таблиц подвкладки — сразу после рендера
     if(opt.addr){ try{ history.replaceState(null,'','#contracts/'+addr); }catch(e){} }
     if(opt.focus){ const b=(opt.focus==='dir'?dirTabs.find(x=>x.dataset.dir===dir):subTabs.find(x=>x.dataset.sub===sub)); if(b) b.focus(); }
   };
@@ -3095,8 +3125,8 @@ function _orkJournalHtml(V){
    +`<div class="note">Срок шага — по датам переходов стадий заказа в Битриксе, рабочие дни по производственному календарю РФ (по Москве), ${_esc((J&&J.label)||'без пауз')}; переходы «пачкой» (3 и больше за 5 минут) срок не дают. Строка — заказ и отрезок с нормой регламента, закончившийся в месяцах «Месяца»: те же заказы${J&&J.since?` (созданы с ${_orkD(J.since)})`:''} и окно, что у M1. Клик по строке — карточка сделки; «Excel» — все строки отбора.</div>`;
   if(!J) return h+`<div class="note">Нет данных: журнала шагов в сборке нет — его собирает orkview.build из истории стадий заказов (crm.stagehistory), вместе с показателями «Месяца».</div></section>`;
   const s0=(J.segs.find(s=>s.seg==='S1')||J.segs[0]||{}).seg||'';
-  h+=`<div class="orkfil" id="orkJf"><label>Шаг <select id="orkJStep" class="search">`
-   +J.segs.map(s=>`<option value="${_esc(s.seg)}"${s.seg===s0?' selected':''}>${_esc(s.seg)} · шаг ${s.step} ${_esc(s.name)} — норма ${s.norm} р.д.</option>`).join('')
+  h+=`<div class="orkfil" id="orkJf"><label class="orkjstep">Шаг <select id="orkJStep" class="search">`
+   +J.segs.map(s=>`<option value="${_esc(s.seg)}"${s.seg===s0?' selected':''}>${_esc(s.seg)} ${_esc(s.name)} · норма ${s.norm} р.д.</option>`).join('')
    +`<option value="">все шаги</option></select></label>`
    +`<label>Месяц <select id="orkJMon" class="search"><option value="">все месяцы окна</option>${J.months.map(m=>`<option value="${_esc(m)}">${_esc(m)}</option>`).join('')}</select></label>`
    +`<label class="orkchk"><input type="checkbox" id="orkJOver" checked> только сверх нормы</label>`
@@ -3116,8 +3146,8 @@ function _orkJPick(rows,F){
     .sort((a,b)=>((b.over||0)-(a.over||0))||_orkJYmd(a.end).localeCompare(_orkJYmd(b.end))||((b.seq||0)-(a.seq||0)));
   return {base,meas,R,k:R.filter(r=>r.over>0).length,out:R.filter(r=>!r.counted).length};
 }
-function _orkJRow(r,cust){
-  return `<tr class="drill" data-ct="${_esc(r.deal)}" tabindex="0">`
+function _orkJRow(r,cust,has){
+  return (!has||has(r.deal)?`<tr class="drill" data-ct="${_esc(r.deal)}" tabindex="0">`:`<tr title="карточки этой сделки в виде нет">`)
     +`<td><b class="mono">№${r.seq||'—'}</b><div class="dep">${_esc(cust(r.deal))}</div><div class="dep orkm">${_esc(r.seg)} · ${_esc(r.end||'—')} · ${r.wd!=null?r.wd+' р.д.':'—'} при норме ${r.norm}</div></td>`
     +`<td>${_esc(r.title||r.order)}<div class="dep">${_esc(r.sup||'')}</div></td>`
     +`<td><b class="mono">${_esc(r.seg)}</b> ${_esc(r.stepName||'')}<div class="dep">шаг ${r.step}</div></td>`
@@ -3126,7 +3156,8 @@ function _orkJRow(r,cust){
     +`<td class="r mono${r.over>0?' hot':''}">${r.over>0?r.over:''}</td>`
     +`<td class="dep">${_esc([r.flags,r.note].filter(Boolean).join('; '))}</td>`
     +`<td>${r.ownerHidden?`<span class="dimv">скрыто</span><div class="dep">${_esc(r.ownerWhy||'')}</div>`
-      :`${_orkWho(r.owner)}${/\(уволен\)$/.test(r.owner||'')?' <span class="gone">уволен</span>':''}<div class="dep">${_esc(r.ownerRole||'')}</div>`}</td>`
+      :r.owner?`${_orkWho(r.owner)}${/\(уволен\)$/.test(r.owner)?' <span class="gone">уволен</span>':''}<div class="dep">${_esc(r.ownerRole||'')}</div>`
+      :`${_esc(r.ownerRole||'')}<div class="dep dimv">имени в справочнике нет</div>`}</td>`
     +`<td class="mono">${_esc(r.m||'')}</td></tr>`;
 }
 // пустой отбор — что именно не нашлось и откуда придёт (portal-ui §2); «все в норме» — известный ноль
@@ -3149,7 +3180,7 @@ function _orkJWire(X,el){
   if(!J||!tb) return;
   const byDeal=Object.fromEntries((X.rows||[]).map(r=>[String(r.deal),r]));
   const cust=d=>{const r=byDeal[String(d)]; return r&&r.customer&&r.customer!=='—'?r.customer:'';};
-  const q=id=>el.querySelector('#'+id), row=r=>_orkJRow(r,cust);
+  const q=id=>el.querySelector('#'+id), has=d=>!!byDeal[String(d)], row=r=>_orkJRow(r,cust,has);
   const F={seg:(q('orkJStep')||{}).value||'', m:'', over:true, all:false, show:false};
   const draw=()=>{
     const P=_orkJPick(J.rows,F), R=P.R;
@@ -3911,7 +3942,7 @@ const _lazyDone={};
 function ensureTab(t){
   if(!LAZY[t]||_lazyDone[t]) return;
   _lazyDone[t]=1;
-  try{ LAZY[t](); _xlMark(document.getElementById('tab-'+t)); }
+  try{ LAZY[t](); if(typeof _xlMark==='function') _xlMark(document.getElementById('tab-'+t)); }
   catch(err){                                   // одна сломанная вкладка не гасит остальные
     console.error('вкладка '+t+':',err);
     const el=document.getElementById('tab-'+t);
@@ -3948,7 +3979,7 @@ requestAnimationFrame(()=>setTimeout(()=>{
 // ---- статус обновления данных: датчик ПО ВОЗРАСТУ данных (зелёный = свежее 2 ч).
 // При устаревании сайт сам опрашивает сервер и перезагружается, когда придёт свежий деплой
 // (воркер при заходе на устаревший сайт триггерит пересборку — см. _worker.js / АВТООБНОВЛЕНИЕ.md).
-_xlMark(document.body);                   // таблицы «Сорсинга», отрисованные при загрузке
+if(typeof _xlMark==='function') _xlMark(document.body);   // таблицы «Сорсинга», отрисованные при загрузке
 window.__RENDER_OK__=1;
 </script>
 

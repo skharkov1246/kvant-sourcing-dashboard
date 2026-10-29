@@ -467,6 +467,9 @@ out.noSeg=_orkJEmpty(J,F6,_orkJPick(J.rows,F6));
 const ok=J.rows.filter(r=>r.measurable&&!(r.over>0)).slice(0,1);
 out.allOk=_orkJEmpty(J,F0,{base:ok,meas:ok,R:[]});
 const hid=J.rows.find(r=>r.ownerHidden); out.hidRow=hid?_orkJRow(hid,cust):'';
+const s1=J.rows.find(r=>r.seg==='S1');
+out.noHead=_orkJRow(Object.assign({},s1,{owner:''}),cust,()=>true);
+out.noCard=_orkJRow(s1,cust,()=>false); out.card=_orkJRow(s1,cust,d=>d===s1.deal);
 this.out=out;`, box);
 process.stdout.write(JSON.stringify(box.out));
 """
@@ -489,7 +492,7 @@ def test_журнал_шагов_в_месяце_под_правом(built):
     ct = copy.deepcopy(built["contracts"])
     с = _render({"main": ct}, built["ork_month"])["main"]["month"]
     assert "Журнал шагов: срок каждого заказа" in с and 'data-xl-name="Журнал шагов"' in с
-    assert '<option value="S1" selected>S1 · шаг 1 Приёмка сделки — норма 1 р.д.</option>' in с
+    assert '<option value="S1" selected>S1 Приёмка сделки · норма 1 р.д.</option>' in с
     assert '<input type="checkbox" id="orkJOver" checked>' in с and '<input type="checkbox" id="orkJAll">' in с
     for m in built["ork_month"]["main"]["journal"]["months"]:
         assert f'<option value="{m}">{m}</option>' in с
@@ -530,3 +533,9 @@ def test_журнал_отбор_строки_и_пусто(built):
     assert out["allOk"].startswith("Сверх нормы — никого: все 1 отрезков")
     # имя скрыто воротами людей — «скрыто» и причина, а не имя
     assert "скрыто" in out["hidRow"] and "раскрыл бы человека" in out["hidRow"]
+    # имени руководителя ОРК в справочнике нет — роль один раз, а не «руководитель ОРК руководитель ОРК»
+    nh = out["noHead"]
+    assert nh.count("руководитель ОРК") == 1 and "имени в справочнике нет" in nh
+    # сделки нет в виде — строка не «кликабельна»: ни drill, ни tabindex, ни data-ct
+    assert 'class="drill"' in out["card"] and 'tabindex="0"' in out["card"]
+    assert "drill" not in out["noCard"] and "tabindex" not in out["noCard"] and "data-ct" not in out["noCard"]

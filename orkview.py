@@ -602,7 +602,9 @@ def _jrow(o: dict, code: str, s: dict, month: str, *, counted: bool, head: str) 
             "wd": wd, "norm": norm, "over": wd - norm if wd is not None and wd > norm else None,
             "inNorm": s.get("inNorm"), "flags": "; ".join(flags), "measurable": not flags,
             "counted": counted, "note": "" if counted else J_OUT,
-            "owner": (head or ork.ROLES["orkHead"]) if code == "S1" else (o.get("orkMgr") or J_NOMGR),
+            # имени руководителя ОРК в справочнике отделов нет — имя пустое, роль — в ownerRole
+            # (иначе в ячейке «руководитель ОРК руководитель ОРК»)
+            "owner": (head or "") if code == "S1" else (o.get("orkMgr") or J_NOMGR),
             "ownerRole": ork.ROLES[st["role"]], "ownerHidden": False, "ownerWhy": "", "m": month}
 
 
