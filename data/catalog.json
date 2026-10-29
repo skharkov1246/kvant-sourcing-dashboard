@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 319,
-    "total_bytes": 126501869,
+    "total_bytes": 126503009,
     "by_sensitivity": {
       "внутреннее": 197,
       "конфиденциально": 68,
@@ -1712,7 +1712,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 557995,
+      "bytes": 556406,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. С 19.10.2026 в файле только числа по сотрудникам (uid Битрикса); список «ждут ответа» с названиями сделок и LLM-оценки — в KV Cloudflare, ключ chat:v1. До первого прогона после переноса файл ещё прежней схемы.",
       "format": "json",
       "shape": "объект",
@@ -2689,6 +2689,51 @@
       ]
     },
     {
+      "path": "gt/data/bitrix_gt.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 265084,
+      "note": "Метки «был ли запрос в компанию» из СП-166. Пишет бот gt-bitrix.yml дважды в неделю. Руками не редактировать.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "deals",
+        "live",
+        "offers",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "deals",
+        "records": 234,
+        "record_keys": [
+          "created",
+          "id",
+          "models",
+          "rfqs",
+          "stage",
+          "title"
+        ]
+      },
+      "last_change": "2026-10-22",
+      "last_author": "github-actions[bot]",
+      "last_commit": "1899fec5",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        ".github/workflows/gt-bitrix.yml",
+        "gt/build.py",
+        "gt/public/ansaldo.html",
+        "gt/tools/bitrix_gt.py",
+        "gt/tools/drop_ru.py",
+        "scripts/build_index.py",
+        "scripts/preflight.py",
+        "tests/test_dataset_has_reader.py"
+      ]
+    },
+    {
       "path": "zip/customs/out/customs_848120_2024-01-01_2024-12-31.json",
       "subproject": "база ЗИП · таможня",
       "bytes": 262883,
@@ -2748,51 +2793,6 @@
         ]
       },
       "referenced_by": []
-    },
-    {
-      "path": "gt/data/bitrix_gt.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 262355,
-      "note": "Метки «был ли запрос в компанию» из СП-166. Пишет бот gt-bitrix.yml дважды в неделю. Руками не редактировать.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "deals",
-        "live",
-        "offers",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "deals",
-        "records": 232,
-        "record_keys": [
-          "created",
-          "id",
-          "models",
-          "rfqs",
-          "stage",
-          "title"
-        ]
-      },
-      "last_change": "2026-10-22",
-      "last_author": "github-actions[bot]",
-      "last_commit": "1899fec5",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        ".github/workflows/gt-bitrix.yml",
-        "gt/build.py",
-        "gt/public/ansaldo.html",
-        "gt/tools/bitrix_gt.py",
-        "gt/tools/drop_ru.py",
-        "scripts/build_index.py",
-        "scripts/preflight.py",
-        "tests/test_dataset_has_reader.py"
-      ]
     },
     {
       "path": "ove/data/bi_lot1.json",

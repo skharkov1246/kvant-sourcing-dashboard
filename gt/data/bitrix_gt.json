@@ -1,17 +1,71 @@
 {
- "updated": "2026-10-26",
+ "updated": "2026-10-29",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
+  {
+   "id": "24280",
+   "title": "390-317 Закупка Сопловой секции 1ст на Taurus-60 г.Казань",
+   "models": [
+    "Taurus 60"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-10-28",
+   "rfqs": []
+  },
+  {
+   "id": "24204",
+   "title": "РН61003624 Запасные части к ГТУ",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2026-10-16",
+   "rfqs": []
+  },
   {
    "id": "24166",
    "title": "388-306 Закупка ГТД Centaur-40 г.Казань",
    "models": [
     "Centaur 40"
    ],
-   "stage": "C2:NEW",
+   "stage": "C2:4",
    "created": "2026-10-23",
-   "rfqs": []
+   "rfqs": [
+    {
+     "id": "53380",
+     "title": "wtt tg GTE Centaur 40",
+     "created": "2026-10-27",
+     "supplier": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
+    },
+    {
+     "id": "53388",
+     "title": "DTEC WC",
+     "created": "2026-10-27",
+     "supplier": "Dongturbo Electric Company Ltd",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
+    },
+    {
+     "id": "53392",
+     "title": "CSTC GTE Solar Centaur 40",
+     "created": "2026-10-27",
+     "supplier": "CSTC China Service Technology (Shandong) Co. Ltd.",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
+    }
+   ]
   },
   {
    "id": "24138",
@@ -19,9 +73,21 @@
    "models": [
     "ГТУ (модель уточнить)"
    ],
-   "stage": "C2:NEW",
+   "stage": "C2:EXECUTING",
    "created": "2026-10-21",
-   "rfqs": []
+   "rfqs": [
+    {
+     "id": "53116",
+     "title": "wtt старый запрос ансальдо",
+     "created": "2026-10-26",
+     "supplier": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
   },
   {
    "id": "24060",
@@ -103,7 +169,7 @@
    "models": [
     "SGT-700"
    ],
-   "stage": "C2:4",
+   "stage": "C2:2",
    "created": "2026-10-06",
    "rfqs": [
     {
@@ -147,7 +213,7 @@
    "models": [
     "V64.3A (AE64.3A)"
    ],
-   "stage": "C2:PREPARATION",
+   "stage": "C2:EXECUTING",
    "created": "2026-10-02",
    "rfqs": [
     {
@@ -466,7 +532,7 @@
    "models": [
     "V64.3A (AE64.3A)"
    ],
-   "stage": "C2:PREPARATION",
+   "stage": "C2:EXECUTING",
    "created": "2026-10-01",
    "rfqs": [
     {
@@ -565,7 +631,7 @@
    "models": [
     "V64.3A (AE64.3A)"
    ],
-   "stage": "C2:4",
+   "stage": "C2:1",
    "created": "2026-10-01",
    "rfqs": [
     {
@@ -584,7 +650,7 @@
      "title": "rfq Adoset",
      "created": "2026-10-09",
      "supplier": "Adoset",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -595,7 +661,7 @@
      "title": "rfq Beijing Agend",
      "created": "2026-10-09",
      "supplier": "Beijing Agend",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -606,7 +672,7 @@
      "title": "rfq ABSR Engineers",
      "created": "2026-10-09",
      "supplier": "ABSR Engineers & Services Pvt. Ltd.",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -617,7 +683,7 @@
      "title": "rfq Alpha Group",
      "created": "2026-10-09",
      "supplier": "Alpha Group",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -639,7 +705,7 @@
      "title": "rfq Xiangshu Eurtrade",
      "created": "2026-10-09",
      "supplier": "Xiangshu Eurtrade",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -650,7 +716,7 @@
      "title": "rfq ANATCO",
      "created": "2026-10-09",
      "supplier": "AL NOOR ALAILI TRADING CO. LLC",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -661,7 +727,7 @@
      "title": "rfq Harkesh Rubber",
      "created": "2026-10-09",
      "supplier": "Harkesh Rubber LLP",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -683,7 +749,7 @@
      "title": "rfq Shanghai Huanyao",
      "created": "2026-10-09",
      "supplier": "Shanghai Huanyao",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -694,7 +760,7 @@
      "title": "rfq Theta Tech",
      "created": "2026-10-09",
      "supplier": "Theta Tech International Trading Ltd",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -716,7 +782,7 @@
      "title": "rfq Ada Vana",
      "created": "2026-10-09",
      "supplier": "Al Zerwa Trading Co LLC",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -727,7 +793,7 @@
      "title": "rfq SATATURK",
      "created": "2026-10-09",
      "supplier": "Sataturk",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -738,7 +804,7 @@
      "title": "rfq Akvemtek",
      "created": "2026-10-09",
      "supplier": "Akvemtek",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -749,7 +815,7 @@
      "title": "rfq Beijing Handelsen",
      "created": "2026-10-09",
      "supplier": "Beijing Handelsen International Trade",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -760,7 +826,7 @@
      "title": "rfq Hangzhou Gas Turbine Parts\t",
      "created": "2026-10-09",
      "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -771,7 +837,7 @@
      "title": "rfq Tech-Land",
      "created": "2026-10-09",
      "supplier": "Tech-Land",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -782,7 +848,7 @@
      "title": "rfq Gedik Termo Vana",
      "created": "2026-10-09",
      "supplier": "Gedik Termo Vana",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -793,7 +859,7 @@
      "title": "RFQ Waldemar Pruss Armaturenfabrik GmbH",
      "created": "2026-10-20",
      "supplier": "Waldemar Pruss Armaturenfabrik GmbH",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -815,7 +881,7 @@
      "title": "RFQ Tianjin Xina",
      "created": "2026-10-20",
      "supplier": "Tianjin Xina Intelligent Technology Co., Ltd.",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -1133,7 +1199,7 @@
    "models": [
     "GE 9F/9FA"
    ],
-   "stage": "C2:14",
+   "stage": "C2:LOSE",
    "created": "2026-08-03",
    "rfqs": [
     {
@@ -9023,6 +9089,18 @@
      "n": 2
     },
     {
+     "name": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
+     "n": 1
+    },
+    {
+     "name": "Dongturbo Electric Company Ltd",
+     "n": 1
+    },
+    {
+     "name": "CSTC China Service Technology (Shandong) Co. Ltd.",
+     "n": 1
+    },
+    {
      "name": "KTM Services FZE",
      "n": 1
     },
@@ -10469,6 +10547,10 @@
     {
      "name": "Shanxi Runsheng Import and Export Co., Ltd",
      "n": 2
+    },
+    {
+     "name": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
+     "n": 1
     },
     {
      "name": "GTW BEARINGS S.R.O.",
