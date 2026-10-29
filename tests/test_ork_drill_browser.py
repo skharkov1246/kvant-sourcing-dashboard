@@ -224,11 +224,15 @@ def test_клавиатура_карточка_и_отборы_в_списке(b
     assert pg.locator(ROWS).count() == want
     pg.locator("#drwBody [data-odf='rm:step']").click()
     assert pg.locator(ROWS).count() == total
-    # строка — карточка сделки; «← к списку» — тот же список
-    pg.locator(ROWS).first.focus()
+    # строка заказа — путь заказа по шагам (_opOpen), строка уровня сделки — карточка сделки;
+    # «← к списку» — тот же список
+    first = pg.locator(ROWS).first
+    is_order = first.get_attribute("data-odk") is not None
+    first.focus()
     pg.keyboard.press("Enter")
-    assert pg.locator("#drwBody [data-odback]").count() == 1 and pg.locator(ROWS).count() == 0
-    pg.locator("#drwBody [data-odback]").click()
+    back = "#drwBody [data-opgo=list]" if is_order else "#drwBody [data-odback]"
+    assert pg.locator(back).count() == 1 and pg.locator(ROWS).count() == 0
+    pg.locator(back).click()
     assert pg.locator(ROWS).count() == total
     pg.keyboard.press("Escape")
     assert pg.evaluate("document.activeElement===document.querySelectorAll('#orkPulseB tr[data-od]')[1]")
