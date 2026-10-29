@@ -592,12 +592,18 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
     # 5. что открыть или сдвинуть: очередь КАМа + пробелы денег; до ACTIONS_MAX на человека
     acts: dict[str, list] = defaultdict(list)
     for q in (kamq or {}).get("queue") or []:
+        # номера заказов пункта («900/1», kamqueue ords; у «назначить КАМа» — из его сигналов also;
+        # владелец 29.10.2026: «сделка одна — заказы разные»): по ним пункт сверяется с Битриксом,
+        # поставщик и сроки каждого заказа — в очереди КАМа
+        lbls = list(dict.fromkeys(o["lbl"] for o in (q.get("ords") or [x for a in q.get("also") or []
+                                                                         for x in a.get("ords") or []])
+                                  if o.get("lbl")))
         acts[str(q.get("kamId") or "")].append({
             "code": q.get("code"), "sev": q.get("sev", 9), "what": q.get("what") or "", "act": q.get("act") or "",
             "deal": str(q.get("deal")), "seq": q.get("seq") or 0, "t": str(q.get("title") or "")[:70],
             "days": q.get("days"), "who": q.get("owner") or "", "src": "kam",
             # дни рабочие (р.д.) у сроков регламента ОРК (kamqueue inWd), иначе календарные
-            **({"wd": True} if q.get("inWd") else {})})
+            **({"wd": True} if q.get("inWd") else {}), **({"lbls": lbls} if lbls else {})})
     by_id = {d["id"]: d for d in deals if d["k"] == "r"}
 
     def gap(code: str, d: dict, key: str, who: str = "") -> None:

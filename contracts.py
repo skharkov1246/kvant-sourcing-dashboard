@@ -806,17 +806,22 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         t0 = _t0(str(o.get("createdTime") or ""), deal_cat0.get(did, ""))
         utd_raw = _pdate(o.get(UTD_DATE))            # сырая дата УПД — без подстановки
         _rs = [x for x in (ork.stage_step(ostages.get(sid, sid)) for sid, _ in tr) if x is not None]
-        # номер заказа, как его пишет портал («486/1»), — у пункта очереди, в таблицах недели,
+        # номер заказа, как его пишет портал («900/1»), — у пункта очереди, в таблицах недели,
         # очереди КАМа и карточке (владелец 29.10.2026: «сделка одна — заказы разные 1/2/3»)
         _lbl, _no = ork.order_label(o.get("title"), oid)
+        # «Дата записи нового ответственного» позже конца окна (today = p.end — вчера): на конец
+        # окна назначения ещё не было — как не записана (иначе шаг 4 с р.д. −1 и пункт пропадал
+        # из s1Over и s2Over)
         assign = _pdate(o.get(ASSIGN_AT))
+        assign = assign if assign and assign <= today else None
+        _ork_mgr = _resp[0] if is_ork(uid_of(o.get("assignedById"))) else ""
         lo = {
             "id": oid, "deal": did, "seq": 0, "lbl": _lbl, "ordNo": _no,
             "title": str(o.get("title") or "")[:70], "sup": supl.get(str(o.get("companyId"))) or "",
             "oss": _who[0], "ossGone": _who[1],
             # Responsible person заказа; менеджер ОРК — он, если он из отдела ОРК (решение 26.10.2026)
             "resp": _resp[0], "respOrk": is_ork(uid_of(o.get("assignedById"))),
-            "orkMgr": _resp[0] if is_ork(uid_of(o.get("assignedById"))) else "",
+            "orkMgr": _ork_mgr,
             "live": sm == "P", "success": sm == "S", "closedRecent": bool(sm == "S" and moved and moved >= recent_from),
             "created": _pdate(o.get("createdTime")), "dl": _pdate(o.get(DL_CUSTOMER)),
             "shipPlan": _pdate(o.get(SHIP_PLAN)), "shipFact": _pdate(o.get(SHIP_FACT)),
@@ -838,15 +843,16 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "reachMax": max(_rs) if _rs else None,
             "kamOrder": who(o.get(KAM_ORDER))[0], "direction": str(o.get(DIRECTION_F) or ""),
             # «Дата записи нового ответственного»: приёмка кончается назначением, если оно раньше
-            # выхода из «Заказ создан» (ork.assign_at, вопрос владельца 29.10.2026)
+            # выхода из «Заказ создан» и ответственный из ОРК (ork.assign_at, вопрос владельца 29.10.2026)
             "prepayShare": _share(o.get(PREPAY_F)), "assignDate": assign,
             # артефакты шагов (ork.ARTIFACTS): файл, флажок, дата есть — содержимое не проверено
             "art": {a["key"]: _has(o.get(a["field"])) for a in ork.ARTIFACTS},
             # только для расчёта (в страницу не идут): первый выход на шаги и сегменты S1–S10
             "_reach": ork.reach_times(tr, ostages),
+            # назначение — в сегменты только у ответственного из ОРК (то же правило, что ork.assign_at)
             "_segs": ork.segments(tr, ostages, t0=t0 or None,
                                   facts={"delFact": _pdate(o.get(DEL_FACT)), "utdRaw": utd_raw,
-                                         "assignAt": assign}),
+                                         "assignAt": assign if _ork_mgr else None}),
         }
         a = lo["art"]
         a["planDates"] = bool(lo["prodStart"] and lo["prodEnd"])
@@ -1090,6 +1096,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             pend = _pdate(o.get(PROD_END))
             ords_det.append({
                 "id": str(o.get("id")), "title": str(o.get("title") or "")[:70], "lbl": lo["lbl"],
+                "ordNo": lo["ordNo"],
                 "sup": supl.get(str(o.get("companyId"))) or "—",
                 "stage": osid, "stageName": _stage_name(osid),
                 "days": odays, "thr": round(othr, 1), "slow": oslow, "live": olive,
@@ -1133,7 +1140,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "stepWhy": (("сделка закрыта: в счёте только шаг 12 (УПД)" if sem != "F" else "сделка проиграна")
                             if ostep_closed else ov["why"] if olive else ""),
             })
-        ords_det.sort(key=lambda x: (not x["live"], -(x["dlDays"] if x["dlDays"] is not None else -9999),
+        # карточка: живые раньше, затем по номеру заказа («900/1», «900/2», «900/10»; владелец
+        # 29.10.2026: «сделка одна — заказы разные 1/2/3»), без номера — в конце, по сроку
+        ords_det.sort(key=lambda x: (not x["live"], x["ordNo"] is None, x["ordNo"] or 0,
+                                     -(x["dlDays"] if x["dlDays"] is not None else -9999),
                                      -(x["days"] or 0)))
 
         # --- лаг заведения первого заказа (вход в кат.0 → первый заказ)

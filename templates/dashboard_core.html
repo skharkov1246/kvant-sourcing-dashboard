@@ -1772,7 +1772,7 @@ function _incDraw(el,H,M){
     el.querySelector('#incK7').innerHTML=!M?'':(!K7?'<div class="note" style="margin-top:8px">K7 · своя часть по положению: у человека нет сделок, полученных в квартале или к получению.</div>'
       :`<div class="note" style="margin-top:8px">${k?'K7 · своя часть по положению':'K7 · часть пула без человека (не закреплено: уволен или роль не указана) — не чья-то своя часть'} при К = ${String(M.k||RU.k).replace('.',',')}: получено в квартале <b>${money(K7.paidQ,K7.nA,K7.nR,K7.n)}</b>, к получению <b>${money(K7.due,K7.nA,K7.nR,K7.n)}</b>${K7.dueQ0?` (из них в этом квартале ${money(K7.dueQ0,K7.nA,K7.nR,K7.n)})`:''} — по ${sdG(K7.n)}, сверено файлом ${K7.nA}, с результатом ${K7.nR}${k?`; роли: ${K7.roles.map(r=>_INC_ROLE[r]||r).join(', ')}`:''}. Видно только праву «Деньги КАМов».</div>`);
     el.querySelector('#incActs').innerHTML=A.items.map(x=>{const d=byId[x.deal]||{},md=M&&M.deals[x.deal];
-      return `<tr><td>${_esc(x.what)}${x.who?`<div class="dep">${x.src==='kam'?'хозяин по регламенту':'ведёт'}: ${_esc(x.who)}</div>`:''}</td><td><a href="${url(x.deal)}" target="_blank" rel="noopener">${seqTag(x)}${_esc(x.t||('Сделка #'+x.deal))}</a>${d.h?`<div class="dep">${_esc(d.h)}</div>`:''}</td><td class="r mono">${x.days!=null?`${x.days}<span class="dimv">${x.wd?' р.д.':' дн'}</span>`:''}</td>${M?`<td class="r mono">${md&&md.r!=null?_fmtE(md.r):''}</td>`:''}<td>${_esc(x.act)}</td></tr>`;}).join('')
+      return `<tr><td>${_esc(x.what)}${x.who?`<div class="dep">${x.src==='kam'?'хозяин по регламенту':'ведёт'}: ${_esc(x.who)}</div>`:''}</td><td><a href="${url(x.deal)}" target="_blank" rel="noopener">${seqTag(x)}${_esc(x.t||('Сделка #'+x.deal))}</a>${d.h?`<div class="dep">${_esc(d.h)}</div>`:''}${(x.lbls||[]).length?`<div class="dep mono">${x.lbls.map(l=>_ordNo(l,x.seq)).join(', ')}</div>`:''}</td><td class="r mono">${x.days!=null?`${x.days}<span class="dimv">${x.wd?' р.д.':' дн'}</span>`:''}</td>${M?`<td class="r mono">${md&&md.r!=null?_fmtE(md.r):''}</td>`:''}<td>${_esc(x.act)}</td></tr>`;}).join('')
       ||`<tr><td colspan="${M?5:4}" class="dimv" style="padding:14px">Нет данных: пунктов у человека нет</td></tr>`;
     if(A.n>A.items.length) el.querySelector('#incActs').insertAdjacentHTML('beforeend',`<tr><td colspan="${M?5:4}" class="dimv">ещё ${A.n-A.items.length} — после этих</td></tr>`);
   };
@@ -2234,7 +2234,7 @@ function openContract(x){
   // заказы поставщикам
   const ords=x.orders||[];
   h+=`<div class="h">Заказы поставщикам (${ords.length})</div>`;
-  // номер заказа («486/1») — в начале названия; нет его там — перед названием (владелец 29.10.2026)
+  // номер заказа («900/1») — в начале названия; нет его там — перед названием (владелец 29.10.2026)
   h+=ords.map(o=>`<div class="req"><div class="rt">${o.late?'🚩 ':''}${o.lbl&&String(o.title||'').trim().indexOf(o.lbl)!==0?`<b class="mono">${_esc(o.lbl)}</b> `:''}${_esc(o.title)}</div>`
     +`<div class="rm"><span class="sp">${_esc(o.sup)}</span><span class="pill${o.slow||o.late?' p-no_answer':''}">${_esc(_stShort(o.stageName))}</span>`
     // срок заказа — шаг регламента ОРК против его нормы (р.д., без пауз); дни в стадии — справочно
@@ -2403,14 +2403,15 @@ const _orkD=s=>{const m=/^(\d{4})-(\d\d)-(\d\d)/.exec(String(s||'')); return m?`
 const _orkDm=s=>{const m=/^(\d{4})-(\d\d)-(\d\d)/.exec(String(s||'')); return m?`${m[3]}.${m[2]}`:String(s||'—');};
 const _orkWho=w=>_esc(String(w==null?'':w).replace(/ \(уволен\)$/,''));
 // заказ строки (владелец 29.10.2026: «сделка одна — заказы разные 1/2/3 — разные поставщики и сроки»):
-// _orkNo — «№486/1», как в Битриксе (номер заказа уже несёт № реализации; без номера в названии —
-// «№486 · id 7050»); _orkFx — поставщик (только если он есть в данных страницы: то же поле, что у
-// столбца «Заказ · поставщик») и срок, по которому считана строка («срок 15.10.2025», «с 22.10 (назначение)»)
-const _orkNo=x=>/^\d/.test(x.ordLbl||'')?`№${_esc(x.ordLbl)}`:`№${x.seq||'—'}${x.ordLbl?' · '+_esc(x.ordLbl):''}`;
+// _ordNo — «№900/1», как в Битриксе (номер заказа несёт № реализации); номер в названии карточки
+// от другой сделки (карточку скопировали) или его нет — «№900 · 905/2», «№900 · id 7001»; _orkFx —
+// поставщик (только если он есть в данных страницы: то же поле, что у столбца «Заказ · поставщик») и
+// срок, по которому считана строка («срок 01.09.2026», «с 14.10 (назначение)»)
+const _ordNo=(l,seq)=>{l=String(l||''); const m=/^(\d+)\//.exec(l); return m&&(!seq||+m[1]===+seq)?`№${_esc(l)}`:`№${seq||'—'}${l?' · '+_esc(l):''}`;};
+const _orkNo=x=>_ordNo(x.ordLbl,x.seq);
 const _orkFx=x=>[x.sup&&x.sup!=='—'?'поставщик '+_esc(x.sup):'',x.ref?_esc(x.ref):''].filter(Boolean).join(' · ');
 // «дд.мм», а не текущего года — «дд.мм.гггг» (начало счёта срока шага в карточке заказа)
 const _orkDy=s=>{const m=/^(\d{4})/.exec(String(s||'')); return m&&+m[1]!==new Date().getFullYear()?_orkD(s):_orkDm(s);};
-const _orkOrd=x=>x&&x.ordLbl?`<b class="mono">${_orkNo(x)}</b>${_orkFx(x)?' · '+_orkFx(x):''}`:'';
 // пункты одной сделки — подряд (по самому долгому), затем по номеру заказа: как lifecycle.group_sort
 const _orkQSort=Q=>{const t={},k=x=>x.sev+'|'+x.deal; Q.forEach(x=>{t[k(x)]=Math.max(t[k(x)]||0,x.days||0);});
   return Q.sort((a,b)=>(a.sev-b.sev)||(t[k(b)]-t[k(a)])||((b.seq||0)-(a.seq||0))||String(a.deal).localeCompare(String(b.deal))||((a.ordNo!=null?a.ordNo:1e6)-(b.ordNo!=null?b.ordNo:1e6))||((b.days||0)-(a.days||0)));};
@@ -2515,7 +2516,7 @@ function _orkWeek(X,O,el,h){
   h+=`<div class="secttl"><b>·</b> Неделя ${_orkDm(W.mon)}–${_orkD(W.sun)}: что сделать и кто${qmark('ork.week')}</div>`
    +`<div class="kpis orkt5" id="orkTiles" style="grid-template-columns:repeat(5,1fr)">`
    +_orkTile({code:'W1',title:`Приёмка дольше ${nw(1)} р.д.`,st:T1,filt:'w1',cls:T1.value?'warn':'',
-      meta:`заказов ${T1.orders||0} · сделок без заказа ${T1.noOrder||0}${T1.excluded?` · не в счёте (гигиена, сделка вне «Реализации»): ${T1.excluded}`:''} · ${recTxt}${T1.byAssign?` (из них назначением менеджера ОРК: ${T1.byAssign})`:''}${T1.assignStale?` · дата назначения раньше начала приёмки — не в счёте: ${T1.assignStale}`:''} · ${_esc(T1.label||'без пауз')}`,who:'руководитель ОРК: принять сделку, назначить менеджера'})
+      meta:`заказов ${T1.orders||0} · сделок без заказа ${T1.noOrder||0}${T1.excluded?` · не в счёте (гигиена, сделка вне «Реализации»): ${T1.excluded}`:''} · ${recTxt}${T1.byAssign&&rec.n?` · из ${rec.n} закончено назначением менеджера ОРК: ${T1.byAssign}`:''}${T1.assignStale||T1.assignNoMgr?` · «Заказ создан» с датой назначения не в счёте:${T1.assignStale?` раньше начала приёмки ${T1.assignStale}`:''}${T1.assignStale&&T1.assignNoMgr?',':''}${T1.assignNoMgr?` ответственный не из ОРК ${T1.assignNoMgr}`:''}`:''} · ${_esc(T1.label||'без пауз')}`,who:'руководитель ОРК: принять сделку, назначить менеджера'})
    +_orkTile({code:'W2',title:'Сверх нормы — работа ОРК',st:T2,filt:'w2',cls:T2.value?'bad':'',
       meta:`шаг 1: ${bs[1]||0} · 4: ${bs[4]||0} · 5: ${bs[5]||0} · 8: ${bs[8]||0}${T2.waitUtd?` · ждём УПД от клиента (не в счёте): ${T2.waitUtd}`:''}${(W.waitUtd||{}).unknown?` · срок УПД неизвестен: ${W.waitUtd.unknown}`:''}${T2.excluded?` · не в счёте (гигиена, приёмка вне «Реализации»): ${T2.excluded}`:''}${(O.trust||{}).noCalendar?` · год без календаря: ${O.trust.noCalendar}`:''} · ${_esc(T2.label||'')}`,who:'менеджеры ОРК — таблица «Сверх нормы по менеджерам»'})
    +_orkTile({code:'W3',title:'Зона риска: срок клиента',st:T3,filt:'w3',cls:T3.value?'bad':'',
@@ -2873,7 +2874,7 @@ function _ctPanel(X,el,opt){
   // ---------- 3. ДЕНЬГИ ВО ВРЕМЕНИ: что отгружать и во что обходится ожидание ----------
   h+=`<details class="sect"><summary>Деньги во времени: что отгружать первым и цена ожидания${qmark('ct.cost')}</summary><div class="in"><div class="grid">`
    +`<section class="card"><h2>Отгружать в первую очередь</h2><div class="note">Каждый день ожидания стоит денег: стоимость отгрузки × ${RATE}% ÷ 365. Сверху — заказы, чья отгрузка вернёт в оборот больше всего; 🚩 — срок клиенту уже сорван.</div>`
-   +((dl.shipFirst||[]).map(t=>`<div class="tlrow"><span class="tld">${t.late?'🚩 ':''}№${/^\d/.test(t.lbl||'')?_esc(t.lbl):(t.seq||'—')}</span><span class="tln">${_esc(t.customer)} <span class="dimv">· ${_esc(_stShort(t.stageName))} · ${t.revLbl}${t.late?` · просрочка ${t.dlDays} дн`:(t.dl?` · срок ${t.dl}`:'')}</span></span><span class="tldur">${_fmtE(t.burnDay)}/дн</span></div>`).join('')||'<div class="dimv">просроченных отгрузок нет</div>')
+   +((dl.shipFirst||[]).map(t=>`<div class="tlrow"><span class="tld">${t.late?'🚩 ':''}${_ordNo(t.lbl,t.seq)}</span><span class="tln">${_esc(t.customer)} <span class="dimv">· ${_esc(_stShort(t.stageName))} · ${t.revLbl}${t.late?` · просрочка ${t.dlDays} дн`:(t.dl?` · срок ${t.dl}`:'')}</span></span><span class="tldur">${_fmtE(t.burnDay)}/дн</span></div>`).join('')||'<div class="dimv">просроченных отгрузок нет</div>')
    +`</section>`
    +`<section class="card"><h2>Цена просрочки — оценка</h2><div class="note">ОЦЕНКА, а не убыток: упущенная доходность — стоимость отгрузки, которую заказчик оплатил бы раньше, × дни задержки × стоимость денег. Допущения: клиент платит всю сумму после доставки (предоплата не вычтена), сумма сделки делится на заказы по их закупке. Сейчас зависло <b>${dl.lateRev||'—'}</b>${dl.avgLate?` в среднем на <b>${dl.avgLate} дн</b> сверх обещанного`:''}.${dl.lateNoSum?` Просроченных заказов без суммы закупки — ${dl.lateNoSum}: в деньги не вошли.`:''}</div>`
    +`<div class="srccmp used" style="margin-top:8px"><span class="sl">Упущено (оценка), ${RATE}% год.</span><div class="sb"><i style="width:100%"></i></div><span class="sv"><b style="color:var(--nr)">${dl.loss||'—'}</b></span><span class="sd bad">итого</span></div>`
@@ -3238,19 +3239,20 @@ function _kqWire(el,K,pid){
     act:'сверить с ОСС готовность и подтвердить клиенту дату',days:u.left,kam:u.kam,kamId:u.kamId,kamGone:u.kamGone,
     deal:u.deal,src:'real',seq:u.seq,customer:u.customer,title:u.title,dl:u.dl,sup:u.sup,
     ords:u.lbl?[{lbl:u.lbl,sup:u.sup,ref:'срок '+u.dl}]:[]});
-  // заказы пункта — каждый строкой: номер («№486/1»), поставщик, срок, дни (владелец 29.10.2026)
-  const ordl=o=>`<div class="dep">↳ <b class="mono">${/^\d/.test(o.lbl||'')?'№':''}${_esc(o.lbl)}</b>${o.sup?' · поставщик '+_esc(o.sup):''}${o.ref?' · '+_esc(o.ref):''}${o.days!=null?` · ${o.days} ${o.inWd?'р.д.':'дн'}`:''}</div>`;
+  // заказы пункта — каждый строкой: номер («№900/1»), поставщик, срок, дни; хозяин заказа — если он
+  // не тот, что у пункта (у заказов одной сделки менеджеры ОРК разные; владелец 29.10.2026)
+  const ordl=(o,x)=>`<div class="dep">↳ <b class="mono">${_ordNo(o.lbl,x.seq)}</b>${o.sup?' · поставщик '+_esc(o.sup):''}${o.ref?' · '+_esc(o.ref):''}${o.days!=null?` · ${o.days} ${o.inWd?'р.д.':'дн'}`:''}${o.owner&&o.owner!==(x.owner||'')?' · хозяин '+_esc(o.owner):''}</div>`;
   // продажа — из закрытого массива «Дохода»: только сверенные файлом экономики (класс A)
   const IM=_incMoney(), sale=x=>{const m=IM&&IM.deals[String(x.deal)]; return m&&m.s?_fmtE(m.s):'';};
   const who=x=>`${_esc(x.kam||'—')}${x.kamGone?' <span class="gone">уволен</span>':''}`;
   const deal=x=>x.src==='presale'
     ?`<a href="${url(x.deal)}" target="_blank" rel="noopener">${_esc(x.title||('Сделка #'+x.deal))}</a><div class="dep">пресейл${x.stage?' · '+_esc(x.stage):''}</div>`
     :`${ct?`<b class="mono">№${x.seq||'—'}</b>`:`<a href="${url(x.deal)}" target="_blank" rel="noopener"><b class="mono">№${x.seq||'—'}</b></a>`}<div class="dep">${_esc(x.customer||'—')}</div><div class="dep">${_esc(x.title||'')}</div>`;
-  const what=x=>`${_esc(x.what)}${x.code==='ballKam'&&x.thr?`<div class="dep">порог ${x.thr} дн.</div>`:''}${x.chat?`<div class="dep">${_esc(x.chat)}</div>`:''}${x.code==='noKam'&&x.stage&&x.src==='real'?`<div class="dep">стадия: ${_esc(x.stage)}${x.stageDays!=null?` · ${x.stageDays} дн.`:''}</div>`:''}${(x.also||[]).map(a=>`<div class="dep">↳ ${_esc(a.what)}${a.days!=null?` — ${a.days} ${a.inWd?'р.д., без пауз':'дн.'}`:''}${a.thr?` (порог ${a.thr} дн.)`:''}${a.orders>1?` · заказов ${a.orders}`:''}${(a.ordLbls||[]).length?' · '+a.ordLbls.map(_esc).join(', '):''}</div>`).join('')}`;
+  const what=x=>`${_esc(x.what)}${x.code==='ballKam'&&x.thr?`<div class="dep">порог ${x.thr} дн.</div>`:''}${x.chat?`<div class="dep">${_esc(x.chat)}</div>`:''}${x.code==='noKam'&&x.stage&&x.src==='real'?`<div class="dep">стадия: ${_esc(x.stage)}${x.stageDays!=null?` · ${x.stageDays} дн.`:''}</div>`:''}${(x.also||[]).map(a=>`<div class="dep">↳ ${_esc(a.what)}${a.days!=null?` — ${a.days} ${a.inWd?'р.д., без пауз':'дн.'}`:''}${a.thr?` (порог ${a.thr} дн.)`:''}${a.orders>1?` · заказов ${a.orders}`:''}</div>${(a.ords||[]).map(o=>ordl(o,x)).join('')}`).join('')}`;
   // хозяин пункта — исполнитель шага по регламенту ОРК (решение владельца 26.10.2026, п. 1)
   const own=x=>x.src!=='real'?'':(x.kamOwner?'<div class="dep">вы — хозяин пункта по регламенту</div>'
     :(x.owner?`<div class="dep">хозяин по регламенту: ${_esc(x.owner)}${x.ownerRole?' ('+_esc(x.ownerRole)+')':''}${x.kamCopy?' · вы в копии':''}</div>`:''));
-  const act=x=>`${_esc(x.act)}${own(x)}${(x.ords||[]).length?x.ords.map(ordl).join(''):`${x.orders>1?`<div class="dep">заказов: ${x.orders}</div>`:''}${x.dl?`<div class="dep">срок клиента ${x.dl}${x.sup?' · '+_esc(x.sup):''}</div>`:''}`}`;
+  const act=x=>`${_esc(x.act)}${own(x)}${(x.ords||[]).length?x.ords.map(o=>ordl(o,x)).join(''):`${x.orders>1?`<div class="dep">заказов: ${x.orders}</div>`:''}${x.dl?`<div class="dep">срок клиента ${x.dl}${x.sup?' · '+_esc(x.sup):''}</div>`:''}`}`;
   const draw=()=>{
     const src=qc==='soon'?U.map(soonRow):Q;
     const r=src.filter(x=>(!qc||qc==='soon'||x.code===qc)&&(qw==='*'||key(x)===qw));

@@ -294,6 +294,12 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     s1_recent = [o["_segs"]["segs"]["S1"] for o in orders
                  if (o.get("_segs") or {}).get("segs", {}).get("S1") and in_cat.get(o.get("deal"), True)
                  and back and _end(o["_segs"]["segs"]["S1"]) and _end(o["_segs"]["segs"]["S1"]) > back]
+    # «закончено назначением» — среди тех же отрезков, что в n своевременности (_timeliness: без
+    # пропуска, «пачки», возврата, обратного порядка меток, р.д. известны): k ≤ n по построению
+    by_assign = sum(1 for s in s1_recent if _clean(s) and s.get("wd") is not None
+                    and s.get("endBy") == "назначение")
+    # дата записи у «Заказ создан» не в счёте: раньше начала приёмки / ответственный не из ОРК
+    st1 = [o for o in U if ork.stage_step(o.get("stage")) == 1]
     agree_s1, agree_n = _s1_agree(orders)
     recent = (_timeliness(s1_recent, "S1", agree=agree_s1) if back else
               _ms(None, 0, None, src="S1", need=f"нет производственного календаря на {today.year} год "
@@ -304,9 +310,12 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                        "label": ork.NO_PAUSE, "recent": recent,
                        "agree": agree_s1, "agreeN": agree_n,
                        # приёмка кончилась назначением менеджера ОРК раньше выхода из «Заказ создан»
-                       # (за 20 р.д.); дата записи раньше начала приёмки — не в счёте, счётом
-                       "byAssign": sum(1 for s in s1_recent if s.get("endBy") == "назначение"),
-                       "assignStale": sum(1 for o in U if ork.assign_stale(o)),
+                       # (за 20 р.д., из n своевременности); у живых «Заказ создан» дата записи не
+                       # в счёте — раньше начала приёмки (assignStale) или ответственный не из ОРК
+                       # (assignNoMgr): приёмка не сделана, счётом
+                       "byAssign": by_assign,
+                       "assignStale": sum(1 for o in st1 if ork.assign_stale(o)),
+                       "assignNoMgr": sum(1 for o in st1 if ork.assign_no_mgr(o)),
                        "excluded": sum(1 for o in U if step[o["id"]] == 1 and not_counted(o))})
 
     # --- W2 сверх нормы: только шаги ОРК (1, 4, 5, 8) -----------------------------------------
@@ -491,9 +500,14 @@ def _long_p80(prod: list[dict], s5: dict, today: dt.date) -> dict:
         days = (today - start).days
         if days > p8:
             items.append({"deal": o.get("deal"), "seq": o.get("seq"), "order": o["id"], "days": days,
-                          "ordLbl": o.get("lbl") or "",
+                          "ordLbl": o.get("lbl") or "", "ordNo": o.get("ordNo"),
                           "sup": o.get("sup") or "", "who": (o.get("own") or {}).get("who") or ""})
-    items.sort(key=lambda x: (-x["days"], x["order"]))
+    # заказы одной сделки — подряд (по самому долгому из них), затем по номеру заказа
+    top: dict = {}
+    for x in items:
+        top[str(x["deal"])] = max(top.get(str(x["deal"]), 0), x["days"])
+    items.sort(key=lambda x: (-top[str(x["deal"])], str(x["deal"]),
+                              x["ordNo"] if x["ordNo"] is not None else 10 ** 6, -x["days"], x["order"]))
     known = len(prod) - unknown
     return {"state": s5["state"], "value": len(items), "k": len(items), "n": known, "unknown": unknown,
             "p80": p8, "items": items, "label": label, "src": "Q2 S5",
@@ -587,7 +601,9 @@ def _month(orders: list[dict], U: list[dict], today: dt.date, otd: dict | None, 
                     if o.get("respOrk") and code != "S1" and mi < 2:
                         people[(mi, o.get("orkMgr") or "не назначен")]["segs"][code].append(s)
             for a in ork.ARTIFACTS:
-                at = _d((o.get("_reach") or {}).get(a["need"]))
+                # день прохождения шага — как у ведомости недели (ork.passed_at: на шагах 2–4 и
+                # назначение менеджера ОРК, если оно раньше выхода из «Заказ создан»)
+                at = ork.passed_at(o, a["need"])
                 if at and m0 <= at < m1 and ork.art_required(o, a, o.get("_reach")):
                     req += 1
                     got = bool((o.get("art") or {}).get(a["key"]))
@@ -765,9 +781,9 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
         row("W1", "Приёмка (S1)", "живые заказы в «Заказ создан» без назначения менеджера ОРК с р.д.(t0, сегодня) > 1 "
             "+ сделки без заказа > 1 р.д.; t0 = max(создание заказа, вход сделки в реализацию); приёмка кончается "
             "раньше из двух: выход из «Заказ создан» по стадии или «Дата записи нового ответственного» (не раньше "
-            "дня t0, иначе не в счёте) — после назначения заказ на шаге 4, срок договора с поставщиком (2 р.д.) — "
-            "от назначения; брошенные карточки и сделки вне «Реализации» — не в счёте; стадия не из таблицы — в n "
-            "как «срок неизвестен»", "createdTime, crm.stagehistory, ufCrm20_1787924508120", t["W1"]),
+            "дня t0 и ответственный заказа из отдела ОРК, иначе не в счёте) — после назначения заказ на шаге 4, срок "
+            "договора с поставщиком (2 р.д.) — от назначения; брошенные карточки и сделки вне «Реализации» — не в "
+            "счёте; стадия не из таблицы — в n как «срок неизвестен»", "createdTime, crm.stagehistory, ufCrm20_1787924508120", t["W1"]),
         row("W2", "Сверх нормы, только ОРК", "шаги 1, 4, 5, 8: р.д. от входа в шаг > нормы (шаг 4 — от назначения "
             "менеджера ОРК, если приёмку закончило оно, ork.clock); стадия позади фактов, "
             "брошенная карточка — гигиена, не в n; стадия не из таблицы — в n как «срок неизвестен»; «без пауз». "
@@ -782,9 +798,12 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
             "производстве > 30 дн.", "Production start/end date, budget; Supplier Shipment Date, planned", t["W5"]),
         row("M1", "Своевременность S2+S3+S6", "сегменты, закончившиеся в месяце, без «пачек» и возвратов: в норме / "
             f"все; за ячейкой меньше {ork.GATES['n_managers_min']} ответственных заказа — не показываем (раскрыло бы "
-            "человека; поимённо — под правом руководителей)", "crm.stagehistory (все переходы)",
-            (m0.get("M1") or {}).get("mgr") or {}),
-        row("M2", "Полнота карточки", "Σ есть / Σ требуется по парам (заказ, артефакт) у заказов, прошедших шаг",
+            "человека; поимённо — под правом руководителей). S2 начинается с назначения менеджера ОРК («Дата записи "
+            "нового ответственного»), если оно раньше выхода из «Заказ создан»; стадия прыгнула сразу на шаг 5 и "
+            "дальше — S2 пропущен и не в счёте, как и без назначения", "crm.stagehistory (все переходы), "
+            "ufCrm20_1787924508120", (m0.get("M1") or {}).get("mgr") or {}),
+        row("M2", "Полнота карточки", "Σ есть / Σ требуется по парам (заказ, артефакт) у заказов, прошедших шаг "
+            "(шаги 2–4 — и назначением менеджера ОРК, если оно раньше стадии: ork.passed_at)",
             ", ".join(a["field"] for a in ork.ARTIFACTS), m0.get("M2") or {}),
         row("M3", "Загрузка", "живые заказы на менеджера ОРК / среднее по менеджерам; ±25 %",
             "assignedById, department.get", month.get("M3") or {}),

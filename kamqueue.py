@@ -11,7 +11,7 @@
     хозяин, ОСС в копии, п. 4), УПД на 11-й р.д. (noUtd), приёмка и заказ (s1Over, noOrder,
     noDl), оплата без договора (payNoContract), срок оплаты (noPayPlan); пункты одной сделки
     одного вида сводятся в один (заказов несколько — разговор один), а заказы пункта — каждый
-    своей строкой ords: номер «486/1», поставщик, срок, дни (владелец 29.10.2026);
+    своей строкой ords: номер «900/1», поставщик, срок, дни, хозяин заказа (владелец 29.10.2026);
   • сделки без поля «КАМ» — noKam: хозяин пункта руководитель КАМ, действие
     «назначить КАМа». Это открытые сделки реализации и пресейла и любая сделка
     реализации (в том числе закрытая — без УПД) с пунктом для КАМа. Сигналы, которые
@@ -151,17 +151,19 @@ def _chat_note(ch: dict | None, *, gate: bool = False) -> str:
 
 
 def _lbl_key(lbl: str) -> tuple:
-    """Порядок заказов сделки: «486/2» раньше «486/10»; подпись без номера («id …») — в конце."""
+    """Порядок заказов сделки: «900/2» раньше «900/10»; подпись без номера («id …») — в конце."""
     m = re.match(r"(\d+)/(\d+)$", str(lbl or ""))
     return (0, int(m.group(1)), int(m.group(2)), "") if m else (1, 0, 0, str(lbl or ""))
 
 
 def _ord(x: dict) -> dict:
     """Заказ пункта реализации для строки очереди КАМа: номер, поставщик (то же поле, что у
-    сроков ≤ 14 дн. — в странице у того, кому она отдана), срок пункта, дни."""
+    сроков ≤ 14 дн. — в странице у того, кому она отдана), срок пункта, дни и хозяин заказа по
+    регламенту (у заказов одной сделки менеджеры ОРК бывают разные)."""
     sup = str(x.get("sup") or "")
     return {"lbl": x.get("ordLbl") or "", "sup": "" if sup == "—" else sup, "ref": x.get("ref") or "",
-            "days": x.get("days"), "inWd": bool(x.get("inWd"))}
+            "days": x.get("days"), "inWd": bool(x.get("inWd")),
+            "owner": str(x.get("who") or "").replace(" (уволен)", "")}
 
 
 def _bucket(days: int | None) -> str:
@@ -205,16 +207,16 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
     orphan: dict[str, dict[str, dict]] = defaultdict(dict)
     orphan_x: dict[str, dict] = {}            # пункт реализации — подписи сделки, которой нет в rows
 
-    def signal(did, code: str, days, *, lbl: str = "", **kw) -> None:
+    def signal(did, code: str, days, *, ord_row: dict | None = None, **kw) -> None:
         """Сигнал сделки без КАМа: по виду — один, дней — наибольшее, заказы — счётом и
-        номерами (ordLbls, по номеру заказа)."""
+        строками ords (номер, поставщик, срок, дни, хозяин — как у пункта с КАМом; по номеру)."""
         sig = orphan[str(did)]
         o = sig.get(code)
         if o is None:
             o = sig[code] = {"code": code, "what": CODES[code][1], "days": days, "orders": 0}
         o["orders"] += 1
-        if lbl:
-            o["ordLbls"] = sorted(set(o.get("ordLbls", [])) | {lbl}, key=_lbl_key)
+        if ord_row and ord_row.get("lbl"):
+            o["ords"] = sorted(o.get("ords", []) + [ord_row], key=lambda r: _lbl_key(r["lbl"]))
         if (days or 0) >= (o["days"] or 0):
             o.update(days=days, **kw)
 
@@ -286,7 +288,7 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
             # без КАМа разговор с клиентом вести некому: сигнал — в пункт noKam сделки
             did = str(x.get("deal"))
             orphan_x.setdefault(did, x)
-            signal(did, code, x.get("days"), lbl=x.get("ordLbl") or "", dl=x.get("dl") or "",
+            signal(did, code, x.get("days"), ord_row=_ord(x), dl=x.get("dl") or "",
                    owner=str(x.get("who") or "").replace(" (уволен)", ""), inWd=bool(x.get("inWd")))
             continue
         k = (str(x.get("deal")), code)

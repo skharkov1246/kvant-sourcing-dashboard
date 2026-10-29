@@ -1009,3 +1009,94 @@ def test_сделка_три_заказа_в_неделе_и_зоне_риска
         ("990/3", "Компания 407", "09.10.2026")]
     r = next(r for r in data["rows"] if r["deal"] == "6090")
     assert sorted(o["lbl"] for o in r["orders"]) == ["990/1", "990/2", "990/3"]
+
+
+# ── ревью 29.10.2026: дата позже окна, ответственный не из ОРК, M2 = ведомость, порядок строк ──
+class _ТриЗаказаПлюс(fixture.ТриЗаказа):
+    """fixture.ТриЗаказа и сделка 992 (придумана): 992/1 «Заказ создан» 5 дн. с датой записи
+    назавтра (позже конца окна — как не записана), 992/2 — в день создания, но ответственный из
+    снабжения, не из ОРК (менеджер ОРК не назначен); 990/3 — со сроком клиента раньше 990/1."""
+
+    def __init__(self, *, no_assign_933: bool = False):
+        super().__init__()
+        import contracts as ct
+        now = dt.datetime.fromisoformat(fixture.CT_NOW)
+        t = lambda a: (now - dt.timedelta(days=a)).isoformat()      # noqa: E731
+        d = lambda a: (СЕГОДНЯ - dt.timedelta(days=a)).isoformat()   # noqa: E731
+        if no_assign_933:
+            next(o for o in self.orders if str(o.get("title", "")).startswith("933/3.")).pop(ct.ASSIGN_AT)
+        next(o for o in self.orders if str(o.get("title", "")).startswith("990/3."))[ct.DL_CUSTOMER] = d(400)
+        self.deals.append({"ID": "6092", "TITLE": "992. Приёмка по назначению", "OPPORTUNITY": "60000",
+                           "CURRENCY_ID": "EUR", "COMPANY_ID": "305", "STAGE_ID": "C0:EXECUTING",
+                           "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": t(30), "ASSIGNED_BY_ID": "11",
+                           ct.OSS_DEAL: ["21"], ct.KAM_F: "10"})
+        self.hist[2] += [("6092", "C0:NEW", t(20)), ("6092", "C0:EXECUTING", t(10))]
+        for oid, n, assign, resp in ((99520, 1, d(-1), "31"), (99521, 2, d(5), "33")):
+            self.orders.append({"id": oid, "title": f"992/{n}. Узел", "companyId": "402", "parentId2": 6092,
+                                "opportunity": 5_000, "currencyId": "EUR", "stageId": "DT172_26:NEW",
+                                "createdTime": t(5), "movedTime": t(5), ct.OSS_F: "21", ct.DL_CUSTOMER: d(-90),
+                                ct.ASSIGN_AT: assign, "assignedById": resp})
+            self.hist[172].append((str(oid), "DT172_26:NEW", t(5)))
+
+
+def test_назначение_позже_окна_и_не_из_орк_не_приёмка():
+    """Дата записи позже конца окна — как не записана; ответственный не из отдела ОРК — менеджер
+    ОРК не назначен: оба заказа — s1Over у руководителя ОРК, не s2Over; W1.assignNoMgr — счёт
+    (у «Заказ создан»), assignStale — только у «Заказ создан» (991/1). Сегменты: назначение не
+    из ОРК в S1 не идёт."""
+    data, orders = _orders(_ТриЗаказаПлюс())
+    by = {o["lbl"]: o for o in orders}
+    assert by["992/1"]["assignDate"] is None, "дата позже конца окна отброшена"
+    assert by["992/2"]["assignDate"] == СЕГОДНЯ - dt.timedelta(days=5) and not by["992/2"]["orkMgr"]
+    assert not by["992/2"]["_segs"]["assignUsed"]
+    assert by["933/3"]["_segs"]["assignUsed"]
+    q = data["life"]["queue"]
+    for lbl in ("992/1", "992/2"):
+        codes = {x["code"] for x in q if x["ordLbl"] == lbl}
+        assert "s1Over" in codes and "s2Over" not in codes, (lbl, codes)
+        x = next(x for x in q if x["ordLbl"] == lbl and x["code"] == "s1Over")
+        assert x["role"] == "orkHead" and x["ref"] == "с 14.10 (создан заказ)" and x["days"] == 3
+    T1 = data["ork"]["week"]["tiles"]["W1"]
+    assert (T1["assignStale"], T1["assignNoMgr"]) == (1, 1)
+    _инварианты(data)
+
+
+def test_полнота_карточки_ведомость_и_месяц_одна_дата():
+    """Срок клиента (dl, нужен с шага 2) у 933/3 с назначением: обязателен и в ведомости недели
+    (шаг 1, artReq), и в M2 «Месяца» (ork.passed_at — та же дата назначения; отдел в корпусе — один
+    человек, ячейка отдела скрыта воротами людей, поэтому M2 — у менеджера ОРК 933/3 за текущий
+    месяц): разница с корпусом без назначения — ровно один заказ в обоих местах."""
+    with_a, _o = _orders(_ТриЗаказаПлюс())
+    without, _o = _orders(_ТриЗаказаПлюс(no_assign_933=True))
+    led = [{r["no"]: r for r in d["ork"]["week"]["ledger"]} for d in (with_a, without)]
+    assert led[0][1]["artReq"] == led[1][1]["artReq"] + 1
+    m2 = [next(p for p in d["orkMonth"]["main"]["people"] if p["who"] == "Олег (ОРК)")["cur"]["M2"]
+          for d in (with_a, without)]
+    assert m2[0]["n"] == m2[1]["n"] + 1, m2
+
+
+def test_карточка_и_p80_по_номеру_заказа():
+    """Карточка сделки: живые заказы по номеру (990/1, 990/2, 990/3), даже если срок клиента
+    раньше у 990/3; «дольше P80» — заказы одной сделки подряд и по номеру."""
+    data, _o = _orders(_ТриЗаказаПлюс())
+    r = next(r for r in data["rows"] if r["deal"] == "6090")
+    assert [o["lbl"] for o in r["orders"]] == ["990/1", "990/2", "990/3"]
+    assert r["orders"][2]["dlDays"] > r["orders"][0]["dlDays"]
+    prod = [{"id": str(i), "deal": deal, "seq": seq, "lbl": f"{seq}/{n}", "ordNo": n, "stepSince": f"2026-{m}T10:00:00+03:00"}
+            for i, (deal, seq, n, m) in enumerate((("D1", 901, 2, "09-01"), ("D2", 902, 1, "08-01"),
+                                                   ("D1", 901, 10, "07-15"), ("D1", 901, 1, "09-20")))]
+    lp = orkview._long_p80(prod, {"state": "show", "p80": 10}, СЕГОДНЯ)
+    assert [x["ordLbl"] for x in lp["items"]] == ["901/1", "901/2", "901/10", "902/1"]
+
+
+def test_закончено_назначением_из_n_своевременности():
+    """W1.byAssign — среди тех же отрезков S1, что n своевременности: «пачка», возврат и обратный
+    порядок меток не в счёте, k ≤ n."""
+    data, orders = _orders(fixture.ТриЗаказа())
+    T1 = data["ork"]["week"]["tiles"]["W1"]
+    assert T1["byAssign"] <= ((T1.get("recent") or {}).get("n") or 0)
+    o = next(o for o in orders if o["lbl"] == "933/3")
+    s1 = o["_segs"]["segs"]["S1"]
+    assert s1["endBy"] == "назначение"
+    for bad in ("burst", "ret", "neg"):
+        assert not orkview._clean({**s1, bad: True})
