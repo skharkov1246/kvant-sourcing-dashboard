@@ -54,13 +54,18 @@ def _keys(v) -> list[str]:
     return v["k"] if isinstance(v, dict) else v
 
 
+def _rows(part: dict, key: str = "orders") -> list[dict]:
+    """Строки части данных с подписями (стадия, поставщик, люди — номером в словаре strs)."""
+    return orkview.unpack(part.get(key) or [], part.get("strs") or [])
+
+
 # ── строки «Недели» ───────────────────────────────────────────────────────────────────────
 def test_строки_заказов_та_же_совокупность_что_live(built):
     """week.orders — живые заказы ведомости (U + C12): столько же, сколько week.live, ключи
     уникальны; номер — как портал называет заказ («950/1»); шаг — тот же, что в ведомости."""
     for name, v in _views(built["contracts"]):
         w = v["ork"]["week"]
-        rows = w["orders"]
+        rows = _rows(w)
         assert len(rows) == w["live"] == len({r["k"] for r in rows}), name
         assert all(re.fullmatch(r"\d{1,5}(/\d+)?|#\d+", r["no"]) for r in rows), name
         steps = Counter(r["step"] for r in rows)
@@ -69,9 +74,14 @@ def test_строки_заказов_та_же_совокупность_что_l
         assert steps.get(None, 0) == w["unknown"]
         # строка — то, что нужно списку: сделка, стадия, шаг, хозяин, менеджер ОРК
         for r in rows:
-            assert {"k", "no", "deal", "seq", "stage", "step", "mgr", "mk"} <= set(r), r
+            assert {"k", "no", "deal", "seq", "stage", "step", "mgr"} <= set(r), r
+            assert isinstance(r["stage"], str) and isinstance(r["mgr"], str) and r["stage"] and r["mgr"]
             assert not (set(r) & MONEY_KEYS), "денег в строках нет"
-    main = built["contracts"]["ork"]["week"]["orders"]
+            assert "mk" not in r, "вид менеджера — у строки «Пульса», не в каждой строке"
+        # подписи — номером в словаре: строка в payload без повторяющихся названий
+        assert len(w["strs"]) == len(set(w["strs"])) and w["strs"][0] == ""
+        assert all(isinstance(r[f], int) and r[f] >= 1 for r in w["orders"] for f in orkview.PACKED if f in r), name
+    main = _rows(built["contracts"]["ork"]["week"])
     assert {"950/1", "930/2"} <= {r["no"] for r in main}, "номер заказа — из названия «950/1. …»"
     assert any(r.get("c12") for r in main) and any(r.get("p80") for r in main)
     assert any(r.get("over") for r in main) and any(r.get("wu") for r in main)
@@ -82,7 +92,7 @@ def test_коды_очереди_и_прогноз_у_строки_как_в_о�
     пункта очереди (lifecycle.forecast, одно мерило); кодов закрытой части в строках нет."""
     ct = built["contracts"]
     for name, v in _views(ct):
-        rows = {r["k"]: r for r in v["ork"]["week"]["orders"]}
+        rows = {r["k"]: r for r in _rows(v["ork"]["week"])}
         q = v["life"]["queue"]
         by: dict[str, list] = {}
         for x in q:
@@ -108,7 +118,7 @@ def test_каждое_число_недели_и_его_заказы(built):
     for name, v in _views(built["contracts"]):
         w = v["ork"]["week"]
         D, T = w["drill"], w["tiles"]
-        okeys = {r["k"] for r in w["orders"]}
+        okeys = {r["k"] for r in w["orders"]} | {r["k"] for r in w["hist"]}
         dkeys = {r["k"] for r in w["deals"]}
 
         def known(lst):
@@ -133,6 +143,22 @@ def test_каждое_число_недели_и_его_заказы(built):
                 known(lst)
         assert _n(D["step"]["12"]["closed"]) == w["closed12"]
         assert _n(D["step"]["13"]["close"]) == w["dealClose"]
+        # сделка без заказа (не закрыта) и «к закрытию» («Оплата получена» ⇒ закрыта) — разные
+        # сделки: строка сделки одна на вид, «к закрытию» не показывается «сделкой без заказа»
+        assert not set(D["noOrder"] + D["noOrderOver"]) & set(D["step"]["13"]["close"]), name
+        kinds = {r["k"]: r["kind"] for r in w["deals"]}
+        assert {kinds[k] for k in D["step"]["13"]["close"]} <= {"dealClose"}
+        assert {kinds[k] for k in D["noOrder"]} <= {"noOrder"}
+        # «Моя приёмка»: «в срок за 20 р.д.: k из n» — n ключей, «в норме» у k из них
+        rec = T["W1"]["recent"]
+        if rec.get("state") in ("show", "prelim"):
+            assert _n(D["W1recent"]) == rec["n"], name
+            assert sum(t.startswith("в норме") for t in D["W1recent"]["t"]) == rec["k"]
+            known(D["W1recent"])
+        else:
+            assert "W1recent" not in D, "скрытое «в срок за 20 р.д.» — без списка"
+        # строки законченных заказов приёмки — без менеджера ОРК (поимённо — только «Пульс»)
+        assert not any("mgr" in r for r in w["hist"])
         assert {r: _n(D["adj"][r]) for r in ork.ADJACENT} == w["adjacent"], name
         lp = w["longP80"]
         assert _n(D["p80"]) == (lp["k"] if lp["state"] in ("show", "prelim") else 0)
@@ -143,6 +169,9 @@ def test_каждое_число_недели_и_его_заказы(built):
         for m in w["overByWho"]:
             assert _n(D["who"][m["who"]]["over"]) == m["n"] and _n(D["who"][m["who"]]["wait"]) == m["waitUtd"]
             known(D["who"][m["who"]]["over"] + D["who"][m["who"]]["wait"])
+        # итоги «Сверх нормы по менеджерам» открывают W2 и «ждём УПД»: суммы строк — те же числа
+        assert sum(m["n"] for m in w["overByWho"]) == (T["W2"]["value"] or 0) == _n(D["W2"]), name
+        assert sum(m["waitUtd"] for m in w["overByWho"]) == w["waitUtd"]["n"] == _n(D["waitUtd"]), name
         H, hy = D["hyg"], w["hygiene"]
         assert _n(H["all"]) == hy["n"] and _n(H["excl"]) == hy["excluded"]
         assert _n(H["noMgr"]) == hy["by"].get("noMgr", 0)
@@ -151,7 +180,7 @@ def test_каждое_число_недели_и_его_заказы(built):
         known(H["all"])
     # пример корпуса: у «Ждут смежников» логистики 10 заказов — все на шагах 9 и 11
     w = built["contracts"]["ork"]["week"]
-    rows = {r["k"]: r for r in w["orders"]}
+    rows = {r["k"]: r for r in _rows(w)}
     assert w["adjacent"]["log"] > 0
     assert {rows[k]["step"] for k in w["drill"]["adj"]["log"]} <= {9, 11}
     assert all(rows[k].get("waits") == "log" for k in w["drill"]["adj"]["log"])
@@ -164,16 +193,21 @@ def test_пульс_орк_инварианты(built):
     for name, v in _views(built["contracts"]):
         w = v["ork"]["week"]
         P = w["pulse"]
-        rows = {r["k"]: r for r in w["orders"]}
+        rows = _rows(w)
         assert sum(p["n"] for p in P["rows"]) == w["live"] == P["live"], name
         by = Counter()
         for p in P["rows"]:
             by.update(p["byStep"])
-            assert len(p["keys"]) == p["n"] and {rows[k]["mgr"] for k in p["keys"]} == {p["who"]}
-            assert len(p["overKeys"]) == p["over"] and len(p["waitKeys"]) == p["wait"]
-            assert set(p["overKeys"]) | set(p["waitKeys"]) <= set(p["keys"])
+            # заказы строки — предикат страницы (_odResolve): строки недели с mgr == who; сверх
+            # нормы — и over, ждём УПД — и wu; ключей в данных за строкой нет
+            assert not ({"keys", "overKeys", "waitKeys"} & set(p))
+            mine = [r for r in rows if r["mgr"] == p["who"]]
+            assert len(mine) == p["n"], (name, p["who"])
+            assert sum(1 for r in mine if r.get("over")) == p["over"]
+            assert sum(1 for r in mine if r.get("wu")) == p["wait"]
+            assert Counter(str(r["step"]) if r["step"] is not None else "?" for r in mine) == Counter(p["byStep"])
             assert p["pct"] == round(p["n"] * 100 / w["live"], 1)
-            assert p["deals"] == len({rows[k]["deal"] for k in p["keys"]})
+            assert p["deals"] == len({r["deal"] for r in mine})
         for s in w["ledger"]:
             assert by.get(str(s["no"]), 0) == s["now"], (name, s["no"])
         assert by.get("?", 0) == w["unknown"]
@@ -216,11 +250,13 @@ def test_pulse_who_правило_хозяина():
 
 # ── «Квартал» и «Месяц» ──────────────────────────────────────────────────────────────────
 def test_квартал_заказы_за_q1_и_q3(built):
-    """Q1 по кварталу и поставщику, Q3: ключей — n показателя (в срок — k); скрытая строка
-    поставщика ключей не получает; ключ — среди quarter.orders."""
+    """Q1 по кварталу и поставщику, Q3: ключей — n показателя (в срок — k); у скрытой доли
+    «в срок» (строка поставщика «не показываем») списка с подписями нет, но видимое число
+    готовностей открывает n ключей без подписей «в срок / позже» (nDk); ключ — среди
+    quarter.orders."""
     q = built["contracts"]["ork"]["quarter"]
     D, okeys = q["drill"], {r["k"] for r in q["orders"]}
-    seen = 0
+    seen = hidden_n = 0
     for i, Q in enumerate(q["quarters"]):
         for st in [Q["Q1"]] + Q["suppliers"]:
             if st.get("state") in ("show", "prelim"):
@@ -228,47 +264,67 @@ def test_квартал_заказы_за_q1_и_q3(built):
                 assert len(d["k"]) == st["n"], st.get("sup")
                 assert sum(t.startswith("в срок") for t in d["t"]) == st["k"]
                 assert set(d["k"]) <= okeys
+                assert "nDk" not in st
                 seen += 1
             else:
-                assert "dk" not in st, "скрытая строка — без списка"
+                assert "dk" not in st, "скрытая строка — без списка с подписями"
+                if st in Q["suppliers"] and st.get("n"):
+                    d = D[st["nDk"].split(":", 1)[1]]
+                    assert len(d["k"]) == st["n"] and d["t"] is None, st.get("sup")
+                    assert set(d["k"]) <= okeys
+                    hidden_n += 1
+                else:
+                    assert "nDk" not in st
     assert seen > 2
+    assert hidden_n, "корпус: строка поставщика со скрытой долей и видимым числом готовностей"
     Q3 = q["Q3"]
     assert len(D["Q3"]["k"]) == Q3["n"] and set(D["Q3"]["k"]) <= okeys
     assert sum(t == "первичная оплата 100 %" for t in D["Q3"]["t"]) == Q3["k"]
     assert not any(set(r) & MONEY_KEYS for r in q["orders"])
 
 
-def test_месяц_заказы_за_числами_под_правом(built):
-    """«Месяц» (массив ORKMONTH, под правом ork_heads): у показанной ячейки M1, M2, доставки в
-    срок и поимённо — ключей ровно n; у «не показываем» — ни dk, ни списка; в данных вкладки
-    для всех (CONTRACTS) «Месяца» и его списков нет."""
-    om = built["ork_month"]
-    assert "month" not in built["contracts"]["ork"] and "drill" not in json.dumps(built["contracts"]["ork"]["how"])
-    for vk in ("main", "sep"):
-        V = om.get(vk)
-        if not V:
+def test_квартал_без_менеджеров_орк(built):
+    """«Квартал» видят все с вкладкой (CONTRACTS), а поимённо — только «Месяц» (право ork_heads)
+    и «Пульс ОРК» живых заказов: в строках «Квартала» менеджера нет, и ни одно имя сотрудника ОРК
+    корпуса в «Квартал» не попадает — в том числе у закрытого заказа ОРК-эпохи с ответственным из
+    ОРК (иначе список Q1 дал бы поимённый счёт «в срок / позже»)."""
+    names = [p["name"] for p in fixture.CT_ROSTER.values()]
+    for name, v in _views(built["contracts"]):
+        q = v["ork"]["quarter"]
+        if q is None:                       # вид направления берёт «Квартал» основного (quarterFrom)
             continue
-        D, okeys = V["month"]["drill"], {r["k"] for r in V["month"]["orders"]}
-        cells = []
-        for row in V["month"]["rows"]:
-            cells += list(row["M1"].values()) + [row["M2"], row["otd"]]
-        for p in V["people"]:
-            cells += list(p["M1"].values()) + [p["M2"]] + list((p["cur"].get("M1") or {}).values()) + [p["cur"]["M2"]]
-            if p.get("liveDk"):
-                assert len(D[p["liveDk"].split(":", 1)[1]]["k"]) == p["live"]
-        shown = 0
-        for st in cells:
-            if st.get("state") in ("show", "prelim"):
-                d = D[st["dk"].split(":", 1)[1]]
-                assert len(d["k"]) == st["n"] and set(d["k"]) <= okeys, st
-                shown += 1
-            else:
-                assert "dk" not in st
-        if vk == "main":
-            assert shown >= 3
-            # в корпусе S2/S3/S6 отдела скрыты воротами людей — их отрезков в списках нет
-            hidden = [r["M1"]["S2"] for r in V["month"]["rows"] if r["M1"]["S2"]["state"] == "hidden"]
-            assert hidden and not any(k.endswith(".S2") and not k.startswith("p") for k in D)
+        assert not any("mgr" in r for r in _rows(q)), name
+        blob = json.dumps(q, ensure_ascii=False)
+        assert not [n for n in names if n in blob], name
+    # корпус: в списках Q1 есть закрытые заказы — и у них менеджера нет
+    q = built["contracts"]["ork"]["quarter"]
+    assert any(r.get("closed") for r in q["orders"])
+    # в «Месяце» (под правом) менеджер у строк есть
+    assert any(r.get("mgr") for r in _rows(built["ork_month"]["main"]["month"]))
+
+
+def test_строки_частей_словарём_и_обратно():
+    """_pack / unpack: подписи — номером в словаре, развёртка даёт исходные строки."""
+    rows = [{"k": "1", "stage": "Заказ создан", "mgr": "А (ОРК)", "own": "А (ОРК)", "step": 1},
+            {"k": "d:2", "stage": "Оплата получена", "mgr": "не назначен", "kind": "noOrder", "step": 13}]
+    src = copy.deepcopy(rows)
+    strs = orkview._pack(rows)
+    assert strs == ["", "Заказ создан", "А (ОРК)", "Оплата получена", "не назначен"]
+    assert rows[0]["own"] == rows[0]["mgr"] == 2 and rows[1]["stage"] == 3
+    assert all(r[f] >= 1 for r in rows for f in orkview.PACKED if f in r), "номер 0 — не подпись"
+    assert orkview.unpack(rows, strs) == src
+
+
+def test_оплата_получена_значит_закрыта():
+    """Списки «сделок без заказа» и «к закрытию» не пересекаются потому, что «Оплата получена»
+    — закрытая сделка (contracts: closed = успех, провал или paid), а сделка без заказа — открытая:
+    это допущение строки сделки (одна на вид) держится на корпусе с оплатой без заказов."""
+    stub = fixture.ContractsStub()
+    stub.orders = [o for o in stub.orders if str(o.get("parentId2")) != "6030"]    # 6030 — «Оплата получена»
+    ct = json.loads(json.dumps(fixture.build_contracts(stub=stub), ensure_ascii=False, default=str))
+    assert all(r.get("closed") for r in ct["rows"] if r.get("paidStage"))
+    D = ct["ork"]["week"]["drill"]
+    assert "d:6030" in D["step"]["13"]["close"] and "d:6030" not in D["noOrder"]
 
 
 # ── поставщик — только там, где он уже есть ───────────────────────────────────────────────

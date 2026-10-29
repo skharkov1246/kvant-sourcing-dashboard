@@ -22,8 +22,13 @@ sys.modules.setdefault("dotenv", types.SimpleNamespace(load_dotenv=lambda *a, **
 pw = pytest.importorskip("playwright.sync_api")
 
 ROWS = "#drwBody table.odt tbody tr"
+# все списки, обещанные данными «Месяца» и «Квартала» (dk показанного, liveDk, nDk) — по виду
+ALL_DK = """sep=>{const out=[]; const walk=o=>{if(!o||typeof o!=='object')return; if(Array.isArray(o)){o.forEach(walk);return;}
+  if(o.dk&&(o.state==='show'||o.state==='prelim')) out.push(o.dk); if(o.liveDk) out.push(o.liveDk); if(o.nDk) out.push(o.nDk);
+  for(const k in o) if(k!=='drill'&&k!=='orders') walk(o[k]);};
+  walk(window.__CONTRACTS__.ork.quarter); walk(window.__ORKMONTH__&&window.__ORKMONTH__[sep?'sep':'main']); return out;}"""
 FIND_N = """id=>{const out=[]; const walk=o=>{if(!o||typeof o!=='object')return; if(Array.isArray(o)){o.forEach(walk);return;}
-  if(o.dk===id) out.push(o.n); if(o.liveDk===id) out.push(o.live); for(const k in o) if(k!=='drill'&&k!=='orders') walk(o[k]);};
+  if(o.dk===id) out.push(o.n); if(o.liveDk===id) out.push(o.live); if(o.nDk===id) out.push(o.n); for(const k in o) if(k!=='drill'&&k!=='orders') walk(o[k]);};
   walk(window.__CONTRACTS__&&window.__CONTRACTS__.ork); walk(window.__ORKMONTH__); return out;}"""
 
 
@@ -117,7 +122,11 @@ def test_плитки_смежники_менеджеры_и_очередь(brow
     for t in ("w1", "w2", "w3", "w5"):
         tile = panel.locator(f".actile[data-of='{t}']")
         want = int(tile.locator(".v").inner_text())
+        # плитка открывает диалог списка, а не переключает отбор
+        assert tile.get_attribute("aria-haspopup") == "dialog" and tile.get_attribute("aria-pressed") is None
         assert _clicked_rows(pg, tile) == want, t
+        if not want:
+            assert "За этим числом заказов нет" in pg.locator("#drwBody").inner_text()
         pg.keyboard.press("Escape")
     # «Ждут смежников»: строка — список (а не отбор очереди); «дольше P80» — свой клик
     for r in ("kam", "oss", "log", "sup"):
@@ -127,6 +136,11 @@ def test_плитки_смежники_менеджеры_и_очередь(brow
             continue
         assert _clicked_rows(pg, tr.locator("td").first) == want, r
         assert "Ждут смежников" in pg.locator("#drwName").inner_text()
+        assert pg.locator("#drwBody [data-odq]").count() == 1
+        pg.keyboard.press("Escape")
+        # число «Заказов» — тот же список и тот же переход в очередь, что у строки
+        assert _clicked_rows(pg, tr.locator("button[data-od^='w:adj/']")) == want, r
+        assert pg.locator("#drwBody [data-odq]").count() == 1, "у числа нет «Пункты очереди этих шагов»"
         pg.keyboard.press("Escape")
     p80 = panel.locator("tr[data-adj='sup'] button[data-od='w:p80']")
     assert _clicked_rows(pg, p80) == _expect(p80)
@@ -138,10 +152,31 @@ def test_плитки_смежники_менеджеры_и_очередь(brow
         want = int(c.nth(1).inner_text()) + int(c.nth(3).inner_text())
         assert _clicked_rows(pg, c.first) == want
         pg.keyboard.press("Escape")
-    # из списка W2 — «Пункты в очереди»: отбор очереди виден снимаемой фишкой
+    # из списка W2 — «Пункты в очереди» с клавиатуры: отбор очереди виден снимаемой фишкой, фокус —
+    # на ней, а не в закрытом aria-hidden дровере; роль диалога с общего дровера снята
+    tile = panel.locator(".actile[data-of='w2']")
+    tile.focus()
+    pg.keyboard.press("Enter")
+    pg.wait_for_selector("#drw.on")
+    pg.locator("#drwBody [data-odq]").focus()
+    pg.keyboard.press("Enter")
+    assert pg.locator("#drw.on").count() == 0
+    assert "W2 сверх нормы" in pg.locator("#orkFilt").inner_text()
+    assert not pg.evaluate("document.getElementById('drw').contains(document.activeElement)"), "фокус остался в дровере"
+    assert pg.evaluate("document.activeElement.closest('#orkFilt')!==null")
+    assert pg.evaluate("document.getElementById('drw').getAttribute('role')") is None
+    pg.keyboard.press("Tab")
+    assert not pg.evaluate("document.getElementById('drw').contains(document.activeElement)")
+    # отбор плитки заменяет «человек — хозяин, сверх нормы и «ждём УПД»»: человек остаётся простым отбором
+    who = panel.locator("#orkOver tr[data-who]").first
+    _clicked_rows(pg, who.locator("td").first)
+    pg.locator("#drwBody [data-odq]").click()
+    assert "хозяин, сверх нормы" in pg.locator("#orkFilt").inner_text()
     _clicked_rows(pg, panel.locator(".actile[data-of='w2']"))
     pg.locator("#drwBody [data-odq]").click()
-    assert pg.locator("#drw.on").count() == 0
+    filt = pg.locator("#orkFilt").inner_text()
+    assert "человек:" in filt and "хозяин, сверх нормы" not in filt, filt
+    pg.locator("#orkFilt [data-rm='who']").click()
     assert "W2 сверх нормы" in pg.locator("#orkFilt").inner_text()
     # сочетание отборов, которое ничего не оставляет, — так и сказано, со «Сбросить»
     pg.locator("#orkFilt [data-rm='code']").click()
@@ -161,12 +196,18 @@ def test_плитки_смежники_менеджеры_и_очередь(brow
 
 def test_клавиатура_карточка_и_отборы_в_списке(browser, page_url):
     pg, errs = _open(browser, page_url)
+    # точка выгрузки в Excel: функция _xlMark параллельной правки зовётся с телом списка
+    pg.evaluate("window.__xl=[]; window._xlMark=r=>window.__xl.push(r&&r.id)")
     row = pg.locator("#orkPulseB tr[data-od]").nth(1)
     row.focus()
     pg.keyboard.press("Enter")
     pg.wait_for_selector("#drw.on")
     assert pg.evaluate("document.activeElement.id") == "drwX"
     assert pg.evaluate("document.getElementById('drw').getAttribute('role')") == "dialog"
+    assert "drwBody" in pg.evaluate("window.__xl"), "после отрисовки списка не позван _xlMark"
+    assert pg.locator("#drwBody table.odt").get_attribute("data-xl-name")
+    # дубль «стадия · поставщик» для телефона — не текст ячейки (выгрузка берёт textContent)
+    assert pg.evaluate("[...document.querySelectorAll('#drwBody .odm')].every(e=>e.textContent==='' && e.dataset.odm)")
     total = pg.locator(ROWS).count()
     for _ in range(total * 2 + 40):                 # Tab по кругу — фокус не уходит со списка
         pg.keyboard.press("Tab")
@@ -201,6 +242,23 @@ def test_месяц_и_квартал(browser, page_url, sub):
         el = els.nth(i)
         n = pg.evaluate(FIND_N, el.get_attribute("data-od"))
         assert n and _clicked_rows(pg, el) == n[0], el.get_attribute("data-od")
+        pg.keyboard.press("Escape")
+    # обратная сверка: у каждого списка в данных есть число на странице, и оно открывает n строк
+    have = set(pg.evaluate("[...document.querySelectorAll('#ctPanel-main [data-od]')].map(e=>e.dataset.od)"))
+    want = [d for d in pg.evaluate(ALL_DK, False) if d.startswith("m:" if sub == "month" else "q:")]
+    assert want and not [d for d in want if d not in have], [d for d in want if d not in have]
+    if sub == "quarter":
+        # закрытые заказы — корзиной «заказ закрыт»; менеджеров ОРК в списках «Квартала» нет
+        el = pg.locator("#ctPanel-main .actile[data-od^='q:']").first
+        _clicked_rows(pg, el)
+        body = pg.locator("#drwBody").inner_text()
+        assert "По менеджерам ОРК" not in body and "стадия не из таблицы" not in body
+        pg.keyboard.press("Escape")
+        # строка поставщика со скрытой долей: «Готовностей» и сама строка — список без «в срок / позже»
+        hid = pg.locator("#ctPanel-main tr[data-od$='n']").first
+        n = pg.evaluate(FIND_N, hid.get_attribute("data-od"))
+        assert _clicked_rows(pg, hid.locator("td").first) == n[0]
+        assert "в срок" not in pg.locator("#drwBody table.odt").inner_text()
         pg.keyboard.press("Escape")
     assert not errs, errs
 

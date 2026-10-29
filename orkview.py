@@ -305,9 +305,10 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     # приёмка сделки вне воронки «Реализация» не в счёте (Рег. 3.3) — как у ork.judged и «Месяца»
     back = period_mod.add_workdays_ru(today, -ork.WEEK_BACK_WD)
     in_cat = {d["deal"]: d.get("inCat0", True) for d in deals}
-    s1_recent = [o["_segs"]["segs"]["S1"] for o in orders
-                 if (o.get("_segs") or {}).get("segs", {}).get("S1") and in_cat.get(o.get("deal"), True)
-                 and back and _end(o["_segs"]["segs"]["S1"]) and _end(o["_segs"]["segs"]["S1"]) > back]
+    s1_recent_o = [o for o in orders
+                   if (o.get("_segs") or {}).get("segs", {}).get("S1") and in_cat.get(o.get("deal"), True)
+                   and back and _end(o["_segs"]["segs"]["S1"]) and _end(o["_segs"]["segs"]["S1"]) > back]
+    s1_recent = [o["_segs"]["segs"]["S1"] for o in s1_recent_o]      # заказы — в список за числом
     # «закончено назначением» — среди тех же отрезков, что в n своевременности (_timeliness: без
     # пропуска, «пачки», возврата, обратного порядка меток, р.д. известны): k ≤ n по построению
     by_assign = sum(1 for s in s1_recent if _clean(s) and s.get("wd") is not None
@@ -461,7 +462,8 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     week.update(_week_drill(L=L, U=U, C12=C12, deals=deals, queue=queue, step=step, ov=ov,
                             over_ids=over_ids, wait_ids=wait_ids, long_p80=long_p80, cps=cps,
                             hyg_items=hyg_items, no_order=no_order, risk_q=risk_q, reach_of=reach_of,
-                            measure=measure, today=today, ledger=ledger))
+                            measure=measure, today=today, ledger=ledger, s1_recent_o=s1_recent_o,
+                            recent=recent))
 
     month, month_people, journal = _month(orders, U, today, otd, ov, deal_ok_all={
         d["deal"]: d.get("inCat0", True) for d in deals}, ork_head=ork_head)
@@ -934,17 +936,23 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
 # список заказов (дровер), и строк в нём столько же, сколько в числе (тесты test_ork_drill):
 #   week.orders — живые заказы «Недели» (та же совокупность, что week.live: U + C12);
 #   week.deals  — сделки за числами уровня сделки (без заказа — W1; «закрыть сделку» — шаг 13);
+#   week.hist   — законченные заказы за «в срок за 20 р.д.» «Моей приёмки» (без менеджера ОРК);
 #   week.drill  — число → ключи; week.pulse — «Пульс ОРК» по людям (Σ строк = week.live,
-#                 по шагам — ведомость);
-#   quarter.orders, quarter.drill — Q1 по кварталу и поставщику, Q3; у показателя — dk;
+#                 по шагам — ведомость; заказы строки — week.orders с mgr == who, без ключей);
+#   quarter.orders, quarter.drill — Q1 по кварталу и поставщику, Q3; у показателя — dk; строки
+#                 без менеджера ОРК (поимённо — только «Месяц» и «Пульс»);
 #   month.orders, month.drill (массив ORKMONTH — только праву ork_heads) — M1, M2, доставка в
 #                 срок по месяцам и поимённо.
 # Ключ — id заказа СП-172 строкой; сделка — «d:<id>». Список с подписью строки — {k, t, h}: подпись
 # начинается классом («в срок», «в норме», «P50») — до « · » по нему список группирует строки.
-# Скрытая ячейка («не показываем», «Нет данных») ключей не получает: иначе список раскрыл бы
-# скрытое число (ворота людей «Месяца»). Поставщик — только там, где он уже есть у вида
-# (CONTRACTS: rows[].orders[].sup, очередь); денег в строках нет. Коды закрытой части
-# (DEALCTX: чаты, договоры) в строки не идут — страница добавляет их сама, если право есть.
+# Подписи строк (стадия, поставщик, люди) — номером
+# в словаре strs своей части (_pack; развернуть — unpack). Скрытая ячейка («не показываем»,
+# «Нет данных») ключей не получает: иначе список раскрыл бы скрытое число (ворота людей
+# «Месяца»); исключение — строка поставщика «Квартала» со скрытой долей: её видимое число
+# готовностей получает список без подписей «в срок / позже» (nDk). Поставщик — только там, где
+# он уже есть у вида (CONTRACTS: rows[].orders[].sup, очередь); денег в строках нет. Коды
+# закрытой части (DEALCTX: чаты, договоры) в строки не идут — страница добавляет их сама, если
+# право есть.
 # =============================================================================================
 _NO_RX = re.compile(r"\s*(\d{1,5}(?:/\d+)?)\.")
 PULSE_OUT = "ответственный вне ОРК"      # менеджера ОРК нет, ответственный заказа — не из ОРК
@@ -996,19 +1004,61 @@ def _dk(st: dict, drill: dict, key: str, keys: list, tags: list | None = None, *
     st["dk"] = f"{prefix}:{key}"
 
 
-def _hist_row(o: dict) -> dict:
-    """Строка заказа «Месяца» и «Квартала» (живого и законченного): номер, сделка, поставщик,
-    стадия; шаг — у живого; менеджер ОРК — по ответственному заказа (поле сделки у мерила «по
-    всем заказам» не читается)."""
+def _hist_row(o: dict, *, with_mgr: bool = True) -> dict:
+    """Строка заказа «Месяца», «Квартала» и приёмки за 20 р.д. (живого и законченного): номер,
+    сделка, поставщик, стадия; шаг — у живого. Менеджер ОРК (по ответственному заказа: поле
+    сделки у мерила «по всем заказам» не читается) — только в «Месяце»: он под правом ork_heads.
+    «Квартал» и «Неделю» видят все с вкладкой, а поимённо там — только «Пульс ОРК» живых заказов
+    (with_mgr=False): иначе список Q1 дал бы поимённый счёт «в срок / позже»."""
     live = bool(o.get("live"))
-    return _compact({"k": str(o["id"]), "no": order_no(o), "deal": str(o.get("deal") or ""),
-                     "seq": o.get("seq") or 0, "sup": o.get("sup") or "", "stage": o.get("stage") or "",
-                     "step": ork.step_now(o) if live else None, "closed": not live,
-                     "mgr": pulse_who(o, None)[0]})
+    r = {"k": str(o["id"]), "no": order_no(o), "deal": str(o.get("deal") or ""),
+         "seq": o.get("seq") or 0, "sup": o.get("sup") or "", "stage": o.get("stage") or "",
+         "step": ork.step_now(o) if live else None, "closed": not live}
+    if with_mgr:
+        r["mgr"] = pulse_who(o, None)[0]
+    return _compact(r)
+
+
+# повторяющиеся подписи строк (стадия, поставщик, люди) — номером в словаре своей части данных
+# (strs): строка весит вдвое меньше; страница разворачивает их в одном месте (_odRows)
+PACKED = ("stage", "sup", "mgr", "own", "kam")
+
+
+def _pack(*lists: list[dict]) -> list[str]:
+    # номер 0 — пустая подпись (её в строках нет): номера подписей ≥ 1, и столбец номеров не
+    # приходит «весь нулевой» в живой сверке, когда у вида одна стадия или один менеджер
+    strs: list[str] = [""]
+    idx: dict[str, int] = {"": 0}
+
+    def put(r: dict) -> None:
+        for f in PACKED:
+            v = r.get(f)
+            if isinstance(v, str) and v:
+                if v not in idx:
+                    idx[v] = len(strs)
+                    strs.append(v)
+                r[f] = idx[v]
+    for rows in lists:
+        for r in rows:
+            put(r)
+    return strs
+
+
+def unpack(rows: list[dict], strs: list[str]) -> list[dict]:
+    """Строки части данных с подписями вместо номеров словаря strs (читателям и тестам) — так
+    же, как их разворачивает страница."""
+    def get(r: dict) -> dict:
+        o = dict(r)
+        for f in PACKED:
+            v = o.get(f)
+            if isinstance(v, int) and not isinstance(v, bool):
+                o[f] = strs[v]
+        return o
+    return [get(r) for r in rows]
 
 
 def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p80, cps, hyg_items,
-                no_order, risk_q, reach_of, measure, today, ledger) -> dict:
+                no_order, risk_q, reach_of, measure, today, ledger, s1_recent_o, recent) -> dict:
     """Строки заказов и сделок «Недели», ключи каждого числа и «Пульс ОРК». Множества — те же,
     что у чисел в build (over_ids, wait_ids, ведомость, пункты очереди с w2 и waitUtd)."""
     deal_by = {d["deal"]: d for d in deals}
@@ -1132,10 +1182,28 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
     for k in ("behind", "abandoned", "old", "unknown"):
         H["x" + k] = [str(x["order"]) for x in hyg_items if x["excl"] and k in x["kinds"]]
     D["hyg"] = H
+    # «Моя приёмка»: «в срок за 20 р.д.: k из n» — отрезки S1 в счёте (_timeliness: не пропущен,
+    # без «пачки», возврата и обратного порядка меток, р.д. посчитаны); скрытая — без списка
+    if isinstance(recent, dict) and recent.get("state") in ("show", "prelim"):
+        rk, rt = [], []
+        for o in s1_recent_o:
+            s = o["_segs"]["segs"]["S1"]
+            if s.get("skip") or not _clean(s) or s.get("wd") is None:
+                continue
+            rk.append(str(o["id"]))
+            rt.append(f"{'в норме' if s.get('inNorm') else 'сверх нормы'} · {s['wd']} р.д.")
+        D["W1recent"] = {"k": rk, "t": rt}
+    live_k = {r["k"] for r in rows}
+    want = set((D.get("W1recent") or {}).get("k") or [])
+    # законченные и не из ведомости заказы за числами — строкой без менеджера ОРК
+    hist = [_hist_row(o, with_mgr=False) for o in s1_recent_o
+            if str(o["id"]) in want and str(o["id"]) not in live_k]
 
     # сделки за числами уровня сделки: без заказа (W1, подпись ведомости) и «закрыть сделку»
     deals_out: dict[str, dict] = {}
 
+    # сделка без заказа (не закрыта) и «к закрытию» («Оплата получена» — contracts: paid ⇒ closed)
+    # — разные сделки: строка сделки одна на вид (test_ork_drill проверяет, что множества не пересекаются)
     def drow(did: str, kind: str) -> dict:
         d = deal_by.get(did) or {}
         if did not in deals_out:
@@ -1181,15 +1249,20 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
              "pct": round(len(g["keys"]) * 100 / live_n, 1) if live_n else None,
              "deals": len(g["deals"]), "customers": len(g["cust"]),
              "over": len(g["overKeys"]), "wait": len(g["waitKeys"]),
-             "byStep": dict(sorted(g["byStep"].items())),
-             "keys": g["keys"], "overKeys": g["overKeys"], "waitKeys": g["waitKeys"]}
+             "byStep": dict(sorted(g["byStep"].items()))}
             for g in sorted(G.values(), key=lambda g: (PULSE_ORDER[g["kind"]], g["who"].casefold()))]
+    # заказы строки «Пульса» ключами не дублируются: это строки week.orders с mgr == who (сверх
+    # нормы — и over, ждём УПД — и wu) — ровно та группировка, что выше (страница: _odResolve)
     all_deals = {r["deal"] for r in rows}
     pulse = {"rows": prow, "live": live_n, "deals": len(all_deals),
              "customers": len({(deal_by.get(x) or {}).get("customer") for x in all_deals} - {None, "", "—"}),
              "over": sum(p["over"] for p in prow), "wait": sum(p["wait"] for p in prow),
              "out": PULSE_OUT, "none": PULSE_NONE}
-    return {"orders": rows, "deals": [_compact(x) for x in deals_out.values()], "drill": D, "pulse": pulse}
+    for r in rows:
+        r.pop("mk", None)                               # вид — у строки «Пульса» (kind)
+    dl_rows = [_compact(x) for x in deals_out.values()]
+    strs = _pack(rows, dl_rows, hist)
+    return {"orders": rows, "deals": dl_rows, "hist": hist, "strs": strs, "drill": D, "pulse": pulse}
 
 
 def _quarter_drill(quarter: dict, measure: list[dict], today: dt.date) -> None:
@@ -1229,6 +1302,13 @@ def _quarter_drill(quarter: dict, measure: list[dict], today: dt.date) -> None:
         for j, srow in enumerate(Q.get("suppliers") or []):
             sk, st_ = by_sup.get(srow.get("sup"), ([], []))
             _dk(srow, drill, f"{i}.s{j}", sk, st_, prefix="q", head=f"Q1 · {Q.get('q')} · {srow.get('sup')}")
+            if "dk" not in srow and srow.get("n") and len(sk) == srow["n"]:
+                # доля «в срок» скрыта («пачки», «план = факт»), а число готовностей видно — список за
+                # ним без подписей «в срок / позже»: скрытая доля из него не складывается
+                drill[f"{i}.s{j}n"] = {"k": sk, "t": None,
+                                       "h": f"Q1 · {Q.get('q')} · {srow.get('sup')}: готовности в счёте "
+                                            "(доля «в срок» не показана)"}
+                srow["nDk"] = f"q:{i}.s{j}n"
     era = [o for o in measure if _d(o.get("created")) and _d(o["created"]) >= ork.PREPAY_SINCE]
     q3 = [o for o in era if o.get("prepayShare") is not None]
     for o in q3:
@@ -1239,7 +1319,9 @@ def _quarter_drill(quarter: dict, measure: list[dict], today: dt.date) -> None:
     # строки — только заказов из показанных списков
     want = {k for v in drill.values() for k in (v["k"] if isinstance(v, dict) else v)}
     quarter["drill"] = drill
-    quarter["orders"] = [_hist_row(o) for k, o in used.items() if k in want]
+    # без менеджера ОРК: «Квартал» видят все с вкладкой (поимённо — только «Месяц», под правом)
+    quarter["orders"] = [_hist_row(o, with_mgr=False) for k, o in used.items() if k in want]
+    quarter["strs"] = _pack(quarter["orders"])
 
 
 def _month_drill(month: dict, people: list[dict], orders: list[dict], U: list[dict], today: dt.date, *,
@@ -1325,7 +1407,9 @@ def _month_drill(month: dict, people: list[dict], orders: list[dict], U: list[di
         for mi, part in ((1, p), (0, p.get("cur") or {})):
             src = pp.get((mi, who)) or {"segs": {}, "art": []}
             pm, mm = part.get("M1") or {}, part.get("m") or ""
-            for c in ("S2", "S3", "S6"):
+            # текущий (неполный) месяц человека страница показывает суммой S2+S3+S6 и полнотой —
+            # отрезки по отдельности у него не видны, и ключей за ними нет (каждый dk — число на странице)
+            for c in (("S2", "S3", "S6") if mi == 1 else ()):
                 _dk(pm.get(c) or {}, drill, f"p{pi}.{mi}.{c}", *seg_keys(src["segs"].get(c) or []), prefix="m",
                     head=f"{nm} · {c} · {mm}")
             _dk(pm.get("mgr") or {}, drill, f"p{pi}.{mi}.mgr",
@@ -1336,3 +1420,4 @@ def _month_drill(month: dict, people: list[dict], orders: list[dict], U: list[di
     want = {k for v in drill.values() for k in (v["k"] if isinstance(v, dict) else v)}
     month["drill"] = drill
     month["orders"] = [_hist_row(o) for k, o in used.items() if k in want]
+    month["strs"] = _pack(month["orders"])

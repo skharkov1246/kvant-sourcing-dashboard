@@ -85,6 +85,13 @@ for (const [k, X] of Object.entries(inp.views)) {
     rows: (box._odHtml(M, Object.assign({}, F0, {step: s0})).match(/<tr class="drill" data-odct=/g) || []).length,
     combo: box._odHtml(M, Object.assign({}, F0, {step: s0, sup: 'нет такого поставщика'})),
     one: box._odHtml(M, Object.assign({}, F0, {sup: 'нет такого поставщика'}))};
+  // все заказы «Квартала» одним списком: закрытые — своей корзиной, менеджеров ОРК нет
+  const QR = X.ork.quarter ? box._odModel(X, X.ork, {keys: {k: (X.ork.quarter.orders || []).map(r => r.k), t: null}, pre: 'q', title: 'Квартал'}) : null;
+  extra.qall = QR ? box._odHtml(QR, Object.assign({}, F0)) : '';
+  // за числом заказов нет — «За этим числом заказов нет», а не «по этому отбору пусто»
+  extra.empty = box._odHtml(box._odModel(X, X.ork, {keys: {k: [], t: null}, pre: 'w', title: 'пусто'}), Object.assign({}, F0));
+  const MH = box._odModel(X, X.ork, {id: 'w:hyg/all'});
+  extra.hyg = MH ? box._odHtml(MH, Object.assign({}, F0)) : '';
   out[k] = {found, extra};
 }
 out.qempty = {two: box._orkQEmpty({codeLbl: 'a', stepLbl: 'b'}), one: box._orkQEmpty({codeLbl: 'a'}), none: box._orkQEmpty({})};
@@ -127,6 +134,8 @@ def _n_of(payload, dk: str):
                 hits.append(o.get("n"))
             if o.get("liveDk") == dk:
                 hits.append(o.get("live"))
+            if o.get("nDk") == dk:
+                hits.append(o.get("n"))
             for k, v in o.items():
                 if k not in ("drill", "orders"):
                     walk(v)
@@ -199,3 +208,55 @@ def test_пульс_отрисован_и_ушедший_помечен(run):
     assert len(week) == len(P["rows"])
     # шапка списка человека — «ФИО · N заказов в работе · X % от всех живых · сделок M · заказчиков C»
     assert all(f["items"] == p["n"] for f, p in zip(week, P["rows"]))
+
+
+def _dks(o, out: list) -> list:
+    """Все списки, которые данные «Месяца» и «Квартала» обещают числам: dk у показанного,
+    liveDk, nDk."""
+    if isinstance(o, list):
+        for x in o:
+            _dks(x, out)
+    elif isinstance(o, dict):
+        if o.get("dk") and o.get("state") in ("show", "prelim"):
+            out.append(o["dk"])
+        for f in ("liveDk", "nDk"):
+            if o.get(f):
+                out.append(o[f])
+        for k, v in o.items():
+            if k not in ("drill", "orders"):
+                _dks(v, out)
+    return out
+
+
+def test_у_каждого_списка_в_данных_есть_число_на_странице(run):
+    """Обратная сверка: каждый список, собранный orkview для «Месяца» и «Квартала» (dk, liveDk,
+    nDk), отрисован числом со списком — ни одного числа текстом при собранном списке (полнота
+    текущего месяца у менеджера, «Готовностей» строки поставщика со скрытой долей)."""
+    r, out = run
+    om = r["ork_month"]
+    for view in ("main", "sep"):
+        ids = {f["id"] for f in out[view]["found"]}
+        q = r["contracts"]["ork"]["quarter"]                  # квартал — общий для видов
+        want = _dks(q, []) + _dks((om.get(view) or {}), [])
+        assert not [d for d in want if d not in ids], view
+    main = _dks(r["contracts"]["ork"]["quarter"], []) + _dks(om["main"], [])
+    assert any(d.endswith("n") and d.startswith("q:") for d in main), "корпус: строка поставщика со скрытой долей"
+    assert any(".0.M2" in d and d.startswith("m:p") for d in main), "корпус: полнота текущего месяца у менеджера"
+
+
+def test_закрытые_пусто_гигиена_и_дубль_для_телефона(run):
+    """Список: закрытый заказ — корзиной «заказ закрыт», не «стадия не из таблицы»; в «Квартале» —
+    без «По менеджерам ОРК»; за числом без заказов — «За этим числом заказов нет»; у гигиены —
+    вид и почему (hw); дубль «стадия · поставщик» для узкого экрана — атрибутом, не текстом ячейки."""
+    import re
+    r, out = run
+    ex = out["main"]["extra"]
+    assert 'data-odf="step:x"' in ex["qall"] and "заказ закрыт" in ex["qall"]
+    assert "По менеджерам ОРК" not in ex["qall"] and "По поставщикам" in ex["qall"]
+    assert "За этим числом заказов нет." in ex["empty"] and "отбору" not in ex["empty"]
+    w = r["contracts"]["ork"]["week"]
+    import orkview
+    hw = [x["hw"] for x in orkview.unpack(w["orders"], w["strs"]) if x.get("hw") and x.get("hyg")]
+    assert hw and htmlmod.escape(hw[0], quote=False) in ex["hyg"].replace("&quot;", '"')
+    assert re.search(r'class="dep odm" data-odm="[^"]+"></div>', ex["hyg"])
+    assert "По менеджерам ОРК" in ex["hyg"], "«Неделя»: менеджеры ОРК в списке есть"
