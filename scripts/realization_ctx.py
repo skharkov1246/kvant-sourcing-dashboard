@@ -27,7 +27,16 @@
              (econ_file_runs): упавший или снятый прогон в свод не попадает — ни здесь, ни в
              ночном своде chat-context.yml. Ни пути, ни имени файла. Ключ закрытый; на
              странице числа — только в DEALCTX.
-Ни текста чатов, ни условий договоров, ни цитат.
+  facts      по сделке — факты из чата (решение владельца 25.10.2026, chat-ctx-2,
+             deal_chat_facts): до трёх сумм продажи (сумма, валюта, вид, НДС, дата — только
+             написанная в сообщении и не позже его дня, дата сообщения), договор по сторонам
+             (статус, где лежит, номер спецификации), до пяти сигналов сорсинга (сигнал, роль
+             автора, дата) и «главное» последнего вызова — суточного, а без него истории (дата,
+             уверенность, сутки или история, сколько пунктов вернула модель, была ли сводка
+             сборки; пункты: вид, важность, строка оценки модели, ключи сводки, дата
+             доказательства). Видов базы нет — раздел пуст.
+Ни текста чатов, ни условий договоров, ни цитат: строка «главного» — оценка модели (до 160
+знаков, без сумм, ссылок и имён), а не текст чата.
 
 ДВЕ ПРОВЕРКИ (распоряжение 26.09.2026). Исход и флаги пишет прогон чтения; здесь они
 пересчитываются по строкам contract_terms тем же кодом (contract_terms.флаги_сделки).
@@ -297,6 +306,28 @@ class База:
               from econ_file_latest where status = %s""", (ECON_VERIFIED,))
         return [dict(zip(ключи, r)) for r in rows]
 
+    def факты(self) -> dict[str, list[tuple]]:
+        """Последние факты из чатов (deal_chat_schema v3): суммы стороны «продажа», договор по
+        сторонам, до пяти сигналов сорсинга, «главное» последнего вызова. Видов ещё нет (схема
+        не применена) — пусто: свод без раздела фактов, как до 25.10.2026. Цитат и номеров
+        сообщений не берётся."""
+        if not self.есть("deal_chat_money_latest", "deal_chat_contract_latest", "deal_chat_sourcing_recent",
+                         "deal_chat_important_latest"):
+            return {}
+        return {
+            "money": self._все("select deal_id, money_kind, amount::float8, currency, vat, named_date, msg_at "
+                               "from deal_chat_money_latest order by deal_id, msg_at desc nulls last"),
+            "contract": self._все("select deal_id, side, status, place, spec_no, msg_at from deal_chat_contract_latest "
+                                  "order by deal_id, side"),
+            "src": self._все("select deal_id, signal, author_role, msg_at from deal_chat_sourcing_recent "
+                             "order by deal_id, msg_at desc nulls last"),
+            # ev_at — дата доказательства пункта (свежесть «главного» — по ней), proposed — пунктов
+            # в ответе модели до проверок, with_digest — была ли у модели сводка сборки
+            "imp": self._все("select deal_id, assessed_at, pass, kind, severity, statement, confidence::float8, "
+                             "evidence_keys, ev_at, proposed, with_digest from deal_chat_important_latest "
+                             "order by deal_id, fact_id"),
+        }
+
     def закрыть(self) -> None:
         self.с.close()
 
@@ -407,6 +438,48 @@ def свод_экономики(строки: list[dict]) -> tuple[dict, Counter
     return out, n
 
 
+def свод_фактов(строки: dict[str, list[tuple]]) -> tuple[dict, Counter]:
+    """Раздел facts ключа: по сделке — до трёх сумм продажи (новые первыми), договор по
+    сторонам, до пяти сигналов сорсинга, «главное» последнего вызова. Только значения
+    закрытых списков, суммы и даты; цитат и номеров сообщений нет. Запись сделки, не
+    прошедшая разбор сборки (dealctx._facts), снимается и считается: свод остальных
+    сделок и их оценки чатов уходят в ключ."""
+    по_сделке: dict[str, dict] = defaultdict(lambda: {"money": [], "contract": [], "src": [], "imp": None})
+    for deal, вид, сумма, валюта, ндс, дата, at in строки.get("money") or []:
+        x = по_сделке[str(int(deal))]
+        if len(x["money"]) < dealctx.CHAT_MONEY_MAX:
+            x["money"].append({"amount": round(float(сумма), 2), "cur": валюта, "kind": вид, "vat": ндс,
+                               "date": дата.isoformat() if дата else None, "at": _iso(at)})
+    for deal, сторона, статус, где, спец, at in строки.get("contract") or []:
+        по_сделке[str(int(deal))]["contract"].append({"side": сторона, "status": статус, "where": где, "spec": спец,
+                                                      "at": _iso(at)})
+    for deal, сигнал, роль, at in строки.get("src") or []:
+        по_сделке[str(int(deal))]["src"].append({"signal": сигнал, "role": роль, "at": _iso(at)})
+    for deal, at, проход, вид, важность, текст, уверенность, ключи, ev, предложено, сводка in строки.get("imp") or []:
+        x = по_сделке[str(int(deal))]
+        if x["imp"] is None:
+            x["imp"] = {"at": _iso(at), "src": проход, "conf": None, "items": [],
+                        "n": int(предложено) if предложено is not None else None,
+                        "dg": bool(сводка) if сводка is not None else None}
+        if вид is not None:
+            x["imp"]["items"].append({"kind": вид, "sev": важность, "text": текст, "keys": list(ключи or []),
+                                      "ev": _iso(ev or at)})
+            if уверенность is not None:
+                x["imp"]["conf"] = round(float(уверенность), 2)
+    out, n = {}, Counter()
+    for deal, x in по_сделке.items():
+        if dealctx._facts(json.loads(json.dumps(x, ensure_ascii=False))) is None:
+            n["факты: не по форме"] += 1
+            continue
+        out[deal] = x
+        n["факты: с суммой"] += bool(x["money"])
+        n["факты: с договором"] += bool(x["contract"])
+        n["факты: с сорсингом"] += bool(x["src"])
+        n["факты: с главным"] += bool(x["imp"] and x["imp"]["items"])
+        n["факты: главное высокой важности"] += bool(x["imp"] and any(i["sev"] == "высокая" for i in x["imp"]["items"]))
+    return out, n
+
+
 def собрать(база, ct=None, сейчас: dt.datetime | None = None) -> tuple[dict, Counter]:
     ct = ct or _ct()
     чаты = свод_чатов(база.чаты())
@@ -414,9 +487,13 @@ def собрать(база, ct=None, сейчас: dt.datetime | None = None) -
     договоры, n = свод_договоров(выбор, строки, флаги, ct)
     экономика, n_эк = свод_экономики(база.экономика())
     n.update(n_эк)
+    # факты из чатов — добавочный раздел (версия ключа та же, как с econ); у базы до
+    # схемы v3 и у подпорки без фактов — пусто
+    факты, n_ф = свод_фактов(база.факты() if hasattr(база, "факты") else {})
+    n.update(n_ф)
     свод = {"version": dealctx.VERSION,
             "at": (сейчас or dt.datetime.now(MSK)).astimezone(MSK).isoformat(timespec="seconds"),
-            "chats": чаты, "contracts": договоры, "econ": экономика}
+            "chats": чаты, "contracts": договоры, "econ": экономика, "facts": факты}
     # второй разбор — тем же кодом, что читает сборка: запись не по форме не уйдёт в ключ
     разбор = dealctx.clean(json.loads(json.dumps(свод, ensure_ascii=False)))
     if разбор is None or разбор["bad"]:
@@ -426,6 +503,7 @@ def собрать(база, ct=None, сейчас: dt.datetime | None = None) -
     n["сделок с договорами"] = len(договоры)
     n["флагов"] = sum(len(x["flags"]) for x in договоры.values())
     n["экономика"] = len(экономика)
+    n["факты"] = len(факты)
     return свод, n
 
 
@@ -436,6 +514,9 @@ def журнал(n: Counter, raw: bytes) -> list[str]:
             f"{n['пересчёт']}); исходы: {исходы or 'нет'}; флагов {n['флагов']}",
             f"  финальная экономика: сделок со сверенным файлом {n['экономика']} (переторжка "
             f"{n['экономика: переторжка']}); не прошли вторую сверку {n['экономика: не прошла сверку']}",
+            f"  факты из чатов: сделок {n['факты']} (с суммой {n['факты: с суммой']}, с договором "
+            f"{n['факты: с договором']}, с сорсингом {n['факты: с сорсингом']}, с главным {n['факты: с главным']}, "
+            f"из них высокой важности {n['факты: главное высокой важности']}); не по форме {n['факты: не по форме']}",
             f"  размер свода {len(raw)} Б"]
 
 
@@ -467,7 +548,10 @@ def publish(база, store, *, dry: bool, ct=None, печать=print) -> int:
         печать(f"::error::договоры: у {n['разошлось_текущий']} сделок исход или флаги прогона не сошлись с "
                "пересчётом — во вкладке они «сверка разошлась», нужен разбор")
         return 1
-    if n["экономика: не прошла сверку"]:
+    if n["факты: не по форме"]:
+        печать(f"::error::факты из чатов: у {n['факты: не по форме']} сделок запись базы не прошла разбор сборки — "
+               "во вкладку они не попали (оценки чатов — на месте), нужен разбор")
+    if n["экономика: не прошла сверку"] or n["факты: не по форме"]:
         return 1
     if n["разошлось"]:
         печать(f"::warning::договоры: у {n['разошлось']} сделок прежних прогонов (до 23.10 или прежних правил) "

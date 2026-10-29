@@ -255,6 +255,8 @@ CT_SEP_BODY, CT_MAIN_BODY = "#ctPanel-sep #ctBody", "#ctPanel-main #ctBody"
 CT_SUBS = ("week", "month", "quarter", "main", "how")
 # вкладка направления без его сделок (сводка head.sep есть, вида sep нет) — «Нет данных»
 CT_SEP_EMPTY = "#ctPanel-sep .ctsepempty"
+# «Что важно сегодня» основного вида (dealctx.py, payload["important"]) — строка ведёт в карточку
+CT_IMP_ROW = "#ctPanel-main #ctImp tr[data-ct]"
 KV_FAIL = "data-kv-fail"          # метка ошибки вставленной проверки в DOM
 _KV_FAIL_RE = re.compile(r"<div %s=\"\"[^>]*>([^<]*)</div>" % KV_FAIL)
 _TAB_FAIL = "Вкладка не отрисовалась"
@@ -319,6 +321,19 @@ def _with_tabs_opened(path: Path) -> Path:
               "else if(CX&&Array.isArray(CX.rows)&&CX.head&&CX.head.sep)"
               "kvFail('Реализация: нет переключателя вкладки направления')}"
               "catch(e){kvFail('Реализация, вкладки: '+e)}"
+              # «Что важно сегодня» и «Главное» в карточке (решение владельца 25.10.2026): блок —
+              # в «Неделе руководителя ОРК» под очередью (с 26.10.2026 очередь там). Есть пункты в
+              # закрытой части — есть и строки блока; клик — карточка с блоком «Главное»
+              "try{var DV=window.__DEALCTX__,WK=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"week\"]');"
+              "if(DV&&Array.isArray(DV.queue)&&Array.isArray(DV.important)&&DV.important.length&&WK){"
+              "WK.click();var IR=document.querySelector('%s');"
+              "if(!IR)kvFail('Реализация: блок «Что важно сегодня» не отрисовался');"
+              "else{IR.click();var DW=document.getElementById('drw');"
+              "if(!DW||(DW.textContent||'').indexOf('Главное (оценка модели')<0)"
+              "kvFail('Реализация: в карточке сделки нет блока «Главное»');"
+              "var DX=document.getElementById('drwX');if(DX)DX.click()}"
+              "var MS=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"main\"]');if(MS)MS.click()}}"
+              "catch(e){kvFail('Реализация, «Что важно сегодня»: '+e)}"
               "try{var TB=function(n){return [].slice.call(document.querySelectorAll('.tab'))"
               ".filter(function(x){return x.dataset.tab===n})[0]},CT=TB('contracts'),SO=TB('sourcing'),"
               "SEL=function(a){var x=document.querySelector('#tab-contracts [role=\"tab\"][data-'+a+'][aria-selected=\"true\"]');"
@@ -331,7 +346,8 @@ def _with_tabs_opened(path: Path) -> Path:
               "kvFail('Реализация: при возврате на вкладку потерян её адрес ('+location.hash+')');"
               "SO.click()}}catch(e){kvFail('Реализация, адрес вкладки: '+e)}</script>"
               % (KV_FAIL, ",".join(f"'{t}'" for t in LAZY_TABS), KAM_QUEUE_BODY,
-                 ",".join(f"'{t}'" for t in CT_SUBS), _TAB_FAIL, CT_SEP_BODY, CT_SEP_EMPTY, CT_MAIN_BODY))
+                 ",".join(f"'{t}'" for t in CT_SUBS), _TAB_FAIL, CT_SEP_BODY, CT_SEP_EMPTY, CT_MAIN_BODY,
+                 CT_IMP_ROW))
     tmp = path.parent / (path.stem + ".tabs.html")
     tmp.write_text(html.replace("</body>", inject + "</body>", 1), encoding="utf-8")
     return tmp

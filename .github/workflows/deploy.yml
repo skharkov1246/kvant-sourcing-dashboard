@@ -46,6 +46,7 @@ on:
       - "chat_activity.py"
       - "dealctx.py"            # чаты и договоры во вкладке «Реализация» (23.10.2026)
       - "contract_b2b.py"       # тексты флагов сверки договоров — их читает dealctx.py
+      - "dealdigest.py"         # сводка по сделке для модели → KV dealdigest:v1 (25.10.2026)
       - "kamqueue.py"
       - "kaminc.py"
       - "history.py"
@@ -174,6 +175,9 @@ jobs:
           BITRIX_CHAT_WEBHOOK_URL_2: ${{ secrets.BITRIX_CHAT_WEBHOOK_URL_2 }}
           CHAT_PRIVATE_PATH: ${{ runner.temp }}/chat_private.json
           REALCTX_PATH: ${{ runner.temp }}/realctx.json
+          # сводка по сделке для ночной оценки чатов (dealdigest.py) — файл на раннере;
+          # в ключ dealdigest:v1 её кладёт шаг после деплоя
+          DEALDIGEST_OUT: ${{ runner.temp }}/dealdigest.json
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           # Идентификаторы служебных учётных записей портала через запятую
           # (Settings → Secrets and variables → Actions → Variables). Их карточки
@@ -227,6 +231,19 @@ jobs:
             echo "деплой упал (попытка $i/3) — повтор через 20 с"; sleep 20
           done
           [ "$ok" = 1 ] || { echo "::error::деплой не удался после 3 попыток"; exit 1; }
+
+      # Сводка по сделке для модели (решение владельца 25.10.2026): стадия, шаг регламента,
+      # сроки, заказы, договоры, экономика — те же числа, что на только что выложенной вкладке,
+      # без имён. Публикуется ПОСЛЕ деплоя (на сайте и в ключе — одна сборка) в закрытый ключ
+      # dealdigest:v1; его читает ночная оценка чатов (chat-context.yml). В журнал — только
+      # счётчики. Не вышло — предупреждение: сайт уже выложен, сводка устареет сама.
+      - name: Сводка по сделкам в закрытый ключ (KV dealdigest:v1)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python scripts/dealdigest_kv.py --publish "$RUNNER_TEMP/dealdigest.json" \
+            || echo "::warning::сводка по сделкам не опубликована — ночная оценка чатов увидит только стадию"
 
       - name: Причина падения (в сводку прогона)
         if: failure()

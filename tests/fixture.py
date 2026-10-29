@@ -898,7 +898,31 @@ def realctx_raw() -> dict:
         "6006": e(4_000_000.0, "RUB", 40_000.0, 30_000.0),                       # 5 % — в пределах
         "6010": e(80_000.0, "EUR", 80_000.0, 60_000.0, items=9),                 # 50 000 против 80 000
     }
-    return {"version": 1, "at": t(0.2), "chats": chats, "contracts": contracts, "econ": econ}
+
+    # факты из чата и «главное» (scripts/chat_context.py chat-ctx-2): строки «главного»
+    # придуманы, без сумм и имён; 6101 — сделка отдельного направления
+    def imp(days, items, src="сутки", conf=0.7):
+        return {"at": t(days), "src": src, "conf": conf, "items": items}
+
+    def money(amount, kind, vat="без_ндс", cur="EUR", days=2.0, date=None):
+        return {"amount": amount, "cur": cur, "kind": kind, "vat": vat, "date": date, "at": t(days)}
+    facts = {
+        "6002": {"money": [money(26_000.0, "итог")],
+                 "contract": [{"side": "заказчик", "status": "у_клиента", "where": "эдо", "spec": "№2", "at": t(3)}],
+                 "src": [{"signal": "кп_получено", "role": "сорсер", "at": t(5)}],
+                 "imp": imp(0.3, [{"kind": "клиент_недоволен", "sev": "высокая",
+                                   "text": "Клиент ждёт ответа по сроку с пятницы, нужен звонок КАМа", "keys": ["stage"]}])},
+        "6003": {"money": [money(35_000.0, "наше_кп"), money(29_000.0, "счёт", vat="с_ндс", days=1.0)],
+                 "imp": imp(1.0, [{"kind": "расхождение_суммы", "sev": "средняя",
+                                   "text": "Сумма сделки ниже итоговой экономики — обновить «Сумму»", "keys": ["econ"]}],
+                            src="история")},
+        "6004": {"imp": imp(12.0, [{"kind": "поставщик", "sev": "высокая", "text": "Поставщик переносит отгрузку",
+                                    "keys": []}])},                              # давняя оценка — не «сегодня»
+        "6006": {"imp": imp(0.3, [], conf=None)},                                # спокойная сделка: важного нет
+        "6101": {"imp": imp(0.5, [{"kind": "срыв_срока_клиента", "sev": "высокая",
+                                   "text": "Срок клиента сорван, поставщик не дал новой даты", "keys": ["o1"]}])},
+    }
+    return {"version": 1, "at": t(0.2), "chats": chats, "contracts": contracts, "econ": econ, "facts": facts}
 
 
 def build_realization() -> dict:

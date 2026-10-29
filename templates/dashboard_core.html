@@ -2075,14 +2075,31 @@ function openContract(x){
     +`</div>`;
   // чат и договор сделки — закрытая часть (право «договоры и деньги»)
   const DCx=_dcData(), dcx=DCx?(DCx.deals[String(x.deal)]||null):null;
-  if(dcx&&(dcx.chat||dcx.contract||dcx.todo)){
+  const FX=(dcx&&dcx.facts)||null;    // факты из чата и «главное» (dealctx.py, решение владельца 25.10.2026)
+  if(dcx&&(dcx.chat||dcx.contract||dcx.todo||(FX&&(FX.contract.length||FX.src.length)))){
     h+=`<div class="h">Чат и договор</div><div class="mrow-like" style="font-size:12.5px;line-height:1.7">`
       +(dcx.why?`Чат и простой: ${_esc(dcx.why)}<br>`:'')
       +(dcx.todo?`Что делать первым: <b>${_esc(String(dcx.todo.who).replace(/ \(уволен\)$/,''))}</b> — ${_esc(dcx.todo.act)} <span class="dimv">(${_esc(dcx.todo.what)})</span><br>`:'')
       +(dcx.chat?`Чат: ${_dcChatHtml(dcx.chat)}`:'')
       +(dcx.contract?`Договоры (разбор ${_esc(dcx.contract.at.slice(0,5))}): ${_dcContractHtml(dcx.contract)}`
         +((dcx.contract.flags||[]).length?`<ul style="margin:4px 0 0 16px;padding:0">${dcx.contract.flags.map(f=>`<li>${_esc(f.text)}${f.days!=null?` <span class="dimv">(${f.days} дн)</span>`:''}</li>`).join('')}</ul>`:''):'')
+      +(FX&&FX.contract.length?`<div>Договор по чату: ${FX.contract.map(_esc).join('; ')} <span class="dimv">— оценка модели</span></div>`:'')
+      +(FX&&FX.src.length?`<div>Сорсинг по чату: ${FX.src.map(_esc).join('; ')}</div>`:'')
       +`</div>`;
+  }
+  // «Главное» — 0–3 пункта оценки модели по всему контексту сделки, с хозяином по виду
+  const FI=FX&&FX.imp;
+  if(FI){
+    h+=`<div class="h">Главное (оценка модели${FI.conf!=null?`, уверенность ${FI.conf} %`:''})</div><div class="mrow-like" style="font-size:12.5px;line-height:1.7">`
+      +(FI.items.length?_dcImpItems(FI.items):(FI.dropped?`<span class="dimv">пункты модели (${FI.dropped}) сняты проверкой — показывать нечего</span>`:'<span class="dimv">модель важного не отметила</span>'))
+      +(FI.items.length&&FI.dropped?`<div class="dep dimv">ещё ${FI.dropped} — сняты проверкой</div>`:'')
+      +`<div class="dep dimv">оценка ${_esc(FI.at.slice(0,5))}${FI.src==='история'?' · по истории чата':''}${FI.dg===false?' · по чату и стадии: сводки сроков, заказов, договоров и экономики у модели не было':''}${FI.fresh?'':' · давняя — доказательства старше недели, могла устареть'}</div></div>`;
+  }
+  // суммы из чата — третий источник рядом с файлом и «Суммой», ни одну не заменяют
+  const FM=(FX&&FX.money)||[];
+  const fmHtml=FM.map(m=>`<div>${m.gap?'<span class="nrc">':''}${_esc(m.line)}${m.gap?'</span>':''}${(m.file||m.sum)?`<div class="dep dimv">${[m.file,m.sum].filter(Boolean).map(_esc).join(' · ')}</div>`:''}</div>`).join('');
+  if(fmHtml&&!(dcx&&dcx.econ)){
+    h+=`<div class="h">Суммы в чате (оценка модели)</div><div class="mrow-like" style="font-size:12.5px;line-height:1.7">${fmHtml}<div class="dep dimv">файла «Экономика проекта» нет или он не сверен — сравнение только с «Суммой» сделки</div></div>`;
   }
   // финальная экономика из файла «Экономика проекта» (dealctx.py, решение владельца 23.10.2026):
   // только сверенный файл и только праву «договоры и деньги»; наценка — над поставщиком, не маржа
@@ -2099,6 +2116,7 @@ function openContract(x){
                      :E.vat?`<span class="dimv">«Сумма» сделки похожа на сумму с НДС (налог в сделке не указан; больше продажи файла без НДС на ${pc(E.gap)}&nbsp;%) — не пункт до решения владельца</span>`
                            :`<span class="dimv">«Сумма» сделки без НДС сходится с файлом (расхождение ${pc(E.gap)}&nbsp;%)</span>`)
                   :(E.gapNote?`<span class="dimv">${_esc(E.gapNote)} — «Сумма» сделки с файлом не сверена</span>`:''))
+      +(fmHtml?`<div style="margin-top:4px">${fmHtml}</div>`:'')
       +`</div>`;
   }
   // таймлайн стадий сделки
@@ -2435,7 +2453,12 @@ function _orkTrust(O){
 }
 function _orkPanel(X,sub,el){
   const O=X.ork;
-  if(!O||!O.week||!O.week.tiles){ el.innerHTML=_ctSepNote(X,sub)+_orkNoData('раздела регламента ОРК в данных вкладки','сборка main.py → contracts.compute → orkview.build (заказы СП-172 и история стадий)'); return; }
+  if(!O||!O.week||!O.week.tiles){ el.innerHTML=_ctSepNote(X,sub)+_orkNoData('раздела регламента ОРК в данных вкладки','сборка main.py → contracts.compute → orkview.build (заказы СП-172 и история стадий)')+(sub==='week'?_dcImpBlock(X):'');
+    // «Что важно сегодня» и без раздела ОРК: строка — карточка сделки
+    if(sub==='week'){ const B=el.querySelector('#ctImp'), byD=Object.fromEntries((X.rows||[]).map(r=>[String(r.deal),r]));
+      if(B){ const go=e=>{const tr=e.target.closest('tr[data-ct]'); if(!tr)return; const x=byD[tr.dataset.ct]; if(x)openContract(x);};
+        B.addEventListener('click',go); B.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go(e);}}); } }
+    return; }
   const h=_ctSepNote(X,sub)+_orkTrust(O);
   if(sub==='week') return _orkWeek(X,O,el,h);
   if(sub==='month'){ el.innerHTML=h+_orkMonth(X,O); return; }
@@ -2443,7 +2466,18 @@ function _orkPanel(X,sub,el){
   el.innerHTML=h+_orkHow(X,O);
 }
 
-// ---------- «Неделя руководителя ОРК»: блоки 1–9 ----------
+// «Что важно сегодня» (dealctx.py, решение владельца 25.10.2026) — блок «Недели руководителя
+// ОРК» под очередью: закрытая часть, оценка модели по чату и сводке сделки; не пункт очереди —
+// ни в счётчики, ни в плитки, ни в итоги не входит. Без права «договоры и деньги» — пусто
+function _dcImpBlock(X){
+  const DC=_dcData(); if(!DC) return '';
+  const IL=X.seg?DC.sepImportant:DC.important, HX=((X.head||{}).ctx)||null, IRU=(HX&&HX.rules)||{};
+  return `<div class="secttl" id="ctImpS"><b>·</b> Что важно сегодня <span class="dimv" style="font-weight:400">— оценка модели</span></div>`
+    +`<section class="card"><div class="note">Модель читает новые сообщения чата сделки ${_dcImpBasis(IL)} и отмечает до трёх пунктов «что важно». Здесь — открытые сделки${X.seg?' направления':''}, где доказательство пункта не старше ${IRU.impMaxDays||7} дн.: сначала высокой важности, затем свежие. Это оценка, а не факт: в очередь, плитки, счётчики и итоги не входит. Клик — карточка сделки.</div>`
+    +(Array.isArray(IL)?_dcImpList(IL,IRU.impMaxDays||7):'<div class="dimv">Нет данных: оценок с «главным» ещё нет — их пишет ночная оценка чатов (прогон «Чат сделки», chat-context.yml).</div>')
+    +`</section>`;
+}
+// ---------- «Неделя руководителя ОРК»: блоки 1–10 ----------
 function _orkWeek(X,O,el,h){
   const W=O.week, T=W.tiles||{}, L=X.life||{}, R=X.rows||[], byDeal=Object.fromEntries(R.map(r=>[String(r.deal),r]));
   const DC=_dcData(), DQ=DC?(DC.queue||[]).filter(x=>!!x.seg===!!X.seg):[];
@@ -2549,6 +2583,8 @@ function _orkWeek(X,O,el,h){
    +`<div id="orkFilt" class="note"></div>`
    +`<div class="twrap"><table class="lft orkq"><thead><tr><th>Что случилось</th><th>№ · заказчик</th><th>Заказ · поставщик</th><th>Шаг</th><th>Хозяин пункта · в копии</th><th class="r">Дней</th><th>Что сделать</th></tr></thead><tbody id="orkQb"></tbody></table></div><div id="orkMore"></div>`
    +`<div class="note orknc">${_esc(W.notChecked||'')}.</div></section>`;
+  // 10. «Что важно сегодня» — сразу под очередью: оценка модели, не пункт очереди
+  h+=_dcImpBlock(X);
   el.innerHTML=h;
 
   // ---- отрисовка списков ----
@@ -2768,6 +2804,8 @@ function _ctPanel(X,el,opt){
         nDone=R.filter(r=>r.done||r.closed).length;
   // чаты и договоры (dealctx.py): числа плиток — всем с вкладкой, сделки — только праву
   const DC=_dcData(), HX=H.ctx||null, DD=(DC&&DC.deals)||{};
+  // числа оценок модели (расхождение суммы из чата, «главное» высокой важности) — только закрытой части
+  const FCX=(DC&&DC.factsClosed)?(X.seg?DC.factsClosed.sep:DC.factsClosed.main):null;
   // пункты чатов и договоров — своего вида: у отдельного направления — помеченные seg
   const DQ=DC?(DC.queue||[]).filter(x=>!!x.seg===!!X.seg):[], DCC={};
   DQ.forEach(x=>{DCC[x.code]=(DCC[x.code]||0)+1;});
@@ -2779,7 +2817,7 @@ function _ctPanel(X,el,opt){
   // ---------- шапка: пометка отдельного направления (общая для всех подвкладок) ----------
   let h=_ctSepNote(X,'main');
 
-  h+=`<div class="note">Здесь — сделки, деньги, чаты и договоры. Что делать по регламенту ОРК — на «<a href="#contracts/week" data-ctgo="week" class="orklink">Неделе руководителя ОРК</a>»: ведомость 13 шагов, сверх нормы, зона риска, очередь по исполнителю шага.</div>`;
+  h+=`<div class="note">Здесь — сделки, деньги, чаты и договоры. Что делать по регламенту ОРК — на «<a href="#contracts/week" data-ctgo="week" class="orklink">Неделе руководителя ОРК</a>»: ведомость 13 шагов, сверх нормы, зона риска, очередь по исполнителю шага${_dcData()?', под ней — «Что важно сегодня» (оценка модели по чатам)':''}.</div>`;
 
   h+=`<div class="secttl"><b>·</b> Деньги и экономика</div>`;
 
@@ -2816,7 +2854,7 @@ function _ctPanel(X,el,opt){
      +`<div class="actile${hc.high?' bad':''}${st}" data-m="ctxHigh"${ti}><div class="t">⚠ Риск по чату: высокий</div><div class="v">${hc.cur?(hc.high||0):'—'}</div><div class="m">${hc.cur?`по оценке модели${hc.dueLate?` · срок из чата прошёл: ${hc.dueLate}`:''}`:'нет текущих оценок чатов'}</div></div>`
      +`<div class="actile${hk.risk?' bad':(hk.nopair?' amb':'')}${st}" data-m="ctxContract"${ti}><div class="t">📑 Договор: риски</div><div class="v">${hk.seen?(hk.risk||0):'—'}</div><div class="m">${hk.seen?`расхождение заказчик ↔ поставщик (флагов ${hk.flags||0}) · пары нет: ${hk.nopair||0}`:'договоры этих сделок не разобраны'}</div></div>`
      +`</div>`
-     +`<div class="note" style="margin-top:6px">Покрытие: оценка чата текущая у <b>${hc.cur||0}</b> из ${HX.open} открытых сделок (есть у ${hc.seen||0}); договоры разобраны у <b>${hk.seen||0}</b> из ${HX.open}${hk.unread?`, не дочитаны ${hk.unread}`:''}${hk.unreadable?`, файл не читается ${hk.unreadable}`:''}${HX.econ&&HX.econ.seen?`; финальная экономика (файл) сверена у <b>${HX.econ.seen}</b>${HX.econ.gap?`, «Сумма» сделки расходится больше ${(HX.rules||{}).econGapPct||10} % у ${HX.econ.gap}`:''}${HX.econ.vat?`, похожа на сумму с НДС у ${HX.econ.vat}`:''}`:''}. Свод на ${_esc(HX.at||'—')}. Пустая плитка при малом покрытии — не «всё хорошо».${DC?' Клик по плитке — эти сделки в таблице ниже.':' Сделки, колонки «Чат» и «Договор» и пункты очереди — у права «Поставщики: договоры и деньги».'}</div>`;
+     +`<div class="note" style="margin-top:6px">Покрытие: оценка чата текущая у <b>${hc.cur||0}</b> из ${HX.open} открытых сделок (есть у ${hc.seen||0}); договоры разобраны у <b>${hk.seen||0}</b> из ${HX.open}${hk.unread?`, не дочитаны ${hk.unread}`:''}${hk.unreadable?`, файл не читается ${hk.unreadable}`:''}${HX.econ&&HX.econ.seen?`; финальная экономика (файл) сверена у <b>${HX.econ.seen}</b>${HX.econ.gap?`, «Сумма» сделки расходится больше ${(HX.rules||{}).econGapPct||10} % у ${HX.econ.gap}`:''}${HX.econ.vat?`, похожа на сумму с НДС у ${HX.econ.vat}`:''}`:''}${HX.facts&&(HX.facts.money||HX.facts.imp)?`; из чата — сумма у <b>${HX.facts.money}</b>${FCX&&FCX.gap?` (расходится с файлом или «Суммой» у ${FCX.gap})`:''}, «главное» (оценка модели) у <b>${HX.facts.imp}</b>${FCX&&FCX.impHigh?`, высокой важности у ${FCX.impHigh}`:''}`:''}. Свод на ${_esc(HX.at||'—')}. Пустая плитка при малом покрытии — не «всё хорошо».${DC?' Клик по плитке — эти сделки в таблице ниже.':' Сделки, колонки «Чат» и «Договор» и пункты очереди — у права «Поставщики: договоры и деньги».'}</div>`;
   }
 
   // ---------- 3. ДЕНЬГИ ВО ВРЕМЕНИ: что отгружать и во что обходится ожидание ----------
@@ -3119,6 +3157,29 @@ function _kqHasCt(){const X=window.__CONTRACTS__; return !!(X&&Array.isArray(X.r
 function _dcData(){const D=window.__DEALCTX__; return (D&&Array.isArray(D.queue)&&D.deals&&typeof D.deals==='object'&&!Array.isArray(D.deals))?D:null;}
 const _DC_OUT={'пара':'договоры сверены','недочитана':'договор не дочитан','не читается':'файл договора не читается — перезалить','без стороны':'сторона документа не определена','спорная':'сторона документа спорная','поставщик без заказа':'договор поставщика без заказа','нет пары':'пары нет','нет договоров':'договоры не найдены ни в карточках сделки и заказов, ни в Purchase order','разошлось':'сверка разошлась — разбор'};
 const _dcSide=s=>s==='customer'?'заказчика':'поставщика';
+// «Главное» по сделке (dealctx.py, решение владельца 25.10.2026): пункты оценки модели с хозяином
+function _dcImpItems(items){
+  return `<ul style="margin:4px 0 0 16px;padding:0">${items.map(i=>`<li><b${i.sev==='высокая'?' class="nrc"':''}>${_esc(i.lbl)}</b> <span class="dimv">(${_esc(i.sev)})</span>: ${_esc(i.text)} <span class="dimv">— ${_esc(String(i.who).replace(/ \(уволен\)$/,''))}${i.whoGone?' (уволен — переназначить)':''}${i.fresh===false&&i.ev?` · по сообщениям от ${_esc(String(i.ev).slice(0,5))}`:''}</span></li>`).join('')}</ul>`;
+}
+// на чём основана оценка: сводка сборки была не у всех — так и сказать (правило 15: статус не врёт)
+function _dcImpBasis(L){
+  const A=Array.isArray(L)?L:[];
+  if(A.length&&A.every(i=>i.dg===true))return 'вместе со сводкой учёта (стадия, сроки, заказы, договоры, экономика)';
+  if(A.some(i=>i.dg===true))return 'вместе со сводкой учёта — у части сделок; у остальных только стадия и прошлые оценки (сводки сроков, заказов, договоров и экономики ещё нет)';
+  return 'вместе со стадией сделки и прошлыми оценками — сводки сроков, заказов, договоров и экономики у модели ещё нет';
+}
+function _dcImpList(L,days){
+  // роль «в копии» пункта (ork.ROLES) — как в очереди недели: «Хозяин пункта · в копии»
+  const CP={orkHead:'руководитель ОРК',orkMgr:'менеджер ОРК',kam:'КАМ',oss:'ОСС',log:'логистика',sup:'поставщик'};
+  if(!L.length)return `<div class="dimv">Нет данных: за ${days} дн. модель не отметила важного ни в одной открытой сделке — или чаты этих дней ещё не оценены (ночной прогон «Чат сделки»).</div>`;
+  return `<div class="twrap"><table class="lft"><thead><tr><th>Что важно</th><th>№ · заказчик</th><th>Кому · в копии</th><th>Оценка</th></tr></thead><tbody id="ctImp">`
+    +L.map(i=>`<tr class="drill" data-ct="${_esc(String(i.deal))}" tabindex="0"><td><b${i.sev==='высокая'?' class="nrc"':''}>${_esc(i.lbl)}</b>${i.sev==='высокая'?' <span class="nrc">· высокая</span>':''}<div class="dep">${_esc(i.text)}</div></td>`
+      +`<td>№${i.seq||'—'} ${_esc(i.customer&&i.customer!=='—'?i.customer:String(i.title||'').slice(0,40))}</td>`
+      +`<td>${_esc(String(i.who).replace(/ \(уволен\)$/,''))}${i.whoGone?' <span class="gone">уволен</span>':''}<div class="dep dimv">${_esc(i.role)}</div>`
+      +`${i.copy?`<div class="dep">в копии: ${_esc(String(i.copy).replace(/ \(уволен\)$/,''))}${CP[i.copyRole]?` <span class="dimv">(${CP[i.copyRole]})</span>`:''}</div>`:''}</td>`
+      +`<td class="dimv">${_esc(String(i.at).slice(0,5))}${i.conf!=null?` · ${i.conf}&nbsp;%`:''}${i.src==='история'?' · по истории':''}</td></tr>`).join('')
+    +`</tbody></table></div>`;
+}
 function _dcChatHtml(c){
   if(!c)return '<div class="dep dimv">нет оценки</div>';
   const due=c.due?`${c.duePassed?'<span class="nrc">':''}срок: ${_esc(c.dueKind||'')} ${c.due.slice(0,5)}${c.duePassed?' — прошёл</span>':''}`:'';

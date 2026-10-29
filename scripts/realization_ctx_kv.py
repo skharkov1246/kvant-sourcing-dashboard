@@ -29,36 +29,37 @@ class CtxError(Exception):
 
 
 class KVStore:
-    """Один ключ KV (realctx:v1). Клиент — общий с публикаторами (publish_suppliers.Cloudflare):
-    та же привязка, что у портала, закрытый список ключей, повтор только для чтения."""
+    """Один ключ KV (realctx:v1; сводка по сделке — dealdigest:v1, scripts/dealdigest_kv.py).
+    Клиент — общий с публикаторами (publish_suppliers.Cloudflare): та же привязка, что у
+    портала, закрытый список ключей, повтор только для чтения."""
 
-    def __init__(self, cf, namespace, delays):
-        self.cf, self.ns, self.delays = cf, namespace, delays
+    def __init__(self, cf, namespace, delays, key: str = KV_KEY):
+        self.cf, self.ns, self.delays, self.key = cf, namespace, delays, key
 
     def get_raw(self) -> bytes | None:
-        return self.cf.get(self.ns, KV_KEY)
+        return self.cf.get(self.ns, self.key)
 
     def put(self, raw: bytes) -> None:
-        self.cf.put(self.ns, KV_KEY, raw)
+        self.cf.put(self.ns, self.key, raw)
         for delay in self.delays:
             if delay:
                 self.cf.sleep(delay)
-            if self.cf.get(self.ns, KV_KEY) == raw:
+            if self.cf.get(self.ns, self.key) == raw:
                 return
         raise CtxError("KV_READBACK_MISMATCH")
 
 
-def kv_store() -> KVStore:
+def kv_store(key: str = KV_KEY) -> KVStore:
     spec = importlib.util.spec_from_file_location("kvant_publish_suppliers", ROOT / "scripts" / "publish_suppliers.py")
     ps = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(ps)
 
     class CloudflareCtx(ps.Cloudflare):
-        КЛЮЧИ = (KV_KEY,)
+        КЛЮЧИ = (key,)
 
     try:
         cf = CloudflareCtx(os.environ.get("CLOUDFLARE_ACCOUNT_ID", ""), os.environ.get("CLOUDFLARE_API_TOKEN", ""))
-        return KVStore(cf, cf.namespace(), ps.READBACK_DELAYS)
+        return KVStore(cf, cf.namespace(), ps.READBACK_DELAYS, key)
     except ps.PublishError as e:
         raise CtxError(str(e)) from None
 
@@ -91,8 +92,8 @@ def fetch(path: Path, store, печать=print) -> int:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(raw)
     печать(f"свод чатов и договоров прочитан: чатов {len(разбор['chats'])}, сделок с договорами "
-           f"{len(разбор['contracts'])}, с финальной экономикой {len(разбор['econ'])}, "
-           f"записей не по форме {разбор['bad']}")
+           f"{len(разбор['contracts'])}, с финальной экономикой {len(разбор['econ'])}, с фактами из чатов "
+           f"{len(разбор['facts'])}, записей не по форме {разбор['bad']}")
     return 0
 
 

@@ -91,3 +91,37 @@ def test_один_или_ни_одного_вебхука_чатов(monkeypatch
     assert кто == "вебхук руководителя реализации" and клиент.base == "https://portal.example/rest/9/ccc/"
     monkeypatch.setenv("BITRIX_CHAT_WEBHOOK_URL_2", "не-вебхук")
     assert chat_reader_client(c)[1] == "вебхук сборки"
+
+
+def test_ответивший_вебхук_чата_зовётся_первым_на_следующих_страницах():
+    """Ревью 28.10.2026: история — до шести страниц чата; владельцу отказ на первой — со второй
+    сразу вебхук руководителя, без лишнего запроса к порталу. Другой чат — снова по очереди."""
+    from bitrix_client import ЧтениеЧатов
+    вызовы = []
+
+    class Вебхук:
+        def __init__(self, имя, доступ):
+            self.имя, self.доступ = имя, доступ
+
+        def call(self, method, params=None, **kw):
+            вызовы.append((self.имя, params["DIALOG_ID"]))
+            if params["DIALOG_ID"] not in self.доступ:
+                raise RuntimeError("ACCESS_ERROR")
+            return {"messages": []}
+
+    чтение = ЧтениеЧатов([Вебхук("владелец", {"chat2"}), Вебхук("руководитель", {"chat1", "chat2"})],
+                          ["владельца", "руководителя"])
+    for last in (None, 900, 850):
+        чтение.call("im.dialog.messages.get", {"DIALOG_ID": "chat1", "LAST_ID": last})
+    assert вызовы == [("владелец", "chat1"), ("руководитель", "chat1"), ("руководитель", "chat1"),
+                      ("руководитель", "chat1")]
+    вызовы.clear()
+    чтение.call("im.dialog.messages.get", {"DIALOG_ID": "chat2"})
+    assert вызовы == [("владелец", "chat2")] and чтение.по_вебхуку == [1, 3]
+    # запомненный потерял доступ — следующий по очереди, и запоминается он
+    чтение.клиенты[1].доступ = {"chat2"}
+    чтение.клиенты[0].доступ = {"chat1", "chat2"}
+    вызовы.clear()
+    чтение.call("im.dialog.messages.get", {"DIALOG_ID": "chat1"})
+    чтение.call("im.dialog.messages.get", {"DIALOG_ID": "chat1"})
+    assert вызовы == [("руководитель", "chat1"), ("владелец", "chat1"), ("владелец", "chat1")]
