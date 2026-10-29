@@ -941,3 +941,71 @@ def test_закрыть_сделку_при_недоставленных_зак�
     assert len(dc) == 1 and "не доставлено: 1" in dc[0]["what"] and "без УПД: 1" in dc[0]["what"]
     assert "15.6, 14.6" in dc[0]["what"]
     assert lifecycle.close_note([_синт(3, "Закрытие заказа", live=False, success=True)]) == ""
+
+
+# ── приёмка по назначению и номера заказов (вопрос владельца 29.10.2026) ──────────────────
+def test_приёмка_по_назначению_w1_w2_на_корпусе(ct):
+    """fixture.ТриЗаказа: 933/3 («Заказ создан» 5 дн.) с датой записи в день создания уходит из W1
+    в W2 на шаг 4 (s2Over с 14.10, хозяин менеджер ОРК); 991/1 с датой записи раньше создания —
+    не в счёт, остаётся в W1 (assignStale); W1 — то же число, W2 — на один пункт больше, чем у
+    базового корпуса. Ведомость: шаг 1 — тот же счёт, шаг 4 — +1. Инварианты вкладки держатся."""
+    data, _o = _orders(fixture.ТриЗаказа())
+    w0, w1 = ct["ork"]["week"], data["ork"]["week"]
+    T0, T1 = w0["tiles"], w1["tiles"]
+    assert (T1["W1"]["value"], T1["W1"]["orders"]) == (T0["W1"]["value"], T0["W1"]["orders"])
+    assert T1["W1"]["assignStale"] == 1 and T0["W1"]["assignStale"] == 0
+    assert T1["W1"]["byAssign"] == T0["W1"]["byAssign"] + 1
+    assert T1["W2"]["value"] == T0["W2"]["value"] + 1
+    assert T1["W2"]["byStep"][4] == T0["W2"]["byStep"][4] + 1 and T1["W2"]["byStep"][1] == T0["W2"]["byStep"][1]
+    led0, led1 = ({r["no"]: r for r in w["ledger"]} for w in (w0, w1))
+    assert led1[4]["now"] == led0[4]["now"] + 1 and led1[1]["now"] == led0[1]["now"]
+    q = data["life"]["queue"]
+    s1 = {x["ordLbl"]: x for x in q if x["code"] == "s1Over"}
+    s2 = {x["ordLbl"]: x for x in q if x["code"] == "s2Over"}
+    assert "933/3" not in s1 and "991/1" in s1 and s1["991/1"]["ref"] == "с 15.10 (создан заказ)"
+    x = s2["933/3"]
+    assert (x["days"], x["role"], x["step"], x["ref"], x["since"], x.get("w2")) == (
+        3, "orkMgr", 4, "с 14.10 (назначение)", "2026-10-14", True)
+    r933 = next(r for r in data["rows"] if r["seq"] == 933)
+    o = next(o for o in r933["orders"] if o["lbl"] == "933/3")
+    assert (o["step"], o["stepWd"], o["stepNorm"], o["stepFrom"], o["stepFromBy"], o["stepOver"]) == (
+        4, 3, 2, "2026-10-14", "назначение", True)
+    # гигиена не помечает «позади фактов»: стадия при назначении законно «Заказ создан»
+    assert not [h for h in w1["hygiene"]["items"] if h["ordLbl"] == "933/3"]
+    _инварианты(data)
+
+
+def test_совпадение_опор_s1_без_пар_по_построению():
+    """Совпадение опор S1 меряется только там, где стадия сдвинулась первой: приёмка, законченная
+    назначением, и дата записи раньше начала приёмки в пары не идут."""
+    def o(i, end_by, end, assign, t0="2026-09-01T10:00:00+03:00"):
+        return {"id": str(i), "t0": t0, "assignDate": dt.date.fromisoformat(assign),
+                "_segs": {"segs": {"S1": {"end": end, "endBy": end_by}}}}
+    pairs = [o(i, "стадия", "2026-09-02T10:00:00+03:00", "2026-09-02") for i in range(10)]
+    agree, n = orkview._s1_agree(pairs)
+    assert (agree, n) == (1.0, 10)
+    with_assign = pairs + [o(20 + i, "назначение", "2026-09-02T00:00:00+03:00", "2026-09-02") for i in range(5)]
+    assert orkview._s1_agree(with_assign) == (1.0, 10), "по построению — не пара"
+    stale = pairs + [o(30, "стадия", "2026-09-10T10:00:00+03:00", "2026-08-31")]
+    assert orkview._s1_agree(stale) == (1.0, 10), "дата раньше начала приёмки — не пара"
+    far = pairs + [o(40, "стадия", "2026-09-02T10:00:00+03:00", "2026-09-15")]
+    assert orkview._s1_agree(far) == (10 / 11, 11), "стадия первой, назначение много позже — расхождение"
+
+
+def test_сделка_три_заказа_в_неделе_и_зоне_риска():
+    """Одна сделка — три заказа у разных поставщиков со своими сроками: три пункта «срок клиента
+    прошёл» с номерами 990/1, 990/2, 990/3, подряд и по номеру; в зоне риска — то же (номер,
+    поставщик, срок)."""
+    data, _o = _orders(fixture.ТриЗаказа())
+    q = [x for x in data["life"]["queue"] if x["code"] == "late" and x["seq"] == 990]
+    assert [(x["ordLbl"], x["sup"], x["ref"], x["days"]) for x in q] == [
+        ("990/1", "Компания 401", "срок 14.10.2025", 370), ("990/2", "Компания 404", "срок 29.09.2026", 20),
+        ("990/3", "Компания 407", "срок 09.10.2026", 10)]
+    i = [k for k, x in enumerate(data["life"]["queue"]) if x["seq"] == 990 and x["code"] == "late"]
+    assert i == list(range(i[0], i[0] + 3)), "пункты сделки — подряд"
+    rk = [x for x in data["ork"]["week"]["risk"] if x["seq"] == 990]
+    assert [(x["ordLbl"], x["sup"], x["dl"]) for x in rk] == [
+        ("990/1", "Компания 401", "14.10.2025"), ("990/2", "Компания 404", "29.09.2026"),
+        ("990/3", "Компания 407", "09.10.2026")]
+    r = next(r for r in data["rows"] if r["deal"] == "6090")
+    assert sorted(o["lbl"] for o in r["orders"]) == ["990/1", "990/2", "990/3"]

@@ -393,3 +393,109 @@ def test_ждём_упд_одно_правило_не_сверх_нормы():
     assert 12 not in ork.OVER_CODE and "noUtd" not in ork.OVER_CODE.values()
     assert ork.WAIT_CODE == {12: "noUtd"} and ork.TERM_CODE[12] == "noUtd"
     assert set(ork.TERM_CODE) == set(ork.OVER_CODE) | set(ork.WAIT_CODE)
+
+
+# ── приёмка кончается назначением менеджера ОРК (вопрос владельца 29.10.2026) ─────────────
+# Заказ придуман: создан в среду 14.10.2026, сегодня — понедельник 19.10.2026 (3 р.д.)
+ПРИЁМКА = {"stage": "Заказ создан", "t0": t("10-14", "11:00"), "created": D(2026, 10, 14),
+           "stepSince": t("10-14", "11:00"), "live": True}
+
+
+def test_назначение_в_день_создания_шаг_4_от_назначения():
+    """«Заказ создан», «Дата записи нового ответственного» — в день создания: приёмка сделана,
+    шаг 4 «Подготовка договора с поставщиком» (менеджер ОРК, 2 р.д.) от назначения; не
+    «стадия позади фактов» и не гигиена — стадия до направления заказа законно стоит."""
+    сегодня = D(2026, 10, 19)
+    o = {**ПРИЁМКА, "assignDate": D(2026, 10, 14)}
+    assert ork.assign_at(o) == D(2026, 10, 14) and not ork.assign_stale(o)
+    assert ork.step_now(o) == 4 and ork.stage_step(o["stage"]) == 1
+    v = ork.judged(o, сегодня)
+    assert (v["step"], v["role"], v["norm"], v["since"], v["sinceBy"], v["wd"], v["over"]) == (
+        4, "orkMgr", 2, "2026-10-14", "назначение", 3, True)
+    h = ork.hygiene(o, сегодня)
+    assert not h["behind"] and not h["exclude"] and not v["hyg"]
+    assert ork.clock(o, 4) == (D(2026, 10, 14), "назначение")
+    # назначение на следующий день — тоже шаг 4, срок — от него (2 р.д. — в норме)
+    o2 = {**ПРИЁМКА, "assignDate": D(2026, 10, 15)}
+    assert ork.judged(o2, сегодня)["over"] is False and ork.judged(o2, сегодня)["wd"] == 2
+
+
+def test_назначение_раньше_начала_приёмки_не_в_счёт():
+    """Дата записи раньше дня t0 (МСК) — скопирована или устарела: шаг 1, срок — от t0, счёт —
+    assign_stale. Нет даты — как раньше: шаг 1 от t0."""
+    сегодня = D(2026, 10, 19)
+    старое = {**ПРИЁМКА, "assignDate": D(2026, 10, 13)}
+    assert ork.assign_at(старое) is None and ork.assign_stale(старое)
+    v = ork.judged(старое, сегодня)
+    assert (v["step"], v["role"], v["since"], v["sinceBy"], v["wd"], v["over"]) == (
+        1, "orkHead", "2026-10-14", "начало приёмки", 3, True)
+    нет = ork.judged(ПРИЁМКА, сегодня)
+    assert (нет["step"], нет["wd"], нет["over"]) == (1, 3, True) and not ork.assign_stale(ПРИЁМКА)
+    # мягкая граница факты не трогает: оплачено поставщику при «Заказ создан» — шаг 6 и «позади фактов»
+    оплачен = {**ПРИЁМКА, "assignDate": D(2026, 10, 14), "supPaidPct": 30}
+    assert ork.step_now(оплачен) == 6 and ork.hygiene(оплачен, сегодня)["behind"]
+    assert ork.fact_floor({"assignDate": D(2026, 10, 14)}) == 1, "назначение — не факт шага"
+
+
+def test_направление_заказа_не_обнуляет_срок_шага_4():
+    """Шаг 4 начался с назначения: заказ потом впервые вышел в «Заказ направлен» — срок шага всё
+    ещё от назначения (а не от направления); возврат на шаг 4 — от повторного входа."""
+    сегодня = D(2026, 10, 19)
+    o = {"stage": "Заказ направлен", "t0": t("10-12"), "created": D(2026, 10, 12), "assignDate": D(2026, 10, 12),
+         "stepSince": t("10-16"), "_reach": {1: t("10-12"), 2: t("10-16"), 3: t("10-16"), 4: t("10-16")}}
+    v = ork.overrun(o, сегодня)
+    assert (v["step"], v["since"], v["sinceBy"], v["wd"], v["over"]) == (4, "2026-10-12", "назначение", 5, True)
+    возврат = {**o, "_reach": {**o["_reach"], 2: t("10-13"), 3: t("10-13"), 4: t("10-13"), 5: t("10-14")}}
+    v = ork.overrun(возврат, сегодня)
+    assert (v["since"], v["sinceBy"], v["wd"]) == ("2026-10-16", "вход в шаг", 1)
+    # назначение позже направления — срок от направления
+    позже = {**o, "assignDate": D(2026, 10, 17)}
+    assert ork.overrun(позже, сегодня)["sinceBy"] == "вход в шаг"
+
+
+def test_брошенная_карточка_на_шаге_4_от_назначения():
+    """«Заказ создан» с весны, назначение — 3 р.д. назад: не «брошенная» (шаг 4 идёт с
+    назначения); назначение 3,5 месяца назад — «брошенная» на шаге 4."""
+    сегодня = D(2026, 10, 19)
+    давно = {"stage": "Заказ создан", "t0": t("04-01"), "created": D(2026, 4, 1), "stepSince": t("04-01")}
+    assert ork.hygiene(давно, сегодня)["abandoned"], "без назначения — брошенная на шаге 1"
+    h = ork.hygiene({**давно, "assignDate": D(2026, 10, 14)}, сегодня)
+    assert not h["abandoned"] and not h["exclude"]
+    h = ork.hygiene({**давно, "assignDate": D(2026, 7, 1)}, сегодня)
+    assert h["abandoned"] and "на шаге 4" in h["why"]
+
+
+def test_сегменты_приёмка_кончается_раньше_из_двух():
+    """S1 — от t0 до РАНЬШЕ из двух: выход из «Заказ создан» по стадии или назначение (endBy);
+    назначение — и начало S2. В один день — стадия (у перехода есть время). Раньше дня t0 —
+    не в счёт (assignIgnored)."""
+    tr = [("S:NEW", t("09-01", "09:00")), ("S:SENT", t("09-10")), ("S:PO", t("09-14"))]
+    r = ork.segments(tr, ИМЕНА, t0=t("09-01", "09:00"), facts={"assignAt": D(2026, 9, 1)})
+    s1, s2 = r["segs"]["S1"], r["segs"]["S2"]
+    assert (s1["endBy"], s1["wd"], s1["inNorm"], s1["neg"]) == ("назначение", 0, True, False)
+    assert (s2["startBy"], s2["endBy"], s2["wd"], s2["skip"]) == ("назначение", "стадия", 9, False)
+    assert r["assignUsed"] and not r["assignIgnored"]
+    # стадия раньше назначения — граница стадии
+    r = ork.segments(tr, ИМЕНА, t0=t("09-01", "09:00"), facts={"assignAt": D(2026, 9, 11)})
+    assert (r["segs"]["S1"]["endBy"], r["segs"]["S1"]["wd"]) == ("стадия", 7) and not r["assignUsed"]
+    assert r["segs"]["S2"]["startBy"] == "стадия" and r["segs"]["S2"]["wd"] == 2
+    # в один день — стадия
+    r = ork.segments(tr, ИМЕНА, t0=t("09-01", "09:00"), facts={"assignAt": D(2026, 9, 10)})
+    assert r["segs"]["S1"]["endBy"] == "стадия" and r["segs"]["S1"]["end"] == t("09-10")
+    # раньше начала приёмки — не в счёт
+    r = ork.segments(tr, ИМЕНА, t0=t("09-01", "09:00"), facts={"assignAt": D(2026, 8, 31)})
+    assert r["segs"]["S1"]["endBy"] == "стадия" and r["assignIgnored"]
+    # стадия не сдвинулась: S1 закончило назначение, S2 идёт с него
+    r = ork.segments(tr[:1], ИМЕНА, t0=t("09-01", "09:00"), facts={"assignAt": D(2026, 9, 2)})
+    assert r["segs"]["S1"]["endBy"] == "назначение" and r["segs"]["S1"]["wd"] == 1
+    assert r["open"] == {"seg": "S2", "start": "2026-09-02T00:00:00+03:00"}
+    # без назначения — как раньше
+    r = ork.segments(tr, ИМЕНА, t0=t("09-01", "09:00"))
+    assert r["segs"]["S1"]["endBy"] == "стадия" and not r["assignUsed"] and not r["assignIgnored"]
+
+
+def test_номер_заказа_как_в_портале():
+    assert ork.order_label("486/1. Узел", "7001") == ("486/1", 1)
+    assert ork.order_label(" 486 / 12 — узел", "7001") == ("486/12", 12)
+    assert ork.order_label("486. Узел без номера заказа", "7002") == ("id 7002", None)
+    assert ork.order_label("", "") == ("", None)

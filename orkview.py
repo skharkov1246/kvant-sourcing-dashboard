@@ -303,6 +303,10 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                 extra={"orders": len(over_ids[1]), "noOrder": qcodes.get("noOrder", 0),
                        "label": ork.NO_PAUSE, "recent": recent,
                        "agree": agree_s1, "agreeN": agree_n,
+                       # приёмка кончилась назначением менеджера ОРК раньше выхода из «Заказ создан»
+                       # (за 20 р.д.); дата записи раньше начала приёмки — не в счёте, счётом
+                       "byAssign": sum(1 for s in s1_recent if s.get("endBy") == "назначение"),
+                       "assignStale": sum(1 for o in U if ork.assign_stale(o)),
                        "excluded": sum(1 for o in U if step[o["id"]] == 1 and not_counted(o))})
 
     # --- W2 сверх нормы: только шаги ОРК (1, 4, 5, 8) -----------------------------------------
@@ -329,6 +333,7 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                 extra={"by": {c: qcodes.get(c, 0) for c in ("late", "risk", "forecast")},
                        "label": "результат поставщика и логистики"})
     risk_list = [{"deal": q.get("deal"), "seq": q.get("seq"), "order": q.get("order"), "code": q["code"],
+                  "ordLbl": q.get("ordLbl") or "", "sup": q.get("sup") or "", "ref": q.get("ref") or "",
                   "days": q.get("days"), "dl": q.get("dl") or "", "fc": q.get("fc") or "",
                   "who": q.get("who"), "copy": q.get("escalateTo") or ""} for q in risk_q]
 
@@ -345,6 +350,7 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     for o in prod:
         for p in ork.checkpoints(o, today):
             cps.append({"deal": o.get("deal"), "seq": o.get("seq"), "order": o["id"], "kind": p["kind"],
+                        "ordLbl": o.get("lbl") or "", "sup": o.get("sup") or "",
                         "date": p["date"], "who": (o.get("own") or {}).get("who") or ""})
     cps.sort(key=lambda x: (x["date"], x["kind"]))
     w5_n = len(prod) + unk_n
@@ -392,10 +398,13 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
             hc[k] += 1
         if kinds:
             hyg_items.append({"deal": o.get("deal"), "seq": o.get("seq"), "order": o["id"], "kinds": kinds,
+                              "ordLbl": o.get("lbl") or "", "ordNo": o.get("ordNo"), "sup": o.get("sup") or "",
                               "step": step[o["id"]],
                               "excl": bool(h["exclude"] or step[o["id"]] is None),
                               "why": h.get("why") or ("менеджер ОРК не назначен" if "noMgr" in kinds else "")})
-    hyg_items.sort(key=lambda x: (-(x["seq"] or 0), x["order"]))
+    # заказы одной сделки — подряд и по номеру заказа («933/2» раньше «933/10»)
+    hyg_items.sort(key=lambda x: (-(x["seq"] or 0), str(x["deal"]),
+                                  x["ordNo"] if x["ordNo"] is not None else 10 ** 6, x["order"]))
     # не в счёте «сверх нормы»: стадия позади фактов, брошенная (шаги 1, 4, 5, 8), старая
     # доставка без УПД (шаг 12), стадия не из таблицы; «менеджер ОРК не назначен» в счёте ЕСТЬ —
     # назначить (решение п. 1)
@@ -482,6 +491,7 @@ def _long_p80(prod: list[dict], s5: dict, today: dt.date) -> dict:
         days = (today - start).days
         if days > p8:
             items.append({"deal": o.get("deal"), "seq": o.get("seq"), "order": o["id"], "days": days,
+                          "ordLbl": o.get("lbl") or "",
                           "sup": o.get("sup") or "", "who": (o.get("own") or {}).get("who") or ""})
     items.sort(key=lambda x: (-x["days"], x["order"]))
     known = len(prod) - unknown
@@ -492,12 +502,21 @@ def _long_p80(prod: list[dict], s5: dict, today: dt.date) -> dict:
 
 def _s1_agree(orders: list[dict]) -> tuple[float | None, int]:
     """Совпадение двух опор конца приёмки (в пределах agree_wd р.д.): выход заказа из «Заказ
-    создан» по переходам и «Дата записи нового ответственного» (с 28.08.2026)."""
+    создан» по переходам и «Дата записи нового ответственного» (с 28.08.2026).
+
+    С 29.10.2026 приёмка кончается раньше из двух (ork.segments, вопрос владельца): пара
+    меряется только там, где стадия сдвинулась первой (S1.endBy «стадия»). Где приёмку закончило
+    назначение, конец S1 и есть эта дата — пара совпала бы по построению, а поздний выход из
+    «Заказ создан» — уже шаг 4 (заказ законно стоит в стадии до направления), не расхождение
+    опор: такие пары не идут ни в совпавшие, ни в число пар. Дата записи раньше дня начала
+    приёмки — скопирована или устарела (ork.assign_stale): в S1 её нет, в пары — тоже."""
     pairs = ok = 0
     for o in orders:
         s1 = (o.get("_segs") or {}).get("segs", {}).get("S1")
         b = _d(o.get("assignDate"))
         if not s1 or not b or b < ork.S1_ANCHOR_SINCE:
+            continue
+        if s1.get("endBy") == "назначение" or ork.assign_stale(o):
             continue
         wd = period_mod.workdays_ru(_end(s1), b)
         if wd is None:
@@ -743,10 +762,14 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
                 "state": st.get("state"), "why": st.get("why") or "", "n": st.get("n"),
                 "cover": round(st["cover"], 3) if isinstance(st.get("cover"), float) else st.get("cover")}
     metrics = [
-        row("W1", "Приёмка (S1)", "живые заказы в «Заказ создан» с р.д.(t0, сегодня) > 1 + сделки без заказа > 1 р.д.; "
-            "t0 = max(создание заказа, вход сделки в реализацию); брошенные карточки и сделки вне «Реализации» — "
-            "не в счёте; стадия не из таблицы — в n как «срок неизвестен»", "createdTime, crm.stagehistory", t["W1"]),
-        row("W2", "Сверх нормы, только ОРК", "шаги 1, 4, 5, 8: р.д. от входа в шаг > нормы; стадия позади фактов, "
+        row("W1", "Приёмка (S1)", "живые заказы в «Заказ создан» без назначения менеджера ОРК с р.д.(t0, сегодня) > 1 "
+            "+ сделки без заказа > 1 р.д.; t0 = max(создание заказа, вход сделки в реализацию); приёмка кончается "
+            "раньше из двух: выход из «Заказ создан» по стадии или «Дата записи нового ответственного» (не раньше "
+            "дня t0, иначе не в счёте) — после назначения заказ на шаге 4, срок договора с поставщиком (2 р.д.) — "
+            "от назначения; брошенные карточки и сделки вне «Реализации» — не в счёте; стадия не из таблицы — в n "
+            "как «срок неизвестен»", "createdTime, crm.stagehistory, ufCrm20_1787924508120", t["W1"]),
+        row("W2", "Сверх нормы, только ОРК", "шаги 1, 4, 5, 8: р.д. от входа в шаг > нормы (шаг 4 — от назначения "
+            "менеджера ОРК, если приёмку закончило оно, ork.clock); стадия позади фактов, "
             "брошенная карточка — гигиена, не в n; стадия не из таблицы — в n как «срок неизвестен»; «без пауз». "
             f"Шаг 12 (УПД) — не в W2 и не в n (решение владельца 27.10.2026): р.д.(доставка, сегодня) > "
             f"{ork.NORM_WD[12]} и УПД нет — «{ork.WAIT_UTD}» отдельным столбцом (подпись УПД — за заказчиком), "
