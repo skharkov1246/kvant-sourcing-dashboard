@@ -387,6 +387,13 @@ def _with_tabs_opened(path: Path) -> Path:
               "else if(!document.querySelector('#drwBody [data-odq]'))kvFail('Реализация: «Ждут смежников» '+tr.dataset.adj+' — нет перехода в очередь');XX()});"
               "EA('#orkHygN [data-od]',function(c){var n=parseInt((c.querySelector('b')||{}).textContent,10);c.click();"
               "if(!SH()||RW()!==n)kvFail('Реализация: гигиена '+c.dataset.od+' — строк '+RW()+' вместо '+n);XX()});"
+              # «Сегодня» (владелец 29.10.2026: «как мне понимать, что дальше»): строка — пункты очереди
+              # одного вида; число открывает ровно столько строк и ведёт в очередь
+              "if(((CX3.life||{}).queue||[]).length&&!document.querySelector('#ctPanel-main #orkToday tr[data-tq]'))"
+              "kvFail('Реализация: блок «Сегодня» пуст при непустой очереди');"
+              "EA('#orkToday button[data-tq]',function(b){var n=parseInt(b.textContent,10);b.click();"
+              "if(!SH()||RW()!==n)kvFail('Реализация: «Сегодня» '+b.dataset.tq+' = '+n+', а в списке строк '+RW());"
+              "else if(!document.querySelector('#drwBody [data-odq]'))kvFail('Реализация: «Сегодня» '+b.dataset.tq+' — нет перехода в очередь');XX()});"
               "var OM=window.__ORKMONTH__&&window.__ORKMONTH__.main,"
               "DK=function(root,id){var out=[];var w=function(o){if(!o||typeof o!=='object')return;if(Array.isArray(o)){o.forEach(w);return}"
               "if(o.dk&&(o.state==='show'||o.state==='prelim')&&(id==null||o.dk===id))out.push(id==null?o.dk:o.n);"
