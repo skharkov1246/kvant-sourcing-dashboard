@@ -558,7 +558,7 @@
   /* доставка в срок по месяцам */
   #tab-contracts .ctm .otd{height:160px;gap:6px}
   #tab-contracts .ctm .otd .c{font-size:var(--rz-xs,12px);color:var(--mut)}
-  #tab-contracts .ctm .otd .c .mono{font-family:var(--ctm-font);font-size:11px;color:var(--ink2)}
+  #tab-contracts .ctm .otd .c .mono{font-family:var(--ctm-font);font-size:var(--rz-xs,12px);color:var(--ink2)}
   /* списки и справочник */
   #tab-contracts .ctm .ctm-list{margin:10px 0 0 18px;padding:0;font-size:var(--rz-md,14px);line-height:1.45}
   #tab-contracts .ctm .ctm-list li{margin:0 0 8px}
@@ -1396,7 +1396,7 @@
     #tab-contracts .orkm{display:block}
     #tab-contracts table.lft td,#tab-contracts table.lft th{padding:6px 4px;font-size:12px;hyphens:auto}
     #tab-contracts table.lft th{letter-spacing:.02em}
-    #tab-contracts table.orkhow td,#tab-contracts table.orkhow th,#tab-contracts table.orkfld td,#tab-contracts table.orkfld th{padding:5px 3px;font-size:11px}
+    #tab-contracts table.orkhow td,#tab-contracts table.orkhow th,#tab-contracts table.orkfld td,#tab-contracts table.orkfld th{padding:5px 3px;font-size:12px}
   }
   @media(max-width:440px){
     .kpi .val{font-size:22px}
@@ -3516,7 +3516,7 @@ function openContract(x){
   if(dlTxt||ndTxt) FL.push(['Срок клиента',[dlTxt,ndTxt].filter(Boolean).join('<br>')]);
   if(x.manager&&x.manager!=='—') FL.push(['Ответственный',`<b>${_esc(x.manager)}</b>${x.cities?` <span class="dimv">· ${_esc(x.cities)}</span>`:''}`]);
   if(x.manager&&x.manager!=='—'&&x.oss&&x.oss!=='—') FL.push(['ОСС',`<b>${_esc(x.oss)}</b>`]);
-  FL.push(['В реализации',`с <b>${x.entered||'—'}</b>${x.firstLag!=null?` · первый заказ через <b>${x.firstLag} дн</b>`:''}`]);
+  FL.push(['В реализации',`с <b>${x.entered?_esc(_orkD(x.entered)):'—'}</b>${x.firstLag!=null?` · первый заказ через <b>${x.firstLag} дн</b>`:''}`]);
   h+=`<dl class="rzc-facts">${FL.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`
     +(x.slow?`<div class="rzc-why flag">⚠ ${_esc(x.why)}</div>`:'');
   // ---------- 2. что делать: пункты очереди сделки (кто, что, с какого дня) ----------
@@ -3748,7 +3748,7 @@ function _ctOrdHtml(o,x){
     +(o.delivered?`<span>доставлен ${o.delivered}${o.delUtd?' · по УПД':''}</span>`:'')
     +(o.prodAfterDl?`<span class="srcb disc">пр-во до ${o.prodEnd} — позже срока клиента</span>`:'')
     +(o.live&&(o.respGone||o.ossGone)?`<span class="gone">${o.respGone&&o.ossGone?'ответственный и ОСС заказа уволены':(o.respGone?'ответственный заказа уволен':'ОСС заказа уволен')} — переназначить</span>`:'')
-    +`<span>создан ${o.created}</span><span>закупка ${o.buyLbl}</span></div>`
+    +`<span>создан ${_esc(_orkD(o.created))}</span><span>закупка ${o.buyLbl}</span></div>`
     +`<div class="acts">${typeof _opOpen==='function'?`<button type="button" class="rzc-btn" data-ctop="${_esc(o.id)}">Путь заказа →</button>`:''}`
     +`<a class="rzc-lnk" href="${_ctBxOrd(o.id)}" target="_blank" rel="noopener" aria-label="Заказ ${_esc(lb||o.id)} в Битриксе (новая вкладка)">в Битриксе ↗</a></div></div>`;
 }
@@ -4832,10 +4832,15 @@ function _odPrep(M){
   let t0=_odDay(L.asOf); if(t0==null) t0=_odDay((M.O||{}).asOf);
   if(t0==null){const d=new Date(); t0=Date.UTC(d.getFullYear(),d.getMonth(),d.getDate());}
   const QI=new Map();
+  // шаг без нормы: р.д. на шаге — та же последняя запись пути заказа (ork.path, вход в шаг по
+  // истории и датированным фактам), что в «Пути заказа»: список и путь говорят одно число
+  const PO=new Map(); (Array.isArray((window.__CONTRACTS__||{}).rows)?window.__CONTRACTS__.rows:[]).forEach(d=>(d.orders||[]).forEach(o=>PO.set(String(o.id),o)));
   (L.queue||[]).concat(DC?(DC.queue||[]).filter(q=>!!q.seg===!!X.seg):[]).forEach(q=>{
     const k=(q.order?String(q.order):'d:'+q.deal)+'|'+q.code; if(!QI.has(k)) QI.set(k,q);});
   M.items.forEach(x=>{
     const r=x.r, d=x.d||{}, isD=_odIsDeal(x), codes=[...new Set((r.q||[]).concat(x.dq||[]))];
+    const po=!isD&&r.wd==null&&r.step!=null?PO.get(String(x.k)):null, pl=po&&Array.isArray(po.path)&&po.path.length?po.path[po.path.length-1]:null;
+    x.pn=pl&&pl[0]===+r.step&&pl[2]!=null?{wd:pl[2],from:pl[1]}:null;
     if(isD&&r.kind==='dealClose'&&!codes.includes('dealClose')) codes.push('dealClose');
     if(isD&&r.kind==='noOrder'&&r.over&&!codes.includes('noOrder')) codes.push('noOrder');
     const qs=codes.map(c=>{const q=QI.get(x.k+'|'+c)||QI.get('d:'+(r.deal||'')+'|'+c)||{}; return {c,q,sev:q.sev!=null?+q.sev:50};})
@@ -4847,7 +4852,7 @@ function _odPrep(M){
     else if(r.closed) a={key:'closed',txt:'Заказ закрыт — действий нет',role:'',who:'',sev:99,days:null,unit:'',why:[]};
     else if(r.step!=null){const s=SN[r.step];
       a={key:'s:'+r.step,txt:`Держать срок шага ${r.step}${s?' «'+s.name+'»':''}`,role:(s&&s.roleName)||_OD_ROLE[r.ownR]||'',who:r.own||'',sev:60,
-        days:r.wd!=null?r.wd:r.cd!=null?r.cd:null,unit:r.wd!=null?'р.д.':'дн',why:[]};}
+        days:r.wd!=null?r.wd:x.pn?x.pn.wd:r.cd!=null?r.cd:null,unit:r.wd!=null||x.pn?'р.д.':'дн',why:[]};}
     else a={key:'none',txt:r.missing?'Найти заказ в Битриксе: в данных вкладки его нет':isD?'Разобрать сделку':'Сверить стадию заказа с таблицей шагов',
       role:'менеджер ОРК',who:r.mgr&&!_OD_GROUP(r.mgr)?r.mgr:'',sev:90,days:null,unit:'',why:[]};
     // срок клиента: «просрочен» — по пункту «late» (строки «Недели»); у строк без пунктов — срок
@@ -4856,7 +4861,7 @@ function _odPrep(M){
     const open=!r.closed&&!codes.includes('late')&&(r.step==null||+r.step<=10)&&!isD;
     const late=dl!=null&&dl<t0&&(codes.includes('late')||(!trust&&open))?Math.round((t0-dl)/864e5):null;
     const left=late==null&&dl!=null&&dl>=t0&&open?Math.round((dl-t0)/864e5):null;
-    Object.assign(x,{a,dl,fc,late,left,ratio:r.wd!=null&&r.norm?r.wd/r.norm:0,sd:r.wd!=null?r.wd:r.cd!=null?r.cd:0,
+    Object.assign(x,{a,dl,fc,late,left,ratio:r.wd!=null&&r.norm?r.wd/r.norm:0,sd:r.wd!=null?r.wd:x.pn?x.pn.wd:r.cd!=null?r.cd:0,
       s:[r.no,x.k,r.seq||d.seq?'№'+(r.seq||d.seq):'',d.customer,r.sup].filter(Boolean).join(' ').toLowerCase()});
   });
   const G=new Map();
@@ -4946,6 +4951,7 @@ function _odTr(x,P,withSup){
       +(nm!=null?`<span class="odbar${r.over?' over':''}" aria-hidden="true"><i style="width:${Math.round(r.wd/mx*100)}%"></i><s style="left:${Math.round(nm/mx*100)}%"></s></span>`:'')
       +(r.over?'<div class="dep hot">сверх нормы</div>':r.wu?'<div class="dep amb">ждём УПД от клиента</div>':'');}
   else if(r.tu) dy='<div class="oddays dimv">срок шага неизвестен</div>';
+  else if(x.pn) dy=`<div class="oddays"><b>${x.pn.wd} р.д.</b> на шаге · шаг не нормируется</div>${x.pn.from&&!r.since?`<div class="dep">с ${_esc(_orkD(x.pn.from))} · вход в шаг</div>`:''}`;
   else if(r.cd!=null) dy=`<div class="oddays"><b>${r.cd} дн</b> на шаге${r.norm==null?' · шаг не нормируется':''}</div>`;
   const c2=`<td class="odc2" data-l="Где застрял">`
     +(r.step!=null?`<div class="odstep"><span class="odsn">Шаг ${r.step}</span>${s?' · '+_esc(s.name):''}</div>`
@@ -5294,7 +5300,7 @@ function _opStuck(o,S,P,w,D){
 function _opTodo(o,Q,S){
   const one=(x,lvl)=>`<li class="op-todo-i"><p class="op-what">${_esc(_orkCap(x.what||''))}${lvl?' <span class="op-tag">по сделке</span>':''}${x.days!=null?` <span class="op-mut">· ${x.days} ${x.inWd?'р.д.':'дн.'}</span>`:''}</p>`
     +`<p class="op-act">→ ${_esc(x.act||'')}</p>`
-    +`<p class="op-who">${x.who?`<b>${_orkWho(x.who)}</b>`:'не назначен'}${x.roleName?` · ${_esc(x.roleName)}`:''}${x.escalateTo?` <span class="op-mut">· в копии ${_orkWho(x.escalateTo)}${x.copyRole&&_OD_ROLE[x.copyRole]?' ('+_esc(_OD_ROLE[x.copyRole])+')':''}</span>`:''}</p></li>`;
+    +`<p class="op-who">${x.who?`<b>${_orkWho(x.who)}</b>`:'не назначен'}${x.roleName?` · ${_esc(x.roleName)}`:''}${x.escalateTo?` <span class="op-mut">· в копии ${_orkWho(x.escalateTo)}${x.copyRole&&_OD_ROLE[x.copyRole]&&!String(x.escalateTo).includes('('+_OD_ROLE[x.copyRole]+')')&&!/\([^)]*\)\s*$/.test(String(x.escalateTo))?' ('+_esc(_OD_ROLE[x.copyRole])+')':''}</span>`:''}</p></li>`;
   let h='';
   if(Q.ord.length||Q.deal.length) h=`<ol class="op-todo">${Q.ord.map(x=>one(x,0)).join('')}${Q.deal.map(x=>one(x,1)).join('')}</ol>`;
   else if(o.live&&o.step!=null) h=`<p class="op-line">Пунктов очереди нет. По регламенту на шаге ${o.step}: <b>${_esc(_OP_DO[o.step]||'')}</b>${o.stepWho?` — ${_orkWho(o.stepWho)}`:''}.</p>`;

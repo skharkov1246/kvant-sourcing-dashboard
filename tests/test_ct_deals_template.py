@@ -145,7 +145,7 @@ def test_карточка_сделки_по_порядку(page):
     assert c["dealLink"] == f"https://kvantpro.bitrix24.ru/crm/deal/details/{c['deal']}/"
     assert c["ords"] == len(c["ordLinks"]) > 0
     assert all(re.fullmatch(r"https://kvantpro\.bitrix24\.ru/crm/type/172/details/\d+/", h) for h in c["ordLinks"])
-    assert c["paths"] == 0, "без _opOpen кнопки «Путь заказа» нет"
+    assert c["paths"] == c["ords"], "_opOpen есть — у каждого заказа «Путь заказа →»"
     assert "кто:" in c["todo"] or "Пунктов в очереди нет" in c["text"]
     assert "Сделка в Битриксе ↗" in c["text"] and "Экономика сделки" in c["text"]
 

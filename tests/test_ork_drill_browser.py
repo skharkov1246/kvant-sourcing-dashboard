@@ -198,8 +198,6 @@ def test_клавиатура_карточка_и_отборы_в_списке(b
     pg, errs = _open(browser, page_url)
     # точка выгрузки в Excel: функция _xlMark параллельной правки зовётся с телом списка
     pg.evaluate("window.__xl=[]; window._xlMark=r=>window.__xl.push(r&&r.id)")
-    # строка — карточка сделки, когда пути заказа нет (_opOpen); путь — test_разбор_числа_…
-    pg.evaluate("window._opOpen=undefined; 0")
     row = pg.locator("#orkPulseB tr[data-od]").nth(1)
     row.focus()
     pg.keyboard.press("Enter")
@@ -255,7 +253,7 @@ def test_месяц_и_квартал(browser, page_url, sub):
     assert want and not [d for d in want if d not in have], [d for d in want if d not in have]
     if sub == "quarter":
         # закрытые заказы — корзиной «заказ закрыт»; менеджеров ОРК в списках «Квартала» нет
-        el = pg.locator("#ctPanel-main .actile[data-od^='q:']").first
+        el = pg.locator("#ctPanel-main .ctm-kpi[data-od^='q:'], #ctPanel-main .actile[data-od^='q:']").first
         _clicked_rows(pg, el)
         body = pg.locator("#drwBody").inner_text()
         assert "По менеджерам ОРК" not in body and "стадия не из таблицы" not in body
@@ -297,7 +295,7 @@ def test_разбор_числа_что_делать_отборы_сортиро
     отборе; строка заказа — путь заказа (_opOpen, когда он есть), ссылка в Битрикс — своя;
     дровер min(1200px, 100vw), ничего не обрезано справа."""
     pg, errs = _open(browser, page_url, width=width)
-    pg.evaluate("window.__op=[]; window._opOpen=k=>window.__op.push(k); 0")   # 0: функцию evaluate вызвал бы сам
+    pg.evaluate("window.__op=[]; window._opOpen=(k,o)=>window.__op.push([k,(o||{}).back]); 0")   # 0: функцию evaluate вызвал бы сам
     tile = pg.locator("#ctPanel-main .actile[data-of='w3']")
     total = int(tile.locator(".v").inner_text())
     _clicked_rows(pg, tile)
@@ -361,6 +359,6 @@ def test_разбор_числа_что_делать_отборы_сортиро
     k = r0.get_attribute("data-odk")
     r0.focus()
     pg.keyboard.press("Enter")
-    assert pg.evaluate("window.__op") == [k]
+    assert pg.evaluate("window.__op") == [[k, "list"]]
     pg.keyboard.press("Escape")
     assert not errs, errs
