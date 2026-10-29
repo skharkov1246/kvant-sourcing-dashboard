@@ -323,16 +323,17 @@ def test_журнал_шагов_в_excel_как_на_странице(page_run)
     s1_over = [x for x in J if x["seg"] == "S1" and x["measurable"] and (x["over"] or 0) > 0]
     j = out["journal"]
     assert out["jbar"] and j["file"] == "КВАНТ_Реализация_Месяц_Журнал шагов_2026-10-29.xlsx"
-    assert j["head"] == ["Сделка", "Заказ", "Шаг", "Начало", "Конец", "Р.д.", "Норма", "Сверх нормы на",
-                         "Отметки", "Хозяин", "Месяц"]
+    assert j["head"] == ["Сделка", "Заказ", "Шаг", "Начало", "Конец", "Шёл, р.д.", "Норма, р.д.",
+                         "Дольше нормы на, р.д.", "Почему не считаем", "Кто отвечал", "Месяц"]
     rows = _rows(j["b64"])
     data = rows[1:1 + j["rows"]]
     assert j["rows"] == len(s1_over) > 0
-    assert all(row[2].startswith("S1 ") and isinstance(row[7], int) and row[7] >= 1 for row in data)
+    assert all(row[2].startswith("Приёмка сделки") and "S1" in row[2] and isinstance(row[7], int) and row[7] >= 1
+               for row in data)
     assert [row[7] for row in data] == sorted((x["over"] for x in s1_over), reverse=True)
     assert all(isinstance(row[5], int) and row[6] == 1 for row in data), "р.д. и норма — числами"
     assert all(re.fullmatch(r"\d\d\.\d\d\.\d{4}", row[4]) and re.fullmatch(r"\d\d\.\d{4}", row[10]) for row in data)
-    assert rows[-1][0].startswith("Отбор: шаг S1 Приёмка сделки") and "только сверх нормы" in rows[-1][0]
+    assert rows[-1][0].startswith("Отбор: Приёмка сделки (шаг 1 · S1)") and "только дольше нормы" in rows[-1][0]
     a = out["journalAll"]
     assert a["rows"] == len(J) and len(_rows(a["b64"])) == 1 + len(J) + 2
 
@@ -387,7 +388,7 @@ def test_таблица_сделок_как_на_странице(page_run):
     out, r, _m = page_run
     d = out["deals"]
     assert d["rows"] == d["shown"] > 0 and not d["full"]
-    assert d["head"][0] == "№" and "Сумма сделки" in d["head"]
+    assert d["head"][0] == "№" and "Продажа, €" in d["head"]
     first = _rows(d["b64"])[1]
     assert isinstance(first[0], int), "№ сделки — числом"
 

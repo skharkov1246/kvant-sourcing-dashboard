@@ -341,7 +341,7 @@ def _with_tabs_opened(path: Path) -> Path:
               "WK.click();var IR=document.querySelector('%s');"
               "if(!IR)kvFail('Реализация: блок «Что важно сегодня» не отрисовался');"
               "else{IR.click();var DW=document.getElementById('drw');"
-              "if(!DW||(DW.textContent||'').indexOf('Главное (оценка модели')<0)"
+              "if(!DW||(DW.textContent||'').indexOf('Главное по сделке — оценка ИИ')<0)"
               "kvFail('Реализация: в карточке сделки нет блока «Главное»');"
               "var DX=document.getElementById('drwX');if(DX)DX.click()}"
               "var MS=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"main\"]');if(MS)MS.click()}}"

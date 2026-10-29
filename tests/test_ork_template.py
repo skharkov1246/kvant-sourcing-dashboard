@@ -139,12 +139,12 @@ def test_месяц_без_права_нет_доступа(built):
     ct = copy.deepcopy(built["contracts"])
     без = _render({"main": ct}, {"__kvNoData": True})["main"]
     assert "нет доступа: нужно право «Реализация: показатели менеджеров ОРК»" in без["month"]
-    for слово in ("M1 · ", "приёмка", "По менеджерам ОРК", "Своевременность шагов по месяцам"):
+    for слово in ('ctm-cs">M1<', "приёмка", "По менеджерам ОРК", "Шаги вовремя по месяцам"):
         assert слово not in без["month"], слово
     assert без["how"].count("под правом") >= 3
     с = _render({"main": ct}, built["ork_month"])["main"]
-    assert "нет доступа" not in с["month"] and "M1 · " in с["month"] and "По менеджерам ОРК" in с["month"]
-    assert "Своевременность шагов по месяцам" in с["month"]
+    assert "нет доступа" not in с["month"] and 'ctm-cs">M1<' in с["month"] and "По менеджерам ОРК" in с["month"]
+    assert "Шаги вовремя по месяцам" in с["month"]
 
 
 def test_ждём_упд_от_клиента_отдельно_от_сверх_нормы(built):
@@ -308,7 +308,7 @@ def test_карточка_заказа_номер_и_начало_счёта(т�
     js = (r"""
 const vm = require('node:vm'); const fs = require('node:fs');
 const inp = JSON.parse(fs.readFileSync(0, 'utf8')); const out = {};
-const box = {JSON, String, Math, out, inp, encodeURIComponent};
+const box = {JSON, String, Math, out, inp, encodeURIComponent, window: {__CONTRACTS__: {ork: inp.ork}}};
 vm.createContext(box);
 vm.runInContext(inp.esc + '\n' + inp.helpers + '\nconst _stShort=n=>String(n||"").split(" | ")[0];\n' + inp.fn
   + '\nfor (const x of inp.rows) out[x.deal] = (x.orders||[]).map(o=>_ctOrdHtml(o,x));'
@@ -318,7 +318,8 @@ process.stdout.write(JSON.stringify(out));
     helpers = "\n".join(_line(p) for p in ("const _orkD=", "const _orkDm=", "const _orkDy=", "const _ctBxOrd=",
                                            "const _CT_ROLE="))
     rows = [r for r in ct["rows"] if r["deal"] == "6090" or r["seq"] == 933]
-    inp = {"esc": _line("const _esc="), "helpers": helpers, "fn": _fn("_ctOrdHtml"), "rows": rows}
+    inp = {"esc": _line("const _esc="), "helpers": helpers + "\n" + _fn("_ctStepNm"), "fn": _fn("_ctOrdHtml"),
+           "rows": rows, "ork": ct["ork"]}
     r = subprocess.run(["node", "-e", js], input=json.dumps(inp, ensure_ascii=False), capture_output=True,
                        text=True, timeout=120)
     assert r.returncode == 0, r.stderr[-2000:]
@@ -334,8 +335,10 @@ process.stdout.write(JSON.stringify(out));
         assert "data-ctop=" not in hit[0], "без _opOpen кнопки пути нет"
     assert "просрочен на" in next(h for h in card if ">990/1<" in h), "990/1 — срок клиента прошёл"
     o933 = [h for h in out[next(r["deal"] for r in rows if r["seq"] == 933)] if ">933/3<" in h]
-    assert len(o933) == 1 and "шаг 4 · 3 р.д. при норме 2" in o933[0] and "с 14.10 (назначение)" in o933[0]
-    assert "исполнитель: " in o933[0]
+    # номер шага — всегда со словом: имя шага из ведомости «Недели» (ork.STEPS)
+    nm4 = next(s["name"] for s in ct["ork"]["week"]["ledger"] if s["no"] == 4)
+    assert len(o933) == 1 and f"шаг 4 «{nm4}» · 3 р.д. на шаге при норме 2" in o933[0] and "с 14.10 (назначение)" in o933[0]
+    assert "исполнитель шага: " in o933[0]
     assert 'data-ctop="' in out["withPath"] and "Путь заказа →" in out["withPath"]
 
 
@@ -507,16 +510,18 @@ def test_журнал_шагов_в_месяце_под_правом(built):
     ct = copy.deepcopy(built["contracts"])
     с = _render({"main": ct}, built["ork_month"])["main"]["month"]
     assert "Журнал шагов: срок каждого заказа" in с and 'data-xl-name="Журнал шагов"' in с
-    assert '<option value="S1" selected>S1 Приёмка сделки · норма 1 р.д.</option>' in с
+    assert '<option value="S1" selected>Приёмка сделки (шаг 1 · S1) · норма 1 р.д.</option>' in с
     assert '<input type="checkbox" id="orkJOver" checked>' in с and '<input type="checkbox" id="orkJAll">' in с
     for m in built["ork_month"]["main"]["journal"]["months"]:
-        assert f'<option value="{m}">{m}</option>' in с
-    for th in ("Сделка", "Заказ", "Шаг", "Начало", "Конец", "Р.д.", "Норма", "Сверх нормы на", "Отметки",
-               "Хозяин", "Месяц"):
-        assert f">{th}</th>" in с, th
-    assert "по датам переходов стадий заказа в Битриксе" in с and "производственному календарю РФ" in с
+        mm, yy = m.split(".")
+        word = ("январь февраль март апрель май июнь июль август сентябрь октябрь ноябрь декабрь".split())[int(mm) - 1]
+        assert f'<option value="{m}">{word} {yy}</option>' in с, m
+    for th in ("Сделка", "Заказ", "Шаг", "Начало", "Конец", "Шёл, р.д.", "Норма, р.д.", "Дольше нормы на, р.д.",
+               "Почему не считаем", "Кто отвечал", "Месяц"):
+        assert f'scope="col">{th}</th>' in с, th
+    assert "по датам смены стадий заказа в Битриксе" in с and "производственному календарю РФ" in с
     assert "«пачкой»" in с and "срок не дают" in с
-    assert с.index("Своевременность шагов по месяцам") < с.index("Журнал шагов") < с.index("По менеджерам ОРК")
+    assert с.index("Шаги вовремя по месяцам") < с.index("Журнал шагов") < с.index("<b>·</b> По менеджерам ОРК")
     без = _render({"main": ct}, {"__kvNoData": True})["main"]["month"]
     assert "Журнал шагов" not in без and "orkJb" not in без
     # массив «Месяца» без журнала (сборка старше) — «Нет данных» и откуда придёт
@@ -540,14 +545,14 @@ def test_журнал_отбор_строки_и_пусто(built):
     for r in s1:
         assert f'data-ct="{r["deal"]}"' in d["html"] and f'>{r["over"]}</td>' in d["html"]
     assert d["html"].count("<tr ") == len(s1) and 'class="dep orkm"' in d["html"]
-    assert d["note"].startswith("Отбор: шаг S1 Приёмка сделки · все месяцы окна · только сверх нормы · без неизмеримых")
+    assert d["note"].startswith("Отбор: Приёмка сделки (шаг 1 · S1) · все месяцы окна · только дольше нормы · без шагов без честного срока")
     assert out["all"]["n"] == out["all"]["base"] == len(rows) and "все шаги" in out["all"]["note"]
     assert out["mon"]["n"] == sum(1 for r in s1 if r["m"] == out["mon"]["m"]) > 0
-    assert out["empty"].startswith("Нет данных: в окне «Месяца» нет законченных отрезков")
-    assert out["noSeg"].startswith("Нет данных: отрезков S6 Подготовка к отгрузке от поставщика, закончившихся в 08.2026, нет")
-    assert out["allOk"].startswith("Сверх нормы — никого: все 1 отрезков")
-    # имя скрыто воротами людей — «скрыто» и причина, а не имя
-    assert "скрыто" in out["hidRow"] and "раскрыл бы человека" in out["hidRow"]
+    assert out["empty"].startswith("Нет данных: в окне «Месяца» нет законченных шагов")
+    assert out["noSeg"].startswith("Нет данных: шагов «Подготовка к отгрузке от поставщика», закончившихся в августе 2026, нет")
+    assert out["allOk"].startswith("Дольше нормы — никого: все 1 шаг отбора в норме")
+    # имя скрыто воротами людей — «скрыто» и причина словами (это была бы оценка одного человека), а не имя
+    assert "скрыто" in out["hidRow"] and "оценка одного сотрудника" in out["hidRow"]
     # имени руководителя ОРК в справочнике нет — роль один раз, а не «руководитель ОРК руководитель ОРК»
     nh = out["noHead"]
     assert nh.count("руководитель ОРК") == 1 and "имени в справочнике нет" in nh

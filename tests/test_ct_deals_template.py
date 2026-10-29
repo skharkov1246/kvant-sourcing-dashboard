@@ -124,9 +124,9 @@ def test_строка_что_сделать_и_битрикс(page):
             assert any(a[:20].lower() in r["act"].lower() for a in r["acts"]), (r["deal"], r["act"])
         assert re.search(r"\d+ заказ(а|ов)?", r["ord"]), r["ord"]
         if r["overN"]:
-            assert f"{r['overN']} сверх нормы" in r["ord"], r["ord"]
+            assert f"{r['overN']} дольше нормы" in r["ord"], r["ord"]
     assert page["head"][0].startswith("№") and any(h.startswith("Что сделать") for h in page["head"])
-    assert page["xl"][0] == "№" and "Сумма сделки" in page["xl"], page["xl"]
+    assert page["xl"][0] == "№" and "Продажа, €" in page["xl"], page["xl"]
     assert {c["m"] for c in page["chips"]} >= {"all", "live", "late", "slow"}
     assert [c["p"] for c in page["chips"] if c["m"] == "all"] == ["true"]
 
