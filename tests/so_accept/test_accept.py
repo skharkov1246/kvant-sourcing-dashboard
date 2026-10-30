@@ -150,7 +150,7 @@ def test_p08_градиентов_нет(open_page, cfg):
 
 # ---------------------------------------------------------------- П-9 адрес
 STATE = """(()=>{const d=document.getElementById('drw'),on=d.classList.contains('on');
-  const kind=!on?'none':document.querySelector('#drwBody #soDrwF')?'sourcer':document.querySelector('#drwBody .sowhyd')?'list':'other';
+  const kind=!on?'none':document.querySelector('#drwBody #soDrwF')?'sourcer':/^Списка по ссылке нет/.test(document.getElementById('drwName').textContent)?'missing':document.querySelector('#drwBody .sowhyd')?'list':'other';
   const t=document.querySelector('#soTabs [aria-selected=true]'); return {kind,sub:t&&t.dataset.sub,hash:location.hash}})()"""
 
 
@@ -159,7 +159,7 @@ def test_p09_адрес_открывает_уровни(open_page, cfg, browser,
     uid = pg.evaluate("String((window.__DATA__.sourcersA||[]).find(r=>r.act!==false).id)")
     cases = [("#sourcing/pulse", "none", "pulse"), ("#sourcing/today?n=pawStale", "list", "today"),
              (f"#sourcing/people?n=pawStale&u={uid}", "list", "people"), (f"#sourcing/people?p={uid}", "sourcer", "people"),
-             ("#sourcing/rfq?n=nosuchkey", "none", "rfq"), ("#sourcing/how", "none", "how"), ("#sourcing", "none", "today")]
+             ("#sourcing/rfq?n=nosuchkey", "missing", "rfq"), ("#sourcing/how", "none", "how"), ("#sourcing", "none", "today")]
     bad = []
     for h, kind, sub in cases:
         ctx = browser.new_context(viewport={"width": 1280, "height": 800})
