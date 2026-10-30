@@ -77,6 +77,8 @@ def main(argv=None) -> int:
     # Проверка до часовой сборки данных: бот настроен и получатель найден. Иначе
     # прогон 19.10.2026 час собирал данные и только потом узнал, что бота нет.
     ap.add_argument("--check", action="store_true", help="только проверить бота и получателя, без отправки")
+    # имя файла у получателя: «<имя>_<дата>.<расширение>»; прогон «Деньги сорсинга» шлёт тем же ботом
+    ap.add_argument("--name", default="Премии", help="начало имени файла у получателя")
     ap.add_argument("files", nargs="*")
     a = ap.parse_args(argv)
     if not a.check and not a.files:
@@ -103,7 +105,7 @@ def main(argv=None) -> int:
             p = Path(f)
             with p.open("rb") as fh:
                 _call(token, "sendDocument", data={"chat_id": chat},
-                      files={"document": (f"Премии_{day}{p.suffix}", fh)})
+                      files={"document": (f"{a.name}_{day}{p.suffix}", fh)})
         print(f"отправлено в Telegram: файлов {len(a.files)}")
         return 0
     except Exception as e:                     # в журнал — только класс ошибки
