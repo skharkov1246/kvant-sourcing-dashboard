@@ -7184,7 +7184,8 @@ function _orkWeekHead(C){
       return v?`<button type="button" class="odn rzn wkmb" data-od="w:step/${k}/over" data-of="w:step/${k}/over" data-odt="${_esc(`Шаг ${k} · ${SNm[k]}: дольше нормы`)}" aria-label="${_esc(`${SNm[k]}: ${v} ${uo(v)} — открыть заказы`)}" title="${_esc(SNm[k])}">${in_}</button>`:`<span class="wkmb rzfinal" title="${_esc(SNm[k])}">${in_}</span>`;}).join('')}</span>`:'';
   const w2l=ok(T2)?`<p class="wkw2l">${w2s.map(k=>`<span>${SNm[k]} ${_wkN(bs[k]||0,`w:step/${k}/over`,`Шаг ${k} · ${SNm[k]}: дольше нормы`)}</span>`).join('<span aria-hidden="true"> · </span>')}</p>`:'';
   const t2=`<div class="wkt${w2?' wkbad':''}" id="wkTW2"><div class="wkth">Шаги ${_wkAbbr('ОРК')} дольше нормы <span class="rzcode">W2</span></div>`
-    +`<div class="wktm">${w2==null?`<div class="wktv wkdim">—</div>`:_wkN(w2,'w:W2','Шаги ОРК дольше нормы',{rank:2,cls:'wktn',html:`<span class="wktv">${w2}</span><span class="wktu">${uo(w2)}</span>`})}${bars}</div>${w2l}`
+    +`<div class="wktm">${w2==null?`<div class="wktv wkdim">—</div>`:w2?_wkN(w2,'w:W2','Шаги ОРК дольше нормы',{rank:2,cls:'wktn',html:`<span class="wktv">${w2}</span><span class="wktu">${uo(w2)}</span>`})
+      :`<span class="wktn rzfinal" data-kpi-rank="2"><span class="wktv">0</span><span class="wktu">заказов</span></span>`}${bars}</div>${w2l}`
     +(w2!=null?wkl('overOrders','order'):'')
     +`<p class="wkta">${w2==null?_esc(_orkSt(T2).note):w2?`<b>Менеджеры ${_wkAbbr('ОРК')}</b> → довести шаг`:'Все шаги отдела в норме.'}${T2.state==='prelim'?' · <span class="wkmut">мало данных: '+_esc(String(T2.n))+' '+uo(+T2.n||0)+' в расчёте</span>':''}</p></div>`;
   // 4. плитка «Срок под угрозой» (KPI 3): две части — до срока ≤ 14 дн. без отгрузки и прогноз позже срока
@@ -8710,7 +8711,7 @@ function _odN(n,id,title,o){
 function _odWhoName(x){
   x=String(x==null?'':x);
   if(x==='none') return 'не назначен'; if(x==='out') return 'ответственный вне ОРК';
-  if(/^\d{1,12}$/.test(x)&&typeof _rzPeople==='function'){try{const p=_rzPeople().find(z=>z.id===x); if(p) return p.name;}catch(e){}}
+  if(/^\d{1,12}$/.test(x)&&typeof _rzPeople==='function'){try{const p=_rzPeople().find(z=>z.id===x); if(p) return p.name+(p.gone?' (уволен)':'');}catch(e){}}
   return x;
 }
 // человек ключа списка — так, как он записан в данных: ушедший там с подписью «(уволен)» (contracts.who),
@@ -8719,7 +8720,10 @@ function _odWhoIn(o,x){const n=_odWhoName(x), g=n+' (уволен)'; o=o||{}; re
 function _odWhoKey(w){
   w=String(w==null?'':w);
   if(w==='не назначен') return 'none'; if(w==='ответственный вне ОРК') return 'out';
-  if(typeof _rzPeople==='function'){try{const n=w.replace(/ \(уволен\)$/,''), p=_rzPeople().find(z=>z.name===n); if(p) return p.id;}catch(e){}}
+  // уволенный и действующий с одной подписью в Битриксе — разные люди: сначала полное совпадение с пометкой
+  // «(уволен)», потом — по имени без неё (стресс-проверка 30.10.2026: иначе список открывал тёзку)
+  if(typeof _rzPeople==='function'){try{const P=_rzPeople(), n=w.replace(/ \(уволен\)$/,''),
+    p=P.find(z=>z.name+(z.gone?' (уволен)':'')===w)||P.find(z=>z.name===n); if(p) return p.id;}catch(e){}}
   return w;
 }
 // группа «Что сделать сегодня» как список адреса (2.6: n=queue&f=code.<код> или cust.d<id сделки>):
