@@ -12,6 +12,7 @@ import html
 import json
 import re
 import sys
+from urllib.parse import quote
 import types
 from pathlib import Path
 
@@ -37,7 +38,7 @@ try{
   out.tiles=[].slice.call(document.querySelectorAll('#kpis .sotile')).map(function(t){return txt(t.querySelector('.t'));});
   out.more=[].slice.call(document.querySelectorAll('#kpisMore .sotile')).map(function(t){return txt(t.querySelector('.t'));});
   out.today=[].slice.call(document.querySelectorAll('#soToday tr[data-sq]')).map(function(tr){
-    return {key:tr.dataset.sq, act:txt(tr.querySelector('.soact')), n:parseInt(txt(tr.querySelector('[data-so]')),10), unit:txt(tr.querySelector('.sounit'))};});
+    return {key:tr.dataset.sq, act:txt(tr.querySelector('.soact')), n:parseInt(txt(tr.querySelector('[data-so]')),10), unit:txt(tr.querySelector('.sounit')), more:tr.hidden};});
   out.order=[].slice.call(document.querySelectorAll('#soOrder tr[data-sq]')).map(function(tr){return {key:tr.dataset.sq, n:parseInt(txt(tr.querySelector('[data-so]')),10), unit:txt(tr.querySelector('.sounit'))};});
   out.orderOpen=document.getElementById('soOrderS').open;
   out.blockTag=/БЛОК\s*A|БЛОК\s*B/.test(txt(T));
@@ -119,8 +120,9 @@ def page(tmp_path_factory):
 
 def test_первый_экран_вывод_три_плитки_сегодня(page):
     assert page["verdict"].startswith("Главное сегодня"), page["verdict"]
-    assert page["tiles"] == ["Запросов за период", "КП засчитано", "Ждут итога КП"]
-    assert page["more"] == ["Нарушения правил КП", "Сделки без запроса"]
+    # управление по регламенту первым: сделки дольше нормы стадии; КП без итога — всегда на первом экране
+    assert len(page["tiles"]) == 3 and page["tiles"][0] == "Сделки дольше нормы" and "Ждут итога КП" in page["tiles"], page["tiles"]
+    assert set(page["tiles"] + page["more"]) >= {"Запросов за период", "Нарушения правил КП", "Сделки без запроса"}
     # подвкладки: управление первым, пульс вторым; «Сделки пресейла» — только при воронке в сборке
     assert [x.split(":")[0] for x in page["subs"]] == ["today", "pulse", "people", "rfq", "presale", "how"], page["subs"]
     assert page["firstPanel"] == ["today"] and page["todayFirst"] == "Сегодня"
@@ -130,10 +132,10 @@ def test_первый_экран_вывод_три_плитки_сегодня(p
 
 
 def test_сегодня_не_больше_шести_дел_одна_единица(page):
-    today = page["today"]
+    today = [r for r in page["today"] if not r.get("more")]
     assert 0 < len(today) <= 6, today
-    for r in today:
-        unit = "сдел" if r["key"] in ("ps-src", "ps-rfq", "ps-stale", "unc") else "запрос"
+    for r in page["today"]:
+        unit = "сдел" if r["key"] in ("ps-src", "ps-rfq", "ps-stale", "unc", "over") else "запрос"
         assert r["unit"].startswith(unit), r
     assert [r["key"] for r in today][:2] == ["ps-src", "gone"], "сначала то, что держит всё остальное"
     # отметка в карточках — вне «Сегодня», свёрнутым блоком
@@ -147,7 +149,7 @@ def test_число_открывает_ровно_свои_записи(page):
     assert len(cl) >= 15, len(cl)
     for c in cl:
         assert c["open"] and c["rows"] == c["n"] > 0, c
-        want = "?n=" + c["key"] + ("&u=" + c["uid"] if c["uid"] else "")
+        want = "?n=" + quote(c["key"], safe="") + ("&u=" + quote(c["uid"], safe="") if c["uid"] else "")
         assert re.fullmatch(r"#sourcing/[a-z]+\?.*", c["hash"]) and c["hash"].endswith(want), c
         assert c["why"].startswith("Почему в списке.") and "Что сделать." in c["why"], c["why"]
         for ln in c["links"]:

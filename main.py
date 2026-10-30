@@ -617,6 +617,14 @@ def run(args) -> int:
         for d in s.get("details", []):
             mails = _by_card.get(str(d.get("id"))) or []
             d["mailN"] = len(mails)
+            # регламент сорсера (v1.4): ответа нет — повторное письмо на 2-й раб. день, звонок на 3-й,
+            # на 10-й — «Ответ не получен (в срок)». Рабочих дней от ПЕРВОГО письма (письма — новые
+            # сверху) по день сборки; писем нет — от создания карточки (письмо ушло не из Битрикса)
+            _first = (mails[-1].get("dt") if mails else None) or d.get("dt")
+            try:
+                d["wdf"] = period_mod.workdays_ru(dt.date.fromisoformat(str(_first)[:10]), p.end) if _first else None
+            except ValueError:
+                d["wdf"] = None
             if mails:
                 top = mails[0]                       # последнее письмо карточки
                 d["mailSubj"] = top["subj"]
