@@ -406,6 +406,14 @@ def _with_tabs_opened(path: Path) -> Path:
               "EA('.wk button.odn[data-od]',function(b){var n=parseInt(b.textContent,10);if(isNaN(n))return;b.click();"
               "if(!SH())kvFail('Реализация: число '+b.dataset.od+' не открыло список заказов');"
               "else if(RW()!==n)kvFail('Реализация: число '+b.dataset.od+' = '+n+', а в списке строк '+RW());XX()});"
+              # «Сделки без хозяина» (решение владельца 30.10.2026, п. 3): счётчик «Недели» = week.noOwner.n =
+              # строки своего списка (Сделка · Чего нет · Кто назначает · Сколько дней без · Заказов)
+              "var NOW=(CX3.ork.week||{}).noOwner;if(NOW&&NOW.n){var NB2=document.querySelector('#ctPanel-main button.odn[data-od=\"w:noOwner\"]');"
+              "if(!NB2)kvFail('Реализация: нет счётчика «Сделок без хозяина» при '+NOW.n+' сделках');"
+              "else{if(parseInt(NB2.textContent,10)!==NOW.n)kvFail('Реализация: счётчик «Сделок без хозяина» = '+NB2.textContent+', а в данных '+NOW.n);"
+              "NB2.click();var TH=[].slice.call(document.querySelectorAll('#drwBody table.odown thead th:not([hidden])')).map(function(t){return t.textContent.trim()}).join(' · ');"
+              "if(TH!=='Сделка · Чего нет · Кто назначает · Сколько дней без · Заказов')kvFail('Реализация: столбцы списка «Сделки без хозяина»: '+TH);"
+              "if(RW()!==NOW.n)kvFail('Реализация: «Сделок без хозяина» '+NOW.n+', а в списке строк '+RW());XX()}}"
               # плитки: KPI 1–3 есть; части складываются в число плитки (каждый заказ — один раз, Д-1)
               "var KN=function(r){var e=document.querySelector('#ctPanel-main [data-kpi-rank=\"'+r+'\"]');return e?parseInt(e.textContent,10):NaN},"
               "PS=function(sel){return [].slice.call(document.querySelectorAll('#ctPanel-main '+sel)).reduce(function(a,b){return a+(parseInt(b.textContent,10)||0)},0)};"
@@ -439,6 +447,18 @@ def _with_tabs_opened(path: Path) -> Path:
               "if(!SH()||RW()!==n)kvFail('Реализация: «'+z[0]+'» '+id+' = '+n+', а в списке строк '+RW());XX()})});"
               "var MS3=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"main\"]');if(MS3)MS3.click()}}"
               "catch(e){kvFail('Реализация, плитки, «Пульс», смежники, гигиена, «Месяц» и «Квартал»: '+e)}"
+              # фишка «Без хозяина» «Сделок и денег» — то же число сделок, что счётчик «Недели»; отбор даёт
+              # столько же строк таблицы сделок
+              "try{var CX4=window.__CONTRACTS__,NO4=CX4&&CX4.ork&&CX4.ork.week&&CX4.ork.week.noOwner,"
+              "MB4=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"main\"]');"
+              "if(NO4&&NO4.n&&MB4){MB4.click();var CH4=document.querySelector('#ctPanel-main #ctChips .stchip[data-m=\"noOwner\"]');"
+              "if(!CH4)kvFail('Реализация: в «Сделках и деньгах» нет фишки «Без хозяина»');"
+              "else{var c4=parseInt((CH4.querySelector('b')||{}).textContent,10);"
+              "if(c4!==NO4.n)kvFail('Реализация: фишка «Без хозяина» = '+c4+', а сделок без хозяина '+NO4.n);"
+              "CH4.click();var tr4=document.querySelectorAll('#ctPanel-main #ctBody tr[data-deal],#ctPanel-main #ctBody tr[data-ct]').length;"
+              "if(tr4&&tr4!==NO4.n)kvFail('Реализация: отбор «Без хозяина» — строк '+tr4+' вместо '+NO4.n);"
+              "var LV4=document.querySelector('#ctPanel-main #ctChips .stchip[data-m=\"live\"]');if(LV4)LV4.click()}}}"
+              "catch(e){kvFail('Реализация, «Без хозяина»: '+e)}"
               "try{var TB=function(n){return [].slice.call(document.querySelectorAll('.tab'))"
               ".filter(function(x){return x.dataset.tab===n})[0]},CT=TB('contracts'),SO=TB('sourcing'),"
               "SEL=function(a){var x=document.querySelector('#tab-contracts [role=\"tab\"][data-'+a+'][aria-selected=\"true\"]');"
