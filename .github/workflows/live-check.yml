@@ -202,6 +202,17 @@ jobs:
           SERVICE_BASE="$(cat /tmp/service-base.txt)" SERVICE_HEAD="$(cat /tmp/service-head.txt)" \
             python scripts/live_check.py /tmp/out-base /tmp/out-head
 
+      # Та же проверка страницы, что у деплоя, — на странице правки из живых данных. 30.10.2026 сверка
+      # прошла, а деплой остановился на «число w:who/204/wait не открыло список»: у уволенного на живых
+      # данных был список, которого нет в тестовом корпусе. В журнал — то же, что пишет деплой.
+      - name: Проверка страницы правки (как у деплоя)
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+          page="$(ls /tmp/out-head/dashboard_*.html 2>/dev/null | head -1 || true)"
+          if [ -z "$page" ]; then echo "::error::страница правки не собрана"; exit 1; fi
+          python scripts/validate_dashboard.py "$page"
+
       - name: Уборка
         if: always()
         run: rm -rf /tmp/portal-snapshot /tmp/out-base /tmp/out-head /tmp/base /tmp/base.log /tmp/head.log

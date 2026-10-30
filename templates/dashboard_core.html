@@ -7776,7 +7776,7 @@ function _wkWire(C,el,F){
     else if(id==='w:W2') key=W2C.map(gc).find(Boolean)||''; else if(id==='w:unpaid'||id==='w:unpaidDeals') key=gc('unpaid'); else if(id==='w:waitUtd') key=gc('noUtd');
     else if(id==='w:W1') key=gc('s1Over')||gc('noOrder'); else if(id==='w:W1o') key=gc('ordAssign');
     else if((m=/^w:step\/(\d+)\/over$/.exec(id))) key=gc(({1:'s1Over',4:'s2Over',5:'s3Over',8:'s6Over'})[m[1]]||'');
-    else if((m=/^w:who\/(.+)\/(over|wait|late|all)$/.exec(id))){const w=_odWhoName(m[1]); return {queue:()=>{F.who=w==='не назначен'?'':w; F.role=''; return openGroup(st.g);},queueLbl:'Показать в «Что сделать сегодня»'};}
+    else if((m=/^w:who\/(.+)\/(over|wait|late|all)$/.exec(id))){const w=_odWhoIn(((C.W||{}).drill||{}).who,m[1]); return {queue:()=>{F.who=w==='не назначен'?'':w; F.role=''; return openGroup(st.g);},queueLbl:'Показать в «Что сделать сегодня»'};}
     if(!key||!grp(key)) return null;
     // группа «Порядка в карточках» (hyg) — вне «Что сделать сегодня» (решение 30.10.2026): кнопка говорит, куда ведёт
     return {queue:()=>openGroup(key),queueLbl:_wkQLbl(key)};};
@@ -8701,6 +8701,9 @@ function _odWhoName(x){
   if(/^\d{1,12}$/.test(x)&&typeof _rzPeople==='function'){try{const p=_rzPeople().find(z=>z.id===x); if(p) return p.name;}catch(e){}}
   return x;
 }
+// человек ключа списка — так, как он записан в данных: ушедший там с подписью «(уволен)» (contracts.who),
+// а ключ — id без неё (_odWhoKey подпись снимает); нет такой записи — имя как есть
+function _odWhoIn(o,x){const n=_odWhoName(x), g=n+' (уволен)'; o=o||{}; return !(n in o)&&(g in o)?g:n;}
 function _odWhoKey(w){
   w=String(w==null?'':w);
   if(w==='не назначен') return 'none'; if(w==='ответственный вне ОРК') return 'out';
@@ -8771,7 +8774,7 @@ function _odResolve(X,O,id){
     if(p[0]==='pulse'){const r=((S.W.pulse||{}).rows||[])[+p[1]], f=p[2]||'keys';
       v=r&&['keys','overKeys','waitKeys'].includes(f)?S.orders.filter(x=>x.mgr===r.who&&(f==='keys'||(f==='overKeys'?x.over:x.wu))).map(x=>x.k):null;}
     else if(p[0]==='who'){
-      const w=(S.D.who||{})[_odWhoName(p.slice(1,-1).join('/'))], f=p[p.length-1];
+      const w=(S.D.who||{})[_odWhoIn(S.D.who,p.slice(1,-1).join('/'))], f=p[p.length-1];
       v=!w?null:f==='all'?{k:(w.over||[]).concat(w.wait||[]),t:(w.over||[]).map(()=>'сверх нормы').concat((w.wait||[]).map(()=>'ждём УПД от клиента'))}:w[f];
     } else {
       // «…/~ord» и «…/~deal» — только заказы или только сделки того же списка (части плитки W1:
