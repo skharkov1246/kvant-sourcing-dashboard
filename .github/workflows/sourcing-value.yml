@@ -1,0 +1,113 @@
+name: Деньги сорсинга — PDF владельцу в Telegram
+
+# Вопрос владельца 30.10.2026: сколько денег принёс сорсинг на последних 50 сделках,
+# перешедших в реализацию, и на сколько отторговано с помощью новых поставщиков.
+# Прогон собирает данные так же, как деплой дашборда (main.py со сводом realctx:v1 —
+# продажа и закупка из сверенных файлов экономики первыми), дочитывает запросы СП-166,
+# заказы СП-172 и историю поставщиков этих сделок, цены разобранных КП из закрытой базы,
+# делает PDF-ведомость (scripts/sourcing_value.py) и отправляет её ботом оповещений в
+# личную переписку владельца (scripts/premia_telegram.py).
+#
+# Публичность. Репозиторий открыт, журнал Actions тоже. На сайт ничего не выкладывается,
+# артефактов нет: файлы живут на раннере до конца прогона. Вывод main.py пишется в файл,
+# в журнал — только счётчики и доли: ни сумм, ни названий. Имя получателя — хешем.
+on:
+  workflow_dispatch:
+    inputs:
+      to_sha256:
+        description: "SHA-256 имени получателя в Telegram (строчными, без @)"
+        required: true
+      n:
+        description: "Сколько последних сделок, перешедших в реализацию"
+        default: "50"
+      parts:
+        # распоряжение 22.09.2026 о дроблении: чтение по сделкам — столькими частями
+        description: "Число частей чтения по сделкам"
+        type: choice
+        default: "10"
+        options: ["10", "25", "50"]
+
+permissions:
+  contents: read
+
+concurrency:
+  # общая очередь чтения портала (CLAUDE.md, «Битрикс не перегружать»), как у зондов
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        # psycopg2 — цены КП из закрытой базы и клиент KV бота (publish_suppliers)
+        run: pip install -r requirements.txt pdfminer.six psycopg2-binary==2.9.10
+
+      # бот и получатель — до часовой сборки данных: не настроено — стоп за секунды
+      - name: Получатель в Telegram
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TO_SHA256: ${{ inputs.to_sha256 }}
+        run: python scripts/premia_telegram.py --check --to-sha256 "$TO_SHA256"
+
+      # свод чатов, договоров и сверенной экономики — как у деплоя: без него продажа
+      # «Реализации» шла бы из «Суммы» Битрикса, а не из файла экономики
+      - name: Свод сделок (KV realctx:v1)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          mkdir -p /tmp/sv
+          python scripts/realization_ctx_kv.py /tmp/sv/realctx.json \
+            || echo "::warning::свод не прочитан — продажа из «Суммы» Битрикса по правилу НДС"
+
+      - name: Данные — как пересборка дашборда
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SERVICE_ACCOUNT_IDS: ${{ vars.SERVICE_ACCOUNT_IDS }}
+          REALCTX_PATH: /tmp/sv/realctx.json
+          # рядом может идти пересборка дашборда (её очередь своя) — с запасом, как зонды
+          BITRIX_RPS: "1.0"
+          BITRIX_PARALLEL: "1"
+        run: |
+          set -uo pipefail
+          python main.py --no-llm --out /tmp/sv/reports --data-json /tmp/sv/modules.json \
+            > /tmp/sv/build.log 2>&1
+          code=$?
+          grep -E '^  ✓ контрактов:' /tmp/sv/build.log || true
+          [ "$code" -eq 0 ] || { echo "сборка данных упала: код $code"; exit 1; }
+
+      - name: Расчёт — запросы, заказы, новые поставщики, цены КП
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BITRIX_RPS: "1.0"
+          BITRIX_PARALLEL: "1"
+          N: ${{ inputs.n }}
+          PARTS: ${{ inputs.parts }}
+        run: python scripts/sourcing_value.py --data /tmp/sv/modules.json --out /tmp/sv/out --n "$N" --parts "$PARTS"
+
+      - name: PDF и проверка
+        run: |
+          set -euo pipefail
+          google-chrome --headless --disable-gpu --no-sandbox --no-pdf-header-footer \
+            --run-all-compositor-stages-before-draw --virtual-time-budget=60000 \
+            --print-to-pdf=/tmp/sv/out/sourcing.pdf file:///tmp/sv/out/doc.html > /dev/null 2>&1
+          # ни одна сделка не потеряна при печати (docs/ПРАВИЛА-PDF.md); вывод — номера реализаций
+          python scripts/pdf_check.py /tmp/sv/out/sourcing.pdf --expect-file /tmp/sv/out/ids.txt
+
+      - name: Отправка в Telegram
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TO_SHA256: ${{ inputs.to_sha256 }}
+        run: python scripts/premia_telegram.py --to-sha256 "$TO_SHA256" --name "Деньги_сорсинга" /tmp/sv/out/sourcing.pdf
