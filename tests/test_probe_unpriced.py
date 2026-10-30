@@ -52,3 +52,33 @@ def test_deal_priced_if_any_card_within_month_of_first():
           "3": pu.ts("2026-09-20T10:00:00+03:00")}          # 46 дней — позже месяца
     d = pu.deal_stats(cards, kp, NOW)
     assert d == {"7": ("2026-08", True), "8": ("2026-08", False)}   # сделка 9 — незрелая
+
+
+def test_tkp_date_prefers_offer_then_beyond():
+    kinds = {"C2:OFFER": "offer", "C2:TORG": "beyond", "C2:NEW": "none"}
+    k = lambda sid: kinds.get(sid, "none")                               # noqa: E731
+    h = [("C2:NEW", "2026-08-01T10:00:00+03:00"), ("C2:TORG", "2026-08-05T10:00:00+03:00"),
+         ("C2:OFFER", "2026-08-10T10:00:00+03:00")]
+    assert pu.tkp_date(h, k) == (pu.ts("2026-08-10T10:00:00+03:00"), "offer")
+    assert pu.tkp_date(h[:2], k) == (pu.ts("2026-08-05T10:00:00+03:00"), "beyond")
+    assert pu.tkp_date(h[:1], k) == (None, "")
+
+
+def test_tkp_split_price_ask_after():
+    tkp = pu.ts("2026-08-10T10:00:00+03:00")
+    cards = [card(1, "2026-08-01T10:00:00+03:00"), card(2, "2026-08-02T10:00:00+03:00")]
+    assert pu.tkp_split(cards, {"2": pu.ts("2026-08-08T10:00:00+03:00")}, tkp) == "price"
+    assert pu.tkp_split(cards, {"2": pu.ts("2026-08-12T10:00:00+03:00")}, tkp) == "ask"     # цена после ТКП
+    assert pu.tkp_split([card(3, "2026-08-15T10:00:00+03:00")], {}, tkp) == "after"
+
+
+def test_tkp_date_cat0_only_after_presale():
+    kinds = {"NEW": "beyond", "C2:NEW": "none", "PREPARATION": "beyond"}
+    k = lambda sid: kinds.get(sid, "none")                               # noqa: E731
+    f = lambda sid: "2" if str(sid).startswith("C2:") else "0"          # noqa: E731
+    # заведена в кат. 0, перенесена в предпродажу, выиграна: ТКП — по второму входу в кат. 0
+    h = [("NEW", "2026-08-01T10:00:00+03:00"), ("C2:NEW", "2026-08-02T10:00:00+03:00"),
+         ("PREPARATION", "2026-09-01T10:00:00+03:00")]
+    assert pu.tkp_date(h, k, f) == (pu.ts("2026-09-01T10:00:00+03:00"), "beyond")
+    # только кат. 0 без предпродажи — ТКП не выдавалось
+    assert pu.tkp_date(h[:1], k, f) == (None, "")

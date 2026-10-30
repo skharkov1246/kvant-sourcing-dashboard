@@ -15,6 +15,15 @@
   • ЗАЯВКА — сделка карточек; её начало — первая карточка сделки в окне зонда; расценена через
     месяц, если хотя бы одна её карточка вошла в стадию КП за ОКНО_ДНЕЙ дней от этого начала.
 
+СДЕЛКИ С ВЫДАННЫМ ТКП (уточнение владельца того же дня: «а строк с выданными ТКП?»). ТКП
+выдано — по истории стадий сделки, правилами зонда конверсии (probe_conversion.вид_стадии): дата —
+первый вход в стадию «предложение выдано»; нет такой — первый вход в стадию дальше предложения
+(торги, ожидание решения, реализация, проигрыш после предложения) — «без даты», его вход и есть
+дата-заменитель. Печатается: (1) те же когорты строк, только у сделок с выданным ТКП; (2) заявки с
+выданным ТКП — была ли к дате ТКП хотя бы одна цена сорсинга: «цена до ТКП», «запрос до ТКП, цены
+нет», «запросы только после ТКП». Чтение — только входы в стадии предложения и дальше (фильтр
+полная история стадий сделок, частями по сделкам (≈ 50 сделок на запрос и листание).
+
 ВТОРАЯ СВЕРКА ДРУГИМ ПУТЁМ (правило 26.09.2026). Стадия сейчас против истории: карточки, которые
 СЕЙЧАС в стадии КП, а входа в КП в истории нет, — печатаются; и файл «Offer from supplier»
 (правило 19.10.2026) — у скольких расценённых и нерасценённых он лежит.
@@ -26,7 +35,8 @@
 ЧТО В ЖУРНАЛ. Только счётчики и доли по когортам и корзинам стадий: ни названий, ни номеров.
 
 НАГРУЗКА: карточки по месяцам (≈ 1 запрос на 50) и входы в стадии КП (≈ 1 на 50) — порядка
-300–600 запросов при 1/с.
+300–600 запросов; история стадий сделок с запросами — ещё ≈ 500–900; всего до ≈ 1 500 при 1/с
+(≈ 25 мин): ставить вне 01:00–05:30 UTC, не на деплой в :07 и не на скан чатов в 21:00.
 """
 from __future__ import annotations
 
@@ -129,6 +139,46 @@ def deal_stats(cards: list[dict], kp_first: dict[str, dt.datetime], now: dt.date
         ok = any((k := kp_first.get(str(c.get("id")))) and k <= start + win for c in cs)
         out[d] = (start.astimezone(MSK).strftime("%Y-%m"), ok)
     return out
+
+
+def tkp_date(entries: list[tuple[str, str]], kind_of, funnel_of=lambda sid: "") -> tuple[dt.datetime | None, str]:
+    """(дата выдачи ТКП, вид): первый вход в «предложение выдано» — «offer»; нет — первый вход в
+    стадию дальше предложения — «beyond» (дата-заменитель); нет и его — (None, "").
+    Вход в кат. 0 засчитывается, только если раньше сделка была в другой воронке: кат. 0 — и воронка
+    по умолчанию, заведение сделки в ней ТКП не означает (probe_conversion)."""
+    ev = sorted((t, sid) for sid, raw in entries if (t := ts(raw)))
+    first_pre = next((t for t, sid in ev if funnel_of(sid) not in ("", "0")), None)
+
+    def ok(t, sid) -> bool:
+        return funnel_of(sid) != "0" or (first_pre is not None and t > first_pre)
+    for want in ("offer", "beyond"):
+        t = next((t for t, sid in ev if kind_of(sid) == want and ok(t, sid)), None)
+        if t:
+            return t, want
+    return None, ""
+
+
+def tkp_split(cards: list[dict], kp_first: dict[str, dt.datetime], tkp_at: dt.datetime) -> str:
+    """Заявка с выданным ТКП: «price» — цена сорсинга была к дате ТКП; «ask» — запрос до ТКП был,
+    цены к ТКП нет; «after» — все запросы заведены после ТКП."""
+    pre = [c for c in cards if (t := ts(c.get("createdTime"))) and t <= tkp_at]
+    if not pre:
+        return "after"
+    if any((k := kp_first.get(str(c.get("id")))) and k <= tkp_at for c in cards):
+        return "price"
+    return "ask"
+
+
+def _parts(seq: list, parts: int) -> list[list]:
+    """Ровно одно разбиение на parts почти равных смежных частей (распоряжение 22.09.2026)."""
+    parts = max(1, min(parts, len(seq))) if seq else 1
+    k, m = divmod(len(seq), parts)
+    out, i = [], 0
+    for j in range(parts):
+        n = k + (1 if j < m else 0)
+        out.append(seq[i:i + n])
+        i += n
+    return [x for x in out if x]
 
 
 def _pct(a: int, b: int) -> str:
@@ -243,6 +293,68 @@ def main() -> int:
         print(f"{m} | {c['n']} | {c['bad']} | {_pct(c['bad'], c['n'])}")
     print(f"ИТОГО заявок {tn}: не расценено через {ОКНО_ДНЕЙ} дн. {tb} ({_pct(tb, tn)}); первая когорта неполная: "
           f"карточки её сделок до окна зонда не читались")
+
+    # ── сделки с выданным ТКП
+    from probe_conversion import вид_стадии, воронка_стадии, читать_историю
+    мета = client.deal_stage_meta()
+    kind_of = lambda sid: вид_стадии(sid, мета)[0]                         # noqa: E731
+    tkp_stages = sorted(sid for sid in мета if kind_of(sid) in ("offer", "beyond"))
+    # история целиком, без фильтра стадий: правилу кат. 0 нужен вход в предпродажную воронку
+    deal_ids = sorted({str(c.get("parentId2")) for c in all_cards if str(c.get("parentId2") or "0") not in ("", "0")},
+                      key=int)
+    hist: dict[str, list] = {}
+    bad = 0
+    for part in _parts(deal_ids, max(10, int(os.environ.get("PROBE_PARTS") or 10))):
+        h, err = читать_историю(client, part)
+        if err:
+            bad += 1
+            print(f"  часть истории сделок не прочитана: {err}")
+            continue
+        hist.update(h)
+    tkp_at = {}
+    kinds = Counter()
+    for d in deal_ids:
+        t, k = tkp_date(hist.get(d, []), kind_of, воронка_стадии)
+        if t:
+            tkp_at[d] = t
+            kinds[k] += 1
+    print(f"\nСДЕЛКИ С ВЫДАННЫМ ТКП: сделок с запросами {len(deal_ids)}, ТКП выдано {len(tkp_at)} (с датой "
+          f"{kinds['offer']}, по стадии дальше предложения {kinds['beyond']}); стадий предложения и дальше "
+          f"{len(tkp_stages)}; частей истории не прочитано {bad}")
+    print(f"КОГОРТЫ СТРОК СДЕЛОК С ВЫДАННЫМ ТКП (не расценено = нет входа в КП за {ОКНО_ДНЕЙ} дн. от запроса)")
+    print("месяц   | зрелых | не расценено | доля")
+    zt = zb = 0
+    for start, _ in cohorts:
+        key = start.strftime("%Y-%m")
+        cs = [c for c in cards_by_m.get(key) or [] if str(c.get("parentId2") or "") in tkp_at]
+        st = cohort_stats(cs, kp_first, now, stages.classify_stage, kp_buckets, config.RFQ_OFFER_FIELD)
+        if not st["зрелых"]:
+            continue
+        zt, zb = zt + st["зрелых"], zb + st["не_расценено"]
+        print(f"{key} | {st['зрелых']} | {st['не_расценено']} | {_pct(st['не_расценено'], st['зрелых'])}")
+    print(f"ИТОГО строк сделок с ТКП {zt}: не расценено через {ОКНО_ДНЕЙ} дн. {zb} ({_pct(zb, zt)})")
+    by_deal: dict[str, list[dict]] = defaultdict(list)
+    for c in all_cards:
+        by_deal[str(c.get("parentId2") or "")].append(c)
+    print("ЗАЯВКИ С ВЫДАННЫМ ТКП ПО МЕСЯЦУ ТКП: была ли к дате ТКП цена сорсинга")
+    print("месяц ТКП | заявок | цена до ТКП | запрос до ТКП, цены нет | запросы только после ТКП")
+    agg: dict[str, Counter] = defaultdict(Counter)
+    first_m = cohorts[0][0]
+    for d, t in tkp_at.items():
+        if t.astimezone(MSK).date() < first_m:
+            continue                           # ТКП раньше окна: запросы до ТКП зонд не читал
+        m = t.astimezone(MSK).strftime("%Y-%m")
+        agg[m]["n"] += 1
+        agg[m][tkp_split(by_deal.get(d, []), kp_first, t)] += 1
+    tot2 = Counter()
+    for m in sorted(agg):
+        a = agg[m]
+        tot2.update(a)
+        print(f"{m} | {a['n']} | {a['price']} ({_pct(a['price'], a['n'])}) | {a['ask']} ({_pct(a['ask'], a['n'])}) | "
+              f"{a['after']} ({_pct(a['after'], a['n'])})")
+    print(f"ИТОГО заявок с ТКП в окне {tot2['n']}: цена сорсинга до ТКП {tot2['price']} ({_pct(tot2['price'], tot2['n'])}); "
+          f"запрос до ТКП без цены {tot2['ask']} ({_pct(tot2['ask'], tot2['n'])}); запросы только после ТКП "
+          f"{tot2['after']} ({_pct(tot2['after'], tot2['n'])}); первый месяц неполный — запросы до окна не читались")
     return 0
 
 
