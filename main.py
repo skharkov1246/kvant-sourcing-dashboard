@@ -904,6 +904,13 @@ def run(args) -> int:
               f"{_lcc.get('s1Over', 0)}, из них назначить на новый заказ {_ocn.get('ordAssign', 0)}); "
               f"не оплатил: сделок {_dcn.get('unpaid', 0)} (заказов {_lcc.get('unpaid', 0)}); нет срока "
               f"оплаты: сделок {_dcn.get('noPayPlan', 0)} (заказов {_lcc.get('noPayPlan', 0)})")
+        # «Сделки без хозяина» (решение владельца 30.10.2026, п. 3) — только счёт по ролям (правило 17)
+        _no = _wk.get("noOwner") or {}
+        _nr, _ns = _no.get("byRole") or {}, _no.get("byState") or {}
+        print(f"  сделки без хозяина: {_no.get('n', 0)} (нет КАМа или ушёл {_nr.get('kam', 0)}, ОСС сделки "
+              f"{_nr.get('ossDeal', 0)}, менеджера ОРК {_nr.get('orkMgr', 0)}, ушёл ответственный сделки "
+              f"{_nr.get('dealResp', 0)}; где чего-то нет {_ns.get('none', 0)}, где менеджера ОРК нет, а ответственный "
+              f"заказов вне ОРК {_ns.get('out', 0)}, где кто-то ушёл {_ns.get('gone', 0)})")
         # «Пульс ОРК» (решение владельца 29.10.2026) — только счёт по видам строк, без имён (правило 17)
         _pl = (_wk.get("pulse") or {}).get("rows") or []
         _pk = lambda k: sum(x["n"] for x in _pl if x.get("kind") == k)    # noqa: E731
@@ -955,6 +962,7 @@ def run(args) -> int:
     except Exception as e:
         # только класс ошибки: в тексте бывают номера сделок, а журнал публичный
         print(f"  ⚠ вкладка «Контракты» пропущена: {type(e).__name__}")
+    _rz_hist(contracts_data, dealctx_data)
 
     # пресейл — после реализации: чаты сделок читает тот же читатель, остатком бюджета
     _presale()
@@ -1156,6 +1164,31 @@ def _print_summary(m: dict) -> None:
         agg = s["kp"] + s["refusedCol"] + s["noAnswer"]
         ok = "✓" if chk == agg else f"⚠ closed={chk}≠{agg}"
         print(f"  {s['n']:28}{'' if s.get('act', True) else ' (ушёл)'} темп={s.get('perDay')}/раб.дн c={s['c']:4} closed={s['closed']:3} КП={s['kp']:3} отказ={s['refusedCol']:3} молч={s['noAnswer']:3} ТКП={s['tkpP']:3}% ср.срок={s['avgDays']} {ok}")
+
+
+def _rz_hist(contracts_data, dealctx_data) -> None:
+    """«±N за неделю» «Реализации» (решение владельца 30.10.2026, п. 1; rzhist.py): история
+    счётов из файла RZHIST_PATH (шаг deploy.yml читает закрытый ключ rzhist:v1) + сегодняшняя
+    точка → раздел contracts.rzHist страницы; точка — файлом RZHIST_OUT (шаг после деплоя
+    кладёт её в ключ). Нет переменных (живая сверка, локальный запуск) — история из одной
+    сегодняшней точки, файл не пишется. В журнал — только счёты (правило 17); сбой — классом
+    ошибки: вкладка соберётся без «за неделю»."""
+    if not isinstance(contracts_data, dict) or contracts_data.get("rows") is None:
+        return
+    try:
+        import rzhist
+        day = period_mod.now(dealctx_mod.MSK).date()
+        pt = rzhist.point(contracts_data, dealctx_data, day)
+        if pt is None:
+            return
+        hist = rzhist.merge(rzhist.load(os.environ.get("RZHIST_PATH")), pt)
+        contracts_data["rzHist"] = rzhist.page(hist, contracts_data, day)
+        out = os.environ.get("RZHIST_OUT")
+        if out:
+            rzhist.write(out, pt)
+        print(f"• История счётов «Реализации»: {rzhist.log_line(pt, hist)}")
+    except Exception as e:
+        print(f"  ⚠ история счётов «Реализации» не собрана: {type(e).__name__}")
 
 
 def _write_digest(contracts_data, dealctx_data, real_ctx, presale) -> None:

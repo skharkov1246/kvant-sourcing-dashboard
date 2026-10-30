@@ -47,6 +47,8 @@ on:
       - "dealctx.py"            # чаты и договоры во вкладке «Реализация» (23.10.2026)
       - "contract_b2b.py"       # тексты флагов сверки договоров — их читает dealctx.py
       - "dealdigest.py"         # сводка по сделке для модели → KV dealdigest:v1 (25.10.2026)
+      - "rzhist.py"             # история счётов «Реализации» → KV rzhist:v1 (30.10.2026)
+      - "scripts/realization_hist_kv.py"  # чтение и запись ключа rzhist:v1 — шаги до и после сборки
       - "kamqueue.py"
       - "kaminc.py"
       - "history.py"
@@ -166,6 +168,18 @@ jobs:
           python scripts/realization_ctx_kv.py "$RUNNER_TEMP/realctx.json" \
             || echo "::warning::свод чатов и договоров не прочитан — «Реализация» без чатов и договоров"
 
+      # История счётов «Реализации» — «±N за неделю» у чисел «Недели» (решение владельца 30.10.2026,
+      # п. 1): закрытый ключ rzhist:v1, по точке счётов на день (только числа заказов и сделок, не
+      # больше 400 дней). Читается в файл на раннере (RZHIST_PATH); в журнал — только счёт точек.
+      # Нет ключа или доступа — вкладка соберётся с одной сегодняшней точкой («история с …»).
+      - name: История счётов «Реализации» (KV rzhist:v1)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python scripts/realization_hist_kv.py --fetch "$RUNNER_TEMP/rzhist.json" \
+            || echo "::warning::история счётов «Реализации» не прочитана — «за неделю» без прошлых точек"
+
       - name: Генерация дашборда (окно 01.05.2026 → сегодня)
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
@@ -178,6 +192,10 @@ jobs:
           # сводка по сделке для ночной оценки чатов (dealdigest.py) — файл на раннере;
           # в ключ dealdigest:v1 её кладёт шаг после деплоя
           DEALDIGEST_OUT: ${{ runner.temp }}/dealdigest.json
+          # история счётов «Реализации»: прочитанная (rzhist.json) и сегодняшняя точка — её шаг
+          # после деплоя кладёт в ключ rzhist:v1
+          RZHIST_PATH: ${{ runner.temp }}/rzhist.json
+          RZHIST_OUT: ${{ runner.temp }}/rzhist_today.json
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           # Идентификаторы служебных учётных записей портала через запятую
           # (Settings → Secrets and variables → Actions → Variables). Их карточки
@@ -244,6 +262,18 @@ jobs:
         run: |
           python scripts/dealdigest_kv.py --publish "$RUNNER_TEMP/dealdigest.json" \
             || echo "::warning::сводка по сделкам не опубликована — ночная оценка чатов увидит только стадию"
+
+      # Точка счётов «Реализации» за сегодня — в закрытый ключ rzhist:v1 ПОСЛЕ деплоя (на сайте и в
+      # ключе — одна сборка). Ключ читается заново и сливается: одна точка на день по Москве, тот же
+      # день перезаписывается, не больше 400 дней. В журнал — только счёты. Не вышло — предупреждение:
+      # сайт уже выложен, точка дня допишется следующей сборкой.
+      - name: История счётов «Реализации» в закрытый ключ (KV rzhist:v1)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python scripts/realization_hist_kv.py --publish "$RUNNER_TEMP/rzhist_today.json" \
+            || echo "::warning::история счётов «Реализации» не записана — точка дня допишется следующей сборкой"
 
       - name: Причина падения (в сводку прогона)
         if: failure()
