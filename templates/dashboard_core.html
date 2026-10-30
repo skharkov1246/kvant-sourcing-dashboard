@@ -4058,12 +4058,14 @@ const KPV=M.kpRules||{}, KPL=KPV.labels||{};
 const _violTip=v=>Object.entries(v||{}).map(([k,n])=>`${KPL[k]||k}: ${n}`).join('\n');
 // число таблицы — заготовка кнопки: после сборки очереди _soLive делает его кнопкой «ровно эти запросы»,
 // если записей за ним столько же, сколько в числе (аудит 30.10.2026: «Молчание 5» открывало всю карточку)
+// дробь — по-русски, запятой («10,2», а не «10.2» рядом с «0,6»; аудит 30.10.2026)
+function _soF(v){return v==null||v===''?'—':Number(v).toLocaleString('ru-RU',{maximumFractionDigits:1});}
 function _sk(v,key,uid,label,cls){return `<span class="${cls||''}" data-sok="${key}" data-souid="${uid||''}" data-sol="${_esc(label)}">${v}</span>`;}
 document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=v=>((v||0)/r.c*100);
  const stack=`<div class="stack">${KPB.map(([k,cl])=>b[k]?`<i class="${cl}" style="width:${p(b[k])}%"></i>`:'').join('')}</div>`;
  // нет закрытых — срока нет: «—», а не зелёный 0 «самый быстрый»
  const sp=r.avgDays==null?'':(r.avgDays<2?'f':(r.avgDays<6?'m':'s'));
- const avgCell=r.avgDays==null?'<span class="dimv" title="закрытых запросов нет — срок не посчитать">—</span>':`<span class="spd ${sp}">${r.avgDays}</span>`;
+ const avgCell=r.avgDays==null?'<span class="dimv" title="закрытых запросов нет — срок не посчитать">—</span>':`<span class="spd ${sp}">${_soF(r.avgDays)}</span>`;
  const pc=v=>r.c?` <small class="dimv">${Math.round(v/r.c*100)}%</small>`:'';
  const n=(v,clz,key,l)=> v>0?(key?_sk(v,key,String(r.id),`${l} — ${r.n}`,clz):`<span class="${clz||''}">${v}</span>`):`<span class="dimv">0</span>`;
  const q=r.quotes||0, vn=r.violN||0;
@@ -4169,7 +4171,7 @@ if (M.send && M.send.rows){
   // здесь значит «не ведётся», а не «не выиграли» (как в линиях продукт-оунеров)
   const lmx=Math.max(1,...(P.lost||[]).map(x=>x.n));
   h+=`<div class="grid sopsg"><div><h3 class="soh3">Где стоят сделки</h3><p class="sonote">Рабочие стадии по порядку: сделок и дней в стадии (медиана · максимум).</p><div class="barlist">`
-   +proc.map(s=>`<div class="blrow"><div class="blt"><span>${_esc(s.name)} <span class="dimv">· мяч: ${BL[s.ball]||''}</span> <span class="dimv">${s.n?`${s.med??'—'} · ${s.max??'—'} дн`:''}</span>${s.stale?` <span class="psflag">${s.stale} стоят</span>`:''}</span><b>${s.n?_sk(s.n,'st:'+s.id,'',`Сделки на «${s.name}»`):0}</b></div><div class="bltrack"><i style="width:${(s.n/mx*100).toFixed(0)}%"></i></div></div>`).join('')
+   +proc.map(s=>`<div class="blrow"><div class="blt"><span>${_esc(s.name)} <span class="dimv">· мяч: ${BL[s.ball]||''}</span> <span class="dimv">${s.n?`${_soF(s.med)} · ${_soF(s.max)} дн`:''}</span>${s.stale?` <span class="psflag">${s.stale} стоят</span>`:''}</span><b>${s.n?_sk(s.n,'st:'+s.id,'',`Сделки на «${s.name}»`):0}</b></div><div class="bltrack"><i style="width:${(s.n/mx*100).toFixed(0)}%"></i></div></div>`).join('')
    +`</div><p class="sonote">Закрыто отказом: <b>${H.lost}</b>${H.otherStage?` · вне справочника стадий: ${H.otherStage}`:''}. Выигрыш здесь не виден: выигранная сделка уходит в сделку реализации.</p></div>`
    +`<div><h3 class="soh3">Почему отказ</h3><p class="sonote">Стадия отказа — единственная причина, которую портал хранит машинно.</p><div class="barlist">`
    +((P.lost||[]).map(x=>`<div class="blrow"><div class="blt"><span>${_esc(x.name)}</span><b class="nrc">${x.n}</b></div><div class="bltrack"><i style="width:${(x.n/lmx*100).toFixed(0)}%;background:var(--nr)"></i></div></div>`).join('')||'<div class="dimv">Отказов нет.</div>')
