@@ -55,7 +55,7 @@ try{
   var drw=document.getElementById('drw'), body=document.getElementById('drwBody');
   // R4 (спец. 2.8): фокус при открытии — на заголовке панели, не на «×» и не на ссылке
   out.open=drw.classList.contains('on'); out.focusX=document.activeElement===document.getElementById('drwName');
-  out.card={deal:tr0.dataset.ct, secs:[].slice.call(body.querySelectorAll('.ctd-h')).map(function(h){return txt(h).replace(/\s*(—\s*)?\d+$/,'').replace(/\s*\?$/,'');}),
+  out.card={deal:tr0.dataset.ct, secs:[].slice.call(body.querySelectorAll('.ctd-h')).map(function(h){return txt(h).replace(/\s*(—\s*)?\d+( [а-яё]+)?$/,'').replace(/\s*\?$/,'');}),
     dealLink:(document.querySelector('#drwSub a.ctd-bx')||{}).href||'', ords:body.querySelectorAll('.rzc-ord').length,
     ordLinks:[].slice.call(body.querySelectorAll('.rzc-ord a.rzc-lnk')).filter(function(a){return /type\/172/.test(a.getAttribute('href')||'');}).map(function(a){return a.getAttribute('href');}),
     paths:body.querySelectorAll('.rzc-ord [data-ctop]').length, strip:body.querySelectorAll('.ctd-ctodo [data-ctop]').length, todo:txt(body.querySelector('.ctd-ctodo')), text:txt(body)+' '+txt(document.getElementById('drwSub'))};
