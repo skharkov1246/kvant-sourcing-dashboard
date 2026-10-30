@@ -3606,7 +3606,9 @@
     <tr><td>Нет ответа после письма и звонка — «Ответ не получен (в срок)»</td><td class="r">10 раб. дней</td></tr>
     <tr><td>КП — файлом в «Offer from supplier», запрос — на Price at Work</td><td class="r">в день получения</td></tr>
     <tr><td>ЗИП: цены из КП построчно в экономику проекта</td><td class="r">в день получения</td></tr>
+    <tr><td>Срок заказчика («End date and time for receiving offer»): до него — экономика готова; за 3 раб. дня и после срока — дело «Успеть к сроку заказчика» в «Сегодня»</td><td class="r">срок сделки</td></tr>
   </tbody></table></div>
+  <p class="sonote">Норматив КП проверяется после сбора — на анализе КП, сравнении и доработке: КП файлом меньше норматива — дело «Добрать КП до норматива». ЗИП — по флажку «ЗИП» сделки, «Расценка» — по полю «Deal type».</p>
   <p class="sonote">Сделка «Расценка» пропускает проработку ТЗ, анализ КП и сравнение ЭП; норматив — одно КП. Не укладываетесь в срок — к руководителю сорсинга: продление даёт он.</p>
   </section>
 </section>
@@ -4418,12 +4420,12 @@ function openDrw(uid,startFilter,fromRoute){
   // дела «Сегодня» и «Порядка в карточках» этого человека — строкой «что — сколько — дольше всех»
   // как в таблице «Сорсеры»: у действующего — пункты без ждущих назначения (ключ «do:»), у ушедшего — переназначить
   const mine=(_gone(s)?['gone']:SO_TODAY.concat(['noans','ord'])).map(k=>SOQ.by['do:'+k]||SOQ.by[k]).filter(Boolean).map(it=>{const R=it.rows.filter(r=>r.uid===String(s.id));
-    return R.length?{it,n:R.length,max:R.reduce((m,r)=>r.days!=null&&r.days>m?r.days:m,-1)}:null;}).filter(Boolean);
+    return R.length?{it,n:R.length,max:R.reduce((m,r)=>r.days!=null&&r.days>m?r.days:m,-1),due:R[0].days}:null;}).filter(Boolean);
   function render(filter){
     const g=GR.find(x=>x[0]===(filter||''))||GR[0], det=allDet.filter(g[2]);
     let h='';
     h+=`<h4 class="soh4">Что сделать</h4>`+(mine.length?`<div class="twrap"><table class="solst sodo2" data-xl="off"><thead><tr><th scope="col">Что сделать</th><th scope="col" class="r">Сколько</th><th scope="col" class="r">Дольше всех</th></tr></thead><tbody>`
-      +mine.map(x=>`<tr><td data-l="Что сделать">${_esc(x.it.act)}</td><td class="num r" data-l="Сколько"><button type="button" class="solink" data-so2="${x.it.key}" aria-haspopup="dialog" aria-label="${_esc(x.it.act)}: ${x.n} — открыть список">${x.n}</button> <span class="sounit">${_soUnitW(x.it,x.n)}</span></td><td class="num r" data-l="Дольше всех">${_soMax({base:x.it.base||x.it.key,max:x.max})}</td></tr>`).join('')
+      +mine.map(x=>`<tr><td data-l="Что сделать">${_esc(x.it.act)}</td><td class="num r" data-l="Сколько"><button type="button" class="solink" data-so2="${x.it.key}" aria-haspopup="dialog" aria-label="${_esc(x.it.act)}: ${x.n} — открыть список">${x.n}</button> <span class="sounit">${_soUnitW(x.it,x.n)}</span></td><td class="num r" data-l="Дольше всех">${_soMax({base:x.it.base||x.it.key,max:x.max,due:x.due})}</td></tr>`).join('')
       +`</tbody></table></div>`:'<p class="sonote">По очереди у сорсера дел нет.</p>');
     h+=`<h4 class="soh4">Где стоят запросы</h4><div class="stack" style="height:14px;margin:2px 0 8px" role="img" aria-label="${_esc(SBUCK.filter(([k])=>b[k]).map(([k])=>`${STG[k]} ${b[k]}`).join(', '))}">`
       +SBUCK.map(([k,cl])=>b[k]?`<i class="${cl}" style="width:${(b[k]/tot*100).toFixed(1)}%" title="${STG[k]}: ${b[k]}"></i>`:'').join('')+`</div>`
@@ -4522,23 +4524,27 @@ const SO_BALL={head:SO_HEAD,src:'сорсер',kam:'КАМ',real:'реализа
 // Регламент сорсера v1.4 (29.10.2026): стадия сорсера дольше нормы и дожим поставщика (2-й раб. день —
 // повторное письмо, 3-й — звонок) — дела «Сегодня»; «Ответ не получен» на 10-й раб. день — порядок в
 // карточке. Простой сделки с мячом у КАМа — очередь КАМа, а не сорсинга (вкладка «Key-аккаунты»).
-const SO_TODAY=['ps-src','gone','over','ps-rfq','chase','pawStale','unc'];
+const SO_TODAY=['ps-src','gone','ps-due','over','ps-rfq','chase','ps-kp','pawStale','unc'];
 const SO_CARDS=['noans','noFile','fileNoStage','legacy','fileClosed','econ'];
 const SO_HEAD_ONLY=new Set(['ps-src','gone','unc']);   // дела руководителя сорсинга — в «Смотреть как» сорсера не входят
 const SO_ORDER=SO_TODAY.concat(SO_CARDS);
 const SO_SHORT={gone:'переназначить','ps-rfq':'первые запросы','ps-src':'назначить сорсера','ps-stale':'сдвинуть сделку',
-  over:'довести стадию',chase:'дожать',noans:'«Ответ не получен»'};
+  over:'довести стадию',chase:'дожать',noans:'«Ответ не получен»','ps-due':'срок заказчика','ps-kp':'добрать КП'};
 // для фразы-вывода: [что сделать — глаголом, кто]
 const SO_PHRASE={'ps-src':'назначить сорсера','gone':'переназначить запросы ушедшего сорсера','ps-rfq':'отправить первые запросы поставщикам',
   pawStale:'поставить итог КП','unc':'завести запросы по сделкам с суммой','ps-stale':'сдвинуть стоящие сделки пресейла',
-  over:'довести стадию до конца','chase':'дожать поставщиков: повторное письмо и звонок'};
+  over:'довести стадию до конца','chase':'дожать поставщиков: повторное письмо и звонок',
+  'ps-due':'успеть к сроку заказчика','ps-kp':'добрать КП до норматива'};
 // единица дней пункта (аудит 30.10.2026): одна на столбец и от того события, от которого считает норма —
 // стадия и дожим — рабочие дни (регламент), Price at Work — дни на стадии (как pawStale), прочее — с заведения
-const _SO_DU={over:['wd','Раб. дней на стадии'],chase:['wd','Раб. дней с отправки'],noans:['wd','Раб. дней с отправки'],
+const _SO_DU={over:['wd','Раб. дней на стадии'],'ps-kp':['wd','Раб. дней на стадии'],'ps-due':['due','Раб. дней после срока (минус — до срока)'],chase:['wd','Раб. дней с отправки'],noans:['wd','Раб. дней с отправки'],
   paw:['cd','Дней на Price at Work'],pawStale:['cd','Дней на Price at Work'],'ps-src':['cd','Дней с заведения сделки'],
   'ps-rfq':['cd','Дней с заведения сделки'],unc:['cd','Дней с заведения сделки'],econ:['cd','Дней']};
 const _soDU=it=>{const k=String(it.base||it.key||''); return /^(st|over):/.test(k)?_SO_DU.over:(/^ps:/.test(k)?['cd','Дней в стадии']:(_SO_DU[k]||['cd','Дней с заведения запроса']));};
-const _soMax=it=>it.max==null||it.max<0?'—':(_soDU(it)[0]==='wd'?_soN(it.max,'раб. день','раб. дня','раб. дней'):_soDays(it.max));
+// срок заказчика: самый срочный — «просрочен на N р.д.», «сегодня» или «через N р.д.» (дни со знаком)
+const _soMax=it=>{const u=_soDU(it)[0];
+  if(u==='due'){const v=it.due; return v==null?'—':(v>0?`просрочен ${_soN(v,'раб. день','раб. дня','раб. дней')}`:(v===0?'срок сегодня':`через ${_soN(-v,'раб. день','раб. дня','раб. дней')}`));}
+  return it.max==null||it.max<0?'—':(u==='wd'?_soN(it.max,'раб. день','раб. дня','раб. дней'):_soDays(it.max));};
 const _soUnit=(it,n)=>it.unit==='deal'?_soN(n,'сделка','сделки','сделок'):_soN(n,'запрос','запроса','запросов');
 const _soUnitW=(it,n)=>_soUnit(it,n).replace(/^\d+ /,'');
 // стадия запроса → список за числом «Куда дошли» (refused и other — один столбец «Отказ», как refusedCol)
@@ -4572,6 +4578,18 @@ function _soQueue(){
   ((P&&P.openDeals)||[]).forEach(r=>Object.entries(PSF).forEach(([k,[a,def,f]])=>{if(!f(r.flags||[])) return;
     add('ps:'+k,{act:a,who:'',def,fact:1}).rows.push({kind:'deal',id:r.id,t:r.t,uid:r.srcId?String(r.srcId):'-',
       who:(SO_BALL[r.ball]||'—')+(r.who?`: ${r.who}`:''),why:r.stageName?`стадия «${r.stageName}»`:'',days:r.days});}));
+  // регламент v1.4: срок заказчика (до «Экономика готова», 3 р.д. и меньше или прошёл) и норматив КП
+  // (ЗИП — 3, прочие — 1; проверка на стадиях 5, 6, 8) — дела сорсера сделки
+  ((P&&P.openDeals)||[]).forEach(r=>{
+    const who=r.srcId&&!r.srcGone?(r.src||SO_HEAD):SO_HEAD, uid=r.srcId&&!r.srcGone?String(r.srcId):'';
+    if(r.dueSoon) add('ps-due',{act:'Успеть к сроку заказчика: срок прошёл или через 3 р.д.',who:'сорсер сделки',
+        def:'Открытые сделки пресейла до «Экономика готова», где до срока заказчика («End date and time for receiving offer») 3 рабочих дня и меньше или срок уже прошёл. Сорсер успевает с КП и экономикой, КАМ в курсе; продлить срок — с заказчиком через КАМа.'})
+      .rows.push({kind:'deal',id:r.id,t:r.t,who,uid,stage:r.stage,
+        why:[`срок ${_dm(r.due)}`,r.dueWd>0?`просрочен на ${_soN(r.dueWd,'раб. день','раб. дня','раб. дней')}`:(r.dueWd===0?'сегодня':`через ${_soN(-r.dueWd,'раб. день','раб. дня','раб. дней')}`),r.stageName?`стадия «${r.stageName}»`:''].filter(Boolean).join(' · '),days:r.dueWd});
+    if(r.kpShort) add('ps-kp',{act:'Добрать КП до норматива',who:'сорсер сделки',
+        def:'Открытые сделки на анализе КП, сравнении или доработке, где КП файлом меньше норматива инструкции сорсера v1.4: ЗИП — не меньше 3, прочие («Расценка», сложное оборудование) — 1. КП засчитывается только файлом в запросе.'})
+      .rows.push({kind:'deal',id:r.id,t:r.t,who,uid,stage:r.stage,
+        why:[`КП ${r.quotes} из ${r.kpNorm}`,r.zip?'ЗИП':(r.dtype||''),r.stageName?`стадия «${r.stageName}»`:''].filter(Boolean).join(' · '),days:r.wd});});
   // КП → ТКП (presale.kpDeals, история стадий): сделки с КП файлом и из них — с «ТКП отправлено»
   ((P&&P.kpDeals)||[]).forEach(r=>{const row={kind:'deal',id:r.id,t:r.t,uid:r.srcId?String(r.srcId):'-',who:r.src||'сорсер не назначен',
       why:[r.stageName?`стадия «${r.stageName}»${r.sem==='F'?', отказ':''}`:'',r.econ?`экономика ${_dm(r.econ)}`:'',r.tkp?`ТКП ${_dm(r.tkp)}`:'ТКП нет',_soN(r.quotes,'КП','КП','КП')].filter(Boolean).join(' · '),days:null};
@@ -4635,13 +4653,22 @@ function _soQueue(){
   // исполнителя, зависимые пункты их не повторяют (ключ «do:», полный счёт — в плитке и ведомости);
   // в пункте остаются записи, которые хозяин пункта может сделать сам
   const blk=new Set(((Q['ps-src']||{}).rows||[]).map(r=>String(r.id))), goneU=new Set(A.filter(_gone).map(s=>String(s.id)));
+  // сделка в «Сегодня» — один раз: в первом по порядку SO_TODAY пункте (срок раньше стадии, стадия раньше
+  // норматива КП); прочие её причины — в «Почему» строкой «также: …»
+  const first=new Map();
+  SO_TODAY.forEach(k=>((Q[k]||{}).rows||[]).forEach(r=>{if(r.kind!=='deal') return; const id=String(r.id), f=first.get(id);
+    if(!f) first.set(id,{k,row:r,also:[]}); else if(f.k!==k) f.also.push(SO_SHORT[k]||k);}));
+  first.forEach(f=>{if(f.also.length) f.row.why=[f.row.why,`также: ${[...new Set(f.also)].join(', ')}`].filter(Boolean).join(' · ');});
+  const today=new Set(SO_TODAY);
   SO_ORDER.forEach(k=>{const it=Q[k]; if(!it||SO_HEAD_ONLY.has(k)) return;
-    const keep=it.rows.filter(r=>r.kind==='deal'?!blk.has(String(r.id)):!goneU.has(String(r.uid)));
-    if(keep.length<it.rows.length){const o=Q['do:'+k]=Object.assign({},it,{key:'do:'+k,base:k,rows:keep,held:it.rows.length-keep.length});
+    const keep=it.rows.filter(r=>r.kind==='deal'?(!blk.has(String(r.id))&&(!today.has(k)||(first.get(String(r.id))||{}).k===k)):!goneU.has(String(r.uid)));
+    const held=it.rows.filter(r=>r.kind==='deal'?blk.has(String(r.id)):goneU.has(String(r.uid))).length;
+    if(keep.length<it.rows.length){const o=Q['do:'+k]=Object.assign({},it,{key:'do:'+k,base:k,rows:keep,held});
       if(it.viol!=null){o.pre=keep.filter(r=>r.pre).length; o.viol=keep.length-o.pre;}}});
   Object.values(Q).forEach(it=>{it.rows.sort((a,b)=>(b.days??-1)-(a.days??-1)); it.n=it.rows.length;
     it.unit=(it.rows[0]||{}).kind||(it.base&&Q[it.base]&&(Q[it.base].rows[0]||{}).kind)||'card';
-    it.max=it.rows.reduce((m,r)=>r.days!=null&&r.days>m?r.days:m,-1);});
+    it.max=it.rows.reduce((m,r)=>r.days!=null&&r.days>m?r.days:m,-1);
+    if((it.base||it.key)==='ps-due') it.due=it.rows.length?it.rows[0].days:null;});
   const pick=L=>L.map(k=>Q['do:'+k]||Q[k]).filter(it=>it&&it.n);
   return {items:pick(SO_TODAY), cards:pick(SO_CARDS), by:Q};
 }
@@ -4680,7 +4707,7 @@ function _soRowsHtml(items,empty,cap){
 function _soView(items,uid){
   if(!uid) return items;
   return items.filter(it=>!SO_HEAD_ONLY.has(it.base||it.key)).map(it=>{const R=it.rows.filter(r=>r.uid===uid); if(!R.length) return null;
-    const o=Object.assign({},it,{n:R.length,_uid:uid,max:R.reduce((m,r)=>r.days!=null&&r.days>m?r.days:m,-1)});
+    const o=Object.assign({},it,{n:R.length,_uid:uid,max:R.reduce((m,r)=>r.days!=null&&r.days>m?r.days:m,-1),due:R[0].days});
     if(it.viol!=null){o.pre=R.filter(r=>r.pre).length; o.viol=R.length-o.pre;} return o;}).filter(Boolean);
 }
 function _soDrawToday(uid){
@@ -4811,7 +4838,7 @@ _soTiles('');
   // те же пункты, что «Сегодня» и «Порядок» (аудит 30.10.2026: «Дожать» и «Довести стадию» в столбце не было);
   // у действующего — его записи без ждущих сорсера и переназначения (ключ «do:»), у ушедшего — «переназначить»
   const K=x=>SOQ.by['do:'+x]||SOQ.by[x];
-  const keys=r=>_gone(r)?['gone']:['ps-rfq','over','chase','pawStale','noans','ord'];
+  const keys=r=>_gone(r)?['gone']:['ps-due','ps-rfq','over','chase','ps-kp','pawStale','noans','ord'];
   const ACT=r=>keys(r).reduce((a,x)=>a+((K(x)&&K(x).rows.filter(z=>z.uid===String(r.id)).length)||0),0);
   const pace=r=>_gone(r)?(r.perDay??null):(r.perDay4!=null?r.perDay4:(r.perDay??null));
   const trend=r=>{if(_gone(r)||r.perDay4==null||r.perDay==null)return '';const d=r.perDay4-r.perDay;return d>0.2?' <span class="up" title="последние 4 недели выше среднего">▲</span>':(d<-0.2?' <span class="dn" title="последние 4 недели ниже среднего">▼</span>':'');};

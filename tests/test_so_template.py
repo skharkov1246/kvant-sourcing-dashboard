@@ -58,7 +58,8 @@ try{
   });
   out.closedHash=location.hash;
   // Esc: список → запросы сорсера → Esc → список → Esc → закрыто, фокус на числе
-  var b0=document.querySelector('#soToday button[data-so$="pawStale"]');   // запросы (pawStale или do:pawStale): в списке есть имя сорсера
+  // первая видимая кнопка «Сегодня» со списком запросов (в нём есть имя сорсера): ушедшего, дожима, итога КП
+  var b0=[].slice.call(document.querySelectorAll('#soToday tr:not([hidden]) button[data-so]')).filter(function(b){return /(gone|chase|pawStale)$/.test(b.dataset.so);})[0]||null;
   if(b0){
     try{ _soSlot.w=[]; }catch(e){}   // уровни ниже — с адресом: ограничитель (не Chrome) уже исчерпан проходом выше
     b0.focus(); b0.click(); out.lvl1=location.hash;
@@ -144,7 +145,7 @@ def test_сегодня_не_больше_шести_дел_одна_едини�
     today = [r for r in page["today"] if not r.get("more")]
     assert 0 < len(today) <= 6, today
     for r in page["today"]:
-        unit = "сдел" if r["key"] in ("ps-src", "ps-rfq", "ps-stale", "unc", "over") else "запрос"
+        unit = "сдел" if r["key"].removeprefix("do:") in ("ps-src", "ps-rfq", "ps-stale", "unc", "over", "ps-due", "ps-kp") else "запрос"
         assert r["unit"].startswith(unit), r
     assert [r["key"] for r in today][:2] == ["ps-src", "gone"], "сначала то, что держит всё остальное"
     # отметка в карточках — вне «Сегодня», свёрнутым блоком

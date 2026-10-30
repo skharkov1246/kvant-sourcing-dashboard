@@ -66,9 +66,17 @@ KAM_F = "UF_CRM_1740390857"                      # «КАМ»
 # зонд v55: в воронке «Пресейл» заполнена у 96 % открытых, в реализации — у 2 %.
 CAT_F = "UF_CRM_1781862699536"                   # «Категория оборудования» (список, множественный)
 PO_F = "UF_CRM_1779187425"                       # «Product leader»
+# Регламент сорсера v1.4: норматив КП на сделку и срок заказчика (зонд v62, 30.10.2026: «Deal type»
+# заполнен у 94 % сделок пресейла, «ЗИП» — у 100 %, срок — у 82 %)
+DTYPE_F = "UF_CRM_1781862358145"                 # «Deal type (Presale)»: запрос от заказчика · тендер · расценка
+ZIP_F = "UF_CRM_1781862724714"                   # «ЗИП» (да / нет)
+DUE_F = "UF_CRM_1585741032001"                   # «End date and time for receiving offer» — срок заказчика
+KP_NORM_ZIP = 3                                  # ЗИП — не меньше 3 КП; сложное оборудование и «Расценка» — 1
+KP_NORM = 1
+DUE_SOON_WD = 3                                  # «успеть к сроку»: до срока 3 р.д. и меньше или срок прошёл
 DEAL_SELECT = ["ID", "TITLE", "STAGE_ID", "STAGE_SEMANTIC_ID", "DATE_CREATE", "MOVED_TIME",
                "ASSIGNED_BY_ID", "CREATED_BY_ID", "COMPANY_ID", "OPPORTUNITY", SOURCER_F, HEAD_F, KAM_F,
-               chat_activity.CHAT_FIELD, CAT_F, PO_F]
+               chat_activity.CHAT_FIELD, CAT_F, PO_F, DTYPE_F, ZIP_F, DUE_F]
 CAT_NONE = "категория не указана"
 KAM_NONE = "КАМ не указан"
 
@@ -145,6 +153,19 @@ def tkp_stage_ids(stage_meta: dict[str, dict], cid: str) -> tuple[set[str], set[
         elif TKP_RX.search(name) or m.get("sem") == "S":
             tkp.add(sid)
     return econ, tkp
+
+
+def step_of(stage_name: str) -> int | None:
+    """Шаг регламента v1.4 (1–10, порядок REG_STAGES) по подписи стадии; не из регламента — None."""
+    for i, (rx, _norm, _who) in enumerate(REG_STAGES):
+        if rx.search(stage_name or ""):
+            return i + 1
+    return None
+
+
+def _yes(v) -> bool:
+    """Флажок Битрикса: «1», «Y», True — да."""
+    return str(v).strip().upper() in ("1", "Y", "TRUE", "ДА")
 
 
 def reg_of(stage_name: str) -> tuple[int | None, str]:
@@ -248,7 +269,8 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             chat_reader: chat_activity.Reader | None = None,
             cat_labels: dict[str, str] | None = None,
             chat_also: Callable[[dict], bool] | None = None,
-            history: dict[str, list[tuple[str, str]]] | None = None) -> dict:
+            history: dict[str, list[tuple[str, str]]] | None = None,
+            type_labels: dict[str, str] | None = None) -> dict:
     """history — первые входы сделок в стадии {ID: [(STAGE_ID, время ISO), …]} (client.stage_history
     по стадиям «экономика готова» и «ТКП отправлено»); None — история не прочитана: КП → ТКП не
     считается (полей нет), а не «ноль».
@@ -324,6 +346,19 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
         # поставщика wdf) против нормы: вошла в пн с нормой 2 — срок ср, в чт уже «дольше нормы»
         norm, closer = reg_of(stage_name)
         wd = period.workdays_ru(moved, today) if moved and moved < today else (0 if moved else None)
+        step = step_of(stage_name) if sem == "P" else None
+        # норматив КП (v1.4): ЗИП — не меньше 3, прочие («Расценка», сложное оборудование) — 1; проверка —
+        # после сбора КП, на стадиях сорсера 5, 6, 8 (анализ, сравнение, доработка)
+        zip_ = _yes(d.get(ZIP_F))
+        dtype = (type_labels or {}).get(str(d.get(DTYPE_F) or ""), "") if d.get(DTYPE_F) else ""
+        kp_norm = KP_NORM_ZIP if zip_ else KP_NORM
+        n_kp = sum(1 for r in mine if r.get("_hasQuote"))
+        # срок заказчика: раб. дней после срока (> 0 — прошёл, 0 — сегодня, < 0 — осталось); до шага 7
+        due = _date(d.get(DUE_F))
+        due_wd = None
+        if due:
+            due_wd = (period.workdays_ru(due, today) if due < today else
+                      (-period.workdays_ru(today, due) if due > today else 0))
         if open_ and days is not None and days > ЗАСТОЙ_ДНЕЙ:
             flags.append("stale")
         rows.append({
@@ -342,6 +377,10 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             "wd": wd, "norm": norm, "closer": closer, "over": bool(open_ and norm is not None and wd is not None and wd > norm),
             "cats": cats, "po": po, "poId": po_uid, "poGone": po_gone,
             "_chat": chat_activity.chat_id(d),
+            "step": step, "zip": zip_, "dtype": dtype, "kpNorm": kp_norm,
+            "kpShort": bool(open_ and step in (5, 6, 8) and n_kp < kp_norm),
+            "due": due.isoformat() if due else "", "dueWd": due_wd,
+            "dueSoon": bool(open_ and step is not None and step < 7 and due_wd is not None and due_wd >= -DUE_SOON_WD),
             **({"econAt": entered(did, sid, econ_ids), "tkpAt": entered(did, sid, tkp_ids)}
                if history is not None else {}),
         })
@@ -460,6 +499,11 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             # полная длина списка «Требует действия» — до обрезки «act» до 60:
             # заголовок по обрезанному списку показывал 60 при любом числе сверх
             "actN": len(act),
+            # норматив КП и срок заказчика (регламент v1.4) — по открытым сделкам
+            "kpShort": sum(1 for r in open_rows if r["kpShort"]),
+            "dueSoon": sum(1 for r in open_rows if r["dueSoon"]),
+            "duePast": sum(1 for r in open_rows if r["dueSoon"] and (r["dueWd"] or 0) > 0),
+            "dueFilled": sum(1 for r in rows if r["due"]),
             # КП → ТКП по истории стадий (нет истории — полей нет): сделки с КП файлом, из них дошли до
             # «Экономика готова» и до «ТКП отправлено»; сейчас на «Экономика готова» — ждут ТКП от КАМа
             **({"kp": sum(1 for r in rows if r["quotes"]),
@@ -479,7 +523,9 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
         # мяч у КАМа и сделки без КАМа — по обрезанному «act» часть их терялась
         "openDeals": [{k: r[k] for k in ("id", "t", "stage", "stageName", "days", "ball", "who",
                                          "kam", "kamId", "kamGone", "flags", "chat", "created",
-                                         "wd", "norm", "closer", "over", "src", "srcId", "srcGone")}
+                                         "wd", "norm", "closer", "over", "src", "srcId", "srcGone",
+                                         "step", "zip", "dtype", "kpNorm", "quotes", "kpShort",
+                                         "due", "dueWd", "dueSoon")}
                       for r in sorted(open_rows, key=lambda r: -(r["days"] or 0))],
         # сделки с КП файлом (и открытые, и закрытые) — списки за числами «КП → ТКП»
         **({"kpDeals": [{"id": r["id"], "t": r["t"], "stageName": r["stageName"], "sem": r["sem"],
