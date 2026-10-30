@@ -4074,7 +4074,7 @@ document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=
  + `<td class="num r">${n(r.refusedCol,'','stg:refx','Отказ и прочее')}</td><td class="num r">${n(r.noAnswer,'nrc','stg:no_answer','Молчание')}</td>`
  + `<td class="num r" title="${_esc(_violTip(r.viol))}${r.violPre?`\nдо правил 19.10 (наследие, не нарушение): ${r.violPre}`:''}">${n(vn,'nrc')}</td><td class="r">${avgCell}</td></tr>`;}).join('');
 const tot=A.reduce((t,r)=>({c:t.c+r.c,q:t.q+(r.quotes||0),paw:t.paw+(r.buckets.paw||0),sel:t.sel+(r.buckets.selected||0),ns:t.ns+(r.buckets.notsel||0),ref:t.ref+r.refusedCol,nr:t.nr+r.noAnswer,v:t.v+(r.violN||0)}),{c:0,q:0,paw:0,sel:0,ns:0,ref:0,nr:0,v:0});
-document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b><div class="dep">${tot.c} запр.</div></td><td></td><td class="r num q" data-xlv="${tot.q} (${pctOf(tot.q,tot.c)}%)">${_sk(tot.q,'stg:q','','КП засчитано, отдел')} <small class="dimv">${pctOf(tot.q,tot.c)}%</small></td><td class="r num">${_sk(tot.paw,'paw','','Price at Work, отдел')}</td><td class="r num q">${_sk(tot.sel,'stg:selected','','Selected, отдел')}</td><td class="r num">${_sk(tot.ns,'stg:notsel','','Не выбран, отдел')}</td><td class="r num">${_sk(tot.ref,'stg:refx','','Отказ и прочее, отдел')}</td><td class="r num nrc">${_sk(tot.nr,'stg:no_answer','','Молчание, отдел')}</td><td class="r num nrc">${tot.v}</td><td class="r"></td></tr>`;
+document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b><div class="dep">${tot.c} запр.</div></td><td></td><td class="r num q" data-xlv="${tot.q} (${pctOf(tot.q,tot.c)}%)">${_sk(tot.q,'stg:q','','КП засчитано, отдел')} <small class="dimv">${pctOf(tot.q,tot.c)}%</small></td><td class="r num">${_sk(tot.paw,'paw','','Price at Work, отдел')}</td><td class="r num q">${_sk(tot.sel,'stg:selected','','Selected, отдел')}</td><td class="r num">${_sk(tot.ns,'stg:notsel','','Не выбран, отдел')}</td><td class="r num">${_sk(tot.ref,'stg:refx','','Отказ и прочее, отдел')}</td><td class="r num nrc">${_sk(tot.nr,'stg:no_answer','','Молчание, отдел')}</td><td class="r num nrc">${tot.v?_sk(tot.v,'viol','','Нарушения, отдел'):0}</td><td class="r"></td></tr>`;
 
 // ---- правила отметки КП: нарушения и «Экономика готова»
 (function(){
@@ -4103,7 +4103,7 @@ document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var
 
 // ---- отправлено vs создано (+ двинутые без письма в CRM: нейтрально, не «подлог»)
 if (M.send && M.send.rows){
-  document.getElementById('tbSend').innerHTML=M.send.rows.map(r=>`<tr><td><div class="who">${_esc(r.n)}${_gone(r)?'<span class="gone">ушёл</span>':''}</div></td><td class="num r">${r.total}</td><td class="num r q">${r.sent?_sk(r.sent,'mail:yes',String(r.id),'С письмом — '+r.n):0}</td><td class="num r ${r.nosend?'nrc':'dimv'}">${r.nosend?_sk(r.nosend,'mail:no',String(r.id),'Без письма — '+r.n):0}</td><td class="num r ${r.sentPct>=80?'q':(r.sentPct>=50?'':'nrc')}">${r.sentPct}%</td><td class="num r ${r.fake?'':'dimv'}">${r.fake?_sk(r.fake,'mail:fake',String(r.id),'Двинута без письма — '+r.n):0}</td><td class="num r dimv">${r.fuPct}%</td></tr>`).join('');
+  document.getElementById('tbSend').innerHTML=M.send.rows.map(r=>`<tr><td><div class="who">${_esc(r.n)}${_gone(r)?'<span class="gone">ушёл</span>':''}</div></td><td class="num r">${r.total?_sk(r.total,'stg:all',String(r.id),'Запросы — '+r.n):0}</td><td class="num r q">${r.sent?_sk(r.sent,'mail:yes',String(r.id),'С письмом — '+r.n):0}</td><td class="num r ${r.nosend?'nrc':'dimv'}">${r.nosend?_sk(r.nosend,'mail:no',String(r.id),'Без письма — '+r.n):0}</td><td class="num r ${r.sentPct>=80?'q':(r.sentPct>=50?'':'nrc')}">${r.sentPct}%</td><td class="num r ${r.fake?'':'dimv'}">${r.fake?_sk(r.fake,'mail:fake',String(r.id),'Двинута без письма — '+r.n):0}</td><td class="num r dimv">${r.fuPct}%</td></tr>`).join('');
 }
 // ---- разнообразие поставщиков (пай-чарт + поставщиков на сорсера)
 {
@@ -4542,6 +4542,7 @@ function _soQueue(){
       }
       const pawD=d.mv?_soAge(d.mv):base.days;
       // списки за числами таблиц «Куда дошли» и «Письмо ушло» — факт, а не дело (fact: без «Что сделать»)
+      add('stg:all',{act:'Запросы отдела за период',who:'сорсер запроса',def:'Все карточки «Запросы поставщикам» сорсеров отдела, заведённые за период страницы.',fact:1}).rows.push(Object.assign({},base,{who,why:st}));
       const sk=STK[d.st]; if(sk) add(sk[0],{act:sk[1],who:'сорсер запроса',def:sk[2],fact:1}).rows.push(Object.assign({},base,{who,why:st}));
       if(d.q) add('stg:q',{act:'КП засчитано: файл КП в запросе',who:'сорсер запроса',def:'Запросы, где КП приложено файлом в «Offer from supplier»: по ним считаются норматив по КП и KPI сорсера.',fact:1}).rows.push(Object.assign({},base,{who,why:st}));
       if(d.mailN!=null){const mk=d.mailN?['mail:yes','С письмом из Битрикса','Запросы, по которым из Битрикса ушло хотя бы одно письмо поставщику.']
@@ -4790,7 +4791,9 @@ _soTiles('');
   const sent=A.reduce((s,r)=>s+((SEND[String(r.id)]||{}).sent||0),0), hasSend=A.some(r=>SEND[String(r.id)]);
   const paw=A.reduce((s,r)=>s+((r.buckets||{}).paw||0),0), vio=A.reduce((s,r)=>s+(r.violN||0),0);
   const pd=A.filter(r=>!_gone(r)&&r.perDay4!=null).reduce((s,r)=>s+r.perDay4,0);
-  if(tf&&A.length) tf.innerHTML=`<tr><td><b>Отдел, итого</b></td>${num(c,'Запросов')}${num(hasSend?sent:'—','С письмом')}${num(q,'КП, шт.')}${num(pct(q,c),'КП, % запросов')}${num(paw,'Ждут итога')}${num(vio,'Нарушения')}<td class="num r" data-l="Темп, в день" title="Сумма темпа действующих сорсеров">${fx(Math.round(pd*10)/10)}</td><td></td><td></td><td></td></tr>`;
+  // итог отдела — те же списки, что у чисел таблиц (заготовка _sk; кнопка — если строк столько же)
+  if(tf&&A.length) tf.innerHTML=`<tr><td><b>Отдел, итого</b></td>${num(c?_sk(c,'stg:all','','Запросы отдела'):0,'Запросов')}${num(hasSend?(sent?_sk(sent,'mail:yes','','С письмом, отдел'):0):'—','С письмом')}${num(q?_sk(q,'stg:q','','КП засчитано, отдел'):0,'КП, шт.')}${num(pct(q,c),'КП, % запросов')}${num(paw?_sk(paw,'paw','','Ждут итога КП, отдел'):0,'Ждут итога')}${num(vio?_sk(vio,'viol','','Нарушения, отдел'):0,'Нарушения')}<td class="num r" data-l="Темп, в день" title="Сумма темпа действующих сорсеров">${fx(Math.round(pd*10)/10)}</td><td></td><td></td><td></td></tr>`;
+  try{ _soLive(); }catch(e){ console.error('Сорсинг, итог сорсеров:',e); }
 })();
 
 // ---- покрытие по воронкам: «без запроса» — кнопкой списка сделок своей воронки, доля — мерой
