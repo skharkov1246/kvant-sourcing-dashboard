@@ -1,0 +1,13 @@
+{
+  "_": "Приёмка «Сорсинга» (второй круг, 30.10.2026) — проверки П-1…П-10 по образцу «Реализации» R4 (tests/rz_accept). enforce=true — проверка роняет тест; false — меряет и помечает xfail с замером.",
+  "viewports": {"desktop": [1280, 800], "phone": [390, 844]},
+  "subs": ["today", "pulse", "people", "rfq", "presale", "how"],
+  "P2": {"enforce": true},
+  "P3": {"enforce": true, "max_actions": 3, "per_screen_cap": 40},
+  "P4": {"enforce": true, "dead_max": 0},
+  "P6": {"enforce": true, "min_px": 13, "tap_px": 44},
+  "P7": {"enforce": true, "red_max": 0.01},
+  "P8": {"enforce": true},
+  "P9": {"enforce": true},
+  "P10": {"enforce": true, "max_1280": 3200, "max_390": 7000}
+}

@@ -575,9 +575,23 @@ def run(args) -> int:
             except Exception as e:                       # noqa: BLE001
                 print(f"  ⚠ подписи «Категории оборудования» не прочитаны: {type(e).__name__}")
                 _cat_labels = {}
-            _presale_in = dict(cid=_ps[0], cat_name=_ps[1], deals=_pdeals, stage_meta=client.deal_stage_meta(),
+            _psm = client.deal_stage_meta()
+            # КП → ТКП по истории стадий (зонд v62): первые входы сделок пресейла в «Экономика готова»
+            # и «ТКП отправлено» и дальше — фильтр STAGE_ID, с даты первой сделки воронки (≈ 25 запросов).
+            # Не прочитана — None: КП → ТКП на странице «—», а не ноль
+            _phist = None
+            try:
+                _econ_ids, _tkp_ids = presale_mod.tkp_stage_ids(_psm, _ps[0])
+                _since = min((str(d.get("DATE_CREATE") or "")[:10] for d in _pdeals if d.get("DATE_CREATE")), default="")
+                if (_econ_ids or _tkp_ids) and _since:
+                    _phist = client.stage_history(2, since=_since, stage_ids=sorted(_econ_ids | _tkp_ids))
+                    print(f"  история стадий пресейла (КП → ТКП): сделок {len(_phist)}")
+            except Exception as e:                       # noqa: BLE001
+                print(f"  ⚠ история стадий пресейла не прочитана — КП → ТКП не считается: {type(e).__name__}: {без_вебхука(e)}")
+                _phist = None
+            _presale_in = dict(cid=_ps[0], cat_name=_ps[1], deals=_pdeals, stage_meta=_psm,
                                rfqs=rfqs, people=roster, names=names, today=p.end, service_ids=service_ids,
-                               cat_labels=_cat_labels)
+                               cat_labels=_cat_labels, history=_phist)
         else:
             print("• Воронка пресейла: воронки с таким именем в портале нет")
     except Exception as e:                                   # noqa: BLE001
@@ -617,6 +631,14 @@ def run(args) -> int:
         for d in s.get("details", []):
             mails = _by_card.get(str(d.get("id"))) or []
             d["mailN"] = len(mails)
+            # регламент сорсера (v1.4): ответа нет — повторное письмо на 2-й раб. день, звонок на 3-й,
+            # на 10-й — «Ответ не получен (в срок)». Рабочих дней от ПЕРВОГО письма (письма — новые
+            # сверху) по день сборки; писем нет — от создания карточки (письмо ушло не из Битрикса)
+            _first = (mails[-1].get("dt") if mails else None) or d.get("dt")
+            try:
+                d["wdf"] = period_mod.workdays_ru(dt.date.fromisoformat(str(_first)[:10]), p.end) if _first else None
+            except ValueError:
+                d["wdf"] = None
             if mails:
                 top = mails[0]                       # последнее письмо карточки
                 d["mailSubj"] = top["subj"]

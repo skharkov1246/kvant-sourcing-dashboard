@@ -56,6 +56,7 @@ from typing import Callable
 
 import chat_activity
 import config
+import period
 
 PRESALE_RE = re.compile(r"пре\s*-?\s*сейл|presale|pre\s*-?\s*sale|предпродаж", re.I)
 SOURCER_F = config.DEAL_SOURCER_FIELDS[0][0]     # «Сорсер» сделки
@@ -105,6 +106,53 @@ def ball_of(stage_name: str, sem: str = "P") -> str:
 # Пороги — по первому месяцу воронки (медиана «Поиска поставщиков» 11 дней, прочих
 # рабочих стадий 3–7): две недели без смены стадии — уже не поиск, а простой.
 ЗАСТОЙ_ДНЕЙ = 14
+
+# Регламент воронки «Пресейл» — инструкция сорсера v1.4 (29.10.2026): кто закрывает стадию и норма
+# в РАБОЧИХ днях по календарю РФ (period.workdays_ru). Стадия узнаётся по подписи; у стадий без
+# нормы — только медиана и P80, вердикта «дольше нормы» нет (решение по умолчанию 30.10.2026).
+# «Поиск поставщиков и сбор КП» — две задачи по 1 р.д. (разослать запросы, собрать КП): норма стадии 2.
+REG_STAGES = [
+    (re.compile(r"(?i)новый\s+запрос"), None, "КАМ"),
+    (re.compile(r"(?i)назначение\s+сорсера"), None, "руководитель сорсинга"),
+    (re.compile(r"(?i)проработка\s+тз"), 2, "сорсер"),
+    (re.compile(r"(?i)поиск\s+поставщиков"), 2, "сорсер"),
+    (re.compile(r"(?i)анализ\s+кп"), 3, "сорсер"),
+    (re.compile(r"(?i)сравнение\s+предложений"), 2, "сорсер"),
+    (re.compile(r"(?i)экономика\s+готова"), None, "КАМ"),
+    (re.compile(r"(?i)доработка\s+по\s+обратной"), 1, "сорсер"),
+    (re.compile(r"(?i)сорсинг\s+заверш"), None, "КАМ"),
+    (re.compile(r"(?i)согласование\s+финальной"), None, "продукт"),
+]
+
+
+# КП → ТКП по ИСТОРИИ стадий (зонд v62, 30.10.2026): ТКП отправлено = вход в «Сорсинг завершен /
+# Ожидаем решение заказчика» или дальше («Согласование финальной спецификации», успех); экономика
+# готова = вход в «Экономика готова | Можно подавать». Прежний счёт по текущей стадии
+# (stages.deal_reached_tkp) не видел 16 из 16 таких сделок и считал 21 лишнюю — он скрыт (TKP_HIDDEN).
+ECON_RX = re.compile(r"(?i)экономика\s+готова")
+TKP_RX = re.compile(r"(?i)сорсинг\s+заверш|ожида\w*\s+решени|согласование\s+финальной")
+
+
+def tkp_stage_ids(stage_meta: dict[str, dict], cid: str) -> tuple[set[str], set[str]]:
+    """(стадии «экономика готова», стадии «ТКП отправлено» и дальше, включая успех) воронки cid."""
+    econ, tkp = set(), set()
+    for sid, m in stage_meta.items():
+        if str(m.get("cat")) != str(cid):
+            continue
+        name = str(m.get("name") or "")
+        if ECON_RX.search(name):
+            econ.add(sid)
+        elif TKP_RX.search(name) or m.get("sem") == "S":
+            tkp.add(sid)
+    return econ, tkp
+
+
+def reg_of(stage_name: str) -> tuple[int | None, str]:
+    """(норма в р.д. или None, кто закрывает) — по подписи стадии; не из регламента — (None, '')."""
+    for rx, norm, who in REG_STAGES:
+        if rx.search(stage_name or ""):
+            return norm, who
+    return None, ""
 # первый запрос поставщику уходит в среднем через 2 дня после сделки
 БЕЗ_ЗАПРОСА_ДНЕЙ = 3
 # строк «Требует действия» на странице (вес страницы); полное число — head.actN
@@ -199,8 +247,12 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             today: dt.date, service_ids: set[str] | None = None,
             chat_reader: chat_activity.Reader | None = None,
             cat_labels: dict[str, str] | None = None,
-            chat_also: Callable[[dict], bool] | None = None) -> dict:
-    """chat_reader — общий на сборку читатель чатов: простой по стадии проверяется
+            chat_also: Callable[[dict], bool] | None = None,
+            history: dict[str, list[tuple[str, str]]] | None = None) -> dict:
+    """history — первые входы сделок в стадии {ID: [(STAGE_ID, время ISO), …]} (client.stage_history
+    по стадиям «экономика готова» и «ТКП отправлено»); None — история не прочитана: КП → ТКП не
+    считается (полей нет), а не «ноль».
+    chat_reader — общий на сборку читатель чатов: простой по стадии проверяется
     чатом сделки (золотое правило, см. шапку). None — без чата, как до 19.10.2026.
     chat_also(строка) — открытые сделки, чей чат прочитать сверх простоя по стадии
     (очередь КАМа: kamqueue.chat_wanted); флагов им не меняет, только пишет chat."""
@@ -222,6 +274,16 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
         p = people.get(uid) or {}
         gone = p.get("active") is False
         return (p.get("name") or names.get(uid) or f"user#{uid}"), gone
+
+    econ_ids, tkp_ids = tkp_stage_ids(stage_meta, cid)
+
+    def entered(did: str, sid: str, ids: set[str]) -> str:
+        """Дата первого входа сделки в любую из стадий ids по истории; сейчас в такой стадии, а
+        входа в выдаче нет (история урезана) — «сейчас»; не входила — ''."""
+        ts = [t for s, t in (history or {}).get(did, []) if s in ids and t]
+        if ts:
+            return min(ts)[:10]
+        return today.isoformat() if sid in ids else ""
 
     rows = []
     for d in deals:
@@ -258,6 +320,10 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
         if open_ and on_src and not mine and age is not None and age >= БЕЗ_ЗАПРОСА_ДНЕЙ:
             flags.append("norfq")
         days = (today - moved).days if moved else None
+        # регламент: рабочих дней на стадии (после дня входа по MOVED_TIME, по сегодня — как дожим
+        # поставщика wdf) против нормы: вошла в пн с нормой 2 — срок ср, в чт уже «дольше нормы»
+        norm, closer = reg_of(stage_name)
+        wd = period.workdays_ru(moved, today) if moved and moved < today else (0 if moved else None)
         if open_ and days is not None and days > ЗАСТОЙ_ДНЕЙ:
             flags.append("stale")
         rows.append({
@@ -273,8 +339,11 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             "sum": float(d.get("OPPORTUNITY") or 0) > 0,
             "company": str(d.get("COMPANY_ID") or "0") not in ("", "0"),
             "flags": flags, "chat": None,
+            "wd": wd, "norm": norm, "closer": closer, "over": bool(open_ and norm is not None and wd is not None and wd > norm),
             "cats": cats, "po": po, "poId": po_uid, "poGone": po_gone,
             "_chat": chat_activity.chat_id(d),
+            **({"econAt": entered(did, sid, econ_ids), "tkpAt": entered(did, sid, tkp_ids)}
+               if history is not None else {}),
         })
 
     # ЗОЛОТОЕ ПРАВИЛО ЧАТА: простой по стадии подтверждает только тишина в чате.
@@ -306,7 +375,12 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
                         "ball": ball_of(m.get("name") or sid, m.get("sem", "P")),
                         "med": _median([r["days"] for r in here]),
                         "max": max((r["days"] for r in here if r["days"] is not None), default=None),
-                        "stale": sum(1 for r in here if "stale" in r["flags"])})
+                        "stale": sum(1 for r in here if "stale" in r["flags"]),
+                        # регламент: кто закрывает, норма, рабочие дни на стадии и сколько дольше нормы
+                        "norm": reg_of(m.get("name") or sid)[0], "closer": reg_of(m.get("name") or sid)[1],
+                        "wdMed": _median([r["wd"] for r in here if r["wd"] is not None]),
+                        "wdMax": max((r["wd"] for r in here if r["wd"] is not None), default=None),
+                        "over": sum(1 for r in here if r["over"])})
     known = {sid for sid, _ in stages}
     чужие = sum(1 for r in rows if r["stage"] not in known)
 
@@ -333,6 +407,11 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
         a["quotes"] += r["quotes"]
         a["norfq"] += "norfq" in r["flags"]
         a["stale"] += "stale" in r["flags"]
+        if history is not None and r["quotes"]:
+            # КП → ТКП: сделки сорсера с КП файлом — дошли до «Экономика готова» и до «ТКП отправлено»
+            a["kp"] = a.get("kp", 0) + 1
+            a["kpEcon"] = a.get("kpEcon", 0) + bool(r["econAt"] or r["tkpAt"])
+            a["kpTkp"] = a.get("kpTkp", 0) + bool(r["tkpAt"])
     by_src = sorted(agg.values(), key=lambda a: (a["id"] == "", -a["open"], -a["rfq"]))
 
     with_rfq = [r for r in rows if r["rfq"]]
@@ -381,6 +460,12 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             # полная длина списка «Требует действия» — до обрезки «act» до 60:
             # заголовок по обрезанному списку показывал 60 при любом числе сверх
             "actN": len(act),
+            # КП → ТКП по истории стадий (нет истории — полей нет): сделки с КП файлом, из них дошли до
+            # «Экономика готова» и до «ТКП отправлено»; сейчас на «Экономика готова» — ждут ТКП от КАМа
+            **({"kp": sum(1 for r in rows if r["quotes"]),
+                "kpEcon": sum(1 for r in rows if r["quotes"] and (r["econAt"] or r["tkpAt"])),
+                "kpTkp": sum(1 for r in rows if r["quotes"] and r["tkpAt"]),
+                "wait7": sum(1 for r in open_rows if r["stage"] in econ_ids)} if history is not None else {}),
         },
         "stages": st_rows,
         "poLines": po_lines(rows),
@@ -393,6 +478,13 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
         # все открытые сделки, без обрезки: очередь КАМа (kamqueue.py) берёт отсюда
         # мяч у КАМа и сделки без КАМа — по обрезанному «act» часть их терялась
         "openDeals": [{k: r[k] for k in ("id", "t", "stage", "stageName", "days", "ball", "who",
-                                         "kam", "kamId", "kamGone", "flags", "chat", "created")}
+                                         "kam", "kamId", "kamGone", "flags", "chat", "created",
+                                         "wd", "norm", "closer", "over", "src", "srcId", "srcGone")}
                       for r in sorted(open_rows, key=lambda r: -(r["days"] or 0))],
+        # сделки с КП файлом (и открытые, и закрытые) — списки за числами «КП → ТКП»
+        **({"kpDeals": [{"id": r["id"], "t": r["t"], "stageName": r["stageName"], "sem": r["sem"],
+                         "srcId": r["srcId"], "src": r["src"], "srcGone": r["srcGone"], "quotes": r["quotes"],
+                         "econ": r["econAt"], "tkp": r["tkpAt"]}
+                        for r in sorted(rows, key=lambda r: (r["tkpAt"] or "9", r["id"])) if r["quotes"]]}
+           if history is not None else {}),
     }
