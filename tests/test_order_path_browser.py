@@ -229,3 +229,82 @@ def test_производство_дольше_обычного_не_откло�
         pg.wait_for_selector("#odTable")
     assert not errs, errs
     pg.close()
+
+
+@pytest.mark.parametrize("sub", ["week", "month", "quarter", "how", "week/sep", "quarter/sep"])
+def test_телефон_подпись_столбца_не_на_значении(browser, page_url, sub):
+    """Ревью R4 (30.10.2026): на 390 px таблица «карточками» (table.rzflow) — подпись столбца
+    (::before, 40 % ширины) слева, значение — справа от неё: отступ ячейки с подписью не меньше
+    35 % её ширины (правила самих таблиц, например .ctm table.ctm-t td, специфичнее и клали
+    подпись поверх значения)."""
+    pg = browser.new_page(viewport={"width": 390, "height": 844})
+    pg.goto(page_url + "#contracts/" + sub)
+    pg.wait_for_function("window.__RENDER_OK__===1")
+    pg.evaluate("document.querySelectorAll('#tab-contracts details').forEach(d=>d.open=true)")
+    m = pg.evaluate("""()=>{let n=0; const bad=[];
+      document.querySelectorAll('#tab-contracts table.rzflow :is(td,th)[data-l]').forEach(c=>{const w=c.getBoundingClientRect().width; if(!w) return; n++;
+        if(parseFloat(getComputedStyle(c).paddingLeft)<0.35*w) bad.push(c.dataset.l);}); return {n, bad:bad.slice(0,5)}}""")
+    assert not m["bad"], m
+    assert pg.evaluate("document.documentElement.scrollWidth<=innerWidth")
+    pg.close()
+
+
+@pytest.mark.parametrize("w", [1280, 1920])
+def test_ведомость_13_шагов_без_прокрутки(browser, page_url, w):
+    """Ревью R4: ведомость «Где сейчас заказы: 13 шагов» умещается в свою обёртку — подзаголовок
+    столбца «Нет файлов шага» переносится, а не растягивает таблицу."""
+    pg, errs = _open(browser, page_url, w)
+    r = pg.evaluate("()=>{const t=document.querySelector('#tab-contracts table.orkled'), x=t.closest('.twrap'); return [x.scrollWidth, x.clientWidth]}")
+    assert r[0] <= r[1] + 1, r
+    assert not errs, errs
+    pg.close()
+
+
+def test_телефон_плитки_недели_без_наложений(browser, page_url):
+    """Ревью R4: на 390 px плитки W1–W5 по две в ряд — слова не наезжают на код (W1…), пометка
+    «предварительно» не выходит за плитку."""
+    pg, errs = _open(browser, page_url, 390)
+    out = pg.evaluate("""()=>{const out=[]; document.querySelectorAll('#tab-contracts .orktw').forEach(w=>{const card=w.getBoundingClientRect();
+      const L=[...w.querySelectorAll('*')].filter(e=>e.children.length===0&&e.textContent.trim()&&e.getBoundingClientRect().width>0);
+      L.forEach(e=>{const r=e.getBoundingClientRect(); if(r.right>card.right+0.5||r.left<card.left-0.5) out.push('вне плитки: '+e.textContent.trim());});
+      for(let i=0;i<L.length;i++) for(let j=i+1;j<L.length;j++){const a=L[i].getBoundingClientRect(), b=L[j].getBoundingClientRect();
+        if(Math.min(a.right,b.right)-Math.max(a.left,b.left)>2&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>2) out.push(L[i].textContent.trim()+' × '+L[j].textContent.trim());}});
+      return out}""")
+    assert out == [], out
+    assert not errs, errs
+    pg.close()
+
+
+def test_дни_на_шаге_в_списке_как_в_пути(browser, page_url):
+    """Ревью R4: «Где застрял» строки списка за W3 и «Заказы в работе» — то же число р.д., та же
+    единица и та же дата «с …», что в «Пути заказа» этого заказа (шаг без нормы — тоже)."""
+    import re
+    pg, errs = _open(browser, page_url)
+    seen, checked = set(), 0
+    for sel in ("#tab-contracts .actile[data-of=w3]", "#ctPanel-main button.odn[data-od='w:live']"):
+        b = pg.locator(sel).first
+        if not b.count():
+            continue
+        b.click()
+        pg.wait_for_selector("#drw.on")
+        rows = pg.evaluate("""()=>[...document.querySelectorAll('#drwBody tr[data-odk]')].map(tr=>{const d=tr.querySelector('.odc2 .oddays'),
+          m=/с (\\d\\d\\.\\d\\d\\.\\d{4})/.exec((tr.querySelector('.odc2')||{}).textContent||''); return [tr.dataset.odk, d?d.textContent.trim():'', m?m[1]:'']})""")
+        for k, days, since in rows:
+            if k in seen or k.startswith("d:") or not re.match(r"\d+ ", days):
+                continue
+            seen.add(k)
+            pg.locator(f'#drwBody tr[data-odk="{k}"]').first.click()
+            pg.wait_for_selector("#opRoot")
+            hero = pg.evaluate("""()=>{const R=document.getElementById('opRoot'), b=R.querySelector('.op-num'),
+              m=/Считаем с (\\d\\d\\.\\d\\d\\.\\d{4})/.exec(R.textContent); return [b?b.textContent.trim():'', m?m[1]:'']}""")
+            if hero[0]:
+                checked += 1
+                assert days.split(" на шаге")[0].split(" при норме")[0].strip() == hero[0], (k, days, hero)
+                if since and hero[1]:
+                    assert since == hero[1], (k, since, hero)
+            pg.locator("[data-opgo=list]").click()
+            pg.wait_for_selector("#odTable")
+        pg.keyboard.press("Escape")
+    assert checked >= 5, checked
+    assert not errs, errs
+    pg.close()
