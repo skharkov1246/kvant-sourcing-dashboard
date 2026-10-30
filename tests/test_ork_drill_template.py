@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import html as htmlmod
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -43,8 +44,8 @@ const box = {document, window: {__ORKMONTH__: inp.orkMonth, __CONTRACTS__: inp.c
 vm.createContext(box);
 vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + inp.unpack + '\nfunction _dcData(){return null;}\n' + inp.code
   + '\nthis._orkWeek=_orkWeek; this._orkMonth=_orkMonth; this._orkQuarter=_orkQuarter; this._odModel=_odModel;'
-  + ' this._odHtml=_odHtml; this._orkQEmpty=_orkQEmpty; this._orkPulse=_orkPulse; this._odSub=_odSub;'
-  + ' this._odPrep=_odPrep; this._odDef=_odDef;', box);
+  + ' this._odHtml=_odHtml; this._orkWeekCtx=_orkWeekCtx; this._orkWeekToday=_orkWeekToday; this._orkWeekPeople=_orkWeekPeople; this._odSub=_odSub;'
+  + ' this._odPrep=_odPrep; this._odDef=_odDef; this._odCnt=_odCnt;', box);
 const unesc = s => String(s).replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 const attr = (tag, a) => { const m = new RegExp(' ' + a + '="([^"]*)"').exec(tag); return m ? unesc(m[1]) : null; };
 const F0 = {step: null, sup: '', mgr: '', tag: ''};
@@ -78,7 +79,9 @@ for (const [k, X] of Object.entries(inp.views)) {
       const M = box._odModel(X, X.ork, {id, F: step != null ? {step} : otag != null ? {tag: otag} : null});
       const html = M ? box._odHtml(M, Object.assign({}, F0, M.F0 || {})) : '';
       found.push({sub, el, id, step, tag: otag, cls: attr(tag, 'class'), text,
-                  items: M ? M.items.length : null, rows: (html.match(/<tr class="drill" data-odk="[^"]*" data-odct=/g) || []).length});
+                  items: M ? M.items.length : null, rows: (html.match(/<tr class="drill" data-odk="[^"]*" data-odct=/g) || []).length,
+                  // единица списка (спец. «сделка и заказ», E27): счёт — разные объекты единицы; пары — под заказом
+                  cnt: M ? box._odCnt(M) : null, pairs: (html.match(/<li class="odpi/g) || []).length});
     }
   }
   const extra = {};
@@ -118,10 +121,11 @@ for (const [k, X] of Object.entries(inp.views)) {
 }
 out.fallback = box._odHtml(box._odModel(inp.views.main, inp.views.main.ork,
   {keys: {k: ['79001', '79002', '79999'], t: null}, pre: 'w', title: 'запасные'}), Object.assign({}, F0));
-out.qempty = {two: box._orkQEmpty({codeLbl: 'a', stepLbl: 'b'}), one: box._orkQEmpty({codeLbl: 'a'}), none: box._orkQEmpty({})};
+const CM = box._orkWeekCtx(inp.views.main, inp.views.main.ork);
+out.qempty = {role: box._orkWeekToday(CM, {role: 'нет такой роли', who: ''}), all: box._orkWeekToday(CM, {role: '', who: ''})};
 const W = JSON.parse(JSON.stringify(inp.views.main.ork.week));
 W.pulse.rows[0].gone = true; W.pulse.rows[0].who = W.pulse.rows[0].who + ' (уволен)';
-out.pulseGone = box._orkPulse(W);
+out.pulseGone = box._orkWeekPeople(box._orkWeekCtx(inp.views.main, Object.assign({}, inp.views.main.ork, {week: W})));
 process.stdout.write(JSON.stringify(out));
 """
 
@@ -177,25 +181,40 @@ def _n_of(payload, dk: str):
 
 def test_каждое_число_открывает_ровно_свои_заказы(run):
     r, out = run
-    payload = {"ct": r["contracts"]["ork"], "month": r["ork_month"]}
     for view in ("main", "sep"):
+        # массив «Месяца» — свой у вида (ключи «m:1.due» есть у обоих видов, числа разные)
+        payload = {"ct": r["contracts"]["ork"], "month": r["ork_month"][view]}
         found = out[view]["found"]
-        assert len([f for f in found if f["sub"] == "week"]) >= 10, view
-        pulse = (r["contracts"] if view == "main" else r["contracts"]["sep"])["ork"]["week"]["pulse"]["rows"]
+        # у направления «Неделя» — карточки сделок (3.6): чисел меньше, чем в основном виде
+        assert len([f for f in found if f["sub"] == "week"]) >= (10 if view == "main" else 2), view
         for f in found:
             assert f["items"] is not None, f
+            c = f["cnt"]
             if f["step"] is None and f.get("tag") is None:
-                assert f["rows"] == f["items"], f          # список без отбора — все строки числа
+                # список без отбора — все объекты числа: строк столько, сколько разных объектов единицы
+                # списка (сделок у списка сделок, заказов у заказов); пары «заказ × отрезок | файл» —
+                # строкой заказа и вложенными строками, пар столько же, сколько ключей
+                if c["u"] in ("segment", "file"):
+                    assert f["rows"] == c["uo"] and f["pairs"] == f["items"] == c["n"], f
+                elif c["u"] == "deal":
+                    assert f["rows"] == c["n"], f
+                else:
+                    assert f["rows"] == f["items"], f
             if f["id"].startswith("w:") and f["el"] == "button":
-                # кнопка числа «Недели»: строк столько, сколько в числе (с отбором шага или подписи — в отборе)
-                assert f["rows"] == int(f["text"]), f
-            elif f["id"].startswith("w:pulse/") and f["el"] == "tr":
-                assert f["items"] == pulse[int(f["id"].split("/")[1])]["n"], f
+                # кнопка числа «Недели»: строк столько, сколько в числе (с отбором шага или подписи — в отборе);
+                # у списка сделок — сделок
+                assert f["rows"] == int(re.match(r"\d+", f["text"]).group()), f
             elif f["id"][:2] in ("m:", "q:"):
                 n = _n_of(payload, f["id"])
-                assert n and f["items"] == n[0], f
+                if not n:
+                    # R4 (Д-2, Д-10): списки без показателя-владельца — «не доставлено», «не считаем»,
+                    # столбцы «Доставки к сроку», хвост P80: длина списка = число на кнопке
+                    src = (r["ork_month"][view]["month"] if f["id"][0] == "m"
+                           else r["contracts"]["ork"]["quarter"])
+                    n = [len((src.get("drill") or {}).get(f["id"][2:], {}).get("k") or [])]
+                assert n and n[0] and f["items"] == n[0], f
                 if f["el"] == "button" and f["text"].isdigit():
-                    assert int(f["text"]) == f["rows"], f
+                    assert int(f["text"]) == (f["pairs"] if c["u"] in ("segment", "file") else f["rows"]), f
             else:
                 raise AssertionError(f"число без проверки: {f}")
     subs = {f["sub"] for f in out["main"]["found"]}
@@ -223,23 +242,30 @@ def test_отборы_в_списке(run):
 
 
 def test_очередь_пуста_из_за_сочетания(run):
+    """«Что сделать сегодня»: отбор, под который пунктов нет, — «Под отбор «…» заказов нет.» и
+    «Снять отбор», а не «всё по регламенту»; без отбора — группы и открытая первая."""
     _r, out = run
     q = out["qempty"]
-    assert "по этому сочетанию отборов пусто" in q["two"] and "регламент" not in q["two"] and "data-rmall" in q["two"]
-    assert "всё по регламенту" in q["one"] and "всё по регламенту" in q["none"]
+    assert "Под отбор «роль: нет такой роли» заказов нет." in q["role"] and "data-wkreset" in q["role"]
+    assert "регламент" not in q["role"]
+    assert 'class="wkg on"' in q["all"] and q["all"].count('class="wkg') >= 2
 
 
 def test_пульс_отрисован_и_ушедший_помечен(run):
+    """«Кто сколько ведёт» (одна таблица вместо «Пульса» и «Сверх нормы», В4): ушедший помечен
+    «уволен — переназначить», подпись без «(уволен)»; у каждого человека с заказами — число
+    списка его заказов (w:pulse/i/keys), строк в списке столько же."""
     r, out = run
     gone = out["pulseGone"]
-    assert "Пульс ОРК: заказы в работе по людям" in gone and '<span class="gone">уволен — переназначить</span>' in gone
-    assert "(уволен)" not in htmlmod.unescape(gone.split("</thead>")[1].split("data-ods")[0]), "подпись без «(уволен)»"
+    assert "Кто сколько ведёт" in gone and "уволен — переназначить (рук. ОРК)" in gone
+    body = htmlmod.unescape(gone.split("</thead>")[1])
+    assert "(уволен)</th>" not in body and "(уволен) <span" not in body.split("data-od")[0]
     P = r["contracts"]["ork"]["week"]["pulse"]
-    assert gone.count('data-od="w:pulse/') >= len(P["rows"])
-    week = [f for f in out["main"]["found"] if f["sub"] == "week" and f["id"].startswith("w:pulse/") and f["el"] == "tr"]
-    assert len(week) == len(P["rows"])
-    # шапка списка человека — «ФИО · N заказов в работе · X % от всех живых · сделок M · заказчиков C»
-    assert all(f["items"] == p["n"] for f, p in zip(week, P["rows"]))
+    assert len(re.findall(r'data-od="w:pulse/\d+/keys"', gone)) == sum(1 for p in P["rows"] if p["n"])
+    # строка «не назначен» открывает и «Без менеджера ОРК» в выводе и счётчике (одно множество, раунд 3)
+    week = [f for f in out["main"]["found"] if f["sub"] == "week" and re.match(r"w:pulse/\d+/keys$", f["id"])]
+    assert len({f["id"] for f in week}) == sum(1 for p in P["rows"] if p["n"])
+    assert all(f["items"] == P["rows"][int(f["id"].split("/")[1])]["n"] for f in week)
 
 
 def _dks(o, out: list) -> list:
@@ -278,20 +304,20 @@ def test_у_каждого_списка_в_данных_есть_число_на
 
 def test_закрытые_пусто_гигиена_и_дубль_для_телефона(run):
     """Список: закрытый заказ — корзиной «заказ закрыт», не «стадия не из таблицы»; в «Квартале» —
-    без «По менеджерам ОРК»; за числом без заказов — «За этим числом заказов нет»; у гигиены —
-    вид и почему (hw); дубль «стадия · поставщик» для узкого экрана — атрибутом, не текстом ячейки."""
+    без отбора «Менеджер ОРК»; за числом без заказов — «За этим числом заказов нет»; у гигиены —
+    вид и почему (hw); поставщик — строкой в ячейке заказа и отбором «Поставщик» (R4, 3.7)."""
     import re
     r, out = run
     ex = out["main"]["extra"]
     assert 'data-odf="step:x"' in ex["qall"] and "заказ закрыт" in ex["qall"]
-    assert "По менеджерам ОРК" not in ex["qall"] and "По поставщикам" in ex["qall"]
+    assert 'data-odsel="mgr"' not in ex["qall"] and 'class="odsupf"' in ex["qall"]
     assert "За этим числом заказов нет." in ex["empty"] and "отбору" not in ex["empty"]
     w = r["contracts"]["ork"]["week"]
     import orkview
     hw = [x["hw"] for x in orkview.unpack(w["orders"], w["strs"]) if x.get("hw") and x.get("hyg")]
     assert hw and htmlmod.escape(hw[0], quote=False) in ex["hyg"].replace("&quot;", '"')
-    assert re.search(r'class="dep odm" data-odm="[^"]+"></div>', ex["hyg"])
-    assert "По менеджерам ОРК" in ex["hyg"], "«Неделя»: менеджеры ОРК в списке есть"
+    assert re.search(r'<div class="dep odsup">поставщик: [^<]+</div>', ex["hyg"])
+    assert 'data-odsel="mgr"' in ex["hyg"], "«Неделя»: менеджеры ОРК в списке есть"
 
 
 def test_строка_списка_номер_заказа_и_день_отсчёта(run):
@@ -346,8 +372,9 @@ def test_разбор_числа_что_делать_худшие_сверху_�
     links = re.findall(r'<a class="odbx"[^>]*>', h)
     assert links and all('target="_blank"' in a and 'rel="noopener"' in a and 'data-xlv=""' in a for a in links)
     # шапка выгрузки — по столбцу на поле (ревью 30.10.2026): видимые столбцы и скрытые рядом
-    for t in ("№ заказа", "Сделка", "Шаг №", "Р.д. на шаге", "Норма, р.д.", "Срок клиента", "Что сделать", "Кто отвечает", "Поставщик"):
+    for t in ("№ заказа", "Сделка", "Шаг №", "Раб. дн. на шаге", "Норма, раб. дн.", "Срок клиента", "Почему", "Что сделать", "Кто делает", "Поставщик"):
         assert f'data-xlv="{t}"' in h, t
     assert "клик — фильтр" not in h and "Что делать" in h
-    assert h.index("<table") < h.index("По поставщикам") and '<details class="odcuts"' in h
+    # порядок экрана (R4, 3.7): сверка → «Почему» → «Что делать» → шаги → отборы → таблица
+    assert h.index('class="odrec"') < h.index('id="odWhyH"') < h.index('id="odActH"') < h.index('id="odStpH"') < h.index('class="odsupf"') < h.index("<table")
     assert "просрочен на " in h

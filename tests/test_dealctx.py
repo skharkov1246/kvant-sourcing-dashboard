@@ -240,7 +240,7 @@ def test_вкладка_со_сводом():
     assert d["6002"]["chat"]["conf"] == 80, "уверенность модели — рядом с оценкой"
     assert d["6007"]["contract"]["missing"] == ["customer", "supplier"]
     assert any(q["what"] == ("договор заказчика и поставщика не найден: ни в карточках договоров сделки "
-                             "и её заказов, ни в Purchase order") for q in dc["queue"])
+                             "и её заказов, ни в Purchase order — заказ не определён") for q in dc["queue"])
     # «что делать первым» — самое важное из обеих очередей обоих видов вкладки
     for did, rec in d.items():
         if "todo" in rec:
@@ -539,26 +539,31 @@ def test_хозяин_пунктов_чатов_и_договоров_по_ре�
         if q["code"] in ("chatDue", "chatRisk"):
             assert q["role"] != "oss" and q["copyRole"] != "oss" and q["signal"] == dealctx.SIGNAL
     due = next(q for q in dc["queue"] if q["code"] == "chatDue")          # срок оплаты из чата
-    assert due["role"] == "kam" and due["who"] == rows[due["deal"]]["kam"] and due["step"] == 13
+    # шаг пункта сделки — шаг стадии сделки (2 — договор с заказчиком), а не шаг 13 таблицы ITEM
+    # (спецификация «сделка и заказ», §1.6 п. 4)
+    assert due["role"] == "kam" and due["who"] == rows[due["deal"]]["kam"] and due["step"] == 2
     risk = next(q for q in dc["queue"] if q["code"] == "chatRisk")
-    assert risk["role"] == "orkMgr" and risk["copyRole"] == "kam" and risk["escalateTo"] == rows[risk["deal"]]["kam"]
+    # менеджер ОРК — роль заказа: пункт сделки ведёт руководитель ОРК, менеджеры заказов — в копии
+    assert risk["role"] == "orkHead" and risk["copyRole"] == "orkMgr"
+    assert risk["escalateTo"] == "менеджеры заказов: не назначен (3)"
+    assert (risk["alsoCopy"], risk["alsoCopyRole"]) == (rows[risk["deal"]]["kam"], "kam"), "КАМ — по-прежнему в копии"
     miss = {q["deal"]: q for q in dc["queue"] if q["code"] == "contractMissing"}
     assert miss["6007"]["role"] == "kam" and miss["6007"]["copyRole"] == "orkMgr", "обеих сторон нет"
-    assert miss["6003"]["role"] == "orkMgr" and miss["6003"]["step"] == 4, "нет договора поставщика"
-    # вид срока из чата — по таблице ork.ITEM
-    for kind, role in (("отгрузка", "orkMgr"), ("документы", "orkMgr"), ("доставка", "kam"),
-                       ("оплата", "kam"), ("встреча", "orkMgr")):
-        ow = dealctx._reg("chatDue", {"kam": "К", "stepCell": {"step": 7}}, {"kam": "К"}, key=f"chatDue:{kind}")
+    assert miss["6007"]["escalateTo"].startswith("менеджеры заказов: ")
+    assert miss["6003"]["role"] == "orkHead" and miss["6003"]["step"] is None, "нет договора поставщика"
+    # вид срока из чата — по таблице ork.ITEM; где ITEM даёт менеджера ОРК — у сделки руководитель ОРК
+    for kind, role in (("отгрузка", "orkHead"), ("документы", "orkHead"), ("доставка", "kam"),
+                       ("оплата", "kam"), ("встреча", "orkHead")):
+        ow = dealctx._reg("chatDue", {"kam": "К", "dealStep": 6, "norders": 1, "stepCell": {"step": 7}},
+                          {"kam": "К"}, key=f"chatDue:{kind}")
         assert ow["role"] == role, kind
-        if kind == "документы":                  # отгрузочные или УПД — по шагу сделки, не догадкой
-            assert ow["step"] == 7
-    # оплаченная сделка (ячейка — шаг 13, ОСС «закрыть сделку»): документы из чата — УПД, шаг 12
-    # менеджера ОРК, а не «шаг 13 · менеджер ОРК» (исполнитель шага 13 — ОСС, а ОСС пунктов
-    # чата не получает, Рег. 1.11)
-    ow = dealctx._reg("chatDue", {"kam": "К", "stepCell": {"step": 13, "role": "oss"}}, {"kam": "К"},
-                      key="chatDue:документы")
-    assert (ow["step"], ow["role"], ow["copyRole"]) == (12, "orkMgr", "kam")
-    ow = dealctx._reg("chatDue", {"kam": "К", "stepCell": {"step": 13}}, {"kam": "К"}, key="chatDue:оплата")
+        assert ow["step"] is None, "шаги 4–12 — шаги заказов: у пункта сделки шага нет"
+    # оплаченная сделка (стадия — шаг 13): шаг пункта сделки — 13, хозяин документов — не ОСС
+    # (ОСС пунктов чата не получает, Рег. 1.11)
+    ow = dealctx._reg("chatDue", {"kam": "К", "dealStep": 13, "norders": 1, "stepCell": {"step": 13, "role": "oss"}},
+                      {"kam": "К"}, key="chatDue:документы")
+    assert (ow["step"], ow["role"]) == (13, "orkHead") and ow["copyRole"] != "oss"
+    ow = dealctx._reg("chatDue", {"kam": "К", "dealStep": 13, "norders": 1}, {"kam": "К"}, key="chatDue:оплата")
     assert (ow["step"], ow["role"]) == (13, "kam")
     # очередь «Недели» = очередь регламента + эти пункты: роль есть у каждого
     life = r["contracts"]["life"]
@@ -674,9 +679,13 @@ def test_главное_в_карточке_и_в_что_важно_сегодн
     assert dc["important"][1]["role"] == "ответственный сделки" and dc["important"][1]["who"] == rows["6003"]["manager"]
     # срыв срока клиента — менеджер ОРК на шаге сделки, КАМ в копии (регламент ОРК, 26.10.2026)
     sep0, r6101 = dc["sepImportant"][0], rows["6101"]
-    exp = dealctx._reg("imp", r6101, dealctx._people(r6101, ""), key="imp:срыв_срока_клиента")
+    # ключ сводки o1 — первый живой заказ сделки: пункт этого заказа, его менеджер ОРК и шаг
+    o1 = next(o for o in r6101["orders"] if o["live"])
+    assert (sep0["unit"], sep0["order"], sep0["ordLbl"]) == ("order", o1["id"], o1["lbl"])
+    exp = dealctx._reg("imp", r6101, dealctx._people(r6101, ""), key="imp:срыв_срока_клиента", order=o1)
     assert (sep0["role"], sep0["roleKey"], sep0["copyRole"]) == ("менеджер ОРК", "orkMgr", "kam")
-    assert sep0["who"] == exp["who"] and sep0["copy"] == r6101["kam"] and sep0["step"] == dealctx._step_now(r6101)
+    assert sep0["who"] == exp["who"] == (o1["orkMgr"] or "не назначен")
+    assert sep0["copy"] == r6101["kam"] and sep0["step"] == o1["step"]
     assert sep0["who"] != r6101.get("ossDeal") or not r6101.get("ossDeal"), "ОСС пунктов модели не получает"
     assert первый["conf"] == 70 and первый["at"] == "19.10.2026" and первый["basis"] == ["stage"]
     # карточка: давняя оценка — в карточке с пометкой, а не в «сегодня»; спокойная — «важного нет»

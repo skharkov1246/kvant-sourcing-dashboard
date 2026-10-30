@@ -208,7 +208,8 @@ def test_пени_не_прикидкой_а_после_чтения_догов�
     for нет in ("Пени по контрактам", "dlPen", "calcPen", "Потенциальные пени", "0,05–0,1%",
                 "Пени не начисляются"):
         assert нет not in t, нет
-    assert "Пени — после чтения условий договоров." in вкладка
+    # «Сделки и деньги» R4 (WP-E): «Пени — после чтения условий договоров; здесь их не считаем.»
+    assert "Пени — после чтения условий договоров" in вкладка
     методика = t[t.index("'ct.cost':"):t.index("'ct.dl':")]
     assert "прикидк" not in методика and "Пени — после чтения условий договоров." in методика
     # остальное в «Цене просрочки» на месте: ставка и пересчёт упущенной доходности
@@ -229,7 +230,8 @@ def test_ведёт_уволенный_плитка_фильтр_и_свод_с�
     assert data["gone"]["deals"] == data["gone"]["byResp"] == data["life"]["counts"]["gone"] == 1
     _t, вкладка = _вкладка()
     assert "nGone=live.filter(r=>r.managerGone||r.ossGone||r.respGone)" in вкладка
-    assert "r.filter(x=>(x.managerGone||x.ossGone||x.respGone)&&!x.closed)" in вкладка
+    # отбор таблицы — то же условие (R4, WP-E: отборы — словарём «режим → условие»)
+    assert "(x.managerGone||x.ossGone||x.respGone)&&!x.closed" in вкладка
     # без уволенных — как было: признака нет ни у одной сделки
     assert not any(r["respGone"] for r in _compute(fixture.ContractsStub())["rows"])
 

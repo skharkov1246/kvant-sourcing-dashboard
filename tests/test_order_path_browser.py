@@ -80,8 +80,9 @@ def test_строка_списка_открывает_путь_и_назад(bro
     row.click()
     pg.wait_for_selector("#opRoot")
     assert pg.locator("#opRoot").get_attribute("data-opk") == k
-    assert pg.evaluate("document.activeElement.dataset.opgo") == "list"
-    assert pg.locator("#opRoot .op-steps > li").count() == 13
+    # R4 (спецификация 2.8): фокус при открытии — на заголовке панели, не на ссылке и не на кнопке
+    assert pg.evaluate("document.activeElement.id") == "drwName"
+    assert pg.locator("#opRoot .op-steps > li.op-s").count() == 13
     o = pg.evaluate("k=>{for(const d of window.__CONTRACTS__.rows) for(const o of d.orders||[]) if(String(o.id)===k) return o;}", k)
     if o["step"] is not None:
         assert pg.locator("#opRoot li[aria-current=step] .op-dot").inner_text() == str(o["step"])
@@ -93,13 +94,18 @@ def test_строка_списка_открывает_путь_и_назад(bro
         pg.keyboard.press("Tab")
         assert pg.evaluate("document.getElementById('drw').contains(document.activeElement)")
     # «← к списку» — тот же список, фокус на той же строке
-    pg.locator("[data-opgo=list]").click()
+    pg.locator("#drwCrumbs [data-odcr=list]").first.click()
     pg.wait_for_selector("#odTable")
     assert not pg.locator("#opRoot").count()
-    assert pg.evaluate("document.activeElement.dataset.odk") == k
-    # Enter на строке — путь; Esc — закрыть, фокус на число
+    assert pg.evaluate("(document.activeElement.closest('tr')||document.activeElement).dataset.odk") == k
+    # Enter на строке — путь; Esc — на уровень вверх (к списку, фокус на строке), ещё Esc — закрыть,
+    # фокус на число
     pg.keyboard.press("Enter")
     pg.wait_for_selector("#opRoot")
+    pg.keyboard.press("Escape")
+    pg.wait_for_selector("#odTable")
+    assert not pg.locator("#opRoot").count()
+    assert pg.evaluate("(document.activeElement.closest('tr')||document.activeElement).dataset.odk") == k
     pg.keyboard.press("Escape")
     assert not pg.evaluate("document.getElementById('drw').classList.contains('on')")
     assert pg.evaluate("el=>document.activeElement===el", num.element_handle())
@@ -123,9 +129,11 @@ def test_заказы_сделки_и_карточка(browser, page_url):
     assert pg.evaluate("document.getElementById('drw').classList.contains('on')")
     pg.evaluate("k=>_opOpen(k,{back:'deal'})", k)
     pg.wait_for_selector("#opRoot")
-    back = pg.locator("[data-opgo=deal]")
-    assert back.inner_text().startswith("← к сделке №")
-    assert pg.evaluate("document.activeElement.dataset.opgo") == "deal"
+    back = pg.locator("#drwCrumbs .odcrb[data-odcr=deal]")
+    assert back.inner_text().startswith("Сделка №")
+    assert pg.evaluate("document.activeElement.id") == "drwName"
+    # из сделки — без «‹ ›»: соседние заказы ходят только по списку за числом
+    assert not pg.locator("#drwNav:not([hidden]) [data-odnav]").count()
     back.click()
     pg.wait_for_function("!document.getElementById('opRoot')")
     assert pg.evaluate("document.getElementById('drw').contains(document.activeElement)")
@@ -177,7 +185,7 @@ def test_карточка_из_таблицы_путь_назад_esc(browser, p
         top = pg.evaluate("document.getElementById('drwBody').scrollTop")
         pg.keyboard.press("Enter")
         pg.wait_for_selector("#opRoot")
-        pg.locator("[data-opgo=deal]").click()
+        pg.locator("#drwCrumbs [data-odcr=deal]").first.click()
         pg.wait_for_function("!document.getElementById('opRoot')")
         assert pg.evaluate("document.activeElement.dataset.ctop") == k
         assert pg.evaluate("document.getElementById('drwBody').scrollTop") == top
@@ -225,7 +233,7 @@ def test_производство_дольше_обычного_не_откло�
         pg.wait_for_selector("#opRoot")
         t = pg.locator("#opRoot").inner_text()
         assert "Отклонений нет" not in t and "статус и новую дату" in t
-        pg.locator("[data-opgo=list]").click()
+        pg.locator("#drwCrumbs [data-odcr=list]").first.click()
         pg.wait_for_selector("#odTable")
     assert not errs, errs
     pg.close()
@@ -243,7 +251,10 @@ def test_телефон_подпись_столбца_не_на_значении
     pg.evaluate("document.querySelectorAll('#tab-contracts details').forEach(d=>d.open=true)")
     m = pg.evaluate("""()=>{let n=0; const bad=[];
       document.querySelectorAll('#tab-contracts table.rzflow :is(td,th)[data-l]').forEach(c=>{const w=c.getBoundingClientRect().width; if(!w) return; n++;
-        if(parseFloat(getComputedStyle(c).paddingLeft)<0.35*w) bad.push(c.dataset.l);}); return {n, bad:bad.slice(0,5)}}""")
+        // R4 · WP-F: подпись — своей колонкой сетки (::before в потоке), а не поверх отступа — тоже не наложение
+        // или подписи нет / она в строке перед значением — строка-карточка поставщика «Квартала»
+        const bf=getComputedStyle(c,'::before'), grid=bf.position==='static'||bf.content==='none';
+        if(!grid&&parseFloat(getComputedStyle(c).paddingLeft)<0.35*w) bad.push(c.dataset.l);}); return {n, bad:bad.slice(0,5)}}""")
     assert not m["bad"], m
     assert pg.evaluate("document.documentElement.scrollWidth<=innerWidth")
     pg.close()
@@ -254,7 +265,7 @@ def test_ведомость_13_шагов_без_прокрутки(browser, pag
     """Ревью R4: ведомость «Где сейчас заказы: 13 шагов» умещается в свою обёртку — подзаголовок
     столбца «Нет файлов шага» переносится, а не растягивает таблицу."""
     pg, errs = _open(browser, page_url, w)
-    r = pg.evaluate("()=>{const t=document.querySelector('#tab-contracts table.orkled'), x=t.closest('.twrap'); return [x.scrollWidth, x.clientWidth]}")
+    r = pg.evaluate("()=>{const t=document.querySelector('#tab-contracts table.wkled'), x=t.closest('.twrap'); return [x.scrollWidth, x.clientWidth]}")
     assert r[0] <= r[1] + 1, r
     assert not errs, errs
     pg.close()
@@ -281,7 +292,7 @@ def test_дни_на_шаге_в_списке_как_в_пути(browser, page_u
     import re
     pg, errs = _open(browser, page_url)
     seen, checked = set(), 0
-    for sel in ("#tab-contracts .actile[data-of=w3]", "#ctPanel-main button.odn[data-od='w:live']"):
+    for sel in ("#tab-contracts button.rzn[data-kpi-rank='1']", "#ctPanel-main button.odn[data-od='w:live']"):
         b = pg.locator(sel).first
         if not b.count():
             continue
@@ -295,16 +306,67 @@ def test_дни_на_шаге_в_списке_как_в_пути(browser, page_u
             seen.add(k)
             pg.locator(f'#drwBody tr[data-odk="{k}"]').first.click()
             pg.wait_for_selector("#opRoot")
-            hero = pg.evaluate("""()=>{const R=document.getElementById('opRoot'), b=R.querySelector('.op-num'),
-              m=/Считаем с (\\d\\d\\.\\d\\d\\.\\d{4})/.exec(R.textContent); return [b?b.textContent.trim():'', m?m[1]:'']}""")
+            hero = pg.evaluate("""()=>{const R=document.getElementById('opRoot'), b=R.querySelector('.op-num'), t=R.querySelector('.op-meta'),
+              m=/^с (\\d\\d\\.\\d\\d\\.\\d{4})/.exec(t?t.textContent.trim():''); return [b?b.textContent.trim():'', m?m[1]:'']}""")
             if hero[0]:
                 checked += 1
-                assert days.split(" на шаге")[0].split(" при норме")[0].strip() == hero[0], (k, days, hero)
+                assert re.match(r"\d+", days).group(0) == hero[0], (k, days, hero)
+                assert "раб. дн." in days, (k, days)
                 if since and hero[1]:
                     assert since == hero[1], (k, since, hero)
-            pg.locator("[data-opgo=list]").click()
+            pg.locator("#drwCrumbs [data-odcr=list]").first.click()
             pg.wait_for_selector("#odTable")
         pg.keyboard.press("Escape")
     assert checked >= 5, checked
     assert not errs, errs
+    pg.close()
+
+
+def test_шаг_раскрывается_esc_и_соседний_заказ(browser, page_url):
+    """R4, WP-D (спецификация 2.8, 3.8): строка пути раскрывает «Шаг» (aria-expanded, «Кончается,
+    когда», файлы шага); Esc сворачивает шаг и возвращает фокус на его строку, следующий Esc — к
+    списку; «]» и «›» — соседний заказ того же списка за одно действие, счётчик «N из M»."""
+    pg, errs = _open(browser, page_url)
+    _list_with_orders(pg)
+    n = pg.locator(ORDER_ROW).count()
+    pg.locator(ORDER_ROW).first.click()
+    pg.wait_for_selector("#opRoot")
+    sh = pg.locator("#opRoot li.op-s:not(.is-next) button.op-sh").first
+    st = sh.get_attribute("data-opstep")
+    sh.click()
+    pg.wait_for_selector(f"#opStep{st}")
+    assert pg.locator(f'#opRoot button[data-opstep="{st}"]').get_attribute("aria-expanded") == "true"
+    assert "Кончается, когда" in pg.locator(f"#opStep{st}").inner_text()
+    pg.keyboard.press("Escape")
+    assert not pg.locator(f"#opStep{st}").count()
+    assert pg.evaluate("document.activeElement.dataset.opstep") == st
+    if n > 1:
+        first = pg.locator("#opRoot").get_attribute("data-opk")
+        assert pg.locator("#drwNav .odnc").inner_text().startswith("1 из ")
+        pg.keyboard.press("]")
+        pg.wait_for_function("k=>document.getElementById('opRoot').dataset.opk!==k", arg=first)
+        assert pg.locator("#drwNav .odnc").inner_text().startswith("2 из ")
+        pg.locator("#drwNav [data-odnav='-1']").click()
+        pg.wait_for_function("k=>document.getElementById('opRoot').dataset.opk===k", arg=first)
+    pg.keyboard.press("Escape")
+    pg.wait_for_selector("#odTable")
+    assert not errs, errs
+    pg.close()
+
+
+@pytest.mark.parametrize("w,h", [(1280, 800), (390, 844)])
+def test_первый_экран_где_застрял_и_что_сделать(browser, page_url, w, h):
+    """Спецификация 3.10 и задание WP-D: «Где застрял» целиком и начало «Что сделать» — до
+    innerHeight на 1280×800 и 390×844; текст панели не мельче 13 px."""
+    pg = browser.new_page(viewport={"width": w, "height": h})
+    pg.goto(page_url + "#contracts/week")
+    pg.wait_for_selector("#tab-contracts [data-od]")
+    k = pg.evaluate("()=>{for(const d of window.__CONTRACTS__.rows) for(const o of d.orders||[]) if(o.live&&o.stepOver) return String(o.id);}")
+    pg.evaluate("k=>_opOpen(k,{})", k)
+    pg.wait_for_selector("#opRoot")
+    m = pg.evaluate("""()=>{const b=s=>{const e=document.querySelector(s); return e?e.getBoundingClientRect().bottom:1e9;};
+      return {stuck:b('#opRoot .op-stuck'), todo:b('#opTodoH'), H:innerHeight,
+        small:[...document.querySelectorAll('#opRoot *')].filter(e=>e.getClientRects().length&&[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())&&parseFloat(getComputedStyle(e).fontSize)<13).length}}""")
+    assert m["stuck"] <= m["H"] and m["todo"] <= m["H"], m
+    assert m["small"] == 0, m
     pg.close()

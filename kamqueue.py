@@ -93,7 +93,8 @@ CODES = {
     "planAfterDl": (5, lifecycle.EXC["planAfterDl"][1]),
     "unpaid": (6, lifecycle.EXC["unpaid"][1]),
     "noUtd": (7, lifecycle.EXC["noUtd"][1]),
-    "s1Over": (7, lifecycle.EXC["s1Over"][1]),
+    # подпись вкладки КАМов — прежняя (до 30.10.2026): там пункт по-прежнему один на заказ
+    "s1Over": (7, f"приёмка дольше {lifecycle.ork.NORM_WD[1]} р.д."),
     "noOrder": (7, lifecycle.EXC["noOrder"][1]),
     "noPayPlan": (8, lifecycle.EXC["noPayPlan"][1]),
     "noDl": (8, lifecycle.EXC["noDl"][1]),
@@ -279,7 +280,15 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
 
     # 2. реализация: пункты по срокам и закрытию — один на сделку и вид
     agg: dict[tuple[str, str], dict] = {}
-    for x in (life or {}).get("queue") or []:
+    # пункт сделки, свёрнутый из заказов (lifecycle.per_order: unpaid, noPayPlan, приёмка), — по
+    # заказу, как до 30.10.2026: заказы пункта КАМа — строками ords, счёт orders — заказы
+    for x in lifecycle.per_order((life or {}).get("queue") or []):
+        if x.get("code") == "ordAssign":
+            # срок шага 1 заказа уже принятой сделки (решение владельца 30.10.2026, п. 1) в очереди
+            # «Реализации» — ordAssign у руководителя ОРК; очередь КАМа его видит, как до 30.10.2026,
+            # пунктом «приёмка дольше 1 р.д.» с КАМом в копии: вкладка КАМов этим решением не
+            # менялась (изменить её — отдельное решение владельца)
+            x = {**x, "code": "s1Over", "copyRole": "kam", "escalateTo": x.get("kam") or x.get("escalateTo") or ""}
         code = x.get("code")
         uid = str(x.get("kamId") or "")
         if not kam_involved(x):

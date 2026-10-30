@@ -270,12 +270,19 @@ try{
   var ov=document.getElementById('orkJOver');ov.checked=false;ov.dispatchEvent(new Event('change'));
   var al=document.getElementById('orkJAll');al.checked=true;al.dispatchEvent(new Event('change'));
   snap(tj,'journalAll');
+  // «Как считается» и «Квартал»: ячейки «доля + k из n» и «число + мало данных» (data-xlv, раунд 3)
+  document.querySelector('#tab-contracts [role="tab"][data-sub="how"]').click();
+  snap(document.getElementById('ctmHowMet').nextElementSibling.querySelector('table'),'howMet');
+  snap(document.getElementById('ctmHowArt').nextElementSibling.querySelector('table'),'howArt');
+  document.querySelector('#tab-contracts [role="tab"][data-sub="quarter"]').click();
+  snap(document.querySelector('#tab-contracts table.ctm-rg'),'qRange');
   document.querySelector('#tab-contracts [role="tab"][data-sub="week"]').click();
-  snap(document.getElementById('orkQb').closest('table'),'queue');
+  snap(document.getElementById('orkPulseB').closest('table'),'people');
   snap(document.getElementById('orkLed').closest('table'),'ledger');
-  snap(document.getElementById('orkRisk').closest('table'),'risk');
+  snap(document.getElementById('orkLedD').closest('table'),'ledgerD');
   // список за числом (дровер): в имени файла — подвкладка и направление числа, как у таблиц вкладки
-  var od=function(sel,key){var b=document.querySelector(sel+' button[data-od="w:live"]'); b.click();
+  // «N заказов в работе» — в шапке вкладки (R4, WP-A), по выбранному направлению; в панели — если есть
+  var od=function(sel,key){var b=document.querySelector(sel+' button[data-od="w:live"]')||document.querySelector('#ctLive button[data-od="w:live"]'); b.click();
     var t=document.getElementById('odTable'); snap(t,key); out[key].trs=t.tBodies[0].rows.length; out[key].n=+b.textContent;
     _odClose(false);};
   od('#ctPanel-main','odMain');
@@ -324,8 +331,9 @@ def test_журнал_шагов_в_excel_как_на_странице(page_run)
     s1_over = [x for x in J if x["seg"] == "S1" and x["measurable"] and (x["over"] or 0) > 0]
     j = out["journal"]
     assert out["jbar"] and j["file"] == "КВАНТ_Реализация_Месяц_Журнал шагов_2026-10-29.xlsx"
-    assert j["head"] == ["Сделка", "Заказ", "Шаг", "Начало", "Конец", "Шёл, р.д.", "Норма, р.д.",
-                         "Дольше нормы на, р.д.", "Почему не считаем", "Кто отвечал", "Месяц"]
+    # E52 (спецификация «сделка и заказ»): строка — шаг заказа, первым столбцом — заказ, сделка — вторым
+    assert j["head"] == ["Заказ", "Сделка", "Шаг", "Начало", "Конец", "Шёл, раб. дн.", "Норма, раб. дн.",
+                         "Дольше нормы, раб. дн.", "Почему не считаем", "Кто делал", "Месяц"]
     rows = _rows(j["b64"])
     data = rows[1:1 + j["rows"]]
     assert j["rows"] == len(s1_over) > 0
@@ -334,34 +342,74 @@ def test_журнал_шагов_в_excel_как_на_странице(page_run)
     assert [row[7] for row in data] == sorted((x["over"] for x in s1_over), reverse=True)
     assert all(isinstance(row[5], int) and row[6] == 1 for row in data), "р.д. и норма — числами"
     assert all(re.fullmatch(r"\d\d\.\d\d\.\d{4}", row[4]) and re.fullmatch(r"\d\d\.\d{4}", row[10]) for row in data)
-    assert rows[-1][0].startswith("Отбор: Приёмка сделки (шаг 1 · S1)") and "только дольше нормы" in rows[-1][0]
+    assert rows[-1][0].startswith("Отбор: Приёмка сделки — S1 (шаг 1)") and "только дольше нормы" in rows[-1][0]
     a = out["journalAll"]
     assert a["rows"] == len(J) and len(_rows(a["b64"])) == 1 + len(J) + 2
 
 
-def test_очередь_недели_все_строки_а_не_первые_40(page_run):
-    """Очередь «Что делать» показывает первые 40 и «Показать все»; кнопка выгружает весь отбор —
-    в файле столько строк, сколько пунктов в очереди вида."""
+def test_журнал_номер_заказа_в_каждой_строке(page_run):
+    """Ревью раунда 3: номер заказа — кнопка, её выгрузка пропускала, и строки одной сделки в файле
+    не различались. Столбец «Заказ» (первый) — «933/1 · название · поставщик», «Сделка» — «сделка №933 · заказчик»."""
+    out, _r, _m = page_run
+    rows = _rows(out["journalAll"]["b64"])[1:1 + out["journalAll"]["rows"]]
+    assert rows and all(re.match(r"(\d+/\d+|id \d+)( · |$)", str(row[0] or "")) for row in rows), rows[:3]
+    assert all(str(row[1] or "").startswith("сделка №") for row in rows), rows[:3]
+
+
+def test_доли_и_оговорки_одной_ячейкой_не_склеиваются(page_run):
+    """Ревью раунда 3: «75 %3 из 4», «10меньше 80 %», «28мало данных» — две величины в одной ячейке
+    уходили склейкой. Теперь — data-xlv: «75 (3 из 4)», число «10», «28 (мало данных)»."""
+    out, _r, _m = page_run
+    met = _rows(out["howMet"]["b64"])
+    i = next(j for j, h in enumerate(met[0]) if str(h).startswith("С датами"))
+    vals = [row[i] for row in met[1:1 + out["howMet"]["rows"]] if row[i] not in (None, "—")]
+    assert vals and all(re.fullmatch(r"\d+ \(\d+ из \d+\)", str(v)) for v in vals), vals
+    art = _rows(out["howArt"]["b64"])
+    j = next(k for k, h in enumerate(art[0]) if "%" in str(h))
+    pv = [row[j] for row in art[1:1 + out["howArt"]["rows"]] if row[j] not in (None, "—")]
+    assert pv and all(isinstance(v, int) for v in pv), pv
+    q = _rows(out["qRange"]["b64"])
+    # E49: «В расчёте» — с единицей словами (у звена «вся сделка» — сделки, у прочих — заказы)
+    k = next(x for x, h in enumerate(q[0]) if str(h).startswith("В расчёте"))
+    qv = [row[k] for row in q[1:1 + out["qRange"]["rows"]] if row[k] is not None]
+    assert qv and all(re.fullmatch(r"\d+ (заказ|заказа|заказов|сделка|сделки|сделок)( \(мало данных\))?", str(v)) for v in qv), qv
+    assert not any(re.search(r"\d(мало|меньше)", str(v)) for v in qv + pv + vals)
+
+
+def test_кто_сколько_ведёт_все_люди_и_итог(page_run):
+    """«Кто сколько ведёт» (R4: одна таблица вместо «Пульса» и «Сверх нормы»): в файле — строка на
+    человека и итог; «Заказов в работе» — числом, сумма строк = итог = заказы в работе вида."""
     out, r, _m = page_run
-    q = out["queue"]
-    assert q["shown"] == 40 and q["full"] and q["rows"] > 40
-    assert q["file"].startswith("КВАНТ_Реализация_Неделя руководителя ОРК_Очередь дел") and "(" not in q["file"]
-    assert len(_rows(q["b64"])) == 1 + q["rows"]
+    p = out["people"]
+    assert p["file"].startswith("КВАНТ_Реализация_Неделя руководителя ОРК_Кто сколько ведёт")
+    rows = _rows(p["b64"])
+    i = rows[0].index("Заказов в работе")
+    body = rows[1:1 + p["rows"]]
+    assert body[-1][0] == "Итого"
+    live = r["contracts"]["ork"]["week"]["live"]
+    assert body[-1][i] == live and sum(x[i] for x in body[:-1]) == live
+    assert all(isinstance(x[i], int) for x in body)
 
 
 def test_число_со_списком_заказов_идёт_в_файл(page_run):
     """Число «Реализации» со списком заказов за ним — кнопка (.odn): в файле оно есть, как на
-    странице. Ведомость 13 шагов: «Сейчас» каждой строки — число живых заказов на шаге (кнопка
-    списка), в файле — то же число, а не пустая ячейка."""
+    странице. Ведомость в двух частях (спец. «сделка и заказ», E21): шаги заказа 4–12 — «Заказов на
+    шаге» каждой строки — число живых заказов на шаге (кнопка списка), в файле — то же число; шаги
+    сделки 1–3 и 13 — своей таблицей «Сделок на шаге», итог — сумма строк, единицы не смешаны."""
     out, r, _m = page_run
     led = out["ledger"]
-    assert led["head"][:3] == ["Шаг регламента", "Кто делает", "На шаге"]
-    L = r["contracts"]["ork"]["week"]["ledger"]
+    assert led["head"][:3] == ["Шаг заказа", "Кто делает", "Заказов на шаге"]
+    L = [s for s in r["contracts"]["ork"]["week"]["ledger"] if s["no"] not in (1, 2, 3, 13)]
     rows = _rows(led["b64"])[1:1 + led["rows"]]
-    assert led["rows"] == len(L) + 1 and sum(1 for s in L if s["now"]) > 0     # + строка «Итого на шагах»
+    assert led["rows"] == len(L) + 1 and sum(1 for s in L if s["now"]) > 0     # + строка «Всего заказов на шагах 4–12»
     for row, s in zip(rows, L):
         assert str(row[2]).split(" · ")[0] == str(s["now"] or 0), (s["no"], row[2])
-    assert rows[-1][0] == "Итого на шагах" and rows[-1][2] == sum(s["now"] or 0 for s in L)
+    assert rows[-1][0] == "Всего заказов на шагах 4–12" and rows[-1][2] == sum(s["now"] or 0 for s in L)
+    ld = out["ledgerD"]
+    assert ld["head"][:3] == ["Шаг сделки", "Кто делает", "Сделок на шаге"]
+    rd = _rows(ld["b64"])[1:1 + ld["rows"]]
+    assert ld["rows"] == 4 + 1 and [str(x[0]).split(" ")[0] for x in rd[:-1]] == ["1", "2", "3", "13"]
+    assert rd[-1][0] == "Всего сделок на шагах 1–3 и 13" and rd[-1][2] == sum(int(x[2]) for x in rd[:-1]) > 0
 
 
 def test_список_за_числом_имя_файла_с_подвкладкой_и_направлением(page_run):
@@ -381,14 +429,15 @@ def test_список_за_числом_имя_файла_с_подвкладк�
         assert len(rows) == 1 + x["rows"]
         # шапка — столбцы списка без значков сортировки; в ячейках — данные, без ссылок «в Битриксе»
         # и без подписей для телефона (поставщик под заказом — только столбцом)
-        # ревью 30.10.2026: по столбцу на поле, числа — числами (как в выгрузке до R4: «Шаг», «Р.д.»)
-        H = ["№ заказа", "Сделка", "Заказчик", "Шаг №", "Шаг", "Стадия в Битриксе", "Р.д. на шаге",
-             "Норма, р.д.", "Дней после срока клиента (минус — до срока)", "Срок клиента", "Прогноз доставки",
-             "Что сделать", "Кто отвечает", "Менеджер ОРК", "Ещё пункты очереди"]
+        # ревью 30.10.2026: по столбцу на поле, числа — числами; R4 (WP-C): поставщик — столбцом за
+        # заказчиком, «Почему» — столбцом, единица «раб. дн.», «Кто делает»
+        H = ["№ заказа", "Сделка", "Заказчик", "Поставщик", "Шаг №", "Шаг", "Стадия в Битриксе", "Раб. дн. на шаге",
+             "Норма, раб. дн.", "Дней после срока клиента (минус — до срока)", "Срок клиента", "Прогноз доставки",
+             "Почему", "Вторая причина", "Что сделать", "Кто делает", "Менеджер ОРК", "Ещё пункты очереди"]
         assert rows[0][:len(H)] == H, rows[0]
         assert not any("Битрикс" in str(c) or "поставщик:" in str(c) for row in rows[1:] for c in row)
         col = {h: i for i, h in enumerate(rows[0])}
-        for h in ("Шаг №", "Р.д. на шаге", "Норма, р.д.", "Дней после срока клиента (минус — до срока)"):
+        for h in ("Шаг №", "Раб. дн. на шаге", "Норма, раб. дн.", "Дней после срока клиента (минус — до срока)"):
             vals = [row[col[h]] for row in rows[1:] if row[col[h]] not in (None, "")]
             assert all(isinstance(v, int) for v in vals), (h, vals[:5])
             assert vals or x is b, h                    # у второго направления заказов мало — типы, не наличие
@@ -397,23 +446,28 @@ def test_список_за_числом_имя_файла_с_подвкладк�
         assert all(isinstance(row[col["Что сделать"]], str) and row[col["Что сделать"]] for row in rows[1:])
 
 
-def test_зона_риска_дни_числом(page_run):
-    """«Срок клиента под угрозой»: «Дней» — числом (ревью 30.10.2026: стало «35 дн. после срока»
-    текстом); смысл дней — в столбце «Что случилось»."""
+def test_кто_сколько_ведёт_числа_числами(page_run):
+    """«Кто сколько ведёт»: «Дольше нормы на его шагах», «Срок клиента сорван», «Ждём УПД» — числами,
+    итоги = W2, сорванные заказы (Д-1, по заказам) и «ждём УПД» вида."""
     out, r, _m = page_run
-    k = out["risk"]
-    rows = _rows(k["b64"])
-    i = rows[0].index("Дней, кал.")
-    vals = [row[i] for row in rows[1:1 + k["rows"]]]
-    assert k["rows"] == len(r["contracts"]["ork"]["week"]["risk"]) > 0
-    assert all(isinstance(v, int) for v in vals if v not in (None, "")) and any(isinstance(v, int) for v in vals)
+    rows = _rows(out["people"]["b64"])
+    h = rows[0]
+    body = rows[1:1 + out["people"]["rows"]]
+    w = r["contracts"]["ork"]["week"]
+    for name, want in (("Дольше нормы на его шагах", w["tiles"]["W2"]["value"]),
+                       ("Срок клиента сорван", w["tiles"]["W3"]["byOrders"]["late"]),
+                       ("Ждём УПД", w["waitUtd"]["n"])):
+        i = h.index(name)
+        assert all(isinstance(x[i], int) for x in body), name
+        assert body[-1][i] == want == sum(x[i] for x in body[:-1]), name
 
 
 def test_таблица_сделок_как_на_странице(page_run):
     out, r, _m = page_run
     d = out["deals"]
-    assert d["rows"] == d["shown"] > 0 and not d["full"]
-    assert d["head"][0] == "№" and "Продажа, €" in d["head"]
+    # R4: итог по видимым строкам — в tfoot (под автофильтром): строк файла = видимые + строка итога
+    assert d["nData"] == d["shown"] > 0 and d["rows"] == d["shown"] + 1 and not d["full"]
+    assert d["head"][0] == "№" and "Продажа, € тыс." in d["head"]
     first = _rows(d["b64"])[1]
     assert isinstance(first[0], int), "№ сделки — числом"
 

@@ -371,20 +371,22 @@ def _with_tabs_opened(path: Path) -> Path:
               "try{var WK2=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"week\"]'),CX2=window.__CONTRACTS__;"
               "if(WK2&&CX2&&CX2.ork&&CX2.ork.week&&CX2.ork.week.drill){WK2.click();"
               "var NB=[].slice.call(document.querySelectorAll('#ctPanel-main button.odn[data-od]')).slice(0,60);"
-              # одно число дней (ревью R4, 30.10.2026): «р.д. на шаге» строки списка = число «Пути заказа»
+              # одно число дней (ревью R4, 30.10.2026): «раб. дн. на шаге» строки списка (единица — R4, 2.7) = число «Пути заказа»
               # (o.stepWd, у шага без нормы — последняя запись ork.path на текущем шаге), та же единица
               "var OI={};[].concat(CX2.rows||[],(CX2.sep||{}).rows||[]).forEach(function(d){(d.orders||[]).forEach(function(o){OI[String(o.id)]=o})});"
               "var DY=function(id){var bad=[];[].slice.call(document.querySelectorAll('#drwBody table.odt tbody tr[data-odk]')).forEach(function(tr){"
               "var o=OI[tr.dataset.odk],e=tr.querySelector('.odc2 .oddays b');if(!o||!e)return;var P=o.path||[],l=P[P.length-1],"
-              "w=o.stepWd!=null?o.stepWd:(l&&l[0]===o.step?l[2]:null);if(w!=null&&e.textContent.trim()!==w+' р.д.')bad.push(tr.dataset.odk+': '+e.textContent.trim()+' ≠ '+w+' р.д.')});"
+              "w=o.stepWd!=null?o.stepWd:(l&&l[0]===o.step?l[2]:null);if(w!=null&&e.textContent.trim()!==w+' раб. дн.')bad.push(tr.dataset.odk+': '+e.textContent.trim()+' ≠ '+w+' раб. дн.')});"
               "if(bad.length)kvFail('Реализация: число '+id+' — дни на шаге в списке не те, что в пути заказа: '+bad.slice(0,3).join('; '))};"
               "if(!NB.length)kvFail('Реализация: в «Неделе» нет чисел со списком заказов');"
               "NB.forEach(function(b){var n=parseInt(b.textContent,10),D=document.getElementById('drw');b.click();"
-              "var R=document.querySelectorAll('#drwBody table.odt tbody tr').length;"
+              # строка списка — объект его единицы (заказ или сделка); пары «заказ × отрезок | файл» —
+              # вложенными строками под заказом (спец. «сделка и заказ», E27): счёт — пары
+              "var R=document.querySelectorAll('#drwBody table.odt tbody li.odpi').length||document.querySelectorAll('#drwBody table.odt tbody tr[data-odk]').length;"
               "if(!D||!D.classList.contains('on'))kvFail('Реализация: число '+b.dataset.od+' не открыло список заказов');"
               "else if(R!==n)kvFail('Реализация: число '+b.dataset.od+' = '+n+', а в списке строк '+R);"
               # строка списка открывается (путь заказа или карточка сделки): у каждой — ключ заказа
-              "else if(document.querySelector('#drwBody table.odt tbody tr:not([data-odk])'))"
+              "else if(document.querySelector('#drwBody table.odt tbody tr:not([data-odk]):not(.odpr)'))"
               "kvFail('Реализация: число '+b.dataset.od+' — в списке строка без ключа заказа (data-odk)');"
               "else DY(b.dataset.od);"
               "var X2=document.getElementById('drwX');if(X2)X2.click()});"
@@ -395,37 +397,34 @@ def _with_tabs_opened(path: Path) -> Path:
               # nDk) отрисован числом, и оно открывает ровно n строк (ревизия 29.10.2026)
               "try{var WK3=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"week\"]'),CX3=window.__CONTRACTS__;"
               "if(WK3&&CX3&&CX3.ork&&CX3.ork.week&&CX3.ork.week.drill){WK3.click();"
-              "var RW=function(){return document.querySelectorAll('#drwBody table.odt tbody tr').length},"
+              "var RW=function(){return document.querySelectorAll('#drwBody table.odt tbody li.odpi').length||document.querySelectorAll('#drwBody table.odt tbody tr[data-odk]').length},"
               "SH=function(){var D=document.getElementById('drw');return !!D&&D.classList.contains('on')},"
               "XX=function(){var X3=document.getElementById('drwX');if(X3)X3.click()},"
               "EA=function(sel,fn){[].slice.call(document.querySelectorAll('#ctPanel-main '+sel)).forEach(fn)};"
-              "EA('#orkTiles .actile[data-of]',function(t){var v=parseInt((t.querySelector('.v')||{}).textContent,10);t.click();"
-              "if(!SH())kvFail('Реализация: плитка '+t.dataset.of+' не открыла список заказов');"
-              "else if(!isNaN(v)&&RW()!==v)kvFail('Реализация: плитка '+t.dataset.of+' = '+v+', а в списке строк '+RW());XX()});"
-              # части плитки — кнопками своих списков — складываются в число плитки, и каждая открывает
-              # ровно столько строк («не в счёте» — вне частей, отдельной строкой; ревью 30.10.2026)
-              "EA('.orktw',function(w){var t=w.querySelector('.actile[data-of]'),v=t?parseInt((t.querySelector('.v')||{}).textContent,10):NaN,"
-              "P=[].slice.call(w.querySelectorAll('.orkparts button.odn'));if(!P.length||isNaN(v))return;"
-              "var sm=P.reduce(function(a,b){return a+(parseInt(b.textContent,10)||0)},0);"
-              "if(sm!==v)kvFail('Реализация: части плитки '+t.dataset.of+' дают '+sm+', а число плитки '+v);"
-              "P.forEach(function(b){var n=parseInt(b.textContent,10);b.click();"
-              "if(!SH()||RW()!==n)kvFail('Реализация: часть плитки '+t.dataset.of+' «'+(b.dataset.odt||'')+'» = '+n+', а в списке строк '+RW());XX()})});"
-              "var PR=(CX3.ork.week.pulse||{}).rows||[];"
-              "EA('#orkPulseB tr[data-od]',function(tr,i){tr.click();var n=(PR[i]||{}).n;"
-              "if(!SH()||RW()!==n)kvFail('Реализация: строка «Пульса» '+i+' — строк '+RW()+' вместо '+n);XX()});"
-              "EA('#orkAdj tr[data-adj]',function(tr){var b=tr.querySelector('button[data-od]'),n=b?parseInt(b.textContent,10):0;"
-              "(tr.querySelector('td')||tr).click();"
-              "if(!SH()||RW()!==n)kvFail('Реализация: «Ждут смежников» '+tr.dataset.adj+' — строк '+RW()+' вместо '+n);"
-              "else if(!document.querySelector('#drwBody [data-odq]'))kvFail('Реализация: «Ждут смежников» '+tr.dataset.adj+' — нет перехода в очередь');XX()});"
-              "EA('#orkHygN [data-od]',function(c){var n=parseInt((c.querySelector('b')||{}).textContent,10);c.click();"
-              "if(!SH()||RW()!==n)kvFail('Реализация: гигиена '+c.dataset.od+' — строк '+RW()+' вместо '+n);XX()});"
-              # «Сегодня» (владелец 29.10.2026: «как мне понимать, что дальше»): строка — пункты очереди
-              # одного вида; число открывает ровно столько строк и ведёт в очередь
-              "if(((CX3.life||{}).queue||[]).length&&!document.querySelector('#ctPanel-main #orkToday tr[data-tq]'))"
-              "kvFail('Реализация: блок «Сегодня» пуст при непустой очереди');"
+              # «Неделя» R4 (WP-B): каждое число вывода, плиток, счётчиков, ведомости, «Кто сколько
+              # ведёт», «Кого ждём» и ошибок карточек открывает ровно столько строк (всё, не первые 60)
+              "EA('.wk button.odn[data-od]',function(b){var n=parseInt(b.textContent,10);if(isNaN(n))return;b.click();"
+              "if(!SH())kvFail('Реализация: число '+b.dataset.od+' не открыло список заказов');"
+              "else if(RW()!==n)kvFail('Реализация: число '+b.dataset.od+' = '+n+', а в списке строк '+RW());XX()});"
+              # плитки: KPI 1–3 есть; части складываются в число плитки (каждый заказ — один раз, Д-1)
+              "var KN=function(r){var e=document.querySelector('#ctPanel-main [data-kpi-rank=\"'+r+'\"]');return e?parseInt(e.textContent,10):NaN},"
+              "PS=function(sel){return [].slice.call(document.querySelectorAll('#ctPanel-main '+sel)).reduce(function(a,b){return a+(parseInt(b.textContent,10)||0)},0)};"
+              "if(document.querySelector('#ctPanel-main #wkTLate')){[1,2,3].forEach(function(r){if(isNaN(KN(r))&&!document.querySelector('#ctPanel-main #orkTiles .wkdim'))kvFail('Реализация: нет плитки KPI '+r)});"
+              "if(!isNaN(KN(3))&&PS('#wkTThr .wkparts button.odn')!==KN(3))kvFail('Реализация: части «Срок под угрозой» дают '+PS('#wkTThr .wkparts button.odn')+', а плитка '+KN(3));"
+              "if(!isNaN(KN(2))&&PS('#wkTW2 .wkw2l button.odn')!==KN(2))kvFail('Реализация: шаги плитки «Шаги ОРК дольше нормы» дают '+PS('#wkTW2 .wkw2l button.odn')+', а плитка '+KN(2));"
+              "var W3=(CX3.ork.week.tiles||{}).W3||{};if(W3.byOrders&&(W3.state==='show'||W3.state==='prelim')&&(KN(1)||0)+(KN(3)||0)!==W3.value)"
+              "kvFail('Реализация: «сорван» + «под угрозой» = '+((KN(1)||0)+(KN(3)||0))+', а W3 = '+W3.value)}"
+              # «Кого ждём»: строка — список её заказов (клик по строке)
+              "EA('#orkAdj tr[data-adj]',function(tr){var b=tr.querySelector('button[data-od]'),n=b?parseInt(b.textContent,10):0;if(!n)return;"
+              "(tr.querySelector('th')||tr).click();"
+              "if(!SH()||RW()!==n)kvFail('Реализация: «Кого ждём» '+tr.dataset.adj+' — строк '+RW()+' вместо '+n);XX()});"
+              # «Что сделать сегодня»: группы есть при непустой очереди; число группы — ровно её пункты,
+              # из списка — переход обратно к группе
+              "if(((CX3.life||{}).queue||[]).length&&!document.querySelector('#ctPanel-main #orkToday [data-tq]'))"
+              "kvFail('Реализация: блок «Что сделать сегодня» пуст при непустой очереди');"
               "EA('#orkToday button[data-tq]',function(b){var n=parseInt(b.textContent,10);b.click();"
-              "if(!SH()||RW()!==n)kvFail('Реализация: «Сегодня» '+b.dataset.tq+' = '+n+', а в списке строк '+RW());"
-              "else if(!document.querySelector('#drwBody [data-odq]'))kvFail('Реализация: «Сегодня» '+b.dataset.tq+' — нет перехода в очередь');XX()});"
+              "if(!SH()||RW()!==n)kvFail('Реализация: «Что сделать сегодня» '+b.dataset.tq+' = '+n+', а в списке строк '+RW());"
+              "else if(!document.querySelector('#drwBody [data-odq]'))kvFail('Реализация: «Что сделать сегодня» '+b.dataset.tq+' — нет перехода к группе');XX()});"
               "var OM=window.__ORKMONTH__&&window.__ORKMONTH__.main,"
               "DK=function(root,id){var out=[];var w=function(o){if(!o||typeof o!=='object')return;if(Array.isArray(o)){o.forEach(w);return}"
               "if(o.dk&&(o.state==='show'||o.state==='prelim')&&(id==null||o.dk===id))out.push(id==null?o.dk:o.n);"

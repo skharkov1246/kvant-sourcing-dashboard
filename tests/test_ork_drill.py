@@ -26,6 +26,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.modules.setdefault("dotenv", types.SimpleNamespace(load_dotenv=lambda *a, **k: None))
 
+import lifecycle  # noqa: E402
 import ork  # noqa: E402
 import orkview  # noqa: E402
 from tests import fixture  # noqa: E402
@@ -71,7 +72,8 @@ def test_строки_заказов_та_же_совокупность_что_l
         assert all(re.fullmatch(r"\d{1,4}/\d{1,3}|id \d+", r["no"]) for r in rows), name
         steps = Counter(r["step"] for r in rows)
         for s in w["ledger"]:
-            assert steps.get(s["no"], 0) == s["now"], (name, s["no"])
+            # шаги сделки (1–3, 13) — сделки; живые заказы на них — ordersNow (решение 30.10.2026)
+            assert steps.get(s["no"], 0) == (s["now"] if s["unit"] == "order" else s["ordersNow"]), (name, s["no"])
         assert steps.get(None, 0) == w["unknown"]
         # строка — то, что нужно списку: сделка, стадия, шаг, хозяин, менеджер ОРК
         for r in rows:
@@ -96,7 +98,7 @@ def test_коды_очереди_и_прогноз_у_строки_как_в_о�
         rows = {r["k"]: r for r in _rows(v["ork"]["week"])}
         q = v["life"]["queue"]
         by: dict[str, list] = {}
-        for x in q:
+        for x in lifecycle.per_order(q):     # пункт сделки из заказов — по заказу (30.10.2026)
             if x.get("order"):
                 by.setdefault(str(x["order"]), []).append(x["code"])
         for k, r in rows.items():
@@ -153,7 +155,8 @@ def test_каждое_число_недели_и_его_заказы(built):
             if T[code].get("state") in ("show", "prelim"):
                 assert _n(D[code]) == T[code]["value"], (name, code)
             known(D[code])
-        assert _n(D["W1"]) == T["W1"]["orders"] + T["W1"]["noOrder"]
+        assert _n(D["W1"]) == T["W1"]["accept"] + T["W1"]["noOrder"]
+        assert _n(D["W1o"]) == (T["W1o"].get("value") or 0)
         assert Counter(D["W3"]["t"]) == Counter({c: n for c, n in T["W3"]["by"].items() if n})
         for s in w["ledger"]:
             e = D["step"][str(s["no"])]
@@ -168,12 +171,14 @@ def test_каждое_число_недели_и_его_заказы(built):
                 known(lst)
         assert _n(D["step"]["12"]["closed"]) == w["closed12"]
         assert _n(D["step"]["13"]["close"]) == w["dealClose"]
+        assert _n(D["step"]["13"]["now"]) == w["dealsToClose"] >= w["dealClose"]
         # сделка без заказа (не закрыта) и «к закрытию» («Оплата получена» ⇒ закрыта) — разные
         # сделки: строка сделки одна на вид, «к закрытию» не показывается «сделкой без заказа»
-        assert not set(D["noOrder"] + D["noOrderOver"]) & set(D["step"]["13"]["close"]), name
+        assert not set(_keys(D["noOrder"]) + _keys(D["noOrderOver"])) & set(_keys(D["step"]["13"]["now"])), name
         kinds = {r["k"]: r["kind"] for r in w["deals"]}
-        assert {kinds[k] for k in D["step"]["13"]["close"]} <= {"dealClose"}
-        assert {kinds[k] for k in D["noOrder"]} <= {"noOrder"}
+        assert {kinds[k] for k in _keys(D["step"]["13"]["close"])} <= {"dealClose"}
+        assert {kinds[k] for k in _keys(D["step"]["13"]["now"])} <= {"dealClose", "dealOpen"}
+        assert {kinds[k] for k in _keys(D["noOrder"])} <= {"noOrder"}
         # «Моя приёмка»: «в срок за 20 р.д.: k из n» — n ключей, «в норме» у k из них
         rec = T["W1"]["recent"]
         if rec.get("state") in ("show", "prelim"):
@@ -184,7 +189,7 @@ def test_каждое_число_недели_и_его_заказы(built):
             assert "W1recent" not in D, "скрытое «в срок за 20 р.д.» — без списка"
         # строки законченных заказов приёмки — без менеджера ОРК (поимённо — только «Пульс»)
         assert not any("mgr" in r for r in w["hist"])
-        assert {r: _n(D["adj"][r]) for r in ork.ADJACENT} == w["adjacent"], name
+        assert {r: {"orders": _n(D["adj"][r]), "deals": _n(D["adjDeals"][r])} for r in ork.ADJACENT} == w["adjacent"], name
         lp = w["longP80"]
         assert _n(D["p80"]) == (lp["k"] if lp["state"] in ("show", "prelim") else 0)
         assert _n(D["noOrder"]) == w["dealsNoOrder"] and _n(D["noOrderOver"]) == w["dealsNoOrderOver"]
@@ -206,7 +211,7 @@ def test_каждое_число_недели_и_его_заказы(built):
     # пример корпуса: у «Ждут смежников» логистики 10 заказов — все на шагах 9 и 11
     w = built["contracts"]["ork"]["week"]
     rows = {r["k"]: r for r in _rows(w)}
-    assert w["adjacent"]["log"] > 0
+    assert w["adjacent"]["log"]["orders"] > 0
     assert {rows[k]["step"] for k in w["drill"]["adj"]["log"]} <= {9, 11}
     assert all(rows[k].get("waits") == "log" for k in w["drill"]["adj"]["log"])
 
@@ -234,7 +239,7 @@ def test_пульс_орк_инварианты(built):
             assert p["pct"] == round(p["n"] * 100 / w["live"], 1)
             assert p["deals"] == len({r["deal"] for r in mine})
         for s in w["ledger"]:
-            assert by.get(str(s["no"]), 0) == s["now"], (name, s["no"])
+            assert by.get(str(s["no"]), 0) == (s["now"] if s["unit"] == "order" else s["ordersNow"]), (name, s["no"])
         assert by.get("?", 0) == w["unknown"]
         assert P["over"] == sum(p["over"] for p in P["rows"]) == (w["tiles"]["W2"]["value"] or 0)
         assert P["wait"] == w["waitUtd"]["n"]
@@ -352,7 +357,7 @@ def test_оплата_получена_значит_закрыта():
     ct = json.loads(json.dumps(fixture.build_contracts(stub=stub), ensure_ascii=False, default=str))
     assert all(r.get("closed") for r in ct["rows"] if r.get("paidStage"))
     D = ct["ork"]["week"]["drill"]
-    assert "d:6030" in D["step"]["13"]["close"] and "d:6030" not in D["noOrder"]
+    assert "d:6030" in D["step"]["13"]["close"]["k"] and "d:6030" not in D["noOrder"]["k"]
 
 
 # ── поставщик — только там, где он уже есть ───────────────────────────────────────────────

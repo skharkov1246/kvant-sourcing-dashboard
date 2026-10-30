@@ -41,23 +41,30 @@ try{
       href:a?a.getAttribute('href'):'', target:a?a.getAttribute('target'):'', rel:a?a.getAttribute('rel'):'',
       tab:tr.getAttribute('tabindex'), act:txt(tr.querySelector('td.c-do')), ord:txt(tr.querySelector('td.c-ord')),
       acts:Q.concat(D).filter(function(q){return String(q.deal)===tr.dataset.ct;}).map(function(q){return q.act;}),
-      norders:r.norders||0, overN:os.filter(function(o){return o.stepOver;}).length};});
+      norders:r.norders||0, overN:os.filter(function(o){return o.stepOver;}).length,
+      // R4 (спец. 3.4): порядок — важность первого пункта сделки (lifecycle.EXC sev), затем просрочка
+      sev:Q.concat(D).filter(function(q){return String(q.deal)===tr.dataset.ct;}).reduce(function(m,q){return Math.min(m,q.sev!=null?+q.sev:99);},99),
+      btn:!!tr.querySelector('td.c-no button.ctd-no')};});
+  out.modes=[].slice.call(document.querySelectorAll('#ctPanel-main [data-m]')).map(function(b){return b.dataset.m;});
   out.chips=[].slice.call(document.querySelectorAll('#ctPanel-main #ctChips button.stchip')).map(function(b){return {m:b.dataset.m,p:b.getAttribute('aria-pressed')};});
   out.xl=_xlSnap(document.querySelector('#ctPanel-main #ctBody').closest('table')).head;
   // карточка с клавиатуры: Enter на строке
-  var tr0=trs[0]; tr0.focus();
-  tr0.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));
+  // R4 (спец. 2.5): первая ячейка строки — кнопка «№», клик и Enter по строке передаются ей
+  var tr0=trs[0], b0=tr0.querySelector('td.c-no button.ctd-no')||tr0; b0.focus();
+  b0.click();
   var drw=document.getElementById('drw'), body=document.getElementById('drwBody');
-  out.open=drw.classList.contains('on'); out.focusX=document.activeElement===document.getElementById('drwX');
-  out.card={deal:tr0.dataset.ct, secs:[].slice.call(body.querySelectorAll('.rzc-h')).map(function(h){return txt(h).replace(/\s*\d+$/,'');}),
-    dealLink:(body.querySelector('a.rzc-bx')||{}).href||'', ords:body.querySelectorAll('.rzc-ord').length,
-    ordLinks:[].slice.call(body.querySelectorAll('.rzc-ord a.rzc-lnk')).map(function(a){return a.getAttribute('href');}),
-    paths:body.querySelectorAll('.rzc-ord [data-ctop]').length, strip:body.querySelectorAll('.rzc-strip [data-ctop]').length, todo:txt(body.querySelector('.rzc-todo')), text:txt(body)};
+  // R4 (спец. 2.8): фокус при открытии — на заголовке панели, не на «×» и не на ссылке
+  out.open=drw.classList.contains('on'); out.focusX=document.activeElement===document.getElementById('drwName');
+  out.card={deal:tr0.dataset.ct, secs:[].slice.call(body.querySelectorAll('.ctd-h')).map(function(h){return txt(h).replace(/\s*(—\s*)?\d+( [а-яё]+)?$/,'').replace(/\s*\?$/,'');}),
+    dealLink:(document.querySelector('#drwSub a.ctd-bx')||{}).href||'', ords:body.querySelectorAll('.rzc-ord').length,
+    ordLinks:[].slice.call(body.querySelectorAll('.rzc-ord a.rzc-lnk')).filter(function(a){return /type\/172/.test(a.getAttribute('href')||'');}).map(function(a){return a.getAttribute('href');}),
+    paths:body.querySelectorAll('.rzc-ord [data-ctop]').length, strip:body.querySelectorAll('.ctd-ctodo [data-ctop]').length, todo:txt(body.querySelector('.ctd-ctodo')), text:txt(body)+' '+txt(document.getElementById('drwSub'))};
+  var focusTo=b0;
   document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
   out.closed=!drw.classList.contains('on');
   setTimeout(function(){
     try{
-      out.focusBack=document.activeElement===tr0;
+      out.focusBack=document.activeElement===focusTo||document.activeElement===tr0;
       // путь заказа: _opOpen есть — у каждого заказа кнопка, вызов с back:'deal' и сделкой
       var calls=[]; window._opOpen=function(k,o){calls.push([k,o&&o.back,o&&o.deal&&String(o.deal.deal)]);};
       var tr1=trs.filter(function(t){return (by[t.dataset.ct].orders||[]).length>1;})[0]||tr0;
@@ -103,12 +110,10 @@ def test_худшие_сверху(page):
     закрытые — внизу. Строк столько же, сколько сделок основного вида."""
     rows = page["rows"]
     assert len(rows) > 5
-    tier = [3 if r["late"] else 2 if r["over"] else 0 if r["closed"] else 1 for r in rows]
-    assert all(a >= b for a, b in zip(tier, tier[1:])), tier
-    late = [r["lateDays"] for r in rows if r["late"]]
-    assert late and late == sorted(late, reverse=True), late
-    first_not_late = next(i for i, r in enumerate(rows) if not r["late"])
-    assert all(not r["late"] for r in rows[first_not_late:]), "просрочка — только в начале"
+    # R4 (спец. 3.4): важность первого пункта сделки (EXC sev, меньше — важнее), затем просрочка, дн.
+    key = [(-1, 0) if r["closed"] else (100 - min(99, r["sev"]), r["lateDays"]) for r in rows]
+    assert all(a >= b for a, b in zip(key, key[1:])), key
+    assert any(r["late"] for r in rows)
     if any(r["closed"] for r in rows):
         i = next(i for i, r in enumerate(rows) if r["closed"])
         assert all(r["closed"] for r in rows[i:]), "закрытые — в конце"
@@ -119,26 +124,29 @@ def test_строка_что_сделать_и_битрикс(page):
     с пунктами очереди — действие одного из них; число заказов — «N заказ(а/ов)», сверх нормы — счётом."""
     for r in page["rows"]:
         assert r["href"] == f"https://kvantpro.bitrix24.ru/crm/deal/details/{r['deal']}/", r
-        assert r["target"] == "_blank" and r["rel"] == "noopener" and r["tab"] == "0"
+        # строка — вне порядка Tab, в нём кнопка «№» (R4, 2.5)
+        assert r["target"] == "_blank" and r["rel"] == "noopener" and r["tab"] == "-1" and r["btn"]
         if r["acts"]:
             assert any(a[:20].lower() in r["act"].lower() for a in r["acts"]), (r["deal"], r["act"])
         assert re.search(r"\d+ заказ(а|ов)?", r["ord"]), r["ord"]
         if r["overN"]:
             assert f"{r['overN']} дольше нормы" in r["ord"], r["ord"]
     assert page["head"][0].startswith("№") and any(h.startswith("Что сделать") for h in page["head"])
-    assert page["xl"][0] == "№" and "Продажа, €" in page["xl"], page["xl"]
-    assert {c["m"] for c in page["chips"]} >= {"all", "live", "late", "slow"}
-    assert [c["p"] for c in page["chips"] if c["m"] == "all"] == ["true"]
+    assert page["xl"][0] == "№" and any(h.startswith("Продажа, €") for h in page["xl"]), page["xl"]
+    # R4 (3.4): «Открытые · Все · Завершённые» — фишками; «сорван», «замедлено» — плиткой и счётчиком «Требует решения»
+    assert {c["m"] for c in page["chips"]} >= {"all", "live"}
+    assert set(page["modes"]) >= {"all", "live", "late", "slow"}, page["modes"]
+    assert [c["p"] for c in page["chips"] if c["m"] == "live"] == ["true"], "по умолчанию — открытые сделки (R4, 3.4)"
 
 
 def test_карточка_сделки_по_порядку(page):
-    """Enter на строке — карточка, фокус на «Закрыть»; Esc закрывает, фокус — снова на строке.
-    Разделы — сверху вниз: что делать, заказы, (чат и договор), экономика, путь по стадиям."""
+    """Кнопка «№» строки — карточка, фокус на заголовке (R4, 2.8); Esc закрывает, фокус — снова на
+    строке. Разделы — сверху вниз: что сделать, заказы, (чат и договор), экономика, путь по стадиям."""
     assert page["open"] and page["focusX"] and page["closed"] and page["focusBack"]
     c = page["card"]
     secs = c["secs"]
-    assert secs[:2] == ["Что делать", "Заказы сделки"], secs
-    order = [s for s in ("Что делать", "Заказы сделки", "Чат и договор", "Экономика сделки", "Путь по стадиям воронки")
+    assert secs[:2] == ["Что сделать", "Заказы"], secs
+    order = [s for s in ("Что сделать", "Заказы", "Чат и договор", "Экономика сделки", "Путь по стадиям сделки")
              if any(x.startswith(s) for x in secs)]
     pos = [next(i for i, x in enumerate(secs) if x.startswith(s)) for s in order]
     assert pos == sorted(pos), secs
@@ -146,9 +154,9 @@ def test_карточка_сделки_по_порядку(page):
     assert c["ords"] == len(c["ordLinks"]) > 0
     assert all(re.fullmatch(r"https://kvantpro\.bitrix24\.ru/crm/type/172/details/\d+/", h) for h in c["ordLinks"])
     assert c["paths"] == c["ords"], "_opOpen есть — у каждого заказа «Путь заказа →»"
-    # ревью 30.10.2026: живые заказы — строкой под шапкой (первый экран карточки), кнопка — путь заказа
-    assert 0 < c["strip"] <= c["ords"]
-    assert "кто:" in c["todo"] or "Пунктов в очереди нет" in c["text"]
+    # R4 (3.9): у дела — номер заказа кнопкой «путь заказа»; кто делает — ролью и именем
+    assert c["strip"] >= 0
+    assert ":" in c["todo"] or "Дел по сделке нет" in c["text"]
     assert "Сделка в Битриксе ↗" in c["text"] and "Экономика сделки" in c["text"]
 
 
