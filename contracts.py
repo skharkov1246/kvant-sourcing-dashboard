@@ -2025,4 +2025,5 @@ def life_all(data: dict | None) -> dict | None:
     lifecycle.group_sort(queue)
     counts = Counter(life.get("counts") or {})
     counts.update(sep_life.get("counts") or {})
-    return {**life, "queue": queue, "counts": dict(counts)}
+    # счёты в своих единицах — по общей очереди заново (люди обоих видов не складываются)
+    return {**life, "queue": queue, "counts": dict(counts), **lifecycle.queue_counts(queue)}

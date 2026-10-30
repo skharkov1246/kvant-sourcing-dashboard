@@ -142,8 +142,12 @@ def test_что_сделать_пункты_очереди_заказа(run):
     # без пунктов заказа и сделки — действие шага по регламенту
     busy = {str(x["order"]) for x in q}
     busy_d = {str(x["deal"]) for x in allq if not x.get("order")}
+    # производство дольше P80 (week.longP80) — свой текст «запросить статус», не «отклонений нет»;
+    # с 30.10.2026 пункт сделки из заказов (unpaid и т. п.) — без заказа, его сделка в busy_d
+    p80 = {str(x["order"]) for v in (ct, ct.get("sep") or {})
+           for x in ((((v.get("ork") or {}).get("week") or {}).get("longP80") or {}).get("items") or [])}
     some = [o for d in ct["rows"] if str(d["deal"]) not in busy_d for o in d.get("orders") or []
-            if o.get("live") and o["step"] and str(o["id"]) not in busy]
+            if o.get("live") and o["step"] and str(o["id"]) not in busy and str(o["id"]) not in p80]
     assert some
     for o in some[:5]:
         assert "Отклонений нет. По регламенту на шаге" in out[str(o["id"])]

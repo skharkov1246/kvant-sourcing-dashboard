@@ -219,9 +219,11 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     hy = {o["id"]: ork.hygiene(o, today) for o in L}
     unk = [o for o in U if step[o["id"]] is None]           # стадия не из таблицы шагов
     unk_n = len(unk)
-    qcodes = Counter(q["code"] for q in queue)
+    # пункты в единицах «заказ × код» (lifecycle.per_order): пункт сделки, свёрнутый из заказов
+    # (unpaid, noPayPlan, приёмка s1Over — решение владельца 30.10.2026), — по копии на заказ
+    qcodes = Counter(q["code"] for q in lifecycle.per_order(queue))
     q_by: dict[str, list] = defaultdict(list)
-    for q in queue:
+    for q in lifecycle.per_order(queue):
         q_by[q["code"]].append(q)
     no_order = [d for d in deals if not d.get("closed") and not d.get("lost") and d.get("inCat0", True)
                 and not d.get("norders")]
@@ -231,10 +233,12 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     # заказа (s1Over…s6Over) ставит то же правило — помечаем его w2 (отбор плитки)
     over_ids: dict[int, set] = {st: {o["id"] for o in L if step[o["id"]] == st and ov[o["id"]]["over"]}
                                 for st in ork.NORM_WD}
-    for st, code in ork.OVER_CODE.items():
-        for q in q_by.get(code, []):
+    for st, codes in ork.STEP_CODES.items():       # шаг 1 — приёмка сделки и ordAssign
+        for q in (q for c in codes for q in q_by.get(c, [])):
             if q.get("order") in over_ids.get(st, set()):
                 q["w2"] = True                     # пункт в счёте W2 — отбор плитки
+                if "_of" in q:
+                    q["_of"]["w2"] = True          # и сам пункт сделки (копия — по заказу)
     over_by_step = Counter({st: len(ids) for st, ids in over_ids.items()})
     # «ждём УПД от клиента» (решение владельца 27.10.2026, Б): шаг 12 больше 10 р.д. от доставки
     # без УПД — judged.waitUtd; не «сверх нормы» менеджера (не в W2, не в столбце «сверх нормы»
@@ -412,7 +416,8 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     # n — пункты сверх нормы (w2, тот же счёт, что у W2 и ведомости); waitUtd — свой столбец
     # «ждём УПД от клиента» (пункты noUtd с waitUtd), в n не идёт (решение 27.10.2026, Б)
     mgr: dict[str, dict] = {}
-    for code, flag in [(c, "w2") for c in ork.OVER_CODE.values()] + [(c, "waitUtd") for c in ork.WAIT_CODE.values()]:
+    for code, flag in ([(c, "w2") for cs in ork.STEP_CODES.values() for c in cs]
+                       + [(c, "waitUtd") for c in ork.WAIT_CODE.values()]):
         for q in q_by.get(code, []):
             if not q.get(flag):
                 continue
@@ -1181,7 +1186,7 @@ def unpack(rows: list[dict], strs: list[str]) -> list[dict]:
 W3_CODES = ("late", "risk", "forecast")
 # кого ждёт шаг (ork.STEPS[].waits): kam — шаги 1–3, 10, 12, 13; oss — 6; sup — 7; log — 9, 11
 STEP_WAITS = {s["no"]: s["waits"] or "" for s in ork.STEPS}
-OUR_CODES = frozenset(ork.OVER_CODE.values()) | {"noOrder"}
+OUR_CODES = frozenset(c for cs in ork.STEP_CODES.values() for c in cs) | {"noOrder"}
 # причина заказа (Д-4, порядок — решение R4, «Как считается»): первая подходящая — cause, вторая —
 # cause2. our — шаг ОРК дольше нормы; sup — производство дольше плана или шаг ждёт поставщика;
 # log / kam / oss — шаг ждёт этот отдел; nodata — нет плановых дат или срока, шаг неизвестен;
@@ -1284,7 +1289,7 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
     q_by: dict[str, list] = defaultdict(list)
     codes_of: dict[str, list] = defaultdict(list)       # заказ → коды пунктов очереди (life.queue)
     dcodes: dict[str, list] = defaultdict(list)          # сделка → коды пунктов уровня сделки
-    for q in queue:
+    for q in lifecycle.per_order(queue):           # пункт сделки из заказов — по заказу
         q_by[q["code"]].append(q)
         if q.get("order"):
             codes_of[str(q["order"])].append(q["code"])
@@ -1402,7 +1407,7 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
     D["waitUtd"] = keys(o for o in L if o["id"] in wait_all)
     # «Сверх нормы по менеджерам» — пункты с w2 и waitUtd у хозяина пункта (тот же счёт)
     who_d: dict[str, dict] = {}
-    for code, flag, mark in ([(c, "over", "w2") for c in ork.OVER_CODE.values()]
+    for code, flag, mark in ([(c, "over", "w2") for cs in ork.STEP_CODES.values() for c in cs]
                              + [(c, "wait", "waitUtd") for c in ork.WAIT_CODE.values()]):
         for q in q_by.get(code, []):
             if q.get(mark):

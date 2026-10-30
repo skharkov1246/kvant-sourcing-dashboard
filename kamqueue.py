@@ -279,7 +279,9 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
 
     # 2. реализация: пункты по срокам и закрытию — один на сделку и вид
     agg: dict[tuple[str, str], dict] = {}
-    for x in (life or {}).get("queue") or []:
+    # пункт сделки, свёрнутый из заказов (lifecycle.per_order: unpaid, noPayPlan, приёмка), — по
+    # заказу, как до 30.10.2026: заказы пункта КАМа — строками ords, счёт orders — заказы
+    for x in lifecycle.per_order((life or {}).get("queue") or []):
         code = x.get("code")
         uid = str(x.get("kamId") or "")
         if not kam_involved(x):

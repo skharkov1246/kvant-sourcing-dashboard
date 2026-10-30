@@ -1012,12 +1012,18 @@ ITEM = {
     "dealOpen": (13, "oss", None),
     "dealClose": (13, "oss", None),
     "noOrder": (1, "orkHead", "kam"),
+    # приёмка — одна на сделку (решение владельца 30.10.2026, п. 1): пункт сделки у руководителя
+    # ОРК, КАМ в копии; заказ, добавленный в уже принятую сделку, — пункт заказа ordAssign
+    # «назначить менеджера ОРК на новый заказ» у руководителя ОРК, без КАМа (не разговор с клиентом)
     "s1Over": (1, "orkHead", "kam"),
+    "ordAssign": (1, "orkHead", None),
     "s2Over": (4, "orkMgr", "orkHead"),
     "s3Over": (5, "orkMgr", "orkHead"),
     "s6Over": (8, "orkMgr", "orkHead"),
     "payNoContract": (5, "orkHead", "kam"),
     "gone": (1, "orkHead", None),
+    # уволен ответственный или ОСС заказа — пункт заказа (единица — заказ, номер в строке)
+    "goneOrd": (None, "orkHead", None),
     "noDl": (1, "orkHead", "kam"),
     "noPlanDates": (6, "oss", None),
     "noFact": (11, "log", None),
@@ -1063,8 +1069,17 @@ OVER_CODE = {1: "s1Over", 4: "s2Over", 5: "s3Over", 8: "s6Over"}
 # «сверх нормы» менеджера (W2, по менеджерам, ведомость, «Замедлено») он не идёт
 WAIT_CODE = {12: "noUtd"}
 WAIT_UTD = "ждём УПД от клиента"
-# все сроки шагов регламента в р.д. → код пункта очереди (inWd у пункта)
+# все сроки шагов регламента в р.д. → код пункта очереди (inWd у пункта). Шаг 1 — ПЕРВАЯ приёмка
+# сделки (s1Over, пункт сделки: решение владельца 30.10.2026, п. 1)
 TERM_CODE = {**OVER_CODE, **WAIT_CODE}
+# тот же срок шага 1 у заказа, добавленного в уже принятую сделку: назначить менеджера ОРК на
+# новый заказ (код → шаг). Дни — рабочие, как у TERM_CODE
+TERM_EXTRA = {"ordAssign": 1}
+# коды пунктов со сроком шага в р.д. (inWd, «с дд.мм (…)»)
+TERM_CODES = frozenset(TERM_CODE.values()) | frozenset(TERM_EXTRA)
+# шаг «сверх нормы» → все коды пунктов этого срока (W2, «Сверх нормы по менеджерам»): шаг 1 —
+# приёмка сделки (s1Over) и назначение менеджера ОРК на новый заказ (ordAssign)
+STEP_CODES = {st: (code, *(c for c, s in TERM_EXTRA.items() if s == st)) for st, code in OVER_CODE.items()}
 
 
 def item_owner(code: str, step_now: int | None, people: dict, *, key: str | None = None) -> dict:

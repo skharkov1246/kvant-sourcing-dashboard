@@ -886,6 +886,16 @@ def run(args) -> int:
               f"{_lcc.get('s2Over', 0)}; за 20 р.д. закончена назначением {_t1.get('byAssign', 0)}; «Заказ "
               f"создан» с датой назначения не в счёте: раньше начала приёмки {_t1.get('assignStale', 0)}, "
               f"ответственный не из ОРК {_t1.get('assignNoMgr', 0)}")
+        # очередь в своих единицах (решения владельца 30.10.2026) — только счёт, без имён (правило 17)
+        _bc, _dcn, _ocn = (_lc.get("bucketCounts") or {}), (_lc.get("dealCounts") or {}), (_lc.get("ordCounts") or {})
+        _bx, _bd, _bh = _bc.get("exec") or {}, _bc.get("deal") or {}, _bc.get("hyg") or {}
+        print(f"  очередь: по заказам {_bx.get('orders', 0)} заказов в {_bx.get('deals', 0)} сделках; по сделкам "
+              f"{_bd.get('deals', 0)} сделок; порядок в карточках {_bh.get('orders', 0)} заказов и "
+              f"{_bh.get('deals', 0)} сделок; пунктов до свёртки {sum(_lcc.values())}, после "
+              f"{len(_lc.get('queue') or [])}; приёмок сделок {_dcn.get('s1Over', 0)} (заказов на шаге 1 "
+              f"{_lcc.get('s1Over', 0)}, из них назначить на новый заказ {_ocn.get('ordAssign', 0)}); "
+              f"не оплатил: сделок {_dcn.get('unpaid', 0)} (заказов {_lcc.get('unpaid', 0)}); нет срока "
+              f"оплаты: сделок {_dcn.get('noPayPlan', 0)} (заказов {_lcc.get('noPayPlan', 0)})")
         # «Пульс ОРК» (решение владельца 29.10.2026) — только счёт по видам строк, без имён (правило 17)
         _pl = (_wk.get("pulse") or {}).get("rows") or []
         _pk = lambda k: sum(x["n"] for x in _pl if x.get("kind") == k)    # noqa: E731

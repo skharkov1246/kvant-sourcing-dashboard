@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.modules.setdefault("dotenv", types.SimpleNamespace(load_dotenv=lambda *a, **k: None))
 
+import lifecycle  # noqa: E402
 import ork  # noqa: E402
 import orkview  # noqa: E402
 from tests import fixture  # noqa: E402
@@ -89,7 +90,8 @@ def test_д3_в_сборке(built):
     for nm, v in _views(built):
         W = v["ork"]["week"]
         U = W["tiles"]["unpaid"]
-        want = {q["order"] for q in v["life"]["queue"] if q["code"] == "unpaid"}
+        # unpaid — пункт сделки с заказами в ords (решение 30.10.2026): плитка — в заказах
+        want = {q["order"] for q in lifecycle.per_order(v["life"]["queue"]) if q["code"] == "unpaid"}
         assert U["orders"] == len(want) == len(W["drill"]["unpaid"]["k"]), nm
         assert set(W["drill"]["unpaid"]["k"]) == {str(k) for k in want}, nm
         assert "keys" not in U and "label" in U

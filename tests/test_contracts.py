@@ -313,10 +313,16 @@ def test_уволенный_ответственный_заказа_ведёт_�
     # и только заказ с уволенным ответственным в другой сделке — не все её заказы
     ждут = sum(1 for r in ct["rows"] if r["deal"] == "1" for o in r["orders"] if o["live"]) + 1
     assert g["orders"] == ждут, (g["orders"], ждут)
+    # прежний счёт counts.gone — сделки с любым признаком (2); пункты разведены (30.10.2026, E8):
+    # gone — люди СДЕЛКИ (сделка 1: ответственный сделки), goneOrd — заказ с уволенным
+    # ответственным (502) или ОСС заказа (501) — с номером заказа
     gone = {q["deal"]: q for q in ct["life"]["queue"] if q["code"] == "gone"}
-    assert set(gone) == {"1", "2"} and ct["life"]["counts"]["gone"] == 2
-    assert gone["2"]["what"] == "ведёт уволенный: ответственный заказа"
-    assert gone["1"]["what"] == "ведёт уволенный: ответственный сделки, ОСС"
+    assert set(gone) == {"1"} and ct["life"]["counts"]["gone"] == 2
+    assert gone["1"]["what"] == "ведёт уволенный: ответственный сделки"
+    go = {q["order"]: q for q in ct["life"]["queue"] if q["code"] == "goneOrd"}
+    assert set(go) == {"501", "502"} and go["502"]["what"] == "заказ ведёт уволенный: ответственный заказа"
+    assert go["501"]["what"] == "заказ ведёт уволенный: ОСС заказа" and go["501"]["ordLbl"] == "901/1"
+    assert (ct["life"]["dealCounts"]["gone"], ct["life"]["ordCounts"]["goneOrd"]) == (1, 2)
     # хозяин пунктов заказа 502 — исполнитель шага (решение 26.10.2026, п. 1): ответственный
     # не из отдела ОРК (отделов нет) — менеджер ОРК «не назначен», даты размещения — ОСС
     q502 = {q["code"]: q for q in ct["life"]["queue"] if q["order"] == "502"}
@@ -350,7 +356,7 @@ def test_уволенный_ответственный_закрытого_зак
     assert r["respGone"] is False and not any(o["respGone"] for o in r["orders"] if o["live"])
     assert next(o for o in r["orders"] if o["id"] == "504")["respGone"] is True, "у заказа — как есть, как ossGone"
     assert ct["gone"]["deals"] == 1 and ct["gone"]["byResp"] == 0
-    assert {q["deal"] for q in ct["life"]["queue"] if q["code"] == "gone"} == {"1"}
+    assert {q["deal"] for q in ct["life"]["queue"] if q["code"] in ("gone", "goneOrd")} == {"1"}
 
 
 def test_доставлено_по_стадии_без_даты_не_просрочка():
@@ -493,6 +499,16 @@ def test_сумма_видов_не_теряет_ни_пункта(сеп, monke
     assert sorted(map(ключ, вместе["queue"])) == sorted(map(ключ, без["life"]["queue"]))
     assert [q["code"] for q in вместе["queue"]] == [q["code"] for q in без["life"]["queue"]]
     assert вместе["counts"] == без["life"]["counts"]
+    # счёты в своих единицах (спецификация «сделка и заказ» E2): по каждой части очереди виды
+    # складываются в прежние — разные заказы, сделки и хозяева общей очереди
+    for k in ("ordCounts", "dealCounts", "bucketCounts"):
+        assert вместе[k] == без["life"][k], k
+    for b in ("exec", "hyg"):
+        assert (сеп["life"]["bucketCounts"][b]["orders"] + сеп["sep"]["life"]["bucketCounts"][b]["orders"]
+                == без["life"]["bucketCounts"][b]["orders"]), b
+    for b in ("exec", "deal", "hyg"):
+        assert (сеп["life"]["bucketCounts"][b]["deals"] + сеп["sep"]["life"]["bucketCounts"][b]["deals"]
+                == без["life"]["bucketCounts"][b]["deals"]), b
     for k in ("live", "total", "lateDeals", "slow", "contracts", "paidStage", "nNoBuy", "grossSusp"):
         assert сеп["head"][k] + сеп["sep"]["head"][k] == без["head"][k], k
     for k in ("lateOrders", "liveOrders", "noDl"):

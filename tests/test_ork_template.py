@@ -292,8 +292,12 @@ def test_неделя_строки_с_номером_заказа_поставщ
         assert len(r) == 1 and sup in r[0] and ref in r[0], lbl
     r = [x for x in qb if ">933/3 ›<" in x and "с 14.10 (назначение)" in x]
     assert len(r) == 1 and "Менеджер ОРК" in r[0]
-    r = [x for x in qb if ">991/1 ›<" in x and "с 15.10 (создан заказ)" in x]
+    # приёмка — пункт сделки (решение владельца 30.10.2026, п. 1): строка сделки, заказы — в ords
+    # (их строки под пунктом — шаблон, пакет TP-2)
+    r = [x for x in qb if "сделка №991" in x and "с 15.10 (создан заказ)" in x]
     assert len(r) == 1 and "Руководитель ОРК" in r[0]
+    acc = next(x for x in v["life"]["queue"] if x["code"] == "s1Over" and x["seq"] == 991)
+    assert [o["lbl"] for o in acc["ords"]] == ["991/1"] and acc["unit"] == "deal"
     # поставщика в данных нет — строка без него, номер и срок остаются
     for x in v["life"]["queue"]:
         x["sup"] = ""

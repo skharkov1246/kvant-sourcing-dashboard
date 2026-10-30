@@ -26,6 +26,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.modules.setdefault("dotenv", types.SimpleNamespace(load_dotenv=lambda *a, **k: None))
 
+import lifecycle  # noqa: E402
 import ork  # noqa: E402
 import orkview  # noqa: E402
 from tests import fixture  # noqa: E402
@@ -96,7 +97,7 @@ def test_коды_очереди_и_прогноз_у_строки_как_в_о�
         rows = {r["k"]: r for r in _rows(v["ork"]["week"])}
         q = v["life"]["queue"]
         by: dict[str, list] = {}
-        for x in q:
+        for x in lifecycle.per_order(q):     # пункт сделки из заказов — по заказу (30.10.2026)
             if x.get("order"):
                 by.setdefault(str(x["order"]), []).append(x["code"])
         for k, r in rows.items():

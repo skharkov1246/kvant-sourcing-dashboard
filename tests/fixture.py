@@ -858,6 +858,75 @@ class ТриЗаказа(ContractsStub):
         self.hist[172].append(("99510", "DT172_26:NEW", t(4)))
 
 
+class СделкаИЗаказы(ContractsStub):
+    """Сделка и заказ поставщика — разные единицы (спецификация «сделка и заказ», T-1; решения
+    владельца 30.10.2026). Базовый корпус ContractsStub — без изменений; поверх — придуманные
+    сделки 920–925 (номера, люди и суммы придуманы, CLAUDE.md правило 18):
+      • 920 — три заказа 920/1–920/3 «Заказ создан» 6 дн., менеджер ОРК не назначен: приёмка
+        сделки — ОДИН пункт сделки, три заказа строками (решение п. 1);
+      • 921 — два заказа доставлены 60 и 50 дн. назад, платёжки клиента нет, планового срока
+        оплаты нет: один пункт «не оплатил» и один «нет срока оплаты» на сделку, по два заказа;
+      • 922 — сделка на стадии шага 2 («ТКП согласован»), заказ направлен поставщику;
+      • 923 — заказ 923/1 доставлен позже срока, заказ 923/2 открыт со сроком впереди;
+      • 924 — два заказа у двух менеджеров ОРК (Олег и Пётр);
+      • 925 — ответственный заказа 925/1 уволен (Тимур, id 35): пункт заказа goneOrd.
+    roster — справочник людей с уволенным (передать в contracts.compute как people)."""
+
+    GONE_ID = "35"
+
+    def __init__(self):
+        super().__init__()
+        import contracts as ct
+        now = dt.datetime.fromisoformat(CT_NOW)
+        t = lambda a: (now - dt.timedelta(days=a)).isoformat()      # noqa: E731
+        d = lambda a: (CT_TODAY - dt.timedelta(days=a)).isoformat()  # noqa: E731
+        self.roster = {**CT_ROSTER, self.GONE_ID: {"name": "Тимур (ОРК)", "active": False, "depts": ["51"]}}
+        plan = {ct.PROD_START: d(-5), ct.PROD_END: d(-40), ct.DEL_BUDGET: d(-80)}
+        deals = (("6200", 920, "Приёмка трёх заказов", "C0:NEW"),
+                 ("6201", 921, "Два неоплаченных заказа", "C0:FINAL_INVOICE"),
+                 ("6202", 922, "Сделка на шаге 2", "C0:NEW"),
+                 ("6203", 923, "Доставлено после срока и открытый заказ", "C0:EXECUTING"),
+                 ("6204", 924, "Два менеджера ОРК", "C0:EXECUTING"),
+                 ("6205", 925, "Ответственный заказа уволен", "C0:EXECUTING"))
+        for did, seq, title, st in deals:
+            self.deals.append({"ID": did, "TITLE": f"{seq}. {title}", "OPPORTUNITY": "40000", "CURRENCY_ID": "EUR",
+                               "COMPANY_ID": "305", "STAGE_ID": st, "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
+                               "DATE_CREATE": t(160), "ASSIGNED_BY_ID": "11", ct.OSS_DEAL: ["21"],
+                               ct.KAM_F: "12"})
+            entered = 20 if did == "6200" else 150
+            self.hist[2].append((did, "C0:NEW", t(entered)))
+            if st != "C0:NEW":
+                self.hist[2].append((did, st, t(30)))
+
+        def order(oid, did, lbl, stage, age, resp, **extra):
+            o = {"id": oid, "title": f"{lbl}. Узел", "companyId": "403", "parentId2": int(did),
+                 "opportunity": 10_000, "currencyId": "EUR", "stageId": f"DT172_26:{stage}",
+                 "createdTime": t(age), "movedTime": t(min(age, 5)), ct.OSS_F: "21",
+                 ct.DL_CUSTOMER: d(-90), "assignedById": resp, **plan, **extra}
+            self.orders.append(o)
+            k = CT_PATH.index(stage)
+            for j, s_ in enumerate(CT_PATH[:k + 1]):
+                self.hist[172].append((str(oid), f"DT172_26:{s_}", t(age - (age - min(age, 5)) * j / max(1, k))))
+
+        for n in (1, 2, 3):                                     # 920: приёмка сделки — одна
+            order(99600 + n, "6200", f"920/{n}", "NEW", 6, "33")
+        for n, ago in ((1, 60), (2, 50)):                       # 921: не оплачено, срока оплаты нет
+            order(99610 + n, "6201", f"921/{n}", "WAITPAY", 120, "31", **{
+                ct.SUP_PAID: 100, ct.SHIP_FACT: d(ago + 20), ct.INB_FACT: d(ago + 10), ct.DEL_FACT: d(ago),
+                ct.UTD_DATE: d(ago - 3), ct.DL_CUSTOMER: d(ago - 10)})
+        order(99621, "6202", "922/1", "SENT", 10, "31", **{ct.ASSIGN_AT: d(9)})
+        order(99631, "6203", "923/1", "SUCCESS", 150, "31", **{
+            ct.SUP_PAID: 100, ct.SHIP_FACT: d(50), ct.INB_FACT: d(30), ct.DEL_FACT: d(20), ct.UTD_DATE: d(18),
+            ct.CLIENT_PO: [{"id": 3}], ct.PAY_PLAN: d(5), ct.DL_CUSTOMER: d(30)})
+        order(99632, "6203", "923/2", "PREPARATION", 60, "31", **{ct.SUP_PAID: 100, ct.DL_CUSTOMER: d(-40)})
+        order(99641, "6204", "924/1", "PREPARATION", 60, "31", **{ct.SUP_PAID: 100})
+        order(99642, "6204", "924/2", "PREPARATION", 60, "32", **{ct.SUP_PAID: 100})
+        order(99651, "6205", "925/1", "PREPARATION", 60, self.GONE_ID, **{ct.SUP_PAID: 100})
+
+    def user_name(self, uid):
+        return "Тимур (ОРК)" if str(uid) == self.GONE_ID else super().user_name(uid)
+
+
 def build_contracts(**kw) -> dict:
     """Синтетика → настоящий contracts.compute → данные вкладки «Реализация». Руководителя
     ОРК (служебный ключ «_orkHead») main.py забирает до записи страницы — здесь так же;
