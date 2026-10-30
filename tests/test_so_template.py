@@ -30,6 +30,9 @@ var drw=document.getElementById('drw');
 try{
   var T=document.getElementById('tab-sourcing');
   out.titles=[].slice.call(T.querySelectorAll('h2.secttl')).map(function(h){return txt(h).replace(/\s*\?$/,'');});
+  out.subs=[].slice.call(T.querySelectorAll('#soTabs [role=tab]')).filter(function(b){return !b.hidden;}).map(function(b){return b.dataset.sub+':'+txt(b);});
+  out.firstPanel=[].slice.call(T.querySelectorAll('.sopanel')).filter(function(p){return !p.hidden;}).map(function(p){return p.dataset.sub;});
+  out.todayFirst=txt(T.querySelector('#soPanel-today h2.secttl'));
   out.verdict=txt(document.getElementById('soVerdict'));
   out.tiles=[].slice.call(document.querySelectorAll('#kpis .sotile')).map(function(t){return txt(t.querySelector('.t'));});
   out.more=[].slice.call(document.querySelectorAll('#kpisMore .sotile')).map(function(t){return txt(t.querySelector('.t'));});
@@ -68,7 +71,8 @@ try{
         out.back2=location.hash; out.back2open=drw.classList.contains('on');
         out.focusBack=!!b0&&document.activeElement===b0;
         // адрес, вставленный в строку браузера, открывает тот же список
-        if(b0){ history.replaceState(null,'','#sourcing/'+b0.dataset.so); window.dispatchEvent(new PopStateEvent('popstate'));
+        if(b0){ history.replaceState(null,'','#sourcing/people?n='+b0.dataset.so); window.dispatchEvent(new PopStateEvent('popstate'));
+          out.directSub=document.getElementById('tab-sourcing').dataset.sosub;
           out.direct={open:drw.classList.contains('on'), rows:rows().length, n:parseInt(txt(b0),10)};
           document.getElementById('drwX').click(); out.direct.after=location.hash; }
         // сверка вторым способом: сводка сборки против числа строк списка
@@ -117,11 +121,11 @@ def test_первый_экран_вывод_три_плитки_сегодня(p
     assert page["verdict"].startswith("Главное сегодня"), page["verdict"]
     assert page["tiles"] == ["Запросов за период", "КП засчитано", "Ждут итога КП"]
     assert page["more"] == ["Нарушения правил КП", "Сделки без запроса"]
-    t = page["titles"]
-    assert t[0] == "Сегодня", t
-    order = ["Сегодня", "Сорсеры: темп и что исправить", "Поток запросов и КП по неделям", "Куда дошли запросы",
-             "Отметка КП по правилам с 19.10.2026", "Воронка пресейла", "Покрытие сделок сорсингом"]
-    assert [x for x in t if x in order] == order, t
+    # подвкладки: управление первым, пульс вторым; «Сделки пресейла» — только при воронке в сборке
+    assert [x.split(":")[0] for x in page["subs"]] == ["today", "pulse", "people", "rfq", "presale", "how"], page["subs"]
+    assert page["firstPanel"] == ["today"] and page["todayFirst"] == "Сегодня"
+    for need in ("Пульс отдела по неделям", "Сорсеры: темп и что исправить", "Куда дошли запросы", "Регламент воронки «Пресейл»"):
+        assert need in page["titles"], (need, page["titles"])
     assert not page["blockTag"], "«БЛОК A/B» — жаргон: на вкладке словами «отдел / вне отдела»"
 
 
@@ -143,15 +147,15 @@ def test_число_открывает_ровно_свои_записи(page):
     assert len(cl) >= 15, len(cl)
     for c in cl:
         assert c["open"] and c["rows"] == c["n"] > 0, c
-        want = "#sourcing/" + c["key"] + ("/" + c["uid"] if c["uid"] else "")
-        assert c["hash"] == want, c
+        want = "?n=" + c["key"] + ("&u=" + c["uid"] if c["uid"] else "")
+        assert re.fullmatch(r"#sourcing/[a-z]+\?.*", c["hash"]) and c["hash"].endswith(want), c
         assert c["why"].startswith("Почему в списке.") and "Что сделать." in c["why"], c["why"]
         for ln in c["links"]:
             assert ln and ln[1] == "_blank" and ln[2] == "noopener", c
             assert re.fullmatch(r"https://kvantpro\.bitrix24\.ru/crm/(type/166|deal)/details/\d+/", ln[0]), ln
         d = [x for x in c["days"] if x is not None]
         assert d == sorted(d, reverse=True), ("дольше ждущие сверху", c["key"], d)
-    assert page["closedHash"] == ""
+    assert re.fullmatch(r"#sourcing/[a-z]+", page["closedHash"]), page["closedHash"]
 
 
 def test_числа_сходятся_со_сводкой_сборки(page):
@@ -170,8 +174,8 @@ def test_числа_сходятся_со_сводкой_сборки(page):
 
 
 def test_адрес_уровня_esc_вверх_фокус_назад(page):
-    assert page["lvl1"].startswith("#sourcing/") and page["lvl2"].startswith("#sourcing/p/")
+    assert "?n=" in page["lvl1"] and "?p=" in page["lvl2"], (page["lvl1"], page["lvl2"])
     assert page["back1"] == page["lvl1"] and page["back1open"], "Esc из запросов сорсера — назад к списку"
-    assert page["back2"] == "" and not page["back2open"] and page["focusBack"]
+    assert page["back2"] == "#sourcing/today" and not page["back2open"] and page["focusBack"]
     d = page["direct"]
-    assert d["open"] and d["rows"] == d["n"] and d["after"] == ""
+    assert d["open"] and d["rows"] == d["n"] and d["after"] == "#sourcing/people" and page["directSub"] == "people"
