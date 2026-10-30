@@ -45,6 +45,7 @@ try{
   // каждое число-кнопка вкладки: открывает ровно столько строк, адрес — #sourcing/<пункт>[/<сорсер>]
   [].slice.call(T.querySelectorAll('[data-so]')).forEach(function(b){
     var n=parseInt(txt(b),10)||parseInt(txt(b.querySelector('.v')),10);
+    try{ _soSlot.w=[]; }catch(e){}   // ограничитель записей в историю (40 за 10 с) — для сотни чисел подряд
     b.click();
     var rs=rows();
     out.clicks.push({key:b.dataset.so, uid:b.dataset.souid||'', n:n, rows:rs.length, open:drw.classList.contains('on'), hash:location.hash,
@@ -55,24 +56,30 @@ try{
   });
   out.closedHash=location.hash;
   // Esc: список → запросы сорсера → Esc → список → Esc → закрыто, фокус на числе
-  var b0=document.querySelector('#soToday button[data-so="pawStale"]');   // запросы: в списке есть имя сорсера
+  var b0=document.querySelector('#soToday button[data-so$="pawStale"]');   // запросы (pawStale или do:pawStale): в списке есть имя сорсера
   if(b0){
+    try{ _soSlot.w=[]; }catch(e){}
     b0.focus(); b0.click(); out.lvl1=location.hash;
     var l=document.querySelector('#drwBody .solnk');
     if(l){ l.click(); out.lvl2=location.hash; out.lvl2name=txt(document.getElementById('drwName')); }
     document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
   }
-  setTimeout(function(){
+  // «Назад» по истории асинхронен: ждём смены адреса (до 3 с), а не фиксированную паузу —
+  // на гейте 60 мс не хватало (прогон 41075308130)
+  function until(cond,cb,left){ if(cond()||left<=0){cb();return;} setTimeout(function(){until(cond,cb,left-25);},25); }
+  var h2=location.hash;
+  until(function(){return location.hash!==h2;},function(){
     try{
       out.back1=location.hash; out.back1open=drw.classList.contains('on'); out.back1name=txt(document.getElementById('drwName'));
       document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
     }catch(e){out.err=String(e&&e.stack||e);}
-    setTimeout(function(){
+    var h1=location.hash;
+    until(function(){return location.hash!==h1||!drw.classList.contains('on');},function(){
       try{
         out.back2=location.hash; out.back2open=drw.classList.contains('on');
         out.focusBack=!!b0&&document.activeElement===b0;
         // адрес, вставленный в строку браузера, открывает тот же список
-        if(b0){ history.replaceState(null,'','#sourcing/people?n='+b0.dataset.so); window.dispatchEvent(new PopStateEvent('popstate'));
+        if(b0){ history.replaceState(null,'','#sourcing/people?n='+encodeURIComponent(b0.dataset.so)); window.dispatchEvent(new PopStateEvent('popstate'));
           out.directSub=document.getElementById('tab-sourcing').dataset.sosub;
           out.direct={open:drw.classList.contains('on'), rows:rows().length, n:parseInt(txt(b0),10)};
           document.getElementById('drwX').click(); out.direct.after=location.hash; }
@@ -84,8 +91,8 @@ try{
           econBad:((((window.__DATA__.kpRules||{}).econ)||{}).rows||[]).length};
       }catch(e){out.err=String(e&&e.stack||e);}
       var p=document.createElement('pre'); p.id='so1out'; p.textContent=JSON.stringify(out); document.body.appendChild(p);
-    },60);
-  },60);
+    },3000);
+  },3000);
 }catch(e){out.err=String(e&&e.stack||e); var p=document.createElement('pre'); p.id='so1out'; p.textContent=JSON.stringify(out); document.body.appendChild(p);}
 })();</script>"""
 
@@ -151,7 +158,9 @@ def test_число_открывает_ровно_свои_записи(page):
         assert c["open"] and c["rows"] == c["n"] > 0, c
         want = "?n=" + quote(c["key"], safe="") + ("&u=" + quote(c["uid"], safe="") if c["uid"] else "")
         assert re.fullmatch(r"#sourcing/[a-z]+\?.*", c["hash"]) and c["hash"].endswith(want), c
-        assert c["why"].startswith("Почему в списке.") and "Что сделать." in c["why"], c["why"]
+        # список-факт за числом таблицы («Куда дошли», «Письмо ушло») — без «Что сделать»
+        fact = c["key"].startswith(("stg:", "mail:", "st:"))
+        assert c["why"].startswith("Почему в списке.") and (fact or "Что сделать." in c["why"]), c["why"]
         for ln in c["links"]:
             assert ln and ln[1] == "_blank" and ln[2] == "noopener", c
             assert re.fullmatch(r"https://kvantpro\.bitrix24\.ru/crm/(type/166|deal)/details/\d+/", ln[0]), ln

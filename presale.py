@@ -284,9 +284,10 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
         if open_ and on_src and not mine and age is not None and age >= БЕЗ_ЗАПРОСА_ДНЕЙ:
             flags.append("norfq")
         days = (today - moved).days if moved else None
-        # регламент: рабочих дней на стадии (с входа в неё по MOVED_TIME, по вчера) против нормы
+        # регламент: рабочих дней на стадии (после дня входа по MOVED_TIME, по сегодня — как дожим
+        # поставщика wdf) против нормы: вошла в пн с нормой 2 — срок ср, в чт уже «дольше нормы»
         norm, closer = reg_of(stage_name)
-        wd = period.workdays_ru(moved, today - dt.timedelta(days=1)) if moved and moved < today else (0 if moved else None)
+        wd = period.workdays_ru(moved, today) if moved and moved < today else (0 if moved else None)
         if open_ and days is not None and days > ЗАСТОЙ_ДНЕЙ:
             flags.append("stale")
         rows.append({

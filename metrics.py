@@ -301,6 +301,12 @@ def build(
                 "wk": wi if wi is not None else -1,
                 "dt": (r.get("createdTime") or "")[:10],
                 "dtx": (r.get("createdTime") or ""),   # полная метка для хронологической сортировки
+                # «Пульс отдела»: КП файлом и неделя последнего движения — по ним же недельные КП
+                # отдела открываются списком (как weekly.kp, но только запросы отдела)
+                **({"q": 1} if r.get("_hasQuote") else {}),
+                "mw": _mw if (_mw := period.week_index(parse_dt(r.get("movedTime") or ""))) is not None else -1,
+                # «Сегодня»: на Price at Work дни считаются от входа в стадию (как pawStale), а не от заведения
+                **({"mv": (r.get("movedTime") or "")[:10]} if classify_stage(r.get("stageId", "")) == "paw" else {}),
                 # нарушения правил отметки КП — только где есть (пустой список не везём);
                 # признаки «до правил» (наследие, льготный срок) — отдельным полем «flp»
                 **({"fl": fl} if fl else {}),
@@ -448,7 +454,7 @@ def build(
         hc = sum(1 for s in sourcers_a if s["from"] <= w.end.isoformat() and s["to"] >= w.start.isoformat())
         # mon — понедельник недели (ISO): по нему «Пульс отдела» сводит неделю с непокрытыми
         # сделками и пресейлом (у них своя разбивка по неделям)
-        row = {"w": w.label, "d": w.days, "mon": w.start.isoformat(), "A": a, "B": b,
+        row = {"w": w.label, "d": w.days, "mon": (w.start - dt.timedelta(days=w.start.weekday())).isoformat(), "A": a, "B": b,
                "kp": kp_got[i], "kpa": kp_taken[i], "inb": kp_mail[i], "hc": hc}
         # Неделя бывает неполной: первая обрезана началом периода (01.05.2026 —
         # пятница, один рабочий день), последняя — концом периода или ещё идёт.

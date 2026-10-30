@@ -2486,6 +2486,10 @@
   #tab-sourcing :where(.sonum:hover,.solink:hover){border-color:var(--a);background:var(--hov)}
   #tab-sourcing :where(.solink){font:600 var(--so-sm) var(--so-sans);min-width:28px;min-height:28px;padding:1px 8px;margin-left:2px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);cursor:pointer}
   #tab-sourcing :where(.sozero){color:var(--dim)}
+  #tab-sourcing :where(.soinl){font:inherit;font-weight:600;color:var(--ink);background:none;border:0;border-bottom:1px solid var(--ctl);padding:0;cursor:pointer}
+  #tab-sourcing :where(.soinl:hover){border-bottom-color:var(--a)}
+  #tab-sourcing :where(.sokpn){display:block;font:600 20px var(--so-sans);color:inherit;background:none;border:0;border-bottom:1px solid var(--ctl);padding:0;margin:0 0 2px;cursor:pointer;text-align:left}
+  #tab-sourcing :where(.kprule .cell.bad .sokpn){color:var(--nr)}
   #tab-sourcing :where(.sotodo){display:inline-flex;align-items:center;gap:4px;margin:0 10px 4px 0;font-size:var(--so-sm);color:var(--ink2);white-space:nowrap}
   #tab-sourcing :where(.sogone td){font-size:var(--so-sm);color:var(--mut);background:var(--panel2)}
   #tab-sourcing :where(.sopace){font-size:var(--so-lg);font-weight:600}
@@ -2619,14 +2623,21 @@
     #tab-sourcing :where(.solink){min-height:44px;min-width:44px}
     #tab-sourcing :where(.ownrow){flex-wrap:wrap}
     #tab-sourcing :where(.ownrow .ocnt){min-width:0;text-align:left}
-    #tab-sourcing :where(.sotd,.sopl,.sops) :where(thead){display:none}
-    #tab-sourcing table:is(.sotd,.sopl,.sops){display:block;width:100%;min-width:0}
-    #tab-sourcing :where(.sotd,.sopl,.sops) :where(tbody,tr){display:block;width:100%}
-    #tab-sourcing :where(.sotd,.sopl,.sops) :where(tbody tr){border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:0 0 10px}
-    #tab-sourcing :where(.sotd,.sopl,.sops) :where(td){display:inline-block;vertical-align:top;border:0;padding:4px 16px 4px 0;text-align:left;max-width:100%}
+    #tab-sourcing :where(.sotd,.sopl,.sops,.soled) :where(thead){display:none}
+    #tab-sourcing table:is(.sotd,.sopl,.sops,.soled){display:block;width:100%;min-width:0}
+    #tab-sourcing :where(.sotd,.sopl,.sops,.soled) :where(tbody,tr){display:block;width:100%}
+    #tab-sourcing :where(.sotd,.sopl,.sops,.soled) :where(tbody tr){border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:0 0 10px}
+    #tab-sourcing :where(.sotd,.sopl,.sops,.soled) :where(td){display:inline-block;vertical-align:top;border:0;padding:4px 16px 4px 0;text-align:left;max-width:100%}
+    #tab-sourcing :where(.soled th[scope=row]){display:block;border:0;padding:0 0 2px}
+    /* «Пульс» на телефоне: показатель, ход, две последние полные недели и «за неделю» — без прокрутки вбок */
+    #tab-sourcing :where(.sopulse .sowo){display:none}
+    #tab-sourcing table.sopulse{min-width:0;table-layout:auto}
+    #tab-sourcing :where(.sopulse .sotr){display:none}
+    #tab-sourcing table.socov{min-width:0}
+    #tab-sourcing :where(.sopulse) :where(th,td){padding-left:4px;padding-right:4px}
     #tab-sourcing :where(.sotd,.sopl,.sops) :where(td:first-child,td[data-l="Что сделать"],td[data-l="Почему"]){display:block;padding-right:0}
     #tab-sourcing :where(.sotd td.sonc){white-space:normal}
-    #tab-sourcing :where(.sotd,.sopl,.sops) :where(td[data-l])::before{content:attr(data-l);display:block;font-size:var(--so-sm);font-weight:600;color:var(--mut)}
+    #tab-sourcing :where(.sotd,.sopl,.sops,.soled) :where(td[data-l])::before{content:attr(data-l);display:block;font-size:var(--so-sm);font-weight:600;color:var(--mut)}
     #tab-sourcing :where(.sotd,.sopl) :where(td[data-l="Что сделать"])::before{display:none}
     #tab-sourcing :where(.sopl tfoot){display:block}
     #tab-sourcing :where(.sopl tfoot tr){display:flex;flex-wrap:wrap;gap:8px}
@@ -2651,6 +2662,26 @@
     #tab-sourcing :where(#kpis .sotb .v){font-size:22px}
     #tab-sourcing :where(#kpis) :where(.d,.sonm,.a,.soparts,.soaside){display:none}
     #tab-sourcing :where(td){font-size:var(--so-sm)}
+    #tab-sourcing :where(#soPanel-today:not([hidden])){display:flex;flex-direction:column}
+    #tab-sourcing :where(#soPanel-today>#soVerdict){order:1}
+    #tab-sourcing :where(#soPanel-today>.sotoday){order:2}
+    #tab-sourcing :where(#soPanel-today>#kpis){order:3;margin-top:12px}
+    #tab-sourcing :where(#soPanel-today>#soMore){order:4}
+    #tab-sourcing :where(#soPanel-today>#soLedgerS){order:5}
+    #tab-sourcing :where(#soPanel-today>#soOrderS){order:6}
+    #tab-sourcing :where(.soas select){min-height:44px}
+    /* «?» — зона нажатия 44 px поверх кружка 20 px (аудит 30.10.2026) */
+    #tab-sourcing :where(.qq){position:relative}
+    #tab-sourcing :where(.kpi .qq){position:absolute}
+    #tab-sourcing :where(.qq)::after{content:'';position:absolute;inset:-12px}
+    #tab-sourcing :where(#soPanel-today .sotoday .secttl){margin-top:0}
+    /* первый экран телефона: строка доверия короче, «зачем» «Сегодня» — в выводе, строка дела — в две строки */
+    #tab-sourcing :where(.sotrust>span:nth-child(2)){display:none}
+    #tab-sourcing :where(.sotoday>.sowhy){display:none}
+    #tab-sourcing :where(.sotd tbody tr){padding:6px 10px}
+    #tab-sourcing :where(.sotd td:not([data-l="Что сделать"])){display:inline-block;padding:2px 12px 2px 0}
+    #tab-sourcing :where(.sotd td:not([data-l="Что сделать"]))::before{display:inline;content:attr(data-l) ": "}
+    #tab-sourcing :where(.sotd td[data-l="Сколько"])::before{content:""}
   }
 
   /* ==== «Реализация»: шрифтовая система вкладки (R3, 29.10.2026) ====
@@ -3377,36 +3408,20 @@
   <h2 class="secttl" id="soCovH">Покрытие сделок сорсингом</h2>
   <p class="sowhy">Подключён ли сорсинг там, где запрос ожидается: живые сделки с суммой вне технических воронок.</p>
   <div class="sotiles sotiles4" id="kpisCov"></div>
-  <div class="grid">
-    <div>
-      <section class="card soc">
-        <h3 class="soh3">Покрытие по воронкам</h3>
-        <div class="twrap"><table><thead><tr><th>Воронка</th><th class="r">Сделок</th><th class="r">С запросом</th><th class="r">Покрытие</th><th class="r">Запросов</th><th class="r" title="Среднее число запросов (карточек) на сделку, где сорсинг есть; не число разных поставщиков">Запросов на сделку</th></tr></thead><tbody id="tbCov"></tbody></table></div>
-        <details class="sohow"><summary>Как читать</summary><div class="sohowb">
-          <p>Только сделки, где ждём запрос: живые, с суммой, вне технических воронок. В пресейле сумма ставится после сравнения КП, поэтому его сделки попадают сюда почти только после сорсинга — покрытие пресейла завышено (долю от всех его сделок см. в «Воронке пресейла», «С запросом поставщику»).</p>
-          <p>«Запросов на сделку» — карточки «Запросы поставщикам», а не разные поставщики: карточка заводится на пару «поставщик × позиция», поэтому один поставщик с тремя позициями даёт три запроса.</p>
-        </div></details>
-      </section>
-      <section class="card soc" id="covWeekly" hidden>
-        <h3 class="soh3">Сделки без запроса по неделям создания</h3>
-        <p class="sonote">Свежая неделя бывает выше: запрос уходит примерно за сутки. Неделя открывает список сделок.</p>
-        <div id="covWeeklyBody"></div>
-      </section>
-    </div>
-    <div>
-      <section class="card soc">
-        <h3 class="soh3">Сколько запросов на сделку</h3>
-        <p class="sonote">Сделки, где запрос есть: слева — единственный запрос, справа — широкий обзвон.</p>
-        <div class="wkchart" id="histchart" style="height:150px"></div>
-      </section>
-      <section class="card soc">
-        <h3 class="soh3">Какие воронки кормит сорсинг</h3>
-        <p class="sonote">Запросы периода по воронке сделки, к которой они заведены.</p>
-        <div class="barlist" id="catList"></div>
-      </section>
-      <div class="insight soins" hidden><h3>Покрытие и глубина</h3><div id="insCov"></div></div>
-    </div>
-  </div>
+  <section class="card soc">
+    <h3 class="soh3">Без запроса — по воронкам</h3>
+    <div class="twrap"><table class="socov" data-xl-name="Сделки без запроса по воронкам"><thead><tr><th scope="col">Воронка</th><th scope="col" class="r">Без запроса</th><th scope="col" class="r" title="Доля сделок с суммой, где запрос поставщику есть">Покрытие, %</th></tr></thead><tbody id="tbCov"></tbody></table></div>
+    <details class="sohow"><summary>Как читать</summary><div class="sohowb">
+      <p>Только сделки, где ждём запрос: живые, с суммой, вне технических воронок. В пресейле сумма ставится после сравнения КП, поэтому его сделки попадают сюда почти только после сорсинга — покрытие пресейла завышено (долю от всех его сделок см. в «Сделках пресейла»).</p>
+      <p>Число «без запроса» открывает эти сделки; доля покрытия — мера, её сделки с запросом на странице не перечислены.</p>
+    </div></details>
+  </section>
+  <section class="card soc" id="covWeekly" hidden>
+    <h3 class="soh3">Сделки без запроса по неделям создания</h3>
+    <p class="sonote">Свежая неделя бывает выше: запрос уходит примерно за сутки. Неделя открывает список сделок.</p>
+    <div id="covWeeklyBody"></div>
+  </section>
+  <div class="insight soins" hidden><h3>Покрытие и глубина</h3><div id="insCov"></div></div>
 </section>
 <section class="sosec" id="ttrOrderTtl" aria-labelledby="soTtrH">
   <h2 class="secttl" id="soTtrH">Скорость до первого запроса поставщикам</h2>
@@ -3425,7 +3440,7 @@
       <p>Темп — запросов в рабочий день за последние 4 недели по вчерашний день: одно окно для всех, кто работал весь этот срок. ▲ и ▼ — последние 4 недели против среднего за окно работы человека. Итог за период растёт со стажем, поэтому людей сравниваем по темпу.</p>
       <p>В темп входят карточки робота пресейла, отнесённые сорсеру по полю «Сорсер» сделки, — сколько их, сказано в строке («роботом N»): темп с роботом и без него — разный труд.</p>
       <p>По неделям — столбик на неделю периода; бледный — неполная неделя, пунктир — человек ещё не работал или уже ушёл, красный — карточки, легшие на ушедшего после ухода.</p>
-      <p>«Что сделать» — пункты очереди «Сегодня» этого человека. У ушедшего — открытые карточки, которые руководитель сорсинга переназначает действующим.</p>
+      <p>«Что сделать» — пункты «Сегодня» и «Порядка в карточках» этого человека: первые запросы, стадия дольше нормы, дожим поставщика, итог КП, «Ответ не получен», отметка КП. Сделка без сорсера и запросы ушедшего сюда не входят — их сначала назначает руководитель сорсинга. У ушедшего — открытые карточки на переназначение.</p>
     </div></details>
     <div class="insight soins" hidden><h3>Нагрузка</h3><div id="insLoad"></div></div>
   </section>
@@ -4036,22 +4051,25 @@ const KPB=[['new','snew'],['sent','ssent'],['dialog','sdlg'],['paw','spaw'],['se
 const KPBL={new:'Новый',sent:'Отправлен',dialog:'Переписка без цены',paw:'Price at Work',selected:'Selected',notsel:'Не выбран',refused:'Отказ',no_answer:'Молчание',other:'Прочее'};
 const KPV=M.kpRules||{}, KPL=KPV.labels||{};
 const _violTip=v=>Object.entries(v||{}).map(([k,n])=>`${KPL[k]||k}: ${n}`).join('\n');
+// число таблицы — заготовка кнопки: после сборки очереди _soLive делает его кнопкой «ровно эти запросы»,
+// если записей за ним столько же, сколько в числе (аудит 30.10.2026: «Молчание 5» открывало всю карточку)
+function _sk(v,key,uid,label,cls){return `<span class="${cls||''}" data-sok="${key}" data-souid="${uid||''}" data-sol="${_esc(label)}">${v}</span>`;}
 document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=v=>((v||0)/r.c*100);
  const stack=`<div class="stack">${KPB.map(([k,cl])=>b[k]?`<i class="${cl}" style="width:${p(b[k])}%"></i>`:'').join('')}</div>`;
  // нет закрытых — срока нет: «—», а не зелёный 0 «самый быстрый»
  const sp=r.avgDays==null?'':(r.avgDays<2?'f':(r.avgDays<6?'m':'s'));
  const avgCell=r.avgDays==null?'<span class="dimv" title="закрытых запросов нет — срок не посчитать">—</span>':`<span class="spd ${sp}">${r.avgDays}</span>`;
  const pc=v=>r.c?` <small class="dimv">${Math.round(v/r.c*100)}%</small>`:'';
- const n=(v,clz)=> v>0?`<span class="${clz||''}">${v}</span>`:`<span class="dimv">0</span>`;
+ const n=(v,clz,key,l)=> v>0?(key?_sk(v,key,String(r.id),`${l} — ${r.n}`,clz):`<span class="${clz||''}">${v}</span>`):`<span class="dimv">0</span>`;
  const q=r.quotes||0, vn=r.violN||0;
  return `<tr class="clickrow" data-uid="${r.id}" tabindex="0" aria-haspopup="dialog"><td><div class="who">${_esc(r.n)}${_tag(r)}</div><div class="dep">${r.c} запр. · закрыто ${r.closed}</div></td><td data-xlv="${_esc(KPB.filter(([k])=>b[k]).map(([k])=>`${KPBL[k]} ${b[k]}`).join(' · '))}">${stack}</td>`
  // счёт и доля — два значения в одной ячейке: в Excel текстом «3 (100%)», а не склейкой «3 100%» = 3100 %
- + `<td class="num r" title="Файл в «Offer from supplier»: ${q} из ${r.c} запросов"${q&&r.c?` data-xlv="${q} (${Math.round(q/r.c*100)}%)"`:''}>${n(q,'q')}${q?pc(q):''}</td>`
- + `<td class="num r">${n(b.paw||0)}</td><td class="num r">${n(b.selected||0,'q')}</td><td class="num r">${n(b.notsel||0)}</td>`
- + `<td class="num r">${n(r.refusedCol)}</td><td class="num r">${n(r.noAnswer,'nrc')}</td>`
+ + `<td class="num r" title="Файл в «Offer from supplier»: ${q} из ${r.c} запросов"${q&&r.c?` data-xlv="${q} (${Math.round(q/r.c*100)}%)"`:''}>${n(q,'q','stg:q','КП засчитано')}${q?pc(q):''}</td>`
+ + `<td class="num r">${n(b.paw||0,'','paw','Price at Work')}</td><td class="num r">${n(b.selected||0,'q','stg:selected','Selected')}</td><td class="num r">${n(b.notsel||0,'','stg:notsel','Не выбран')}</td>`
+ + `<td class="num r">${n(r.refusedCol,'','stg:refx','Отказ и прочее')}</td><td class="num r">${n(r.noAnswer,'nrc','stg:no_answer','Молчание')}</td>`
  + `<td class="num r" title="${_esc(_violTip(r.viol))}${r.violPre?`\nдо правил 19.10 (наследие, не нарушение): ${r.violPre}`:''}">${n(vn,'nrc')}</td><td class="r">${avgCell}</td></tr>`;}).join('');
 const tot=A.reduce((t,r)=>({c:t.c+r.c,q:t.q+(r.quotes||0),paw:t.paw+(r.buckets.paw||0),sel:t.sel+(r.buckets.selected||0),ns:t.ns+(r.buckets.notsel||0),ref:t.ref+r.refusedCol,nr:t.nr+r.noAnswer,v:t.v+(r.violN||0)}),{c:0,q:0,paw:0,sel:0,ns:0,ref:0,nr:0,v:0});
-document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b><div class="dep">${tot.c} запр.</div></td><td></td><td class="r num q" data-xlv="${tot.q} (${pctOf(tot.q,tot.c)}%)">${tot.q} <small class="dimv">${pctOf(tot.q,tot.c)}%</small></td><td class="r num">${tot.paw}</td><td class="r num q">${tot.sel}</td><td class="r num">${tot.ns}</td><td class="r num">${tot.ref}</td><td class="r num nrc">${tot.nr}</td><td class="r num nrc">${tot.v}</td><td class="r"></td></tr>`;
+document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b><div class="dep">${tot.c} запр.</div></td><td></td><td class="r num q" data-xlv="${tot.q} (${pctOf(tot.q,tot.c)}%)">${_sk(tot.q,'stg:q','','КП засчитано, отдел')} <small class="dimv">${pctOf(tot.q,tot.c)}%</small></td><td class="r num">${_sk(tot.paw,'paw','','Price at Work, отдел')}</td><td class="r num q">${_sk(tot.sel,'stg:selected','','Selected, отдел')}</td><td class="r num">${_sk(tot.ns,'stg:notsel','','Не выбран, отдел')}</td><td class="r num">${_sk(tot.ref,'stg:refx','','Отказ и прочее, отдел')}</td><td class="r num nrc">${_sk(tot.nr,'stg:no_answer','','Молчание, отдел')}</td><td class="r num nrc">${tot.v}</td><td class="r"></td></tr>`;
 
 // ---- правила отметки КП: нарушения и «Экономика готова»
 (function(){
@@ -4066,8 +4084,8 @@ document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var
  if(rows.length){
   h+=`<div class="twrap"><table><thead><tr><th>Сорсер</th>${fl.map(k=>`<th class="r">${_esc(KPL[k]||k)}</th>`).join('')}<th class="r">Карточек</th><th class="r" title="Карточки только с признаками «до правил» (наследие до 19.10.2026 и льготный срок), без нарушений: на доразметку">до правил</th></tr></thead><tbody>`
    +rows.map(r=>`<tr class="clickrow" data-uid="${r.id}" data-viol="${r.violN?'1':'pre'}" tabindex="0" aria-haspopup="dialog"><td><div class="who">${_esc(r.n)}${_tag(r)}</div></td>${fl.map(k=>`<td class="num r">${(r.viol||{})[k]?`<span class="nrc">${r.viol[k]}</span>`:'<span class="dimv">0</span>'}</td>`).join('')}<td class="num r"><b>${r.violN}</b></td><td class="num r dimv">${r.violPre||0}</td></tr>`).join('')
-   +((KPV.outsideCards||KPV.outsidePreCards)?`<tr><td><div class="who">Вне отдела</div></td>${fl.map(k=>`<td class="num r">${(KPV.outside||{})[k]||0}</td>`).join('')}<td class="num r"><b>${KPV.outsideCards||0}</b></td><td class="num r dimv">${KPV.outsidePreCards||0}</td></tr>`:'')
-   +`</tbody></table></div>`;
+   +`</tbody></table></div>`
+   +((KPV.outsideCards||KPV.outsidePreCards)?`<p class="sonote">Вне отдела: нарушений ещё ${KPV.outsideCards||0}, до правил ${KPV.outsidePreCards||0} — эти запросы ведут не сорсеры отдела, списка по ним на странице нет.</p>`:'');
  } else h+=`<div class="dimv">Нарушений нет${KPV.outsidePreCards?` · вне отдела «до правил» ${KPV.outsidePreCards}`:''}.</div>`;
  const e=KPV.econ;
  if(e){
@@ -4080,7 +4098,7 @@ document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var
 
 // ---- отправлено vs создано (+ двинутые без письма в CRM: нейтрально, не «подлог»)
 if (M.send && M.send.rows){
-  document.getElementById('tbSend').innerHTML=M.send.rows.map(r=>`<tr><td><div class="who">${_esc(r.n)}${_gone(r)?'<span class="gone">ушёл</span>':''}</div></td><td class="num r">${r.total}</td><td class="num r q">${r.sent}</td><td class="num r ${r.nosend?'nrc':'dimv'}">${r.nosend}</td><td class="num r ${r.sentPct>=80?'q':(r.sentPct>=50?'':'nrc')}">${r.sentPct}%</td><td class="num r ${r.fake?'':'dimv'}">${r.fake}</td><td class="num r dimv">${r.fuPct}%</td></tr>`).join('');
+  document.getElementById('tbSend').innerHTML=M.send.rows.map(r=>`<tr><td><div class="who">${_esc(r.n)}${_gone(r)?'<span class="gone">ушёл</span>':''}</div></td><td class="num r">${r.total}</td><td class="num r q">${r.sent?_sk(r.sent,'mail:yes',String(r.id),'С письмом — '+r.n):0}</td><td class="num r ${r.nosend?'nrc':'dimv'}">${r.nosend?_sk(r.nosend,'mail:no',String(r.id),'Без письма — '+r.n):0}</td><td class="num r ${r.sentPct>=80?'q':(r.sentPct>=50?'':'nrc')}">${r.sentPct}%</td><td class="num r ${r.fake?'':'dimv'}">${r.fake?_sk(r.fake,'mail:fake',String(r.id),'Двинута без письма — '+r.n):0}</td><td class="num r dimv">${r.fuPct}%</td></tr>`).join('');
 }
 // ---- разнообразие поставщиков (пай-чарт + поставщиков на сорсера)
 {
@@ -4095,7 +4113,7 @@ if (M.send && M.send.rows){
     ps.innerHTML=A.slice().sort((a,b)=>(b.nsup||0)-(a.nsup||0)).map(s=>`<div class="ownrow clickrow" data-uid="${s.id}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="${_esc(s.n)}: ${s.nsup||0} поставщиков — открыть запросы"><div class="onm who">${_esc(s.n)}${_tag(s)}</div><div class="obar"><i style="width:${((s.nsup||0)/mx*100).toFixed(0)}%"></i></div><div class="ocnt">${s.nsup||0} <span class="dimv">поставщиков · ${s.c} запросов</span></div></div>`).join('')||'<div class="dimv">Нет данных: у отдела нет запросов за период.</div>';
   }
   if(M.send&&M.send.totals){const ts=M.send.totals;
-  document.getElementById('tfSend').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td class="r num">${ts.total}</td><td class="r num q">${ts.sent}</td><td class="r num nrc">${ts.nosend}</td><td class="r num">${ts.sentPct}%</td><td class="r num">${ts.fake}</td><td class="r"></td></tr>`;}
+  document.getElementById('tfSend').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td class="r num">${ts.total}</td><td class="r num q">${_sk(ts.sent,'mail:yes','','С письмом, отдел')}</td><td class="r num nrc">${_sk(ts.nosend,'mail:no','','Без письма, отдел')}</td><td class="r num">${ts.sentPct}%</td><td class="r num">${_sk(ts.fake,'mail:fake','','Двинута без письма, отдел')}</td><td class="r"></td></tr>`;}
 }
 
 
@@ -4124,10 +4142,11 @@ if (M.send && M.send.rows){
   let h=`<h3 class="soh3">Воронка «${_esc(P.name)}» <span class="sottlx">сделок ${H.total}</span></h3>`
    +`<div class="kpis sotiles sotiles6">`
    +kp('Открыто',H.open,`за 4 недели заведено ${H.new28}`,'')
-   +kp('С запросом поставщику',H.withRfqPct+'%',`${H.withRfq} сделок · ${H.rfq} запросов · медиана ${H.rfqMed??'—'} на сделку`,'ok')
+   // цвет — по порогу, а не постоянный (аудит 30.10.2026: «0%» был зелёным); подпись — «k из n» и чего
+   +kp('С запросом поставщику',H.withRfqPct+'%',`${H.withRfq} из ${H.total} сделок воронки, закрытые тоже · ${H.rfq} запросов · медиана ${H.rfqMed??'—'} на сделку`,H.total?(H.withRfqPct>=80?'ok':(H.withRfqPct<50?'warn':'')):'')
    +kp('До первого запроса',H.lagMed!=null?H.lagMed+' дн':'—',H.rfq?`робот завёл ${H.robotRfqPct}% запросов`:'запросов нет','')
-   +kp('Без сорсера',H.noSrc,`«Сорсер» заполнен у ${H.srcPct}% сделок`,H.noSrc?'warn':'')
-   +kp('Без запросов',H.noRfq,`открыты ${H.noRfqDays}+ дн, ни одного запроса`,H.noRfq?'warn':'')
+   +kp('Без сорсера',H.noSrc,`открытые, мяч у сорсинга, «Сорсер» пуст · по всей воронке поле заполнено у ${H.srcPct}% из ${H.total}`,H.noSrc?'warn':'')
+   +kp('Без запросов',H.noRfq,`открытые, мяч у сорсинга, заведены ${H.noRfqDays}+ дн назад, ни одного запроса`,H.noRfq?'warn':'')
    +kp('Стоят',H.stale,H.chatGate?`в стадии дольше ${H.staleDays} дн, чат молчит`:`в стадии дольше ${H.staleDays} дн`,H.stale?'warn':'')
    +`</div>`;
   // что сделать — первым: худшие сверху, у строки — действие, у кого мяч и ссылка в Битрикс
@@ -4169,7 +4188,7 @@ if (M.send && M.send.rows){
 
 // ---- categories fed by sourcing
 const cats=M.catList, catMax=Math.max(1,...cats.map(c=>c.v));
-document.getElementById('catList').innerHTML=cats.map(c=>`<div class="blrow"><div class="blt"><span>${_esc(c.cat)}</span><b>${c.v} · ${c.p}%</b></div><div class="bltrack"><i style="width:0%" data-w="${c.v/catMax*100}"></i></div></div>`).join('');
+(document.getElementById('catList')||{}).innerHTML=cats.map(c=>`<div class="blrow"><div class="blt"><span>${_esc(c.cat)}</span><b>${c.v} · ${c.p}%</b></div><div class="bltrack"><i style="width:0%" data-w="${c.v/catMax*100}"></i></div></div>`).join('');
 
 // ---- кто заводит запросы
 // Считаем по автору карточки, а не по ответственному: очередь грузит тот, кто
@@ -4268,10 +4287,10 @@ document.getElementById('originDept').innerHTML=(ORG.byDept||[]).map(d=>
 
 // ---- coverage histogram
 const hist=cov.hist, hMax=Math.max(1,...hist.map(x=>x.v));
-document.getElementById('histchart').innerHTML=hist.map(x=>`<div class="wkcol"><div class="wkbars"><div class="wkbar" style="background:var(--b)" data-h="${x.v/hMax*100}" title="${x.l}: ${x.v} сделок"><span style="color:var(--b2)">${x.v}</span></div></div><div class="wklbl">${x.l}</div></div>`).join('');
+(document.getElementById('histchart')||{}).innerHTML=hist.map(x=>`<div class="wkcol"><div class="wkbars"><div class="wkbar" style="background:var(--b)" data-h="${x.v/hMax*100}" title="${x.l}: ${x.v} сделок"><span style="color:var(--b2)">${x.v}</span></div></div><div class="wklbl">${x.l}</div></div>`).join('');
 
 // ---- coverage by category
-document.getElementById('tbCov').innerHTML=cov.byCat.map(c=>{const cl=c.covPct>=70?'q':(c.covPct>=50?'dimv':'nrc');return `<tr><td><div class="who">${_esc(c.cat)}</div></td><td class="num r">${c.deals}</td><td class="num r">${c.withReq}</td><td class="num r ${cl}">${c.covPct}%</td><td class="num r dimv">${c.reqs}</td><td class="num r" style="color:var(--a2)">${c.avgSup}</td></tr>`;}).join('');
+{const _tc=document.getElementById('tbCov'); if(_tc) _tc.dataset.pending='1';}   // строки — после очереди (списки без запроса по воронкам)
 
 // ---- coverage: динамика непокрытых по неделям (когорты по неделе создания)
 (function(){
@@ -4291,7 +4310,7 @@ document.getElementById('tbCov').innerHTML=cov.byCat.map(c=>{const cl=c.covPct>=
 
 // ---- footer
 document.getElementById('footer').innerHTML=
- `<b>Методология.</b> Сущность «Запросы поставщикам» (Bitrix24 entityTypeId 166, воронка 24), createdTime в периоде; исполнитель — ответственный карточки, у карточек робота — «Сорсер» сделки и следы человека. Блок A — отдел 172 (Гринёв) и подчинённые, <b>включая ушедших</b>: их запросы — работа отдела; блок B — все прочие, в том числе карточки без исполнителя (сорсер в сделке не указан, исполнитель не определён) — это не обязательно чужая работа. <b>Темп</b> — запросов в рабочий день (Пн–Пт, праздники не вычитаются) своего окна работы: с даты приёма (не позже первой карточки), у ушедших — по последний вход в портал (* — по последней своей карточке). Рейтинг — по темпу последних 4 недель по вчерашний день; в темп входят карточки робота, отнесённые по полю «Сорсер» сделки. Стадии — по правилам отметки КП 19.10.2026: «КП засчитано» — файл в «Offer from supplier»; Price at Work — КП без итога (сюда же отменённая «КП получено»); Selected — выбран; «Не выбран» = Not Selected + «Не прошли по цене» + «Не подошло по технике»; переписка — Unread Messages и In Correspondance (ответ без цены); «Отказ» = «Отказ в КП» + стадии вне таблицы («Прочее»); «Молчание» = «Ответ не получен (в срок)». Нарушения — стадия КП без файла, файл без перевода стадии, файл при отказе или молчании, Price at Work без итога дольше 14 дней, стадия «КП получено»; ${PRE_TXT}. «Ср. срок» = createdTime→movedTime по закрытым; закрытых нет — «—». Цепочка до сделки — через <span class="mono">parentId2</span>; ${TKP_HIDDEN}. Источник инсайтов: ${INS._source==='claude'?'Claude (Opus)':'правила'}.<br>`+
+ `<b>Методология.</b> Сущность «Запросы поставщикам» (Bitrix24 entityTypeId 166, воронка 24), createdTime в периоде; исполнитель — ответственный карточки, у карточек робота — «Сорсер» сделки и следы человека. Блок A — отдел сорсинга (172) и подчинённые, <b>включая ушедших</b>: их запросы — работа отдела; блок B — все прочие, в том числе карточки без исполнителя (сорсер в сделке не указан, исполнитель не определён) — это не обязательно чужая работа. <b>Темп</b> — запросов в рабочий день (Пн–Пт, праздники не вычитаются) своего окна работы: с даты приёма (не позже первой карточки), у ушедших — по последний вход в портал (* — по последней своей карточке). Рейтинг — по темпу последних 4 недель по вчерашний день; в темп входят карточки робота, отнесённые по полю «Сорсер» сделки. Стадии — по правилам отметки КП 19.10.2026: «КП засчитано» — файл в «Offer from supplier»; Price at Work — КП без итога (сюда же отменённая «КП получено»); Selected — выбран; «Не выбран» = Not Selected + «Не прошли по цене» + «Не подошло по технике»; переписка — Unread Messages и In Correspondance (ответ без цены); «Отказ» = «Отказ в КП» + стадии вне таблицы («Прочее»); «Молчание» = «Ответ не получен (в срок)». Нарушения — стадия КП без файла, файл без перевода стадии, файл при отказе или молчании, Price at Work без итога дольше 14 дней, стадия «КП получено»; ${PRE_TXT}. «Ср. срок» = createdTime→movedTime по закрытым; закрытых нет — «—». Цепочка до сделки — через <span class="mono">parentId2</span>; ${TKP_HIDDEN}. Источник инсайтов: ${INS._source==='claude'?'Claude (Opus)':'правила'}.<br>`+
  `<b>Данные:</b> live-выгрузка из kvantpro.bitrix24.ru · ${M.period.label}.`;
 
 // ---- дрилл-даун по сорсеру: кому и какие запросы он отправлял
@@ -4306,6 +4325,8 @@ const _onlyPre=d=>!!(d.flp&&d.flp.length)&&!(d.fl&&d.fl.length);
 function openDrw(uid,startFilter,fromRoute){
   if(typeof _rzDrw==='function') _rzDrw(true);   // запросы сорсера — та же шрифтовая система, что у вкладки (portal-ui §5б)
   const s=_byId[String(uid)];if(!s)return;
+  if(!fromRoute){const a=document.activeElement; if(a&&a!==document.body&&!_drw.contains(a)) _soRet=a;}
+  _soDlg();
   if(!fromRoute&&typeof _soPush==='function') _soPush('p='+encodeURIComponent(uid));
   _drw.dataset.so='1';
   // Карточка сорсера по принципу вкладки (30.10.2026): что сделать → где стоят запросы → запросы,
@@ -4330,19 +4351,20 @@ function openDrw(uid,startFilter,fromRoute){
     ['viol','Нарушения правил отметки КП',d=>d.fl&&d.fl.length],['pre','До правил — доразметить',_onlyPre]];
   const body=document.getElementById('drwBody');
   // дела «Сегодня» и «Порядка в карточках» этого человека — строкой «что — сколько — дольше всех»
-  const mine=SO_TODAY.concat(['ord']).map(k=>SOQ.by[k]).filter(Boolean).map(it=>{const R=it.rows.filter(r=>r.uid===String(s.id));
+  // как в таблице «Сорсеры»: у действующего — пункты без ждущих назначения (ключ «do:»), у ушедшего — переназначить
+  const mine=(_gone(s)?['gone']:SO_TODAY.concat(['noans','ord'])).map(k=>SOQ.by['do:'+k]||SOQ.by[k]).filter(Boolean).map(it=>{const R=it.rows.filter(r=>r.uid===String(s.id));
     return R.length?{it,n:R.length,max:R.reduce((m,r)=>r.days!=null&&r.days>m?r.days:m,-1)}:null;}).filter(Boolean);
   function render(filter){
     const g=GR.find(x=>x[0]===(filter||''))||GR[0], det=allDet.filter(g[2]);
     let h='';
     h+=`<h4 class="soh4">Что сделать</h4>`+(mine.length?`<div class="twrap"><table class="solst sodo2" data-xl="off"><thead><tr><th scope="col">Что сделать</th><th scope="col" class="r">Сколько</th><th scope="col" class="r">Дольше всех</th></tr></thead><tbody>`
-      +mine.map(x=>`<tr><td data-l="Что сделать">${_esc(x.it.act)}</td><td class="num r" data-l="Сколько"><button type="button" class="solink" data-so2="${x.it.key}" aria-haspopup="dialog" aria-label="${_esc(x.it.act)}: ${x.n} — открыть список">${x.n}</button> <span class="sounit">${_soUnitW(x.it,x.n)}</span></td><td class="num r" data-l="Дольше всех">${_soDays(x.max)}</td></tr>`).join('')
+      +mine.map(x=>`<tr><td data-l="Что сделать">${_esc(x.it.act)}</td><td class="num r" data-l="Сколько"><button type="button" class="solink" data-so2="${x.it.key}" aria-haspopup="dialog" aria-label="${_esc(x.it.act)}: ${x.n} — открыть список">${x.n}</button> <span class="sounit">${_soUnitW(x.it,x.n)}</span></td><td class="num r" data-l="Дольше всех">${_soMax({base:x.it.base||x.it.key,max:x.max})}</td></tr>`).join('')
       +`</tbody></table></div>`:'<p class="sonote">По очереди у сорсера дел нет.</p>');
     h+=`<h4 class="soh4">Где стоят запросы</h4><div class="stack" style="height:14px;margin:2px 0 8px" role="img" aria-label="${_esc(SBUCK.filter(([k])=>b[k]).map(([k])=>`${STG[k]} ${b[k]}`).join(', '))}">`
       +SBUCK.map(([k,cl])=>b[k]?`<i class="${cl}" style="width:${(b[k]/tot*100).toFixed(1)}%" title="${STG[k]}: ${b[k]}"></i>`:'').join('')+`</div>`
       +`<p class="sonote">${SBUCK.filter(([k])=>b[k]).map(([k])=>`${STG[k]} — ${b[k]}`).join(' · ')}</p>`;
     h+=`<div class="sofil"><label for="soDrwF" class="sofl">Показать</label> <select id="soDrwF">${GR.filter(x=>!x[0]||allDet.some(x[2])).map(x=>`<option value="${x[0]}"${x[0]===(filter||'')?' selected':''}>${_esc(x[1])} — ${allDet.filter(x[2]).length}</option>`).join('')}</select></div>`;
-    h+=`<div class="twrap"><table class="solst" data-xl-name="Запросы сорсера"><thead><tr><th scope="col">Запрос</th><th scope="col">Поставщик</th><th scope="col">Стадия</th><th scope="col" class="r">Писем</th><th scope="col" class="r" title="Дней с создания карточки">Дней</th><th scope="col">Что не так</th></tr></thead><tbody>`
+    h+=`<div class="twrap"><table class="solst" data-xl-name="Запросы сорсера"><thead><tr><th scope="col">Запрос</th><th scope="col">Поставщик</th><th scope="col">Стадия</th><th scope="col" class="r">Писем</th><th scope="col" class="r">Дней с заведения</th><th scope="col">Что не так</th></tr></thead><tbody>`
       +(det.length?det.map(d=>`<tr${_onlyPre(d)?' class="sopre"':''}><td data-l="Запрос"><div class="sorec">${_esc(d.mailSubj||d.subj||'—')}</div><div class="dep">запрос №<span class="mono">${_esc(d.id)}</span> · <a class="sobx" href="${_soUrl('card',d.id)}" target="_blank" rel="noopener" data-xlv="" aria-label="Запрос №${_esc(d.id)} в Битриксе, новая вкладка">в Битриксе ↗</a></div></td>`
         +`<td data-l="Поставщик">${_esc(d.to||d.sup||'—')}</td><td data-l="Стадия">${_esc(STG[d.st]||d.st||'—')}</td><td class="num r" data-l="Писем">${d.mailN!=null?d.mailN:'—'}</td><td class="num r" data-l="Дней">${_soAge(d.dt)??'—'}</td>`
         +`<td data-l="Что не так">${d.fl&&d.fl.length?_esc(d.fl.map(f=>KPL[f]||f).join(', ')):(d.flp&&d.flp.length?`до правил: ${_esc(d.flp.map(f=>KPL[f]||f).join(', '))}`:'')}</td></tr>`).join('')
@@ -4352,7 +4374,7 @@ function openDrw(uid,startFilter,fromRoute){
         +sup.map(x=>`<tr><td data-l="Поставщик">${_esc(x.sup)}</td><td class="num r" data-l="Запросов">${x.n}</td></tr>`).join('')+`</tbody></table></div>`;
     }
     body.innerHTML=h;
-    const t=body.querySelectorAll('table.solst')[1]; if(t&&filter) t._xlNote='Отбор: '+g[1];
+    const t=body.querySelector('table.solst[data-xl-name="Запросы сорсера"]'); if(t&&filter) t._xlNote='Отбор: '+g[1];
     const sel=body.querySelector('#soDrwF'); if(sel) sel.addEventListener('change',()=>render(sel.value));
     body.querySelectorAll('[data-so2]').forEach(x=>x.addEventListener('click',()=>_soOpen(x.dataset.so2,x,String(s.id))));
     try{ if(typeof _xlMark==='function') _xlMark(body); }catch(e){ console.error('Excel-хук карточки сорсера:',e); }
@@ -4361,7 +4383,27 @@ function openDrw(uid,startFilter,fromRoute){
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
   const hN=document.getElementById('drwName'); if(hN){hN.setAttribute('tabindex','-1');try{hN.focus({preventScroll:true});}catch(e){}}
 }
+// списки и карточка сорсера «Сорсинга» — модальный диалог (аудит 30.10.2026, WCAG 2.4.3 и 4.1.2):
+// role/aria-modal/aria-labelledby на общем дровере, Tab по кругу внутри; прежние атрибуты
+// возвращает _drwHide. Ловушка своя, на погружении, — пока диалог «Сорсинга» открыт
+const _SO_ARIA=['role','aria-modal','aria-labelledby'];
+function _soDlg(){
+  if(!_soDlg.prev) _soDlg.prev=Object.fromEntries(_SO_ARIA.map(a=>[a,_drw.getAttribute(a)]));
+  _drw.setAttribute('role','dialog'); _drw.setAttribute('aria-modal','true'); _drw.setAttribute('aria-labelledby','drwName');
+  if(_soDlg.on) return; _soDlg.on=1;
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Tab'||!_soDlg.prev||!_drw.classList.contains('on')) return;
+    const shut=el=>{for(let p=el.closest('details');p;p=p.parentElement&&p.parentElement.closest('details')){if(!p.open&&!(el.tagName==='SUMMARY'&&el.parentElement===p)) return true;} return false;};
+    const fs=[..._drw.querySelectorAll('a[href],button,select,input,summary,[tabindex]:not([tabindex="-1"])')].filter(el=>!el.disabled&&el.getClientRects().length&&!shut(el)&&!el.closest('[hidden]'));
+    if(!fs.length) return;
+    const a=fs[0], z=fs[fs.length-1], cur=document.activeElement, i=fs.indexOf(cur);
+    if(!_drw.contains(cur)||i<0){e.preventDefault(); e.stopImmediatePropagation(); (e.shiftKey?z:a).focus(); return;}
+    if(e.shiftKey&&cur===a){e.preventDefault(); e.stopImmediatePropagation(); z.focus();}
+    else if(!e.shiftKey&&cur===z){e.preventDefault(); e.stopImmediatePropagation(); a.focus();}
+  },true);
+}
 function _drwHide(){_ovl.classList.remove('on');_drw.classList.remove('on');_drw.setAttribute('aria-hidden','true');
+  if(_soDlg.prev){const A=_soDlg.prev; _SO_ARIA.forEach(a=>{if(A[a]==null) _drw.removeAttribute(a); else _drw.setAttribute(a,A[a]);}); _soDlg.prev=null;}
   // фокус — туда, откуда открыли список «Сорсинга» (число, плитка, строка)
   const r=typeof _soRet!=='undefined'?_soRet:null; if(r&&document.contains(r)){_soRet=null;try{r.focus({preventScroll:true});}catch(e){}}}
 // up — Esc: на уровень вверх (из запросов сорсера — к списку, назад по истории); без него (×,
@@ -4370,7 +4412,7 @@ function closeDrw(up){
   if(_drw.dataset.so&&/^#sourcing[/?]/.test(location.hash||'')&&/\?/.test(location.hash||'')){
     if(up===true&&((history.state&&history.state.so)||0)>1){ try{ history.back(); return; }catch(e){} }
     // уровни уходят из адреса, подвкладка остаётся
-    try{ history.replaceState(null,'',typeof _soHash==='function'?_soHash(''):location.pathname+location.search); }catch(e){}
+    try{ if(_soSlot()) history.replaceState(null,'',typeof _soHash==='function'?_soHash(''):location.pathname+location.search); }catch(e){}
   }
   delete _drw.dataset.so; _drwHide();
 }
@@ -4419,13 +4461,27 @@ const SO_TODAY=['ps-src','gone','over','ps-rfq','chase','pawStale','unc'];
 const SO_CARDS=['noans','noFile','fileNoStage','legacy','fileClosed','econ'];
 const SO_HEAD_ONLY=new Set(['ps-src','gone','unc']);   // дела руководителя сорсинга — в «Смотреть как» сорсера не входят
 const SO_ORDER=SO_TODAY.concat(SO_CARDS);
-const SO_SHORT={gone:'переназначить','ps-rfq':'первые запросы','ps-src':'назначить сорсера','ps-stale':'сдвинуть сделку'};
+const SO_SHORT={gone:'переназначить','ps-rfq':'первые запросы','ps-src':'назначить сорсера','ps-stale':'сдвинуть сделку',
+  over:'довести стадию',chase:'дожать',noans:'«Ответ не получен»'};
 // для фразы-вывода: [что сделать — глаголом, кто]
 const SO_PHRASE={'ps-src':'назначить сорсера','gone':'переназначить запросы ушедшего сорсера','ps-rfq':'отправить первые запросы поставщикам',
   pawStale:'поставить итог КП','unc':'завести запросы по сделкам с суммой','ps-stale':'сдвинуть стоящие сделки пресейла',
   over:'довести стадию до конца','chase':'дожать поставщиков: повторное письмо и звонок'};
+// единица дней пункта (аудит 30.10.2026): одна на столбец и от того события, от которого считает норма —
+// стадия и дожим — рабочие дни (регламент), Price at Work — дни на стадии (как pawStale), прочее — с заведения
+const _SO_DU={over:['wd','Раб. дней на стадии'],chase:['wd','Раб. дней с отправки'],noans:['wd','Раб. дней с отправки'],
+  paw:['cd','Дней на Price at Work'],pawStale:['cd','Дней на Price at Work'],'ps-src':['cd','Дней с заведения сделки'],
+  'ps-rfq':['cd','Дней с заведения сделки'],unc:['cd','Дней с заведения сделки'],econ:['cd','Дней']};
+const _soDU=it=>{const k=String(it.base||it.key||''); return /^(st|over):/.test(k)?_SO_DU.over:(_SO_DU[k]||['cd','Дней с заведения запроса']);};
+const _soMax=it=>it.max==null||it.max<0?'—':(_soDU(it)[0]==='wd'?_soN(it.max,'раб. день','раб. дня','раб. дней'):_soDays(it.max));
 const _soUnit=(it,n)=>it.unit==='deal'?_soN(n,'сделка','сделки','сделок'):_soN(n,'запрос','запроса','запросов');
 const _soUnitW=(it,n)=>_soUnit(it,n).replace(/^\d+ /,'');
+// стадия запроса → список за числом «Куда дошли» (refused и other — один столбец «Отказ», как refusedCol)
+const STK={selected:['stg:selected','Selected: поставщик выбран','Запросы на Selected: КП поставщика выбрано.'],
+  notsel:['stg:notsel','Не выбран: КП было, выбрали другого','Not Selected, «Не прошли по цене», «Не подошло по технике».'],
+  refused:['stg:refx','Отказ поставщика и прочее','Отказ в КП и стадии вне справочника — столбец «Отказ».'],
+  other:['stg:refx','Отказ поставщика и прочее','Отказ в КП и стадии вне справочника — столбец «Отказ».'],
+  no_answer:['stg:no_answer','Молчание: «Ответ не получен»','Запросы на стадии «Ответ не получен»: поставщик не ответил.']};
 function _soQueue(){
   const Q={}, add=(key,o)=>(Q[key]=Q[key]||Object.assign({key,rows:[]},o));
   const P=M.presale||null, act=(P&&P.act)||[], H=(P&&P.head)||{};
@@ -4470,14 +4526,23 @@ function _soQueue(){
             def:'Запрос отправлен, ответа нет 2 рабочих дня и больше, а повторного письма из Битрикса нет. По регламенту: на 2-й рабочий день — повторное письмо, на 3-й — звонок с записью в карточку запроса. Звонки система не видит — отметьте результат в карточке.'})
           .rows.push(Object.assign({},base,{who,why:`отправлен ${_soN(d.wdf,'раб. день','раб. дня','раб. дней')} назад · писем ${d.mailN??'—'}`,days:d.wdf}));
       }
+      const pawD=d.mv?_soAge(d.mv):base.days;
+      // списки за числами таблиц «Куда дошли» и «Письмо ушло» — факт, а не дело (fact: без «Что сделать»)
+      const sk=STK[d.st]; if(sk) add(sk[0],{act:sk[1],who:'сорсер запроса',def:sk[2],fact:1}).rows.push(Object.assign({},base,{who,why:st}));
+      if(d.q) add('stg:q',{act:'КП засчитано: файл КП в запросе',who:'сорсер запроса',def:'Запросы, где КП приложено файлом в «Offer from supplier»: по ним считаются норматив по КП и KPI сорсера.',fact:1}).rows.push(Object.assign({},base,{who,why:st}));
+      if(d.mailN!=null){const mk=d.mailN?['mail:yes','С письмом из Битрикса','Запросы, по которым из Битрикса ушло хотя бы одно письмо поставщику.']
+          :['mail:no','Без письма из Битрикса','Запросы без исходящего письма из Битрикса: письмо не ушло или ушло из личной почты — её система не видит.'];
+        add(mk[0],{act:mk[1],who:'сорсер запроса',def:mk[2],fact:1}).rows.push(Object.assign({},base,{who,why:`${st} · писем ${d.mailN}`}));
+        if(!d.mailN&&d.st!=='new'&&!d.q&&!['dialog','paw','selected','notsel','refused'].includes(d.st))
+          add('mail:fake',{act:'Двинута без письма в CRM',who:'сорсер запроса',def:'Запрос вышел из «Новый», а исходящего письма из Битрикса, файла КП и стадии с ответом поставщика нет.',fact:1}).rows.push(Object.assign({},base,{who,why:st}));}
       if(d.st==='paw') add('paw',{act:'Запросы на Price at Work: КП есть, итога нет',who:'сорсер запроса',def:'КП получено, поставщик не выбран. Каждому такому запросу нужен итог: Selected или «не выбран».'})
-        .rows.push(Object.assign({},base,{who,why:`Price at Work${d.sup&&d.sup!=='—'?' · '+d.sup:''}${fl.includes('pawStale')?' · дольше нормы, нарушение':(flp.includes('pawStale')?' · дольше нормы, до правил':'')}`}));
+        .rows.push(Object.assign({},base,{who,days:pawD,why:`Price at Work${d.sup&&d.sup!=='—'?' · '+d.sup:''}${fl.includes('pawStale')?' · дольше нормы, нарушение':(flp.includes('pawStale')?' · дольше нормы, до правил':'')}`}));
       const ord=fl.concat(flp).filter(f=>f!=='pawStale');
       if(ord.length) add('ord',{act:'Порядок в карточке запроса: отметка КП',who:'сорсер запроса',def:'Запросы, где отметка КП не по правилам: файл, стадия или «КП получено». Что именно — в столбце «Почему».'})
         .rows.push(Object.assign({},base,{who,why:`${st} · ${ord.map(f=>KPL[f]||f).join(', ')}${fl.some(f=>f!=='pawStale')?'':' · до правил, не нарушение'}`,pre:!fl.some(f=>f!=='pawStale')}));
       Object.keys(SO_FLAG).forEach(f=>{const v=fl.includes(f), p=!v&&flp.includes(f); if(!v&&!p) return;
         const it=add(f,{act:SO_FLAG[f][0],who:'сорсер запроса',def:SO_FLAG[f][2],viol:0,pre:0}); it[v?'viol':'pre']++;
-        it.rows.push(Object.assign({},base,{who,why:`${st}${d.sup&&d.sup!=='—'?' · '+d.sup:''} · ${v?'нарушение':'до правил, не нарушение'}`,pre:p}));});
+        it.rows.push(Object.assign({},base,{who,why:`${st}${d.sup&&d.sup!=='—'?' · '+d.sup:''} · ${v?'нарушение':'до правил, не нарушение'}`,pre:p},f==='pawStale'?{days:pawD}:{}));});
     });
   });
   ((KPV.econ&&KPV.econ.rows)||[]).forEach(x=>add('econ',{act:'Снять «Экономика готова» или закрыть Price at Work по сделке',who:'ответственный сделки',
@@ -4486,13 +4551,31 @@ function _soQueue(){
   (cov.uncovered||[]).forEach(d=>add('unc',{act:'Завести запрос поставщику по сделке с суммой',who:SO_HEAD,
       def:'Живые сделки с суммой, где запрос поставщику ожидается, а его нет: сорсинг к сделке не подключён.'})
     .rows.push({kind:'deal',id:d.id,t:d.t,who:SO_HEAD,why:[d.cat,d.client&&d.client!=='—'?d.client:'',d.amt,d.owner?`менеджер ${d.owner}`:''].filter(Boolean).join(' · '),days:_soAge(d.date)}));
+  // одно дело — один раз (аудит 30.10.2026): пока сделка ждёт сорсера, а запросы ушедшего — нового
+  // исполнителя, зависимые пункты их не повторяют (ключ «do:», полный счёт — в плитке и ведомости);
+  // в пункте остаются записи, которые хозяин пункта может сделать сам
+  const blk=new Set(((Q['ps-src']||{}).rows||[]).map(r=>String(r.id))), goneU=new Set(A.filter(_gone).map(s=>String(s.id)));
+  SO_ORDER.forEach(k=>{const it=Q[k]; if(!it||SO_HEAD_ONLY.has(k)) return;
+    const keep=it.rows.filter(r=>r.kind==='deal'?!blk.has(String(r.id)):!goneU.has(String(r.uid)));
+    if(keep.length<it.rows.length){const o=Q['do:'+k]=Object.assign({},it,{key:'do:'+k,base:k,rows:keep,held:it.rows.length-keep.length});
+      if(it.viol!=null){o.pre=keep.filter(r=>r.pre).length; o.viol=keep.length-o.pre;}}});
   Object.values(Q).forEach(it=>{it.rows.sort((a,b)=>(b.days??-1)-(a.days??-1)); it.n=it.rows.length;
-    it.unit=(it.rows[0]||{}).kind||'card';
+    it.unit=(it.rows[0]||{}).kind||(it.base&&Q[it.base]&&(Q[it.base].rows[0]||{}).kind)||'card';
     it.max=it.rows.reduce((m,r)=>r.days!=null&&r.days>m?r.days:m,-1);});
-  return {items:SO_TODAY.filter(k=>Q[k]&&Q[k].n).map(k=>Q[k]), cards:SO_CARDS.filter(k=>Q[k]&&Q[k].n).map(k=>Q[k]), by:Q};
+  const pick=L=>L.map(k=>Q['do:'+k]||Q[k]).filter(it=>it&&it.n);
+  return {items:pick(SO_TODAY), cards:pick(SO_CARDS), by:Q};
 }
 let SOQ={items:[],cards:[],by:{}};
 try{ SOQ=_soQueue(); }catch(e){ console.error('Сорсинг, очередь «Сегодня»:',e); }
+function _soLive(root){
+  (root||document).querySelectorAll('#tab-sourcing [data-sok]').forEach(sp=>{
+    const key=sp.dataset.sok, uid=sp.dataset.souid||'', it=SOQ.by[key], n=parseInt(sp.textContent,10);
+    const c=!it?0:(uid?it.rows.filter(r=>r.uid===uid).length:it.n);
+    if(n>0&&c===n) sp.outerHTML=_soBtn(key,n,sp.dataset.sol||it.act,uid,('solink '+(sp.className||'')).trim());
+    else{sp.removeAttribute('data-sok');}
+  });
+}
+try{ _soLive(); }catch(e){ console.error('Сорсинг, числа таблиц:',e); }
 // число-кнопка: открывает ровно свои записи (uid — только записи этого сорсера)
 function _soBtn(key,n,label,uid,cls){
   if(!n) return `<span class="sozero">0</span>`;
@@ -4507,7 +4590,7 @@ function _soRowsHtml(items,empty,cap){
     const sub=it.viol!=null?[it.viol?`нарушений ${it.viol}`:'',it.pre?`до правил ${it.pre} — не нарушение, доразметить`:''].filter(Boolean).join(' · ')
       :(it.cut?'в списке — первые сделки пресейла; полное число — в «Сделках пресейла»':'');
     return `<tr data-sq="${it.key}"${it._uid?` data-souid="${_esc(it._uid)}"`:''}${more?' class="somorer" hidden':''}><td data-l="Что сделать"><div class="soact">${_esc(it.act)}</div>${sub?`<div class="sosub">${_esc(sub)}</div>`:''}</td>`
-      +`<td data-l="Кто отвечает">${_esc(_soCap(it._uid?(_byId[it._uid]||{}).n||it.who:it.who))}</td><td class="r sonc" data-l="Сколько">${_soBtn(it.key,it.n,it.act,it._uid||'')} <span class="sounit">${_soUnitW(it,it.n)}</span></td><td class="r" data-l="Дольше всех">${_soDays(it.max)}</td></tr>`;};
+      +`<td data-l="Кто отвечает">${_esc(_soCap(it._uid?(_byId[it._uid]||{}).n||it.who:it.who))}</td><td class="r sonc" data-l="Сколько">${_soBtn(it.key,it.n,it.act,it._uid||'')} <span class="sounit">${_soUnitW(it,it.n)}</span></td><td class="r" data-l="Дольше всех">${_soMax(it)}</td></tr>`;};
   const c=cap||items.length;
   return items.slice(0,c).map(it=>row(it,false)).join('')+(items.length>c?items.slice(c).map(it=>row(it,true)).join('')
     +`<tr class="somoretr"><td colspan="4"><button type="button" class="somorebtn" aria-expanded="false">Ещё ${_soN(items.length-c,'дело','дела','дел')}</button></td></tr>`:'');
@@ -4515,7 +4598,7 @@ function _soRowsHtml(items,empty,cap){
 // «Смотреть как»: весь отдел (руководитель сорсинга) или один сорсер — его записи в тех же пунктах
 function _soView(items,uid){
   if(!uid) return items;
-  return items.filter(it=>!SO_HEAD_ONLY.has(it.key)).map(it=>{const R=it.rows.filter(r=>r.uid===uid); if(!R.length) return null;
+  return items.filter(it=>!SO_HEAD_ONLY.has(it.base||it.key)).map(it=>{const R=it.rows.filter(r=>r.uid===uid); if(!R.length) return null;
     const o=Object.assign({},it,{n:R.length,_uid:uid,max:R.reduce((m,r)=>r.days!=null&&r.days>m?r.days:m,-1)});
     if(it.viol!=null){o.pre=R.filter(r=>r.pre).length; o.viol=R.length-o.pre;} return o;}).filter(Boolean);
 }
@@ -4529,7 +4612,8 @@ function _soDrawToday(uid){
     on.textContent=[c?_soN(c,'пункт по запросам','пункта по запросам','пунктов по запросам'):'',d?_soN(d,'сделка','сделки','сделок'):''].filter(Boolean).join(' · ')||'исправлять нечего';}
   // фраза-вывод: первые два дела очереди, словами и с единицей; у одного хозяина — одним «кому»
   const v=document.getElementById('soVerdict');
-  if(v){const two=T.slice(0,2), who=it=>it._uid?((_byId[it._uid]||{}).n||it.who):it.who, ph=it=>`${SO_PHRASE[it.key]||it.act.toLowerCase()} — <b>${_soUnit(it,it.n)}</b>`;
+  if(v){const two=T.slice(0,2), who=it=>it._uid?((_byId[it._uid]||{}).n||it.who):it.who,
+    ph=it=>`${SO_PHRASE[it.base||it.key]||it.act.toLowerCase()} — <button type="button" class="soinl" data-so="${it.key}"${it._uid?` data-souid="${_esc(it._uid)}"`:''} aria-haspopup="dialog">${_soUnit(it,it.n)}</button>`;
     v.innerHTML=!two.length?(uid?`У ${_esc((_byId[uid]||{}).n||'сорсера')} срочных дел нет.`:'Срочных дел по сорсингу нет.')
       :(two.length===2&&who(two[0])===who(two[1])?`Главное сегодня — ${_esc(who(two[0]))}: ${two.map(ph).join('; ')}.`
         :`Главное сегодня: ${two.map(it=>`${ph(it)} (${_esc(who(it))})`).join('; ')}.`);}
@@ -4538,7 +4622,7 @@ function _soDrawToday(uid){
   _soDrawToday('');
   const sel=document.getElementById('soAs');
   if(sel){ sel.innerHTML=`<option value="">весь отдел — руководитель сорсинга</option>`+A.filter(r=>!_gone(r)).map(r=>`<option value="${_esc(String(r.id))}">${_esc(r.n)}</option>`).join('');
-    sel.addEventListener('change',()=>_soDrawToday(sel.value)); }
+    sel.addEventListener('change',()=>{_soDrawToday(sel.value); _soTiles(sel.value);}); }
   // «Ещё N дел» — раскрыть скрытые строки очереди
   document.getElementById('tab-sourcing')?.addEventListener('click',e=>{const b=e.target.closest('.somorebtn'); if(!b) return;
     const tb=b.closest('tbody'), on=b.getAttribute('aria-expanded')!=='true';
@@ -4549,12 +4633,12 @@ function _soDrawToday(uid){
   if(lb&&P&&P.stages){
     const proc=P.stages.filter(st=>st.sem==='P');
     (P.openDeals||[]).forEach(r=>{const k='st:'+r.stage;
-      SOQ.by[k]=SOQ.by[k]||{key:k,act:`Сделки на «${r.stageName}»`,who:r.closer||'',unit:'deal',def:`Открытые сделки пресейла на стадии «${r.stageName}», дольше стоящие сверху. Норма стадии — ${r.norm!=null?r.norm+' раб. дн.':'не задана регламентом'}.`,rows:[]};
+      SOQ.by[k]=SOQ.by[k]||{key:k,act:`Сделки на «${r.stageName}»`,who:r.closer||'',fact:1,unit:'deal',def:`Открытые сделки пресейла на стадии «${r.stageName}», дольше стоящие сверху. Норма стадии — ${r.norm!=null?r.norm+' раб. дн.':'не задана регламентом'}.`,rows:[]};
       SOQ.by[k].rows.push({kind:'deal',id:r.id,t:r.t,who:r.src||r.who||'—',uid:r.srcId&&!r.srcGone?String(r.srcId):'',why:`${r.wd!=null?_soN(r.wd,'раб. день','раб. дня','раб. дней'):'—'} на стадии${r.norm!=null?` при норме ${r.norm}`:''}`,days:r.wd});});
     Object.values(SOQ.by).forEach(it=>{if(/^(st|over):/.test(it.key)){it.rows.sort((a,b)=>(b.days??-1)-(a.days??-1)); it.n=it.rows.length; it.unit='deal'; it.max=it.rows.reduce((m,r)=>r.days!=null&&r.days>m?r.days:m,-1);}});
     lb.innerHTML=proc.map(st=>{const ks='st:'+st.id, ko='over:'+st.id, n=(SOQ.by[ks]||{}).n||0, ov=(SOQ.by[ko]||{}).n||0;
       return `<tr><th scope="row" data-l="Стадия">${_esc(st.name)}</th><td data-l="Кто закрывает">${_esc(st.closer||'—')}</td><td class="num r" data-l="Норма, раб. дн.">${st.norm!=null?st.norm:'—'}</td>`
-        +`<td class="num r" data-l="Сделок">${_soBtn(ks,n,`Сделки на «${st.name}»`,'','solink')}</td><td class="num r" data-l="Дольше нормы">${st.norm==null?'<span class="dimv">нормы нет</span>':_soBtn(ko,ov,`Дольше нормы на «${st.name}»`,'','solink')}</td>`
+        +`<td class="num r" data-l="Сделок">${_soBtn(ks,n,`Сделки на «${st.name}»`,'','solink')}</td><td class="num r" data-l="Дольше нормы">${st.norm==null?'<span class="dimv">нормы нет</span>':(n&&!(SOQ.by[ks]||{rows:[]}).rows.some(z=>z.days!=null)?'<span class="dimv" title="нет производственного календаря года">—</span>':_soBtn(ko,ov,`Дольше нормы на «${st.name}»`,'','solink'))}</td>`
         +`<td class="num r" data-l="Дольше всех, раб. дн.">${st.wdMax!=null&&n?st.wdMax:'—'}</td></tr>`;}).join('')||'<tr><td colspan="6" class="dimv">Нет данных: стадий воронки пресейла в сборке нет.</td></tr>';
     const sec=document.getElementById('soLedgerS'); if(sec) sec.hidden=false;
   }
@@ -4564,7 +4648,7 @@ function _soDrawToday(uid){
 function _soTile(o){
   const click=!!(o.so&&o.n);
   return `<div class="sotile${o.cls?' '+o.cls:''}">`
-    +`<div class="sotb${click?'':' static'}"${click?` data-so="${o.so}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="${_esc(`${o.t}: ${o.v} — открыть список`)}"`:''}>`
+    +`<div class="sotb${click?'':' static'}"${click?` data-so="${o.so}"${o.uid?` data-souid="${_esc(o.uid)}"`:''} role="button" tabindex="0" aria-haspopup="dialog" aria-label="${_esc(`${o.t}: ${o.v} — открыть список`)}"`:''}>`
     +`<div class="t">${_esc(o.t)}</div><div class="v">${o.v}${o.u?`<small>${o.u}</small>`:''}</div>`
     +(o.d?`<div class="d">${o.d}</div>`:'')+(o.norm?`<div class="sonm">${o.norm}</div>`:'')
     +(o.act?`<div class="a"><b>${_esc(_soCap(o.who||''))}</b> → ${_esc(o.act)}</div>`:'')+`</div>`
@@ -4577,40 +4661,52 @@ function _soSpark(vals){
   const mx=Math.max(1,...vals);
   return `<span class="sospark" role="img" aria-label="по неделям: ${vals.join(', ')}">${vals.map((v,i)=>`<i style="height:${Math.max(2,Math.round(v/mx*22))}px"${i===vals.length-1?' class="last"':''}></i>`).join('')}</span>`;
 }
-(function(){
+// «Смотреть как» (аудит 30.10.2026): плитки следуют выбору — у сорсера его запросы и сделки, дела
+// руководителя (сделки без запроса) не показываются; у отдела — полный счёт и «сначала назначить»
+function _soTiles(uid){
   const el=document.getElementById('kpis'); if(!el) return;
-  const by=SOQ.by, nOf=key=>(by[key]&&by[key].n)||0;
-  const wk=(M.weekly||[]).slice(-7), wv=wk.map(w=>(w.A||0)+(w.B||0));
+  uid=uid?String(uid):'';
+  const by=SOQ.by, nOf=key=>{const it=by[key]; return !it?0:(uid?it.rows.filter(r=>r.uid===uid).length:(it.n||0));};
+  const S=uid?_byId[uid]:null, bt=(key,n,l)=>_soBtn(key,n,l,uid,'solink');
+  const wk=(M.weekly||[]).slice(-7), wv=S?(S.wk||[]).slice(-7):wk.map(w=>(w.A||0)+(w.B||0));
   const pawN=nOf('paw'), pawStale=nOf('pawStale'), viol=nOf('viol'), pre=nOf('pre');
   const vOut=KPV.outsideCards||0, preOut=KPV.outsidePreCards||0;
+  const sq=S?(S.quotes||0):0;
   const T=[
-    {t:'Запросов за период',v:k.total??0,d:`отдел ${k.deptA??0} · вне отдела ${k.outside??0}`,
+    S?{t:'Запросов за период',v:S.c??0,d:`сорсер ${_esc(S.n)}`,
+       parts:[wv.length?`по неделям ${_soSpark(wv)} <span class="dimv">${wv[0]}→${wv[wv.length-1]}</span>`:''].filter(Boolean)}
+     :{t:'Запросов за период',v:k.total??0,d:`отдел ${k.deptA??0} · вне отдела ${k.outside??0}`,
      parts:[`открыто ${k.openCount??0} (${k.inWorkPct??0}%)`,wv.length?`по неделям ${_soSpark(wv)} <span class="dimv">${wv[0]}→${wv[wv.length-1]}</span>`:''].filter(Boolean)},
-    {t:'КП засчитано',v:k.kpCountA??0,d:`${k.deptA?(k.kpPctA??0)+'%':'—'} запросов отдела — с файлом КП в карточке`,
-     norm:'КП — файлом в запрос в день получения',who:'сорсер',act:'прикладывать КП файлом к запросу',cls:'ok'},
-    {t:'Нарушения правил КП',v:viol,so:'viol',n:viol,cls:viol?'bad':'',d:'запросов отдела с нарушением с 19.10.2026',
+    {t:'КП засчитано',v:S?sq:(k.kpCountA??0),d:S?`${S.c?Math.round(sq/S.c*100)+'%':'—'} запросов сорсера — с файлом КП в карточке`:`${k.deptA?(k.kpPctA??0)+'%':'—'} запросов отдела — с файлом КП в карточке`,
+     norm:'КП — файлом в запрос в день получения',who:'сорсер',act:'прикладывать КП файлом к запросу'},
+    {t:'Нарушения правил КП',v:viol,so:'viol',n:viol,uid,cls:viol?'bad':'',d:`запросов ${S?'сорсера':'отдела'} с нарушением с 19.10.2026`,
      norm:'норма — 0',who:'сорсер',act:'исправить по списку',
-     parts:pre?[`до правил ${_soBtn('pre',pre,'До правил','', 'solink')} — доразметить`]:[],
-     aside:vOut?`Вне отдела ещё ${vOut}: эти запросы ведут не сорсеры отдела, списка по ним на странице нет.`:''},
-    {t:'Ждут итога КП',v:pawN,so:'paw',n:pawN,cls:pawStale?'warn':'',d:'на Price at Work: КП есть, итога нет',
-     norm:`итог — не позже ${KPV.staleDays??14} дн.`,who:'сорсер',act:'поставить Selected или «не выбран»',
-     parts:pawStale?[`дольше нормы ${_soBtn('pawStale',pawStale,'Price at Work дольше нормы','','solink')}`]:[]},
-    {t:'Сделки без запроса',v:cov.withoutReq??0,so:'unc',n:nOf('unc'),cls:cov.withoutReq?'bad':'',
-     d:`покрытие ${cov.deals?(cov.covPct??0)+'%':'—'}: запрос есть у ${cov.withReq??0} из ${cov.deals??0} сделок с суммой`,
-     norm:'норма — 0',who:SO_HEAD,act:'назначить сорсера и запрос'},
+     parts:pre?[`до правил ${bt('pre',pre,'До правил')} — доразметить`]:[],
+     aside:!S&&vOut?`Вне отдела ещё ${vOut}: эти запросы ведут не сорсеры отдела, списка по ним на странице нет.`:''},
+    {t:'Ждут итога КП',v:pawN,so:'paw',n:pawN,uid,cls:pawStale?'warn':'',d:'на Price at Work: КП есть, итога нет',
+     norm:`итог — не позже ${KPV.staleDays??14} дн. на Price at Work`,who:'сорсер',act:'поставить Selected или «не выбран»',
+     parts:pawStale?[`дольше нормы ${bt('pawStale',pawStale,'Price at Work дольше нормы')}`]:[]},
   ];
+  if(!S) T.push({t:'Сделки без запроса',v:cov.withoutReq??0,so:'unc',n:nOf('unc'),cls:cov.withoutReq?'bad':'',
+     d:`покрытие ${cov.deals?(cov.covPct??0)+'%':'—'}: запрос есть у ${cov.withReq??0} из ${cov.deals??0} сделок с суммой`,
+     norm:'норма — 0',who:SO_HEAD,act:'назначить сорсера и запрос'});
   // управление по регламенту (инструкция сорсера v1.4): сделки дольше нормы стадии и запросы без дожима —
   // первыми; есть данные — они на первом экране, поток и КП периода — под «Ещё» и в «Пульсе отдела»
-  const P=M.presale||null, onReg=((P&&P.openDeals)||[]).filter(r=>r.norm!=null).length, overN=nOf('over');
+  // на стадиях с нормой — только сделки, где рабочие дни посчитаны (нет календаря года — «—», а не уверенный 0)
+  const P=M.presale||null, regD=((P&&P.openDeals)||[]).filter(r=>r.norm!=null&&(!uid||(String(r.srcId||'')===uid&&!r.srcGone)));
+  const onReg=regD.filter(r=>r.wd!=null).length, overN=nOf('over');
   const hasWdf=A.some(s=>_unpack(s.details).some(d=>d.wdf!=null)), chaseN=nOf('chase');
-  if(onReg) T.unshift({t:'Сделки дольше нормы',v:overN,so:'over',n:overN,cls:overN?'bad':'',
-    d:`из ${_soN(onReg,'открытой','открытых','открытых')} на стадиях сорсера`,
-    norm:'норма стадии — 1–3 раб. дня',who:'сорсер',act:'довести стадию'});
-  if(hasWdf) T.splice(onReg?1:0,0,{t:'Запросы без дожима',v:chaseN,so:'chase',n:chaseN,cls:chaseN?'warn':'',
+  const held=key=>!S&&by['do:'+key]?by['do:'+key].held||0:0;
+  if(regD.length||(!S&&((P&&P.openDeals)||[]).some(r=>r.norm!=null))) T.unshift({t:'Сделки дольше нормы',v:onReg?overN:'—',so:onReg?'over':'',n:overN,uid,cls:overN?'bad':'',
+    d:onReg?`из ${_soN(onReg,'открытой','открытых','открытых')} на стадиях сорсера`:'рабочие дни не посчитаны: нет производственного календаря года',
+    norm:'норма стадии — 1–3 раб. дня',who:'сорсер',act:'довести стадию',
+    parts:held('over')?[`без сорсера ${held('over')} — сначала назначить`]:[]});
+  if(hasWdf) T.splice(T[0].so==='over'?1:0,0,{t:'Запросы без дожима',v:chaseN,so:'chase',n:chaseN,uid,cls:chaseN?'warn':'',
     d:'отправлены 2+ раб. дня назад, ответа нет',
-    norm:'письмо — 2-й раб. день, звонок — 3-й',who:'сорсер',act:'повторное письмо и звонок'});
+    norm:'письмо — 2-й раб. день, звонок — 3-й',who:'сорсер',act:'повторное письмо и звонок',
+    parts:held('chase')?[`у ушедших сорсеров ${held('chase')} — сначала переназначить`]:[]});
   // первый экран — три плитки; остальные — под «Ещё показатели»
-  const ixPaw=T.findIndex(x=>x.so==='paw'), MAIN=(onReg||hasWdf)?[0,1,ixPaw].filter((v,i,a)=>a.indexOf(v)===i).slice(0,3):[0,1,ixPaw];
+  const ixPaw=T.findIndex(x=>x.so==='paw'), MAIN=(T[0].so==='over'||hasWdf)?[0,1,ixPaw].filter((v,i,a)=>a.indexOf(v)===i).slice(0,3):[0,1,ixPaw];
   while(MAIN.length<3){const j=T.findIndex((x,i)=>!MAIN.includes(i)); if(j<0) break; MAIN.push(j);}
   const more=document.getElementById('kpisMore'), mw=document.getElementById('soMore');
   el.innerHTML=MAIN.map(i=>_soTile(T[i])).join('');
@@ -4620,18 +4716,21 @@ function _soSpark(vals){
   // покрытие: те же правила плитки
   const cv=document.getElementById('kpisCov');
   if(cv) cv.innerHTML=[
-    {t:'Где запрос ожидается',v:cov.deals??0,d:'живые сделки периода с суммой, вне технических воронок'},
-    {t:'С запросом',v:cov.withReq??0,d:`сорсинг подключён · ${cov.deals?(cov.covPct??0)+'%':'—'}`,cls:'ok'},
-    {t:'Без запроса',v:cov.withoutReq??0,so:'unc',n:nOf('unc'),cls:cov.withoutReq?'bad':'',d:`${cov.deals?100-(cov.covPct??0)+'%':'—'} сделок с суммой`,norm:'норма — 0',who:SO_HEAD,act:'назначить сорсера и запрос'},
-    {t:'Запросов на сделку',v:cov.avgSuppliers??'—',d:'карточек, где сорсинг есть — не разных поставщиков'},
+    {t:'Без запроса',v:nOf('unc')||(cov.withoutReq??0),so:'unc',n:nOf('unc'),cls:cov.withoutReq?'bad':'',d:`сделок с суммой, где запрос ожидается, а его нет`,norm:'норма — 0',who:SO_HEAD,act:'назначить сорсера и запрос'},
+    {t:'Покрытие',v:cov.deals?`<span class="soratio">${cov.covPct??0}%</span>`:'—',d:'доля сделок с суммой, где запрос поставщику есть'},
   ].map(_soTile).join('');
-})();
+}
+_soTiles('');
 
 // ---- сорсеры: темп, недели, что исправить; сверху — у кого больше дел по очереди
 (function(){
   const tb=document.getElementById('soPeople'); if(!tb) return;
   // столбец «Что сделать»: дела «Сегодня» этого человека и одним числом — порядок в его карточках
-  const keys=['gone','ps-rfq','pawStale','ord'], ACT=r=>keys.reduce((a,x)=>a+((SOQ.by[x]&&SOQ.by[x].rows.filter(z=>z.uid===String(r.id)).length)||0),0);
+  // те же пункты, что «Сегодня» и «Порядок» (аудит 30.10.2026: «Дожать» и «Довести стадию» в столбце не было);
+  // у действующего — его записи без ждущих сорсера и переназначения (ключ «do:»), у ушедшего — «переназначить»
+  const K=x=>SOQ.by['do:'+x]||SOQ.by[x];
+  const keys=r=>_gone(r)?['gone']:['ps-rfq','over','chase','pawStale','noans','ord'];
+  const ACT=r=>keys(r).reduce((a,x)=>a+((K(x)&&K(x).rows.filter(z=>z.uid===String(r.id)).length)||0),0);
   const pace=r=>_gone(r)?(r.perDay??null):(r.perDay4!=null?r.perDay4:(r.perDay??null));
   const trend=r=>{if(_gone(r)||r.perDay4==null||r.perDay==null)return '';const d=r.perDay4-r.perDay;return d>0.2?' <span class="up" title="последние 4 недели выше среднего">▲</span>':(d<-0.2?' <span class="dn" title="последние 4 недели ниже среднего">▼</span>':'');};
   const spMax=Math.max(1,...A.flatMap(r=>r.wk||[]));
@@ -4640,8 +4739,8 @@ function _soSpark(vals){
     const wj=M.weekly[j], pt=!off&&!!wj&&wj.part!=null;
     return `<i${off?' class="aft"':(pt?' class="part"':'')} style="height:${Math.max(1,v/spMax*26)}px" title="${v}${off?' — после ухода':''}${pt?' — '+_wTip(wj):''}"></i>`;}).join('')+`</div>`;};
   const todo=r=>{const uid=String(r.id), out=[];
-    keys.forEach(x=>{const it=SOQ.by[x]; if(!it) return; const n=it.rows.filter(z=>z.uid===uid).length; if(!n) return;
-      out.push(`<span class="sotodo">${_esc(x==='ord'?'порядок в карточках':(SO_FLAG[x]?SO_FLAG[x][1]:(SO_SHORT[x]||x)))} ${_soBtn(x,n,it.act+' — '+r.n,uid,'solink')}</span>`);});
+    keys(r).forEach(x=>{const it=K(x); if(!it) return; const n=it.rows.filter(z=>z.uid===uid).length; if(!n) return;
+      out.push(`<span class="sotodo">${_esc(x==='ord'?'порядок в карточках':(SO_FLAG[x]?SO_FLAG[x][1]:(SO_SHORT[x]||x)))} ${_soBtn(it.key,n,it.act+' — '+r.n,uid,'solink')}</span>`);});
     return out.length?out.join(''):'<span class="dimv">по очереди — ничего</span>';};
   const ACTV=A.filter(r=>!_gone(r)).map(r=>({r,n:ACT(r)})).sort((a,b)=>(b.n-a.n)||((pace(a.r)??0)-(pace(b.r)??0)));
   const GONE=A.filter(_gone).map(r=>({r,n:ACT(r)}));
@@ -4669,7 +4768,7 @@ function _soSpark(vals){
      +`<td data-l="По неделям" data-xlv="${(r.wk||[]).join(' · ')}">${spark(r)}</td>`
      +`<td data-l="Что сделать" class="sodo">${todo(r)}</td></tr>`;};
   tb.innerHTML=ACTV.map(row).join('')
-    +(GONE.length?`<tr class="sogone"><td colspan="11">Ушли из отдела — ${_soN(GONE.length,'человек','человека','человек')}: открытых запросов ${k.goneOpen||0}${k.goneAfter?`, легло после ухода ${k.goneAfter}`:''}. Руководитель сорсинга переназначает их действующим${k.goneAfter?' и меняет «Сорсера» в сделках':''}.</td></tr>`+GONE.map(row).join(''):'')
+    +(GONE.length?`<tr class="sogone"><td colspan="11">Ушли из отдела. Открытые запросы ${_soBtn('gone',(SOQ.by.gone||{}).n||0,'Открытые запросы ушедших сорсеров','','solink')} руководитель сорсинга переназначает действующим${k.goneAfter?`; легло после ухода — ${k.goneAfter}, сменить «Сорсера» в сделках`:''}.</td></tr>`+GONE.map(row).join(''):'')
     || '<tr><td colspan="11" class="dimv">Нет данных: в периоде нет запросов отдела.</td></tr>';
   const tf=document.getElementById('soPeopleF'), c=A.reduce((s,r)=>s+r.c,0), q=A.reduce((s,r)=>s+(r.quotes||0),0);
   const sent=A.reduce((s,r)=>s+((SEND[String(r.id)]||{}).sent||0),0), hasSend=A.some(r=>SEND[String(r.id)]);
@@ -4677,6 +4776,27 @@ function _soSpark(vals){
   const pd=A.filter(r=>!_gone(r)&&r.perDay4!=null).reduce((s,r)=>s+r.perDay4,0);
   if(tf&&A.length) tf.innerHTML=`<tr><td><b>Отдел, итого</b></td>${num(c,'Запросов')}${num(hasSend?sent:'—','С письмом')}${num(q,'КП, шт.')}${num(pct(q,c),'КП, % запросов')}${num(paw,'Ждут итога')}${num(vio,'Нарушения')}<td class="num r" data-l="Темп, в день" title="Сумма темпа действующих сорсеров">${fx(Math.round(pd*10)/10)}</td><td></td><td></td><td></td></tr>`;
 })();
+
+// ---- покрытие по воронкам: «без запроса» — кнопкой списка сделок своей воронки, доля — мерой
+(function(){const tb=document.getElementById('tbCov'); if(!tb) return;
+  const U=cov.uncovered||[], byCat={}; U.forEach(d=>{(byCat[d.cat]=byCat[d.cat]||[]).push(d);});
+  tb.innerHTML=(cov.byCat||[]).map(c=>{const L=byCat[c.cat]||[], k='unc:'+c.cat;
+    if(L.length) SOQ.by[k]={key:k,act:`Сделки без запроса — ${c.cat}`,who:SO_HEAD,unit:'deal',def:'Живые сделки с суммой в этой воронке, где запрос поставщику ожидается, а его нет.',
+      rows:L.map(d=>({kind:'deal',id:d.id,t:d.t,who:SO_HEAD,why:[d.client&&d.client!=='—'?d.client:'',d.amt,d.owner?`менеджер ${d.owner}`:''].filter(Boolean).join(' · '),days:_soAge(d.date)})).sort((a,b)=>(b.days??-1)-(a.days??-1)),n:L.length,max:-1};
+    const nu=Math.max(0,(c.deals||0)-(c.withReq||0));
+    return `<tr><th scope="row" data-l="Воронка">${_esc(c.cat)}</th><td class="num r" data-l="Без запроса">${
+      // одна строка — один источник (аудит 30.10.2026): число и покрытие — из счёта воронки (cov.byCat);
+      // список непокрытых разошёлся с ним — число остаётся счётом, список — рядом своим числом
+      L.length===nu&&nu?_soBtn(k,nu,`Без запроса — ${c.cat}`,'','solink')
+      :(nu?`<span title="по счёту воронки">${nu}</span>`:'<span class="sozero">0</span>')+(L.length&&L.length!==nu?`<div class="dep">в списке непокрытых ${_soBtn(k,L.length,`Без запроса — ${c.cat}, список`,'','solink')}</div>`:'')}</td><td class="num r soratio" data-l="Покрытие, %">${c.covPct}%</td></tr>`;}).join('')
+    ||'<tr><td colspan="3" class="dimv">Нет данных: сделок, где ждём запрос, в периоде нет.</td></tr>';})();
+
+// ---- «Отметка КП по правилам»: ячейка признака — запросы отдела с ним, кнопкой списка (число = строки);
+// вне отдела — строкой: их ведут не сорсеры отдела, списка на странице нет
+(function(){const box=document.querySelector('#kpRulesBody .kprule'); if(!box) return;
+  box.innerHTML=['pawStale','noFile','fileNoStage','fileClosed','legacy'].map(f=>{const it=SOQ.by[f]||{n:0,viol:0,pre:0}, out=(KPV.outside||{})[f]||0;
+    return `<div class="cell${it.viol?' bad':''}">${it.n?_soBtn(f,it.n,KPL[f]||f,'','sokpn'):'<b class="sozero">0</b>'}<span>${_esc(KPL[f]||f)}</span>`
+      +`<span class="dimv" style="display:block;margin-top:3px">нарушений ${it.viol||0} · до правил ${it.pre||0}${out?` · вне отдела нарушений ещё ${out}`:''}</span></div>`;}).join('');})();
 
 // ---- «Пульс отдела»: показатель строкой, недели столбцами, последняя полная неделя против
 // предыдущей — числом и словом «лучше / хуже» по смыслу показателя (portal-ui §5в, R5 «Реализации»)
@@ -4690,35 +4810,51 @@ function _soSpark(vals){
   const by=(arr,key,val)=>{const o={}; (arr||[]).forEach(x=>{const k=String(x[key]||'').slice(0,10); if(k) o[k]=val(x);}); return o;};
   const UNC=by(cov.weekly,'key',x=>x.uncov), PS=by((M.presale||{}).weeks,'from',x=>x.n), PSL=by((M.presale||{}).weeks,'from',x=>x.lost||0);
   const mon=w=>String(w.mon||'');
-  // карточки отдела по неделе создания — список за числом (записи есть в сборке)
-  const wkCards={}; A.forEach(s=>{_unpack(s.details).forEach(d=>{const j=d.wk; if(j==null||j<0) return; (wkCards[j]=wkCards[j]||[]).push({s,d});});});
-  const off=(M.weekly||[]).length-W.length;
-  W.forEach((w,i)=>{const j=off+i, L=wkCards[j]||[]; if(!L.length) return;
-    SOQ.by['wk'+j]={key:'wk'+j,act:`Запросы отдела, неделя ${w.w} (${w.d})`,who:'сорсер запроса',unit:'card',
-      def:'Карточки «Запросы поставщикам» отдела по дате создания в эту неделю (понедельник — воскресенье).',
-      rows:L.map(({s,d})=>({kind:'card',id:d.id,t:d.subj||d.mailSubj||'—',sup:d.sup,uid:String(s.id),who:_gone(s)?`${SO_HEAD} (сорсер ушёл)`:s.n,
-        why:`${STG[d.st]||d.st||''}${d.sup&&d.sup!=='—'?' · '+d.sup:''}`,days:_soAge(d.dt)})).sort((a,b)=>(b.days??-1)-(a.days??-1))};
-    SOQ.by['wk'+j].n=L.length; SOQ.by['wk'+j].max=-1;});
-  // [название, значение недели, хорошо ли рост (1 — лучше, -1 — хуже, 0 — без оценки), кнопка недели]
+  // недельные списки: запросы отдела по неделе создания, КП отдела — по неделе последнего движения
+  // карточки (как weekly.kp сборки, но только отдел), сделки без запроса — по неделе создания сделки
+  const off=(M.weekly||[]).length-W.length, reg=(key,act,def,rows,unit)=>{ if(!rows.length) return '';
+    rows.sort((a,b)=>(b.days??-1)-(a.days??-1));
+    SOQ.by[key]={key,act,who:unit==='deal'?SO_HEAD:'сорсер запроса',unit:unit||'card',def,rows,n:rows.length,max:-1}; return key;};
+  const cardRow=(s,d)=>({kind:'card',id:d.id,t:d.subj||d.mailSubj||'—',sup:d.sup,uid:String(s.id),who:_gone(s)?`${SO_HEAD} (сорсер ушёл)`:s.n,
+    why:`${STG[d.st]||d.st||''}${d.sup&&d.sup!=='—'?' · '+d.sup:''}`,days:_soAge(d.dt)});
+  const ALL=[]; A.forEach(s=>_unpack(s.details).forEach(d=>ALL.push({s,d})));
+  const hasMw=ALL.some(x=>x.d.mw!=null);
+  const K={req:{},kp:{},kpa:{},unc:{}};
+  W.forEach((w,i)=>{const j=off+i, lab=`${w.w} (${w.d})`;
+    K.req[i]=reg('wk'+j,`Запросы отдела, неделя ${lab}`,'Карточки «Запросы поставщикам» отдела по дате создания в эту неделю (понедельник — воскресенье).',ALL.filter(x=>x.d.wk===j).map(x=>cardRow(x.s,x.d)));
+    if(hasMw){
+      K.kp[i]=reg('kpwk'+j,`КП засчитано, отдел, неделя ${lab}`,'Запросы отдела с файлом КП в «Offer from supplier», неделя — последнего движения карточки (отдельной даты у файла выдача не отдаёт).',ALL.filter(x=>x.d.q&&x.d.mw===j).map(x=>cardRow(x.s,x.d)));
+      K.kpa[i]=reg('kpawk'+j,`КП с итогом, отдел, неделя ${lab}`,'Запросы отдела на Selected или «не выбран» — по стадии, без проверки файла; неделя последнего движения карточки.',ALL.filter(x=>(x.d.st==='selected'||x.d.st==='notsel')&&x.d.mw===j).map(x=>cardRow(x.s,x.d)));
+    }
+    const um=mon(w); if(um) K.unc[i]=reg('uncwk'+j,`Сделки без запроса, создана в неделю ${lab}`,'Живые сделки с суммой, созданные в эту неделю, по которым запроса поставщику нет.',
+      (cov.uncovered||[]).filter(d=>String(d.wk||'').slice(0,10)===um).map(d=>({kind:'deal',id:d.id,t:d.t,who:SO_HEAD,why:[d.cat,d.client&&d.client!=='—'?d.client:'',d.amt,d.owner?`менеджер ${d.owner}`:''].filter(Boolean).join(' · '),days:_soAge(d.date)})),'deal');
+  });
+  const cnt=(map,i)=>{const k=map[i]; return k?SOQ.by[k].n:0;};
+  // [название, значение недели, хорошо ли рост (1 — лучше, −1 — хуже, 0 — без оценки), ключ списка недели]
   const ROWS=[
-    ['Запросов отдела',(w)=>w.A,0,(w,i)=>SOQ.by['wk'+(off+i)]?'wk'+(off+i):''],
-    ['Запросов вне отдела',(w)=>w.B,0],
-    ['КП засчитано, шт.',(w)=>w.kp||0,1],
-    ['КП с итогом, шт.',(w)=>w.kpa||0,1],
-    ['Сорсеров в отделе',(w)=>w.hc||0,0],
-    ['Запросов на сорсера',(w)=>w.hc?Math.round(w.A/w.hc*10)/10:null,1],
-  ];
-  if(Object.keys(UNC).length) ROWS.push(['Сделок без запроса (по неделе создания)',(w)=>UNC[mon(w)]??null,-1]);
-  if(Object.keys(PS).length){ ROWS.push(['Сделок пресейла заведено',(w)=>PS[mon(w)]??null,0]); ROWS.push(['Сделок пресейла — отказ',(w)=>PSL[mon(w)]??null,-1]); }
+    ['Запросов отдела',(w,i)=>cnt(K.req,i),0,(w,i)=>K.req[i]],
+    hasMw?['КП засчитано, отдел',(w,i)=>cnt(K.kp,i),1,(w,i)=>K.kp[i]]:null,
+    hasMw?['КП с итогом, отдел',(w,i)=>cnt(K.kpa,i),1,(w,i)=>K.kpa[i]]:null,
+    ['Запросов на сорсера',(w,i)=>w.hc?Math.round(cnt(K.req,i)/w.hc*10)/10:null,1,null],
+  ].filter(Boolean);
+  if((cov.uncovered||[]).length&&W.some((w,i)=>K.unc[i])) ROWS.push(['Сделок без запроса (по неделе создания)',(w,i)=>cnt(K.unc,i),-1,(w,i)=>K.unc[i]]);
   const spark=vals=>{const v=vals.map(x=>x||0), mx=Math.max(1,...v); return `<span class="sospark" role="img" aria-label="по неделям: ${vals.map(x=>x==null?'—':fx(x)).join(', ')}">${v.map((x,i)=>`<i style="height:${Math.max(2,Math.round(x/mx*22))}px"${W[i].part!=null?' class="part"':(i===li?' class="last"':'')}></i>`).join('')}</span>`;};
-  hh.innerHTML=`<tr><th scope="col">Показатель</th><th scope="col" class="sotr">Ход</th>${W.map(w=>`<th scope="col" class="r" title="${_esc(w.d)}${w.part!=null?` · неполная: ${w.part} из 5 раб. дн.`:''}">${_esc(w.w)}<div class="dep">${_esc(w.d)}${w.part!=null?` · ${w.part}/5`:''}</div></th>`).join('')}<th scope="col" class="r" title="Последняя полная неделя против предыдущей полной">За неделю</th></tr>`;
-  hb.innerHTML=ROWS.filter(([,f])=>W.some(w=>f(w)!=null)).map(([nm,f,good,btn])=>{
-    const vals=W.map(f), a=li!=null?vals[li]:null, b=pi!=null?vals[pi]:null;
+  // подпись недели — датами словами («8–14 июн», «29 июн – 5 июл»), а не номером W7 от начала периода
+  const MN=['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+  const wl=w=>{const m=String(w.d||'').match(/^(\d{1,2})(?:\.(\d{2}))?\s*[–-]\s*(\d{1,2})\.(\d{2})$/); if(!m) return w.d||w.w;
+    const m2=MN[+m[4]-1]||m[4], m1=m[2]?(MN[+m[2]-1]||m[2]):m2; return m1===m2?`${+m[1]}–${+m[3]} ${m2}`:`${+m[1]} ${m1} – ${+m[3]} ${m2}`;};
+  // на телефоне видны две последние полные недели (их и сравнивает «за неделю»), прочие — в «Ходе»
+  const keep=new Set([li,pi].filter(x=>x!=null).length?[li,pi]:[W.length-1,W.length-2]), wo=i=>keep.has(i)?'':' sowo';
+  hh.innerHTML=`<tr><th scope="col">Показатель</th><th scope="col" class="sotr">Ход</th>${W.map((w,i)=>`<th scope="col" class="r${wo(i)}" title="${_esc(w.d)}${w.part!=null?` · неполная: ${w.part} из 5 раб. дн.`:''}${w.hc?` · сорсеров в отделе: ${w.hc}`:''}">${_esc(wl(w))}${w.part!=null?`<div class="dep">неполная, ${w.part} из 5 раб. дн.</div>`:''}${w.hc?`<div class="dep">${_soN(w.hc,'сорсер','сорсера','сорсеров')}</div>`:''}</th>`).join('')}<th scope="col" class="r" title="Последняя полная неделя против предыдущей полной">За неделю</th></tr>`;
+  hb.innerHTML=ROWS.filter(([,f])=>W.some((w,i)=>f(w,i)!=null)).map(([nm,f,good,btn])=>{
+    const vals=W.map((w,i)=>f(w,i)), a=li!=null?vals[li]:null, b=pi!=null?vals[pi]:null;
     let dl='<span class="dimv">—</span>';
     if(a!=null&&b!=null){const d=Math.round((a-b)*10)/10;
       dl=!d?'<span class="dimv">без изменений</span>':`<span class="${good===0?'':(d*good>0?'soup':'sodn')}">${d>0?'+':'−'}${fx(Math.abs(d))}${good?` · ${d*good>0?'лучше':'хуже'}`:''}</span>`;}
     return `<tr><th scope="row">${_esc(nm)}</th><td class="sotr" data-l="Ход" data-xlv="${vals.map(x=>x==null?'':x).join(' · ')}">${spark(vals)}</td>${vals.map((v,i)=>{const part=W[i].part!=null, k=btn&&v?btn(W[i],i):'';
-      return `<td class="num r${part?' sopart':''}" data-l="${_esc(W[i].w)}">${k?_soBtn(k,v,`${nm}, ${W[i].w}`,'','solink'):fx(v)}</td>`;}).join('')}<td class="num r" data-l="За неделю">${dl}</td></tr>`;}).join('');
+      // мера «на сорсера» — не счёт множества: её записи — запросы той же недели строкой выше
+      const ratio=/на сорсера/.test(nm);
+      return `<td class="num r${part?' sopart':''}${ratio?' soratio':''}${wo(i)}" data-l="${_esc(wl(W[i]))}">${k&&v&&!ratio?_soBtn(k,v,`${nm}, ${wl(W[i])}`,'','solink'):(v===0?'<span class="sozero">0</span>':fx(v))}</td>`;}).join('')}<td class="num r sodelta" data-l="За неделю">${dl}</td></tr>`;}).join('');
 })();
 
 // ---- список за числом: что считает → кто → записи, дольше ждущие сверху → Битрикс
@@ -4731,7 +4867,10 @@ const SO_SUBS=['today','pulse','people','rfq','presale','how'];
 let _soCur='today';
 function _soDepth(){return (history.state&&history.state.so)||0;}
 function _soHash(q){return '#sourcing/'+_soCur+(q?'?'+q:'');}
-function _soPush(q){ const h=_soHash(q); try{ if(location.hash!==h) history.pushState({so:_soDepth()+1},'',h); }catch(e){} }
+// записи в историю — не чаще 40 за 10 с (как _rzRoute.slot): Chrome гасит частые pushState/replaceState
+// всей страницы, и после сотни чисел подряд (проверка гейта) переставали работать адреса других вкладок
+function _soSlot(){const t=Date.now(); _soSlot.w=(_soSlot.w||[]).filter(x=>t-x<10000); if(_soSlot.w.length>=40) return false; _soSlot.w.push(t); return true;}
+function _soPush(q){ const h=_soHash(q); try{ if(location.hash!==h&&_soSlot()) history.pushState({so:_soDepth()+1},'',h); }catch(e){} }
 function _soParse(){
   const m=(location.hash||'').match(/^#sourcing(?:\/([a-z]+))?(?:\?(.*))?$/); if(!m) return null;
   const q=new URLSearchParams(m[2]||''); return {sub:SO_SUBS.includes(m[1])?m[1]:'', n:q.get('n')||'', u:q.get('u')||'', p:q.get('p')||''};
@@ -4745,7 +4884,8 @@ function _soSub(sub,opt){
   tabs.forEach(b=>{const on=b.dataset.sub===sub; b.classList.toggle('on',on); b.setAttribute('aria-selected',on?'true':'false'); b.tabIndex=on?0:-1;});
   document.querySelectorAll('#tab-sourcing .sopanel').forEach(pn=>{pn.hidden=pn.dataset.sub!==sub;});
   const T=document.getElementById('tab-sourcing'); if(T) T.dataset.sosub=sub;
-  if(opt.addr&&!(T&&T.hidden)){ try{ history.replaceState(history.state,'',_soHash('')); }catch(e){} }
+  try{ _soQQ(); }catch(e){}   // до объявления METH (первый маршрут) — пометит injectMeth
+  if(opt.addr&&!(T&&T.hidden)&&_soSlot()){ try{ history.replaceState(history.state,'',_soHash('')); }catch(e){} }
   if(opt.focus){ const b=tabs.find(x=>x.dataset.sub===sub); if(b) b.focus(); }
 }
 (function(){
@@ -4762,6 +4902,9 @@ function _soRoute(){
   const r=_soParse();
   if(!r){ if(_drw.dataset.so){ delete _drw.dataset.so; _drwHide(); } return; }
   if(r.sub&&r.sub!==_soCur) _soSub(r.sub);
+  const lvl=(r.p&&_byId[r.p])||(r.n&&SOQ.by[r.n]);
+  // уровень из вставленной ссылки — глубина 1: следующий уровень над ним Esc снимает назад, а не всё сразу
+  if(lvl&&!_soDepth()&&_soSlot()){ try{ history.replaceState({so:1},'',location.hash); }catch(e){} }
   if(r.p&&_byId[r.p]) openDrw(r.p,null,true);
   else if(r.n&&SOQ.by[r.n]) _soOpen(r.n,null,r.u,true);
   else if(_drw.dataset.so){ delete _drw.dataset.so; _drwHide(); }
@@ -4771,17 +4914,19 @@ window.addEventListener('hashchange',_soRoute);
 function _soOpen(key,trigger,uid,fromRoute){
   const it=SOQ.by[key]; if(!it) return;
   if(typeof _rzDrw==='function') _rzDrw(true);
-  if(trigger) _soRet=trigger;
+  _soDlg();
+  // фокус после закрытия — туда, откуда открыли первый уровень; кнопка внутри панели при перерисовке исчезнет
+  if(trigger&&!_drw.contains(trigger)) _soRet=trigger;
   if(!fromRoute) _soPush('n='+encodeURIComponent(key)+(uid?'&u='+encodeURIComponent(uid):''));
   _drw.dataset.so='1';
   const all=uid?it.rows.filter(r=>r.uid===String(uid)):it.rows;
   const deals=all.filter(r=>r.kind==='deal').length, cards=all.length-deals;
   document.getElementById('drwName').textContent=it.act;
   document.getElementById('drwSub').textContent=[cards?_soN(cards,'запрос','запроса','запросов'):'',deals?_soN(deals,'сделка','сделки','сделок'):'',
-    uid&&_byId[String(uid)]?`сорсер ${_byId[String(uid)].n}`:`отвечает: ${it.who}`].filter(Boolean).join(' · ');
+    uid&&_byId[String(uid)]?`сорсер ${_byId[String(uid)].n}`:(it.who?`отвечает: ${it.who}`:'')].filter(Boolean).join(' · ');
   const body=document.getElementById('drwBody');
   const whoN={}; all.forEach(r=>{whoN[r.who]=(whoN[r.who]||0)+1;});
-  const WHO=Object.entries(whoN).sort((a,b)=>b[1]-a[1]);
+  const WHO=Object.entries(whoN).sort((a,b)=>b[1]-a[1]), DH=_soDU(it)[1];
   function draw(f){
     const rows=f?all.filter(r=>r.who===f):all;
     const cell=r=>`<div class="sorec">${_esc(r.t)}</div><div class="dep">${r.kind==='card'?'запрос':'сделка'} №<span class="mono">${_esc(r.id)}</span> · <a class="sobx" href="${_soUrl(r.kind,r.id)}" target="_blank" rel="noopener" data-xlv="" aria-label="${r.kind==='card'?'Запрос':'Сделка'} №${_esc(r.id)} в Битриксе, новая вкладка">в Битриксе ↗</a></div>`;
@@ -4789,12 +4934,12 @@ function _soOpen(key,trigger,uid,fromRoute){
     const lnk=(uid,t)=>`<button type="button" class="solnk" data-uid="${_esc(uid)}" aria-haspopup="dialog" aria-label="${_esc(t)} — все запросы сорсера">${_esc(t)}</button>`;
     const whoC=r=>{const S=r.uid&&_byId[r.uid]; if(!S) return _esc(r.who);
       return S.n===r.who?lnk(r.uid,S.n):`${_esc(r.who)}<div class="dep">запросы: ${lnk(r.uid,S.n)}</div>`;};
-    body.innerHTML=`<div class="sowhyd"><p><b>Почему в списке.</b> ${_esc(it.def||'')}</p><p><b>Что сделать.</b> ${_esc(_soCap(it.who))} → ${_esc(it.act.charAt(0).toLowerCase()+it.act.slice(1))}.</p></div>`
+    body.innerHTML=`<div class="sowhyd"><p><b>Почему в списке.</b> ${_esc(it.def||'')}</p>${it.fact?'':`<p><b>Что сделать.</b> ${_esc(_soCap(it.who))} → ${_esc(it.act.charAt(0).toLowerCase()+it.act.slice(1))}.</p>`}</div>`
       +(WHO.length>1?`<div class="sofil" role="group" aria-label="Кто отвечает"><button type="button" class="stchip" data-sow="" aria-pressed="${f?'false':'true'}">Все <b>${all.length}</b></button>`
         +WHO.slice(0,8).map(([w,n])=>`<button type="button" class="stchip" data-sow="${_esc(w)}" aria-pressed="${f===w?'true':'false'}">${_esc(w)} <b>${n}</b></button>`).join('')+`</div>`:'')
       +(it.cut?`<p class="sonote">Сделок пресейла в списке — первые по порядку; полное число — в «Воронке пресейла».</p>`:'')
-      +`<div class="twrap"><table class="solst" data-xl-name="${_esc(it.act)}"><thead><tr><th scope="col">Запись</th><th scope="col">Кто отвечает</th><th scope="col">Почему</th><th scope="col" class="r" title="Дней с создания запроса или сделки; у стоящей сделки — дней в стадии">Дней</th></tr></thead><tbody>`
-      +(rows.length?rows.map(r=>`<tr${r.pre?' class="sopre"':''}><td data-l="Запись">${cell(r)}</td><td data-l="Кто отвечает">${whoC(r)}</td><td data-l="Почему">${_esc(r.why||'')}</td><td class="num r" data-l="Дней">${r.days??'—'}</td></tr>`).join('')
+      +`<div class="twrap"><table class="solst" data-xl-name="${_esc(it.act)}"><thead><tr><th scope="col">Запись</th><th scope="col">Кто отвечает</th><th scope="col">Почему</th><th scope="col" class="r">${_esc(DH)}</th></tr></thead><tbody>`
+      +(rows.length?rows.map(r=>`<tr${r.pre?' class="sopre"':''}><td data-l="Запись">${cell(r)}</td><td data-l="Кто отвечает">${whoC(r)}</td><td data-l="Почему">${_esc(r.why||'')}</td><td class="num r" data-l="${_esc(DH)}">${r.days??'—'}</td></tr>`).join('')
         :`<tr><td colspan="4" class="dimv">Нет записей.</td></tr>`)+`</tbody></table></div>`;
     const t=body.querySelector('table.solst'); if(t&&f) t._xlNote='Отбор: '+f;
     body.querySelectorAll('[data-sow]').forEach(b=>b.addEventListener('click',()=>draw(b.dataset.sow||'')));
@@ -4962,6 +5107,7 @@ function openDeals(list,title,sub){
 // ---- список сделок без запросов поставщикам (покрытие сорсинга)
 function openUncovered(rows,subLbl){
   if(typeof _rzDrw==='function') _rzDrw(true);   // список «Сорсинга» — шрифтовая система вкладки
+  _soDlg();
   rows=(rows||[]).slice();
   const sum=rows.reduce((a,d)=>a+(d.raw||0),0);
   document.getElementById('drwName').textContent='Сделки без запросов поставщикам';
@@ -5086,7 +5232,26 @@ const qmark=k=>`<span class="qq" data-meth="${k}">?</span>`;
 // поэтому работает и для бейджей в динамически отрисованных вкладках без перепривязки
 document.addEventListener('click',e=>{
   const q=e.target.closest('.qq[data-meth]');
-  if(q){ e.stopPropagation(); openMeth(q.dataset.meth); }
+  if(q){ e.stopPropagation();
+    // «Сорсинг»: методика — тем же модальным диалогом, фокус после закрытия — на «?» (аудит 30.10.2026)
+    const so=!!q.closest('#tab-sourcing'); if(so) _soRet=q;
+    openMeth(q.dataset.meth);
+    if(so&&_drw.classList.contains('on')){ _soDlg(); const h=document.getElementById('drwName');
+      if(h){h.setAttribute('tabindex','-1'); try{h.focus({preventScroll:true});}catch(er){}} } }
+},true);
+// «?» «Сорсинга» — кнопка для клавиатуры и чтеца экрана: роль, имя «Как считается: …», Tab, Enter/Пробел
+function _soQQ(){
+  document.querySelectorAll('#tab-sourcing .qq[data-meth]').forEach(q=>{
+    if(q.getAttribute('role')==='button') return;
+    const o=METH[q.dataset.meth];
+    q.setAttribute('role','button'); q.setAttribute('tabindex','0');
+    q.setAttribute('aria-label','Как считается'+(o&&o.t?': '+o.t:'')); q.removeAttribute('title');
+  });
+}
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' ') return;
+  const q=e.target.closest&&e.target.closest('#tab-sourcing .qq[data-meth][role="button"]'); if(!q) return;
+  e.preventDefault(); e.stopPropagation(); q.click();
 },true);
 function _qqNode(key){const s=document.createElement('span');s.className='qq';s.textContent='?';s.title='как считается';s.dataset.meth=key;return s;}
 function injectMeth(){
@@ -6557,7 +6722,8 @@ function renderContracts(){
   // адрес ушёл с «Реализации» (вход через вкладку портала — адрес был пуст) при открытой панели — закрыть её
   const onNav=()=>{const h=location.hash||'';
     if(!/^#contracts(\/|$|\?)/.test(h)){const d=drwEl(); _rzRoute.applied=h;
-      if(d&&d.classList.contains('on')&&d.classList.contains('rz')){_rzRoute.busy++; try{closeLv(true);}finally{_rzRoute.busy--;}} return;}
+      // панель «Сорсинга» (тоже .rz, своя шкала) ведёт свой адрес — её не трогаем (ревью 30.10.2026)
+      if(d&&d.classList.contains('on')&&d.classList.contains('rz')&&!d.dataset.so){_rzRoute.busy++; try{closeLv(true);}finally{_rzRoute.busy--;}} return;}
     if(_rzRoute.applied===h&&!_rzRoute.leaving) return; _rzRoute.applied=h; _rzRoute.leaving=0; apply(_rzRoute.parse(h),{pop:1});};
   window.addEventListener('popstate',onNav); window.addEventListener('hashchange',onNav);
   _rzTipWire();
@@ -11492,7 +11658,7 @@ window.ensureTab=ensureTab;
     +TD.thresholds.map(t=>`<div class="ttrrow"><div class="ttrlbl">за ${_days(t.d)}</div><div class="ttrtrack"><i style="width:${t.pct}%"></i></div><div class="ttrpct"><b>${t.pct}%</b> <span class="dimv">${t.cnt} сд.</span></div></div>`).join('')
     +`<div class="note" style="margin-top:10px">Из <b>${TD.n}</b> сделок с запросом · медиана <b>${TD.p50!=null?_days(TD.p50):'—'}</b> · среднее ${TD.mean!=null?_days(TD.mean):'—'} · самая долгая ${TD.max!=null?_days(TD.max):'—'}. Запрос обычно уходит в первые сутки; всё после 10 дней — длинный хвост (${TD.tail10}% сделок).</div>`;
 })();
-injectMeth();
+injectMeth(); _soQQ();
 
 // ---- animations
 requestAnimationFrame(()=>setTimeout(()=>{
