@@ -29,7 +29,12 @@ ALL_DK = """sep=>{const out=[]; const walk=o=>{if(!o||typeof o!=='object')return
   walk(window.__CONTRACTS__.ork.quarter); walk(window.__ORKMONTH__&&window.__ORKMONTH__[sep?'sep':'main']); return out;}"""
 FIND_N = """id=>{const out=[]; const walk=o=>{if(!o||typeof o!=='object')return; if(Array.isArray(o)){o.forEach(walk);return;}
   if(o.dk===id) out.push(o.n); if(o.liveDk===id) out.push(o.live); if(o.nDk===id) out.push(o.n); for(const k in o) if(k!=='drill'&&k!=='orders') walk(o[k]);};
-  walk(window.__CONTRACTS__&&window.__CONTRACTS__.ork); walk(window.__ORKMONTH__); return out;}"""
+  walk(window.__CONTRACTS__&&window.__CONTRACTS__.ork); walk(window.__ORKMONTH__);
+  // R4 (Д-2, Д-10): списки без показателя-владельца («не доставлено», «не считаем», столбцы по месяцам,
+  // хвост P80) — длина списка в drill; число на кнопке — та же длина (tests/test_rz_wpf.py)
+  if(!out.length){const D=id[0]==='m'?((((window.__ORKMONTH__||{}).main||{}).month||{}).drill||{}):(((window.__CONTRACTS__||{}).ork||{}).quarter||{}).drill||{};
+    const L=D[id.slice(2)]; if(L&&Array.isArray(L.k)) out.push(L.k.length);}
+  return out;}"""
 
 
 @pytest.fixture(scope="module")
@@ -240,7 +245,7 @@ def test_месяц_и_квартал(browser, page_url, sub):
     assert want and not [d for d in want if d not in have], [d for d in want if d not in have]
     if sub == "quarter":
         # закрытые заказы — корзиной «заказ закрыт»; менеджеров ОРК в списках «Квартала» нет
-        el = pg.locator("#ctPanel-main .ctm-kpi[data-od^='q:'], #ctPanel-main .actile[data-od^='q:']").first
+        el = pg.locator("#ctPanel-main .ctmk-n[data-od^='q:'], #ctPanel-main .actile[data-od^='q:']").first
         _clicked_rows(pg, el)
         body = pg.locator("#drwBody").inner_text()
         assert "По менеджерам ОРК" not in body and "стадия не из таблицы" not in body

@@ -25,6 +25,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import re
 from collections import Counter, defaultdict
 
 import lifecycle
@@ -743,10 +744,19 @@ def _month(orders: list[dict], U: list[dict], today: dt.date, otd: dict | None, 
         o_m = otd_by.get(m0.strftime("%m.%Y")) or {}
         otd_st = _ms(o_m.get("pct"), o_m.get("n") or 0, None, src="life.otd",
                      extra={"ontime": o_m.get("ontime"), "label": "результат поставщика и логистики"})
+        # Д-2 (R4): главная доля «Месяца» — к сроку из ВСЕХ, у кого срок клиента наступил в месяце
+        # (lifecycle.otd: due = к сроку + доставлены позже + не доставлены после срока); прежняя
+        # доля по доставленным (otd) остаётся в данных, на странице её нет
+        due_n = o_m.get("due") or 0
+        due_st = _ms(o_m.get("duePct"), due_n, None, src="life.otd.due",
+                     extra={"k": o_m.get("dueOnTime") or 0, "late": o_m.get("dueLateDelivered") or 0,
+                            "open": o_m.get("dueOpenLate") or 0, "target": 95, "warn": 80,
+                            "label": "из всех, у кого срок клиента наступил в месяце"})
         # текущий месяц идёт — неполный: заголовок «Месяца» — последний ПОЛНЫЙ месяц
         # первый месяц эпохи ОРК (24.08 — середина месяца) неполный: в счёте только отрезки
         # заказов, созданных с 24.08 и успевших закончиться, — сдвиг к «в норме»
-        rows.append({"m": m0.strftime("%m.%Y"), "M1": m1s, "M2": m2, "otd": otd_st, "target": 95,
+        rows.append({"m": m0.strftime("%m.%Y"), "M1": m1s, "M2": m2, "otd": otd_st, "otdDue": due_st,
+                     "_due": o_m.get("keys") or {"k": [], "t": []}, "target": 95,
                      "partial": mi == 0, "eraPartial": m0 < ork.ORK_SINCE < m1})
 
     # M3 загрузка: живые заказы ОРК-эпохи на менеджера ОРК против среднего по менеджерам
@@ -768,6 +778,10 @@ def _month(orders: list[dict], U: list[dict], today: dt.date, otd: dict | None, 
         _hide(M3, f"не показываем: менеджеров ОРК {len(load)} < {ork.GATES['n_managers_min']} — "
                   "среднее раскрыло бы нагрузку человека")
     month = {"rows": rows, "M3": M3, "since": ork.ORK_SINCE.isoformat(), "target": 95,
+             # ключи «Доставки к сроку по месяцам» (12 месяцев lifecycle.otd) — _month_drill кладёт их
+             # в drill «y.<мм.гггг>» и убирает это поле
+             "_otd": [{"m": m.get("m"), "due": m.get("due") or 0, "keys": m.get("keys") or {}}
+                      for m in (otd or {}).get("months") or []],
              # заголовок — последний полный месяц (rows[1]); текущий (rows[0]) — рядом, «идёт, неполный»
              "head": 1 if len(rows) > 1 else 0,
              "note": "без поправки на сложность; рейтинга нет — только счёт",
@@ -963,7 +977,9 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
                      "since": a["since"], "cond": a["cond"] or "", "req": req, "have": have,
                      "pct": _pct(have, req)})
     kam_pairs = [(o.get("kamOrder"), o.get("kamDeal")) for o in orders if o.get("kamOrder") and o.get("kamDeal")]
-    return {"metrics": metrics, "violations": violations, "artifacts": arts,
+    drill = _how_drill(orders, U, deals, queue, week, step, violations, arts,
+                       len(kam_pairs) - sum(1 for a, b in kam_pairs if a == b))
+    return {"metrics": metrics, "violations": violations, "artifacts": arts, "drill": drill,
             "kamAgree": {"n": len(kam_pairs), "same": sum(1 for a, b in kam_pairs if a == b)},
             "fieldsAdd": [{"kind": k, "name": n, "for": f, "to": ork.FIELDS_TO, "status": "добавить"}
                           for k, n, f in ork.FIELDS_ADD],
@@ -971,6 +987,47 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
             "gates": dict(ork.GATES), "gatesNote": ork.GATES_NOTE,
             "norms": {str(k): v for k, v in ork.NORM_WD.items()}, "segNorms": dict(ork.SEG_NORM),
             "noPause": ork.NO_PAUSE, "steps": _how_steps()}
+
+
+def _how_drill(orders, U, deals, queue, week, step, violations: dict, arts: list, kam_miss: int) -> dict:
+    """Д-10 (R4): заказы за числами «Как считается» — нарушения порядка стадий, «КАМ заказа ≠ КАМ
+    сделки», заказы без обязательного файла шага. Те же отборы, что у счёта в _how; ключ — только
+    когда длина списка равна числу на странице (страница открывает его кнопкой у числа). Сделка —
+    «d:<id>», как строки сделок «Недели»."""
+    D: dict = {}
+
+    def put(key: str, ks: list, ts: list | None, n, head: str) -> None:
+        if ks and len(ks) == n:
+            D[key] = {"k": ks, "t": ts, "h": head}
+    sg = [(o, o.get("_segs") or {}) for o in orders]
+    put("returns", [str(o["id"]) for o, g in sg if g.get("returns")], None, violations.get("returns"),
+        "Заказ вернули на стадию назад")
+    put("bursts", [str(o["id"]) for o, g in sg if g.get("burst")], None, violations.get("bursts"),
+        "Стадии прокликали разом: 3 и больше смены за 5 минут")
+    put("negative", [str(o["id"]) for o, g in sg if any(x.get("neg") for x in (g.get("segs") or {}).values())],
+        None, violations.get("negative"), "Даты стадий в обратном порядке")
+    pnc = [q for q in queue if q.get("code") == "payNoContract"]
+    put("payNoContract", [("d:" + str(q.get("deal"))) if not q.get("order") else str(q["order"]) for q in pnc],
+        None, violations.get("payNoContract"), "Оплатили поставщику без договора с клиентом")
+    by_deal: dict = defaultdict(list)
+    for o in U:
+        if step[o["id"]] is not None:
+            by_deal[o.get("deal")].append(step[o["id"]])
+    beh = [d for d in deals if by_deal.get(d["deal"]) and ork.deal_behind(d.get("dealStep"), by_deal[d["deal"]])]
+    put("dealBehindOrders", ["d:" + str(d["deal"]) for d in beh], None, violations.get("dealBehindOrders"),
+        "Стадия сделки отстала от заказов")
+    hy = (week.get("hygiene") or {}).get("items") or []
+    put("behindFacts", [str(x["order"]) for x in hy if "behind" in (x.get("kinds") or [])], None,
+        violations.get("behindFacts"), "Стадия заказа отстала от фактов: оплата, отгрузка, доставка")
+    put("unknownStage", [str(o["id"]) for o in U if step[o["id"]] is None], None, violations.get("unknownStage"),
+        "Стадия неизвестна регламенту: сверить стадию в Битриксе")
+    miss = [o for o in orders if o.get("kamOrder") and o.get("kamDeal") and o["kamOrder"] != o["kamDeal"]]
+    put("kamMiss", [str(o["id"]) for o in miss], None, kam_miss, "КАМ в заказе не совпадает с КАМом сделки")
+    for a, row in zip(ork.ARTIFACTS, arts):
+        no = [o for o in orders if ork.art_required(o, a, o.get("_reach")) and not (o.get("art") or {}).get(a["key"])]
+        put("art." + a["key"], [str(o["id"]) for o in no], [f"нет: {a['name']}"] * len(no),
+            (row.get("req") or 0) - (row.get("have") or 0), f"Нет файла «{a['name']}» в карточке заказа")
+    return D
 
 
 def _how_steps() -> list[dict]:
@@ -1074,7 +1131,9 @@ def _hist_row(o: dict, *, with_mgr: bool = True) -> dict:
     live = bool(o.get("live"))
     r = {"k": str(o["id"]), "no": order_no(o), "deal": str(o.get("deal") or ""),
          "seq": o.get("seq") or 0, "sup": o.get("sup") or "", "stage": o.get("stage") or "",
-         "step": ork.step_now(o) if live else None, "closed": not live}
+         "step": ork.step_now(o) if live else None, "closed": not live,
+         # Д-10 (R4): срок клиента и факт доставки — список за числом говорит «к сроку / позже»
+         "dl": _iso(o.get("dl")), "delFact": _iso(o.get("delFact"))}
     if with_mgr:
         r["mgr"] = pulse_who(o, None)[0]
     return _compact(r)
@@ -1448,6 +1507,9 @@ def _quarter_drill(quarter: dict, measure: list[dict], today: dt.date) -> None:
     for i, ((y, q), Q) in enumerate(zip((cur, prev), quarter.get("quarters") or [])):
         ks, ts = [], []
         by_sup: dict[str, tuple[list, list]] = defaultdict(lambda: ([], []))
+        # Д-10 (R4): не в счёте Q1 — «в наличии» (stock), готовность «пачкой» или с возвратом (burst),
+        # и в счёте с плановой датой, равной факту (pef): каждое число у показателя — список
+        extra: dict[str, tuple[list, list]] = {"stock": ([], []), "burst": ([], []), "pef": ([], [])}
         for o in measure:
             r = o.get("_reach") or {}
             ready, pe = _d(r.get(8)), o.get("prodEnd")
@@ -1457,9 +1519,17 @@ def _quarter_drill(quarter: dict, measure: list[dict], today: dt.date) -> None:
             s5 = sg.get("segs", {}).get("S5")
             back = any(a >= 8 > b for a, b in sg.get("returnPairs") or [])
             if (s5 and (s5.get("burstEnd") or s5.get("neg"))) or back:
+                extra["burst"][0].append(o)
+                extra["burst"][1].append("не считаем: " + ("возврат с шага 8 и дальше" if back
+                                                           else "готовность прокликали разом"))
                 continue
             if s5 and s5.get("cd") is not None and s5["cd"] < 1:
+                extra["stock"][0].append(o)
+                extra["stock"][1].append(f"из наличия, без производства · готов {ready:%d.%m}")
                 continue
+            if ready == pe:
+                extra["pef"][0].append(o)
+                extra["pef"][1].append(f"плановая дата равна факту · {pe:%d.%m}")
             t = (("в срок" if ready <= pe else f"позже · на {(ready - pe).days} дн.")
                  + f" · готов {ready:%d.%m} · бюджет {pe:%d.%m}")
             ks.append(str(o["id"]))
@@ -1468,17 +1538,32 @@ def _quarter_drill(quarter: dict, measure: list[dict], today: dt.date) -> None:
             sk.append(str(o["id"]))
             st_.append(t)
             used[str(o["id"])] = o
-        _dk(Q.get("Q1") or {}, drill, f"{i}.Q1", ks, ts, prefix="q",
-            head=f"Q1 · {Q.get('q')}: готовности в счёте")
+        Q1 = Q.get("Q1") or {}
+        _dk(Q1, drill, f"{i}.Q1", ks, ts, prefix="q",
+            head=f"Готово к обещанному сроку · {Q.get('q')}: заказы в счёте")
+        # счёты рядом с долей: только у показанной (у скрытой «пачками» — без списка, как без числа)
+        if Q1.get("state") in ("show", "prelim"):
+            want_n = {"stock": Q1.get("stock"), "burst": Q1.get("burstN"),
+                      "pef": round((Q1.get("planEqFact") or 0) * (Q1.get("n") or 0))}
+            heads = {"stock": "из наличия, без производства — не в счёте",
+                     "burst": "готовность прокликали разом или вернули назад — не в счёте",
+                     "pef": "плановую дату переписали под факт"}
+            for nm, (os_, tg) in extra.items():
+                if os_ and len(os_) == want_n[nm]:
+                    for o in os_:
+                        used[str(o["id"])] = o
+                    drill[f"{i}.{nm}"] = {"k": [str(o["id"]) for o in os_], "t": tg,
+                                          "h": f"{Q.get('q')}: {heads[nm]}"}
         for j, srow in enumerate(Q.get("suppliers") or []):
             sk, st_ = by_sup.get(srow.get("sup"), ([], []))
-            _dk(srow, drill, f"{i}.s{j}", sk, st_, prefix="q", head=f"Q1 · {Q.get('q')} · {srow.get('sup')}")
+            _dk(srow, drill, f"{i}.s{j}", sk, st_, prefix="q",
+                head=f"{srow.get('sup')} · {Q.get('q')}: готовность к обещанному сроку")
             if "dk" not in srow and srow.get("n") and len(sk) == srow["n"]:
                 # доля «в срок» скрыта («пачки», «план = факт»), а число готовностей видно — список за
                 # ним без подписей «в срок / позже»: скрытая доля из него не складывается
                 drill[f"{i}.s{j}n"] = {"k": sk, "t": None,
-                                       "h": f"Q1 · {Q.get('q')} · {srow.get('sup')}: готовности в счёте "
-                                            "(доля «в срок» не показана)"}
+                                       "h": f"{srow.get('sup')} · {Q.get('q')}: готовые заказы "
+                                            "(доля «к сроку» скрыта)"}
                 srow["nDk"] = f"q:{i}.s{j}n"
     era = [o for o in measure if _d(o.get("created")) and _d(o["created"]) >= ork.PREPAY_SINCE]
     q3 = [o for o in era if o.get("prepayShare") is not None]
@@ -1486,13 +1571,94 @@ def _quarter_drill(quarter: dict, measure: list[dict], today: dt.date) -> None:
         used[str(o["id"])] = o
     _dk(quarter.get("Q3") or {}, drill, "Q3", [str(o["id"]) for o in q3],
         [f"первичная оплата {o['prepayShare']:g} %" for o in q3], prefix="q",
-        head="Q3 · схема оплаты: заказы с «Долей первичной оплаты»")
+        head="Сколько платим вперёд: заказы с «Долей первичной оплаты»")
+    # Д-10 (R4): Q2 — отрезки за медианой и P80 по длительности (длинные сверху); P80 — только хвост
+    year_from = today - dt.timedelta(days=ork.YEAR_DAYS)
+    Q2 = quarter.get("Q2") or {}
+    for code in ("S5", "S7", "S8", "cycle"):
+        rows_: list[tuple[int, dict]] = []
+        for o in measure:
+            if code == "cycle":
+                c, f = o.get("created"), o.get("delFact")
+                if c and f and year_from <= f <= today and f >= c:
+                    rows_.append(((f - c).days, o))
+                continue
+            sg = (o.get("_segs") or {}).get("segs", {}).get(code)
+            if not (sg and _end(sg) and year_from <= _end(sg) <= today) or sg.get("skip") or not _clean(sg):
+                continue
+            v = sg.get("cd")
+            if v is not None and v >= 0:
+                rows_.append((v, o))
+        rows_.sort(key=lambda x: -x[0])
+        st = Q2.get(code) or {}
+        nm = SEG_TXT[code]
+        fmt = (lambda v: f"{round(v)} дн.")
+        _dk(st, drill, f"Q2.{code}", [str(o["id"]) for _v, o in rows_], [fmt(v) for v, _o in rows_], prefix="q",
+            head=f"Сроки за год · {nm}: заказы в расчёте, длинные сверху")
+        if st.get("dk"):
+            for _v, o in rows_:
+                used[str(o["id"])] = o
+            tail = [(v, o) for v, o in rows_ if st.get("p80") is not None and v > st["p80"]]
+            if tail:
+                drill[f"Q2.{code}.tail"] = {"k": [str(o["id"]) for _v, o in tail], "t": [fmt(v) for v, _o in tail],
+                                            "h": f"{_cap(nm)}: дольше, чем у 8 из 10 ({round(st['p80'])} дн.)"}
     # строки — только заказов из показанных списков
     want = {k for v in drill.values() for k in (v["k"] if isinstance(v, dict) else v)}
     quarter["drill"] = drill
     # без менеджера ОРК: «Квартал» видят все с вкладкой (поимённо — только «Месяц», под правом)
     quarter["orders"] = [_hist_row(o, with_mgr=False) for k, o in used.items() if k in want]
     quarter["strs"] = _pack(quarter["orders"])
+
+
+# шаг словами для заголовков и подписей списков (R4: S-код — только с номером шага, «S3 (шаг 5)»)
+SEG_TXT = {"S1": "приёмка (шаг 1)", "S2": "договор с поставщиком (шаг 4)",
+           "S3": "заказ и подтверждение поставщика (шаг 5)", "S5": "производство (шаг 7)",
+           "S6": "подготовка к отгрузке (шаг 8)", "S7": "логистика до склада (шаг 9)",
+           "S8": "доставка клиенту (шаг 10)", "cycle": "весь заказ: от создания до доставки"}
+MON_WORD = ("январь", "февраль", "март", "апрель", "май", "июнь", "июль", "август", "сентябрь",
+            "октябрь", "ноябрь", "декабрь")
+MON_IN = ("январе", "феврале", "марте", "апреле", "мае", "июне", "июле", "августе", "сентябре",
+          "октябре", "ноябре", "декабре")
+
+
+def _cap(t: str) -> str:
+    return t[:1].upper() + t[1:] if t else t
+
+
+def _mon_word(m: dt.date) -> str:
+    return f"{MON_WORD[m.month - 1]} {m.year}"
+
+
+def _mon_in(m: dt.date) -> str:
+    return f"{MON_IN[m.month - 1]} {m.year}"
+
+
+def _mm_word(mm: str) -> str:
+    """«09.2026» → «сентябрь 2026»; иное — как есть."""
+    m = re.fullmatch(r"(\d\d)\.(\d{4})", str(mm or ""))
+    return _mon_word(dt.date(int(m[2]), int(m[1]), 1)) if m and 1 <= int(m[1]) <= 12 else str(mm or "")
+
+
+def _excl_keys(st: dict, pairs: list, drill: dict, key: str, head: str, used: dict) -> None:
+    """Д-10 (R4): заказы за «не считаем» ячейки M1 — «пачки», возвраты и обратный порядок меток
+    (excluded) и пропущенный шаг (skipped). Только у показанной ячейки и только когда счёт ключей
+    равен числу у ячейки: у скрытой («раскрыл бы человека») счётов нет — нет и списка."""
+    if not isinstance(st, dict) or st.get("state") not in ("show", "prelim"):
+        return
+    ex = [(o, s) for o, s, _c in pairs if not s.get("skip") and not _clean(s)]
+    sk = [(o, s) for o, s, _c in pairs if s.get("skip")]
+
+    def why(s: dict) -> str:
+        return ("стадии прокликали разом" if s.get("burst") else "возврат на шаг раньше" if s.get("ret")
+                else "даты стадий в обратном порядке")
+    for name, rows, cnt, tag in (("excl", ex, st.get("excluded"), why),
+                                 ("skip", sk, st.get("skipped"), lambda s: "шаг пропущен: стадия перепрыгнула")):
+        if rows and cnt == len(rows):
+            for o, _s in rows:
+                used[str(o["id"])] = o
+            drill[f"{key}.{name}"] = {"k": [str(o["id"]) for o, _s in rows], "t": [tag(s) for _o, s in rows],
+                                      "h": f"{head}: " + ("не считаем — даты недостоверны" if name == "excl"
+                                                          else "шаг пропущен")}
 
 
 def _month_drill(month: dict, people: list[dict], orders: list[dict], U: list[dict], today: dt.date, *,
@@ -1504,6 +1670,7 @@ def _month_drill(month: dict, people: list[dict], orders: list[dict], U: list[di
     ключей не получает."""
     drill: dict = {}
     used: dict[str, dict] = {}
+    by_id = {str(o["id"]): o for o in orders}
     era = [o for o in orders if _d(o.get("created")) and _d(o["created"]) >= ork.ORK_SINCE]
     months = _months(today)
 
@@ -1513,7 +1680,9 @@ def _month_drill(month: dict, people: list[dict], orders: list[dict], U: list[di
             if s.get("skip") or not _clean(s) or s.get("wd") is None:
                 continue
             ks.append(str(o["id"]))
-            ts.append(f"{'в норме' if s.get('inNorm') else 'сверх нормы'} · {code} · {s['wd']} р.д.")
+            # подпись строки: класс первым (по нему список группирует), шаг словами, раб. дн. против нормы
+            ts.append(f"{'в норме' if s.get('inNorm') else 'дольше нормы'} · {SEG_TXT.get(code, code)} · "
+                      f"{s['wd']} раб. дн. при норме {ork.SEG_NORM.get(code, '—')}")
             used[str(o["id"])] = o
         return ks, ts
 
@@ -1548,25 +1717,36 @@ def _month_drill(month: dict, people: list[dict], orders: list[dict], U: list[di
                     if o.get("respOrk") and mi < 2:
                         pp[(mi, o.get("orkMgr") or "не назначен")]["art"].append((o, a, got))
         M1, mm = row.get("M1") or {}, row.get("m") or ""
+        mw = _mon_word(m0)
         for c in ("S1", "S2", "S3", "S6"):
             _dk(M1.get(c) or {}, drill, f"{mi}.{c}", *seg_keys(segs[c]), prefix="m",
-                head=f"{c} · {mm}: отрезки в счёте")
-        _dk(M1.get("mgr") or {}, drill, f"{mi}.mgr", *seg_keys(segs["S2"] + segs["S3"] + segs["S6"]), prefix="m",
-            head=f"S2+S3+S6 · {mm}: отрезки в счёте")
+                head=f"{SEG_TXT[c]} · {mw}: шаги в счёте")
+            _excl_keys(M1.get(c) or {}, segs[c], drill, f"{mi}.{c}", f"{SEG_TXT[c]} · {mw}", used)
+        allm = segs["S2"] + segs["S3"] + segs["S6"]
+        _dk(M1.get("mgr") or {}, drill, f"{mi}.mgr", *seg_keys(allm), prefix="m",
+            head=f"Шаги ОРК (шаги 4, 5, 8) · {mw}: шаги в счёте")
+        _excl_keys(M1.get("mgr") or {}, allm, drill, f"{mi}.mgr", f"Шаги ОРК (шаги 4, 5, 8) · {mw}", used)
         _dk(row.get("M2") or {}, drill, f"{mi}.M2", *art_keys(arts), prefix="m",
-            head=f"Полнота карточки · {mm}: пары «заказ, артефакт»")
-        # доставка в срок за месяц — как lifecycle.otd: доставлен в месяце (не позже сегодня), срок есть
-        ok, ot = [], []
-        for o in orders:
-            f, dl = o.get("delFact"), o.get("dl")
-            if f and f <= today and dl and (f.year, f.month) == (m0.year, m0.month):
-                ok.append(str(o["id"]))
-                # подпись: класс первым (в срок / позже) — по нему список группирует строки
-                ot.append(("в срок" if f <= dl else f"позже · на {(f - dl).days} дн.")
-                          + f" · доставлен {f:%d.%m} · срок {dl:%d.%m}")
-                used[str(o["id"])] = o
-        _dk(row.get("otd") or {}, drill, f"{mi}.otd", ok, ot, prefix="m",
-            head=f"Доставка в срок · {mm}: доставленные заказы со сроком клиента")
+            head=f"Полнота карточки · {mw}: пары «заказ, файл шага»")
+        # Д-2 (R4): доставлено к сроку — все заказы, у кого срок клиента наступил в месяце (ключи —
+        # lifecycle.otd, та же совокупность, что доля); не доставленные после срока — своим списком
+        due_k = row.pop("_due", None) or {}
+        ks, ts = [str(k) for k in due_k.get("k") or []], list(due_k.get("t") or [])
+        D0 = row.get("otdDue") or {}
+        if D0.get("n") == len(ks):
+            for k in ks:
+                if k in by_id:
+                    used[k] = by_id[k]
+            _dk(D0, drill, f"{mi}.due", ks, ts or None, prefix="m",
+                head=f"Срок клиента наступил · {mw}: к сроку, позже и не доставлены")
+        if D0.get("dk"):
+            for part, pref, cnt, head in (("dueOpen", "не доставлен", D0.get("open"),
+                                           f"Срок клиента прошёл в {_mon_in(m0)} — не доставлено"),
+                                          ("dueLate", "позже срока", D0.get("late"),
+                                           f"Срок клиента в {_mon_in(m0)} — доставлено позже срока")):
+                op = [(k, t) for k, t in zip(ks, ts) if str(t).startswith(pref)]
+                if op and len(op) == cnt:
+                    drill[f"{mi}.{part}"] = {"k": [k for k, _ in op], "t": [t for _, t in op], "h": head}
     live_era = [o for o in U if _d(o.get("created")) and _d(o["created"]) >= ork.ORK_SINCE]
     for pi, p in enumerate(people):
         who = p.get("who")
@@ -1576,7 +1756,7 @@ def _month_drill(month: dict, people: list[dict], orders: list[dict], U: list[di
             for o in live:
                 used[str(o["id"])] = o
             drill[f"p{pi}.live"] = {"k": [str(o["id"]) for o in live], "t": None,
-                                    "h": f"{nm} · живые заказы ОРК-эпохи"}
+                                    "h": f"{nm} · заказы в работе, созданные с {ork.ORK_SINCE:%d.%m.%Y}"}
             p["liveDk"] = f"m:p{pi}.live"
         for mi, part in ((1, p), (0, p.get("cur") or {})):
             src = pp.get((mi, who)) or {"segs": {}, "art": []}
@@ -1585,12 +1765,30 @@ def _month_drill(month: dict, people: list[dict], orders: list[dict], U: list[di
             # отрезки по отдельности у него не видны, и ключей за ними нет (каждый dk — число на странице)
             for c in (("S2", "S3", "S6") if mi == 1 else ()):
                 _dk(pm.get(c) or {}, drill, f"p{pi}.{mi}.{c}", *seg_keys(src["segs"].get(c) or []), prefix="m",
-                    head=f"{nm} · {c} · {mm}")
+                    head=f"{nm} · {SEG_TXT[c]} · {_mm_word(mm)}")
             _dk(pm.get("mgr") or {}, drill, f"p{pi}.{mi}.mgr",
                 *seg_keys([x for c in ("S2", "S3", "S6") for x in (src["segs"].get(c) or [])]), prefix="m",
-                head=f"{nm} · S2+S3+S6 · {mm}")
+                head=f"{nm} · шаги ОРК (шаги 4, 5, 8) · {_mm_word(mm)}")
             _dk(part.get("M2") or {}, drill, f"p{pi}.{mi}.M2", *art_keys(src["art"]), prefix="m",
-                head=f"{nm} · полнота карточки · {mm}")
+                head=f"{nm} · полнота карточки · {_mm_word(mm)}")
+    # Д-2, Д-10 (R4): столбец «Доставки к сроку по месяцам» → заказы, у кого срок наступил в месяце
+    for r12 in month.pop("_otd", None) or []:
+        kk = r12.get("keys") or {}
+        ks = [str(k) for k in kk.get("k") or []]
+        if ks and len(ks) == r12.get("due"):
+            for k in ks:
+                if k in by_id:
+                    used[k] = by_id[k]
+            mm = str(r12.get("m") or "")
+            drill[f"y.{mm}"] = {"k": ks, "t": list(kk.get("t") or []) or None,
+                                "h": f"Срок клиента наступил · {_mm_word(mm)}: к сроку, позже и не доставлены"}
+    # Д-10 (R4): «ответственный заказа не из ОРК» у загрузки M3 — список этих заказов (счёт M3.notOrk)
+    no = [o for o in live_era if not o.get("respOrk")]
+    if no and len(no) == (month.get("M3") or {}).get("notOrk"):
+        for o in no:
+            used[str(o["id"])] = o
+        drill["notOrk"] = {"k": [str(o["id"]) for o in no], "t": None,
+                           "h": "Заказы в работе: ответственный заказа не из отдела ОРК"}
     want = {k for v in drill.values() for k in (v["k"] if isinstance(v, dict) else v)}
     month["drill"] = drill
     month["orders"] = [_hist_row(o) for k, o in used.items() if k in want]

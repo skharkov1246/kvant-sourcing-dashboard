@@ -179,8 +179,9 @@ def _n_of(payload, dk: str):
 
 def test_каждое_число_открывает_ровно_свои_заказы(run):
     r, out = run
-    payload = {"ct": r["contracts"]["ork"], "month": r["ork_month"]}
     for view in ("main", "sep"):
+        # массив «Месяца» — свой у вида (ключи «m:1.due» есть у обоих видов, числа разные)
+        payload = {"ct": r["contracts"]["ork"], "month": r["ork_month"][view]}
         found = out[view]["found"]
         # у направления «Неделя» — карточки сделок (3.6): чисел меньше, чем в основном виде
         assert len([f for f in found if f["sub"] == "week"]) >= (10 if view == "main" else 2), view
@@ -193,7 +194,13 @@ def test_каждое_число_открывает_ровно_свои_зака
                 assert f["rows"] == int(re.match(r"\d+", f["text"]).group()), f
             elif f["id"][:2] in ("m:", "q:"):
                 n = _n_of(payload, f["id"])
-                assert n and f["items"] == n[0], f
+                if not n:
+                    # R4 (Д-2, Д-10): списки без показателя-владельца — «не доставлено», «не считаем»,
+                    # столбцы «Доставки к сроку», хвост P80: длина списка = число на кнопке
+                    src = (r["ork_month"][view]["month"] if f["id"][0] == "m"
+                           else r["contracts"]["ork"]["quarter"])
+                    n = [len((src.get("drill") or {}).get(f["id"][2:], {}).get("k") or [])]
+                assert n and n[0] and f["items"] == n[0], f
                 if f["el"] == "button" and f["text"].isdigit():
                     assert int(f["text"]) == f["rows"], f
             else:

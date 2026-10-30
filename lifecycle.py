@@ -758,15 +758,68 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         if 0 <= (today - last).days <= 90:
             deals90[0] += 1
             deals90[1] += all(o["delFact"] <= o["dl"] for o in os_)
+    # Д-2 (R4, 30.10.2026): «доставлено к сроку» со знаменателем «срок наступил» — по месяцу СРОКА
+    # клиента, а не доставки. Доля по доставленным (n, ontime выше) прятала сорванные: заказ после
+    # срока, ещё не доставленный, в неё не входил, и рядом с «100 % в срок» стояли 19 сорванных
+    # сроков. Срок наступил — dl раньше сегодня; доставлен — delivered (факт, без него — дата УПД,
+    # как у пункта late): к сроку (≤ dl) или позже; не доставлен — живой заказ открытой сделки
+    # (ровно пункт late очереди). Прочие (заказ закрыт без даты доставки, сделка закрыта) — не в
+    # знаменателе, счётом dueSkip. Инвариант: due == dueOnTime + dueLateDelivered + dueOpenLate.
+    due: dict[dt.date, dict] = {m: {"due": 0, "dueOnTime": 0, "dueLateDelivered": 0, "dueOpenLate": 0,
+                                    "dueSkip": 0, "k": [], "t": []} for m in months}
+    for o, d in in_scope:
+        dl = o.get("dl")
+        if not dl or dl >= today:
+            continue
+        b = due.get(dt.date(dl.year, dl.month, 1))
+        if b is None:
+            continue
+        f = delivered(o)
+        if f:
+            # дата доставки есть (как у пункта late: с ней заказ не «сорван»); вбитая на будущее —
+            # позже срока, раз срок уже прошёл
+            on = f <= dl
+            b["dueOnTime" if on else "dueLateDelivered"] += 1
+            t = (("к сроку" if on else f"позже срока · на {(f - dl).days} дн.")
+                 + f" · доставлен {f:%d.%m}{' (дата в будущем)' if f > today else ''} · срок {dl:%d.%m}")
+        elif o.get("live") and not d.get("closed"):
+            b["dueOpenLate"] += 1
+            t = f"не доставлен · срок прошёл {(today - dl).days} дн. назад · срок {dl:%d.%m}"
+        else:
+            b["dueSkip"] += 1
+            continue
+        b["due"] += 1
+        b["k"].append(str(o.get("id")))
+        b["t"].append(t)
     otd_rows = [{"m": m.strftime("%m.%Y"), "n": v[0], "ontime": v[1],
                  "pct": round(v[1] / v[0] * 100) if v[0] else None,
-                 "medLate": _median(v[2])} for m, v in otd.items()]
+                 "medLate": _median(v[2]),
+                 "due": due[m]["due"], "dueOnTime": due[m]["dueOnTime"],
+                 "dueLateDelivered": due[m]["dueLateDelivered"], "dueOpenLate": due[m]["dueOpenLate"],
+                 "dueSkip": due[m]["dueSkip"],
+                 "duePct": round(due[m]["dueOnTime"] / due[m]["due"] * 100) if due[m]["due"] else None,
+                 # заказы за долей — ключи и подписи строк списка («Разбор числа»), класс первым
+                 "keys": {"k": due[m]["k"], "t": due[m]["t"]}} for m, v in otd.items()]
     lead_out = {k: {"med": _median(v), "p75": _p75(v), "n": len(v)} for k, v in lead.items()}
     sup_all = {k: {"n": len(v), "ontime": sum(1 for x in v if x <= 0),
                    "pct": round(sum(1 for x in v if x <= 0) / len(v) * 100),
                    "medSlip": _median(v)} for k, v in sup_rel.items()}
     suppliers = [{"sup": k, **v} for k, v in sup_all.items() if v["n"] >= SUP_MIN]
     suppliers.sort(key=lambda x: (x["pct"], -(x["medSlip"] or 0)))
+    # Д-10 (R4): заказы за строкой «Проверка другим способом» — те же отгрузки, что speeds() кладёт
+    # в sup_rel (факт отгрузки за 365 дн. и бюджетный конец производства); счёт строки = число ключей
+    sup_keys: dict[str, tuple[list, list]] = defaultdict(lambda: ([], []))
+    for o in (orders if measure is None else measure):
+        s, sp = o.get("shipFact"), o.get("prodEnd")
+        if s and sp and (today - s).days <= 365 and o.get("sup"):
+            ks, ts = sup_keys[o["sup"]]
+            ks.append(str(o.get("id")))
+            ts.append(("вовремя" if s <= sp else f"позже · на {(s - sp).days} дн.")
+                      + f" · отгружен {s:%d.%m} · бюджет {sp:%d.%m}")
+    for x in suppliers:
+        ks, ts = sup_keys.get(x["sup"], ([], []))
+        if len(ks) == x["n"]:
+            x["keys"] = {"k": ks, "t": ts}
 
     # «хозяева процесса» поимённо (живые заказы, доставка в срок за 90 дней) с 26.10.2026 в
     # страницу не идут: доставка в срок — результат поставщика и логистики, не менеджера (Ан.
@@ -774,10 +827,18 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
 
     # гарантия — тот же набор, что плитка фазы «Гарантия»
     in_w = [o for o, _ in in_scope if phase(o, today, warranty_months) == "warranty"]
+    w_end = {str(o.get("id")): _add_months(delivered(o), warranty_months) for o in in_w}
+    end30 = [o for o in in_w if w_end[str(o.get("id"))] <= today + dt.timedelta(days=30)]
     warranty = {"months": warranty_months, "assumed": True, "active": len(in_w),
-                "ending30": sum(1 for o in in_w
-                                if _add_months(delivered(o), warranty_months) <= today + dt.timedelta(days=30)),
-                "claims": None}
+                "ending30": len(end30),
+                "claims": None,
+                # Д-10 (R4): заказы за числами — «гарантия до ДД.ММ.ГГГГ (допущение N мес.)»
+                "keys": {"k": [str(o.get("id")) for o in in_w],
+                         "t": [f"гарантия до {w_end[str(o.get('id'))]:%d.%m.%Y} (допущение {warranty_months} мес.)"
+                               for o in in_w]},
+                "keys30": {"k": [str(o.get("id")) for o in end30],
+                           "t": [f"гарантия до {w_end[str(o.get('id'))]:%d.%m.%Y} (допущение {warranty_months} мес.)"
+                                 for o in end30]}}
     return {
         "asOf": today.strftime("%d.%m.%Y"),
         "phases": [{"key": k, "name": nm, **ph[k]} for k, nm in PHASES],

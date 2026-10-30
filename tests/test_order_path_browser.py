@@ -251,7 +251,10 @@ def test_телефон_подпись_столбца_не_на_значении
     pg.evaluate("document.querySelectorAll('#tab-contracts details').forEach(d=>d.open=true)")
     m = pg.evaluate("""()=>{let n=0; const bad=[];
       document.querySelectorAll('#tab-contracts table.rzflow :is(td,th)[data-l]').forEach(c=>{const w=c.getBoundingClientRect().width; if(!w) return; n++;
-        if(parseFloat(getComputedStyle(c).paddingLeft)<0.35*w) bad.push(c.dataset.l);}); return {n, bad:bad.slice(0,5)}}""")
+        // R4 · WP-F: подпись — своей колонкой сетки (::before в потоке), а не поверх отступа — тоже не наложение
+        // или подписи нет / она в строке перед значением — строка-карточка поставщика «Квартала»
+        const bf=getComputedStyle(c,'::before'), grid=bf.position==='static'||bf.content==='none';
+        if(!grid&&parseFloat(getComputedStyle(c).paddingLeft)<0.35*w) bad.push(c.dataset.l);}); return {n, bad:bad.slice(0,5)}}""")
     assert not m["bad"], m
     assert pg.evaluate("document.documentElement.scrollWidth<=innerWidth")
     pg.close()
