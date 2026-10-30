@@ -3304,13 +3304,17 @@
   .drw.rz .odtd[open]{padding-bottom:10px}
   .drw.rz .odsec{margin-bottom:16px}
   /* ==== /R4:INT ==== */
-  /* ==== Линии столбцов (владелец 30.10.2026: «нет деления на столбцы — глазу не за что зацепиться»):
-     тонкая линия между соседними ячейками строки — во вкладке «Реализация» и её панели, пока таблица —
-     таблица (шире 900 px; уже строки — карточками, без линий) ==== */
-  :root{--rz-col:var(--line2)}
-  :root[data-theme="dark"]{--rz-col:var(--line)}
+  /* ==== Таблицы сеткой (владелец 30.10.2026: «нет деления на столбцы — глазу не за что зацепиться»;
+     «таблица должна быть матричной, а не только строками; цифры не должны плясать без привязки к
+     линиям»): во вкладке «Реализация» и её панели у каждой ячейки — линия снизу и слева от соседней,
+     у таблицы — рамка; один тон линий строк и столбцов. Пока таблица — таблица (шире 900 px; уже
+     строки — карточками). :not(#_) — сетка сильнее правил отдельных таблиц, снимавших линии ==== */
+  :root{--rz-col:var(--line)}
+  :root[data-theme="dark"]{--rz-col:#3a4452}
   @media (min-width:901px){
-    #tab-contracts table :is(th,td)+:is(th,td),.drw.rz table :is(th,td)+:is(th,td){border-left:1px solid var(--rz-col)}
+    #tab-contracts table:not(#_),.drw.rz table:not(#_){border:1px solid var(--rz-col);border-collapse:collapse}
+    #tab-contracts table:not(#_) :is(th,td),.drw.rz table:not(#_) :is(th,td){border-bottom:1px solid var(--rz-col)}
+    #tab-contracts table:not(#_) :is(th,td)+:is(th,td),.drw.rz table:not(#_) :is(th,td)+:is(th,td){border-left:1px solid var(--rz-col)}
   }
 </style>
 <script>
