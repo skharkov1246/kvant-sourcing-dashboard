@@ -613,16 +613,24 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
             "notChecked": "не проверяется: паузы и эскалации (полей нет), запросы статуса поставщику, "
                           "содержимое файлов (есть ли подпись), проверка контрагента (СП-1066 не читается)"}
     # заказы за числами «Недели» и «Пульс ОРК» (решение владельца 29.10.2026) — те же множества
+    # вид заказа — тем же правилом, что «Пульс ОРК» (pulse_who): «без менеджера ОРК» сделки
+    # делится на заказы без ответственного и с ответственным вне ОРК
+    own = no_owner(deals, today, {str(o["id"]): pulse_who(o, deal_by.get(o.get("deal")))[1]
+                                  for o in orders if o.get("live")})
     week.update(_week_drill(L=L, U=U, C12=C12, deals=deals, queue=queue, step=step, ov=ov,
                             over_ids=over_ids, wait_ids=wait_ids, long_p80=long_p80, cps=cps,
                             hyg_items=hyg_items, no_order=no_order, risk_q=risk_q, reach_of=reach_of,
                             measure=measure, today=today, ledger=ledger, s1_recent_o=s1_recent_o,
                             recent=recent, DS=DS, d1=d1, deals_at=deals_at, o1=o1, w1o_over=w1o_over,
-                            unpaid=unpaid))
+                            unpaid=unpaid, own_ids=[r["deal"] for r in own["rows"]]))
     # Д-9 и R4: ключи за счётами подписей «Недели» (каждый — непустой список при счёте > 0);
     # у каждого списка — единица (unit): сделки — ключами «d:<id>», заказы — id заказа
     D = week["drill"]
     D["W3p"] = {c: _u("order", v["k"], v["t"]) for c, v in w3_parts(risk_q, heavy).items()}
+    # «Сделки без хозяина» (решение 30.10.2026, п. 3): число = строки = ключи «d:» — одно множество
+    week["noOwner"] = own
+    D["noOwner"] = _u("deal", [r["k"] for r in own["rows"]], [owner_gap_text(r["miss"]) for r in own["rows"]],
+                      "Без хозяина")
     # «Клиент не оплатил»: unpaidDeals — сделки (главное число, tiles.unpaid.deals), unpaid — заказы
     # этих сделок (tiles.unpaid.orders; ключ прежний — страница открывает его у числа заказов)
     D["unpaidDeals"] = _u("deal", unpaid.pop("dkeys"), unpaid.pop("dtags"))
@@ -1651,6 +1659,110 @@ def _unpaid(items: list[dict], deal_by: dict, today: dt.date) -> dict:
             "dkeys": [f"d:{d}" for d in deals], "dtags": dtags}
 
 
+# ---- «Сделки без хозяина» (решение владельца 30.10.2026, п. 3) ---------------------------------
+# Открытая сделка воронки реализации, у которой набор хозяев неполон: нет КАМа (поле «КАМ»), нет
+# ОСС сделки (OSS_DEAL), нет менеджера ОРК (ни «Ответственного за реализацию» сделки, ни менеджера
+# ОРК у её живых заказов) или хозяин ушёл (уволен по справочнику людей). Единица — сделка; один
+# список у счётчика «Недели», фильтра «Сделок и денег» и «Разбора числа».
+GONE_MARK = "(уволен)"                    # подпись уволенного у contracts.compute (who)
+OWNER_ROLES = ("kam", "ossDeal", "orkMgr", "dealResp")
+OWNER_ROLE_NAME = {"kam": "КАМ", "ossDeal": "ОСС сделки", "orkMgr": "менеджер ОРК",
+                   "dealResp": "ответственный сделки"}
+# кто назначает: КАМа — руководитель КАМ (хозяин пункта «назначить КАМа» очереди КАМа,
+# kamqueue.HEAD); ОСС сделки, менеджера ОРК и ответственного сделки — руководитель ОРК (хозяин
+# пункта «ведёт уволенный» gone, ork.ITEM["gone"]; шаг 1 «принять сделку и назначить менеджера ОРК»)
+OWNER_ASSIGN = {"kam": "руководитель КАМ", "ossDeal": ork.ROLES["orkHead"],
+                "orkMgr": ork.ROLES["orkHead"], "dealResp": ork.ROLES["orkHead"]}
+# дни «без хозяина» — от входа сделки в «Реализацию» (cat0At): когда поле опустело, Битрикс не
+# хранит; дату увольнения справочник людей тоже не хранит — у ушедшего дней нет (правило 16)
+OWNER_SINCE = "вход сделки в «Реализацию»"
+
+
+def _gone_nm(v) -> bool:
+    return str(v or "").endswith(GONE_MARK)
+
+
+def owner_gaps(d: dict, kind_of: dict | None = None) -> list[dict]:
+    """Строка сделки (contracts.compute) → роли без хозяина [{role, state: none | out | gone, by}]
+    в порядке OWNER_ROLES. Не открытая сделка воронки реализации (закрыта, «Оплата получена»,
+    проиграна, вне кат. 0) — пусто: хозяева нужны только живой работе.
+
+    Менеджер ОРК — «Ответственный за реализацию» сделки и менеджеры ОРК живых заказов
+    (orders[].orkMgr): нет ни одного — «нет»; все есть, но ушли — «ушёл». «Нет» делится по
+    живым заказам так же, как «Пульс ОРК» (pulse_who; kind_of — id заказа → вид mgr | out | none):
+    у каждого живого заказа ответственный есть, но не из ОРК, — «out» («менеджер ОРК не назначен:
+    ответственный заказа вне ОРК»); иначе «none». У роли orkMgr «нет» / «out» — счёт живых
+    заказов: ordNone — без ответственного совсем (они же в «Заказах без менеджера ОРК» и в строке
+    «не назначен» «Пульса»), ordOut — с ответственным вне ОРК (строка «ответственный вне ОРК»).
+    Без kind_of вид заказа не известен — все считаются «без ответственного». Ответственный
+    сделки бывает только «ушёл» (поле в Битриксе обязательное)."""
+    if d.get("closed") or d.get("lost") or not d.get("inCat0", True):
+        return []
+    out: list[dict] = []
+
+    def add(role: str, state: str) -> None:
+        out.append({"role": role, "state": state, "by": OWNER_ASSIGN[role]})
+    for role, v in (("kam", d.get("kam")), ("ossDeal", d.get("ossDeal"))):
+        if not _nm(v):
+            add(role, "none")
+        elif _gone_nm(v):
+            add(role, "gone")
+    live = [o for o in (d.get("orders") or []) if o.get("live")]
+    mgrs = {m for m in [_nm(d.get("orkResp"))] + [_nm(o.get("orkMgr")) for o in live] if m}
+    if not mgrs:
+        kinds = [(kind_of or {}).get(str(o.get("id")), "none") for o in live]
+        n_out = sum(1 for k in kinds if k == "out")
+        n_none = len(kinds) - n_out
+        add("orkMgr", "out" if kinds and not n_none else "none")
+        out[-1].update(ordNone=n_none, ordOut=n_out)
+    elif all(_gone_nm(m) for m in mgrs):
+        add("orkMgr", "gone")
+    if d.get("managerGone"):
+        add("dealResp", "gone")
+    return out
+
+
+OWNER_OUT_TEXT = "менеджер ОРК не назначен: ответственный заказа вне ОРК"
+
+
+def owner_gap_text(gaps: list[dict]) -> str:
+    """«нет: КАМ, ОСС сделки · ушёл: менеджер ОРК» — подпись строки списка за числом; у «out» —
+    своя подпись (OWNER_OUT_TEXT): ответственный у заказов есть, но не из ОРК."""
+    none = [OWNER_ROLE_NAME[g["role"]] for g in gaps if g["state"] == "none"]
+    gone = [OWNER_ROLE_NAME[g["role"]] for g in gaps if g["state"] == "gone"]
+    out = any(g["state"] == "out" for g in gaps)
+    return " · ".join(p for p in (("нет: " + ", ".join(none)) if none else "",
+                                  OWNER_OUT_TEXT if out else "",
+                                  ("ушёл: " + ", ".join(gone)) if gone else "") if p)
+
+
+def no_owner(deals: list[dict], today: dt.date, kind_of: dict | None = None) -> dict:
+    """«Сделки без хозяина» вида: n — сделки (= строки rows = ключи drill.noOwner), byRole —
+    сделки по роли (сделка бывает в нескольких: сумма больше n), byState — сделки, где чего-то
+    нет / где кто-то ушёл. Строка: сделка, роли, дни от входа в «Реализацию» у «нет» (у «ушёл» —
+    None: дата ухода не хранится), заказов живых и всего (без проваленных). Имён и клиента нет:
+    клиента страница берёт из строк сделок (CONTRACTS.rows), где он уже показан."""
+    rows = []
+    for d in deals:
+        gaps = owner_gaps(d, kind_of)
+        if not gaps:
+            continue
+        c0 = _d(d.get("cat0At"))
+        dd = (today - c0).days if c0 else None
+        miss = [{**g, "days": dd if g["state"] in ("none", "out") else None} for g in gaps]
+        os_ = [o for o in (d.get("orders") or []) if not o.get("lost")]
+        rows.append({"k": f"d:{d['deal']}", "deal": str(d["deal"]), "seq": d.get("seq") or 0,
+                     "miss": miss, "days": max((g["days"] for g in miss if g["days"] is not None), default=None),
+                     "orders": sum(1 for o in os_ if o.get("live")), "ordersAll": len(os_)})
+    rows.sort(key=lambda r: (-(r["days"] if r["days"] is not None else -1), -int(r["seq"] or 0)))
+    by_role = {r: sum(1 for x in rows if any(g["role"] == r for g in x["miss"])) for r in OWNER_ROLES}
+    by_state = {s: sum(1 for x in rows if any(g["state"] == s for g in x["miss"])) for s in ("none", "out", "gone")}
+    return {"n": len(rows), "unit": "deal", "rows": rows, "byRole": by_role, "byState": by_state,
+            "roles": OWNER_ROLE_NAME, "assign": OWNER_ASSIGN, "since": OWNER_SINCE, "outText": OWNER_OUT_TEXT,
+            "units": {"n": "deal", "byRole": "deal", "byState": "deal", "days": "day", "orders": "order",
+                      "ordNone": "order", "ordOut": "order"}}
+
+
 def _pl(n: int, one: str, few: str, many: str) -> str:
     n = abs(int(n))
     if n % 10 == 1 and n % 100 != 11:
@@ -1685,7 +1797,7 @@ def late_hist(orders: list[dict], deal_by: dict, today: dt.date) -> list[int]:
 
 def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p80, cps, hyg_items,
                 no_order, risk_q, reach_of, measure, today, ledger, s1_recent_o, recent, DS, d1, deals_at,
-                o1, w1o_over, unpaid) -> dict:
+                o1, w1o_over, unpaid, own_ids=None) -> dict:
     """Строки заказов и сделок «Недели», ключи каждого числа и «Пульс ОРК». Множества — те же,
     что у чисел в build (over_ids, wait_ids, ведомость, пункты очереди с w2 и waitUtd)."""
     deal_by = {d["deal"]: d for d in deals}
@@ -1929,6 +2041,8 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
         r.update(own=q.get("who") or r["own"], ownR=q.get("role") or r["ownR"], cd=q.get("days"))
     for k in unpaid.get("dkeys") or []:
         drow(k[2:], "unpaid", None)
+    for did in own_ids or []:                       # «Сделки без хозяина» — строка сделки за ключом «d:»
+        drow(did, "noOwner", None)
 
     # «Пульс ОРК» (решение владельца 29.10.2026, п. 4): живые заказы по менеджеру ОРК; всем с
     # вкладкой, как «Сверх нормы по менеджерам» (решение 27.10.2026, А) — счёт, без среднего и

@@ -1035,7 +1035,7 @@ def realctx_raw() -> dict:
     return {"version": 1, "at": t(0.2), "chats": chats, "contracts": contracts, "econ": econ, "facts": facts}
 
 
-def build_realization() -> dict:
+def build_realization(hist: bool = True) -> dict:
     """«Реализация» со сводом чатов и договоров — как main.py: contracts.compute с чатами и
     финальной экономикой свода, затем dealctx.build. → {"contracts": …, "dealctx": …, "ork_month": …}
     для dashboard.write."""
@@ -1052,7 +1052,38 @@ def build_realization() -> dict:
     ct["head"]["ctx"] = head
     if sep is not None and ct.get("sep"):
         ct["sep"]["head"]["ctx"] = sep
+    if hist:
+        # как main._rz_hist: история счётов (придуманная, rz_hist_points) + сегодняшняя точка
+        import rzhist
+        pt = rzhist.point(ct, payload, CT_TODAY)
+        ct["rzHist"] = rzhist.page(rzhist.merge(rz_hist_points(pt), pt), ct, CT_TODAY)
     return {"contracts": ct, "dealctx": payload, "ork_month": ork_month}
+
+
+# ── История счётов «Реализации» (rzhist): придуманные точки на RZ_HIST_DAYS дней до CT_TODAY —
+# сегодняшние счёты со сдвигом по дню; у одних счётов неделю назад было больше (стало лучше), у
+# других меньше (стало хуже), у «Приёмки» — столько же
+RZ_HIST_DAYS = 30
+RZ_HIST_SHIFT = {"lateOrders": -3, "lateDeals": -1, "threatOrders": 2, "overOrders": -2, "acceptDeals": 0,
+                 "noMgrOrders": 4, "unpaidDeals": -1, "closeDeals": 1, "execOrders": -2, "dealDeals": 3,
+                 "hygOrders": 5, "hygDeals": 0, "execOrdersFull": -2, "dealDealsFull": 3, "hygOrdersFull": 5,
+                 "hygDealsFull": 0}
+
+
+def rz_hist_points(pt: dict, days: int = RZ_HIST_DAYS) -> dict:
+    """История до CT_TODAY: точка k дней назад = сегодня + сдвиг × k / 7 (целое, не меньше 0);
+    у отдельного направления — без сдвига. Ровно неделю назад — сегодня + сдвиг."""
+    import rzhist
+    h = rzhist.empty()
+    for k in range(days, 0, -1):
+        d = (CT_TODAY - dt.timedelta(days=k)).isoformat()
+        m = {f: (None if v is None else max(0, v + round(RZ_HIST_SHIFT.get(f, 0) * k / 7)))
+             for f, v in pt["main"].items()}
+        p = {"d": d, "main": m}
+        if pt.get("sep"):
+            p["sep"] = dict(pt["sep"])
+        h["pts"].append(p)
+    return h
 
 
 # ── «Пресейл» для очереди КАМа и золотого правила чата. Стадии — имена воронки
