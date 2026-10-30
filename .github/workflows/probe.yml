@@ -13,7 +13,7 @@ on:
         description: "Какой зонд запустить"
         type: choice
         default: bitrix_probe.py
-        options: [bitrix_probe.py, probe_mail_files.py, probe_conversion.py, probe_presale.py, probe_2526.py, probe_fields.py, probe_pace.py, probe_won.py, probe_kp_rules.py, probe_realization.py, probe_contracts.py, probe_category.py, probe_money.py, probe_econ_files.py, probe_contract_gaps.py, probe_real_segments.py, probe_money_sources.py, probe_regulation.py, probe_deal_rfq.py, probe_presale_reg.py]
+        options: [bitrix_probe.py, probe_mail_files.py, probe_conversion.py, probe_presale.py, probe_2526.py, probe_fields.py, probe_pace.py, probe_won.py, probe_kp_rules.py, probe_realization.py, probe_contracts.py, probe_category.py, probe_money.py, probe_econ_files.py, probe_contract_gaps.py, probe_real_segments.py, probe_money_sources.py, probe_regulation.py, probe_deal_rfq.py, probe_presale_reg.py, probe_unpriced.py]
       limit:
         description: "Размер выборки (только для зондов, которые его читают; пусто — по умолчанию)"
         required: false
@@ -69,6 +69,7 @@ jobs:
           # окна 07:20–11:00 и 13:20–17:00 UTC, без идущего деплоя (критика v59, G39).
           # Если cbr.ru не отвечает раннеру, курсы ЦБ берутся с зеркала cbr-xml-daily.ru
           # запросом на нужную дату (до 900 запросов, ~4–6 мин; это не Битрикс).
+          # probe_unpriced.py (v62, не расценено через месяц, когорты): ≈ 300–600 запросов; PROBE_LIMIT — месяцев (≥ 10).
           # probe_regulation.py (v60, регламент ОРК) — ≈ 830 запросов, предел 1 100 (~15 мин):
           # окна 07:20–11:00 и 13:20–17:00 UTC, не на деплой в :07 и не на скан чатов в 21:00.
           # probe_presale_reg.py (v62, пресейл по регламенту сорсера v1.4) — ≈ 430 запросов при 10 частях
