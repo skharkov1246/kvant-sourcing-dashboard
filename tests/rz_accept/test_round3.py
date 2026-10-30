@@ -16,11 +16,13 @@ from tests.rz_accept.conftest import mark
 
 pytest.importorskip("playwright.sync_api")
 
-# что должно быть целиком (full) или хотя бы начаться (start) до innerHeight — спецификация, 3.10
+# что должно быть целиком (full) или хотя бы начаться (start) до innerHeight — спецификация, 3.10.
+# «Неделя», 1280: «Что сделать сегодня» — три части (спецификация «сделка и заказ поставщика», §2): строка
+# части A «Дела по заказам» со ссылкой «Порядок в карточках» стоит над группами — в первом экране 3 группы
 SUPROW = "#tab-contracts .ctm-sup tbody tr:not(.ctm-gh):has(td:nth-child(3))"
 TABLE_3_10 = {
     "week": {"desktop": [("фраза", "#wkLead", 1, "full"), ("3 плитки", "#orkTiles .wkt", 3, "full"),
-                         ("5 счётчиков", "#wkMore li.wkc", 5, "full"), ("4 группы действий", "#orkToday li.wkg", 4, "full")],
+                         ("5 счётчиков", "#wkMore li.wkc", 5, "full"), ("3 группы действий", "#orkToday li.wkg", 3, "full")],
              "phone": [("фраза", "#wkLead", 1, "full"), ("KPI 1–3 строками", "#orkTiles .wkt", 3, "full"),
                        ("1 группа действий", "#orkToday li.wkg", 1, "full")]},
     "month": {"desktop": [("фраза", "#ctmMonH", 1, "full"), ("буллеты", ".ctmks .ctmk", 2, "full"),

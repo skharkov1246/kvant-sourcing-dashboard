@@ -177,7 +177,12 @@ def test_плитки_смежники_менеджеры_и_очередь(brow
     if more.count():
         n = int(panel.locator(".wkg.on button[data-tq]").inner_text())
         more.click()
-        assert panel.locator("#wkqD tbody tr").count() == n
+        # строки — заказы группы (число группы — разные заказы); шапки сделок «клиентских» кодов —
+        # отдельные строки tr.wkdhr, по одной на сделку, в счёт не входят
+        assert panel.locator("#wkqD tbody tr:not(.wkdhr):not(.wksubr)").count() == n
+        hd = panel.locator("#wkqD tbody tr.wkdhr button.wkdeal")
+        ds = [hd.nth(i).get_attribute("data-ct") for i in range(hd.count())]
+        assert len(ds) == len(set(ds))
     # отбор по человеку: группы — только его пункты; под отбор пусто — «Снять отбор»
     who = pg.locator("#wkWho option").nth(1).get_attribute("value")
     pg.locator("#wkWho").select_option(who)
