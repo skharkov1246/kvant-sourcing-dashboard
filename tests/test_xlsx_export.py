@@ -279,6 +279,7 @@ try{
   document.querySelector('#tab-contracts [role="tab"][data-sub="week"]').click();
   snap(document.getElementById('orkPulseB').closest('table'),'people');
   snap(document.getElementById('orkLed').closest('table'),'ledger');
+  snap(document.getElementById('orkLedD').closest('table'),'ledgerD');
   // список за числом (дровер): в имени файла — подвкладка и направление числа, как у таблиц вкладки
   // «N заказов в работе» — в шапке вкладки (R4, WP-A), по выбранному направлению; в панели — если есть
   var od=function(sel,key){var b=document.querySelector(sel+' button[data-od="w:live"]')||document.querySelector('#ctLive button[data-od="w:live"]'); b.click();
@@ -392,19 +393,23 @@ def test_кто_сколько_ведёт_все_люди_и_итог(page_run):
 
 def test_число_со_списком_заказов_идёт_в_файл(page_run):
     """Число «Реализации» со списком заказов за ним — кнопка (.odn): в файле оно есть, как на
-    странице. Ведомость 13 шагов: «Заказов на шаге» каждой строки — число живых заказов на шаге
-    (кнопка списка), в файле — то же число, а не пустая ячейка."""
+    странице. Ведомость в двух частях (спец. «сделка и заказ», E21): шаги заказа 4–12 — «Заказов на
+    шаге» каждой строки — число живых заказов на шаге (кнопка списка), в файле — то же число; шаги
+    сделки 1–3 и 13 — своей таблицей «Сделок на шаге», итог — сумма строк, единицы не смешаны."""
     out, r, _m = page_run
     led = out["ledger"]
-    assert led["head"][:3] == ["Шаг", "Кто делает", "Заказов на шаге"]
-    L = r["contracts"]["ork"]["week"]["ledger"]
+    assert led["head"][:3] == ["Шаг заказа", "Кто делает", "Заказов на шаге"]
+    L = [s for s in r["contracts"]["ork"]["week"]["ledger"] if s["no"] not in (1, 2, 3, 13)]
     rows = _rows(led["b64"])[1:1 + led["rows"]]
-    assert led["rows"] == len(L) + 1 and sum(1 for s in L if s["now"]) > 0     # + строка «Всего на шагах»
+    assert led["rows"] == len(L) + 1 and sum(1 for s in L if s["now"]) > 0     # + строка «Всего заказов на шагах 4–12»
     for row, s in zip(rows, L):
         assert str(row[2]).split(" · ")[0] == str(s["now"] or 0), (s["no"], row[2])
-    # итог — заказы: у шагов сделки (1–3, 13; решение 30.10.2026) в нём живые заказы шага (ordersNow)
-    assert rows[-1][0] == "Всего на шагах" and rows[-1][2] == sum(
-        (s.get("ordersNow") if s.get("unit") == "deal" else s["now"]) or 0 for s in L)
+    assert rows[-1][0] == "Всего заказов на шагах 4–12" and rows[-1][2] == sum(s["now"] or 0 for s in L)
+    ld = out["ledgerD"]
+    assert ld["head"][:3] == ["Шаг сделки", "Кто делает", "Сделок на шаге"]
+    rd = _rows(ld["b64"])[1:1 + ld["rows"]]
+    assert ld["rows"] == 4 + 1 and [str(x[0]).split(" ")[0] for x in rd[:-1]] == ["1", "2", "3", "13"]
+    assert rd[-1][0] == "Всего сделок на шагах 1–3 и 13" and rd[-1][2] == sum(int(x[2]) for x in rd[:-1]) > 0
 
 
 def test_список_за_числом_имя_файла_с_подвкладкой_и_направлением(page_run):

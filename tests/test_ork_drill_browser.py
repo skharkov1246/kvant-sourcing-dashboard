@@ -87,7 +87,10 @@ def _clicked_rows(pg, el) -> int:
     # подсказку (WCAG 1.4.13), и только следующий Esc — список
     pg.mouse.move(0, 0)
     pg.wait_for_selector("#drw.on")
-    return pg.locator(ROWS).count()
+    # спец. «сделка и заказ» (E27): пары «заказ × отрезок | файл» — вложенными строками под заказом;
+    # строка списка — объект его единицы (заказ или сделка)
+    pairs = pg.locator("#drwBody table.odt tbody li.odpi").count()
+    return pairs or pg.locator(ROWS + ".drill").count()
 
 
 def _close_and_focus(pg, el) -> None:
@@ -115,14 +118,14 @@ def test_каждое_число_недели_открывает_свои_зак
     if not sep:
         # «Кто сколько ведёт»: число заказов человека — его список; шапка — по образцу владельца
         P = pg.evaluate("window.__CONTRACTS__.ork.week.pulse.rows")
-        bs = panel.locator("#orkPulseB button[data-od^='w:pulse/']")
+        bs = panel.locator("#orkPulseB button[data-od^='w:pulse/'][data-od$='/keys']")
         assert bs.count() == sum(1 for p in P if p["n"])
         for i in range(bs.count()):
             b = bs.nth(i)
             p = P[int(b.get_attribute("data-od").split("/")[1])]
             assert _clicked_rows(pg, b) == p["n"]
             head = pg.locator("#drwSub").inner_text()
-            assert f"{p['n']} заказ" in head and "от всех в работе" in head and f"сделок {p['deals']}" in head
+            assert f"{p['n']} заказ" in head and "от всех в работе" in head and f"сделок с его заказами {p['deals']}" in head
             pg.keyboard.press("Escape")
     assert not errs, errs
 

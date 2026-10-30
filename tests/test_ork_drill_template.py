@@ -45,7 +45,7 @@ vm.createContext(box);
 vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + inp.unpack + '\nfunction _dcData(){return null;}\n' + inp.code
   + '\nthis._orkWeek=_orkWeek; this._orkMonth=_orkMonth; this._orkQuarter=_orkQuarter; this._odModel=_odModel;'
   + ' this._odHtml=_odHtml; this._orkWeekCtx=_orkWeekCtx; this._orkWeekToday=_orkWeekToday; this._orkWeekPeople=_orkWeekPeople; this._odSub=_odSub;'
-  + ' this._odPrep=_odPrep; this._odDef=_odDef;', box);
+  + ' this._odPrep=_odPrep; this._odDef=_odDef; this._odCnt=_odCnt;', box);
 const unesc = s => String(s).replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 const attr = (tag, a) => { const m = new RegExp(' ' + a + '="([^"]*)"').exec(tag); return m ? unesc(m[1]) : null; };
 const F0 = {step: null, sup: '', mgr: '', tag: ''};
@@ -79,7 +79,9 @@ for (const [k, X] of Object.entries(inp.views)) {
       const M = box._odModel(X, X.ork, {id, F: step != null ? {step} : otag != null ? {tag: otag} : null});
       const html = M ? box._odHtml(M, Object.assign({}, F0, M.F0 || {})) : '';
       found.push({sub, el, id, step, tag: otag, cls: attr(tag, 'class'), text,
-                  items: M ? M.items.length : null, rows: (html.match(/<tr class="drill" data-odk="[^"]*" data-odct=/g) || []).length});
+                  items: M ? M.items.length : null, rows: (html.match(/<tr class="drill" data-odk="[^"]*" data-odct=/g) || []).length,
+                  // единица списка (спец. «сделка и заказ», E27): счёт — разные объекты единицы; пары — под заказом
+                  cnt: M ? box._odCnt(M) : null, pairs: (html.match(/<li class="odpi/g) || []).length});
     }
   }
   const extra = {};
@@ -187,10 +189,20 @@ def test_каждое_число_открывает_ровно_свои_зака
         assert len([f for f in found if f["sub"] == "week"]) >= (10 if view == "main" else 2), view
         for f in found:
             assert f["items"] is not None, f
+            c = f["cnt"]
             if f["step"] is None and f.get("tag") is None:
-                assert f["rows"] == f["items"], f          # список без отбора — все строки числа
+                # список без отбора — все объекты числа: строк столько, сколько разных объектов единицы
+                # списка (сделок у списка сделок, заказов у заказов); пары «заказ × отрезок | файл» —
+                # строкой заказа и вложенными строками, пар столько же, сколько ключей
+                if c["u"] in ("segment", "file"):
+                    assert f["rows"] == c["uo"] and f["pairs"] == f["items"] == c["n"], f
+                elif c["u"] == "deal":
+                    assert f["rows"] == c["n"], f
+                else:
+                    assert f["rows"] == f["items"], f
             if f["id"].startswith("w:") and f["el"] == "button":
-                # кнопка числа «Недели»: строк столько, сколько в числе (с отбором шага или подписи — в отборе)
+                # кнопка числа «Недели»: строк столько, сколько в числе (с отбором шага или подписи — в отборе);
+                # у списка сделок — сделок
                 assert f["rows"] == int(re.match(r"\d+", f["text"]).group()), f
             elif f["id"][:2] in ("m:", "q:"):
                 n = _n_of(payload, f["id"])
@@ -202,7 +214,7 @@ def test_каждое_число_открывает_ровно_свои_зака
                     n = [len((src.get("drill") or {}).get(f["id"][2:], {}).get("k") or [])]
                 assert n and n[0] and f["items"] == n[0], f
                 if f["el"] == "button" and f["text"].isdigit():
-                    assert int(f["text"]) == f["rows"], f
+                    assert int(f["text"]) == (f["pairs"] if c["u"] in ("segment", "file") else f["rows"]), f
             else:
                 raise AssertionError(f"число без проверки: {f}")
     subs = {f["sub"] for f in out["main"]["found"]}
@@ -249,9 +261,9 @@ def test_пульс_отрисован_и_ушедший_помечен(run):
     body = htmlmod.unescape(gone.split("</thead>")[1])
     assert "(уволен)</th>" not in body and "(уволен) <span" not in body.split("data-od")[0]
     P = r["contracts"]["ork"]["week"]["pulse"]
-    assert gone.count('data-od="w:pulse/') == sum(1 for p in P["rows"] if p["n"])
+    assert len(re.findall(r'data-od="w:pulse/\d+/keys"', gone)) == sum(1 for p in P["rows"] if p["n"])
     # строка «не назначен» открывает и «Без менеджера ОРК» в выводе и счётчике (одно множество, раунд 3)
-    week = [f for f in out["main"]["found"] if f["sub"] == "week" and f["id"].startswith("w:pulse/")]
+    week = [f for f in out["main"]["found"] if f["sub"] == "week" and re.match(r"w:pulse/\d+/keys$", f["id"])]
     assert len({f["id"] for f in week}) == sum(1 for p in P["rows"] if p["n"])
     assert all(f["items"] == P["rows"][int(f["id"].split("/")[1])]["n"] for f in week)
 

@@ -367,11 +367,13 @@ def _with_tabs_opened(path: Path) -> Path:
               "if(bad.length)kvFail('Реализация: число '+id+' — дни на шаге в списке не те, что в пути заказа: '+bad.slice(0,3).join('; '))};"
               "if(!NB.length)kvFail('Реализация: в «Неделе» нет чисел со списком заказов');"
               "NB.forEach(function(b){var n=parseInt(b.textContent,10),D=document.getElementById('drw');b.click();"
-              "var R=document.querySelectorAll('#drwBody table.odt tbody tr').length;"
+              # строка списка — объект его единицы (заказ или сделка); пары «заказ × отрезок | файл» —
+              # вложенными строками под заказом (спец. «сделка и заказ», E27): счёт — пары
+              "var R=document.querySelectorAll('#drwBody table.odt tbody li.odpi').length||document.querySelectorAll('#drwBody table.odt tbody tr[data-odk]').length;"
               "if(!D||!D.classList.contains('on'))kvFail('Реализация: число '+b.dataset.od+' не открыло список заказов');"
               "else if(R!==n)kvFail('Реализация: число '+b.dataset.od+' = '+n+', а в списке строк '+R);"
               # строка списка открывается (путь заказа или карточка сделки): у каждой — ключ заказа
-              "else if(document.querySelector('#drwBody table.odt tbody tr:not([data-odk])'))"
+              "else if(document.querySelector('#drwBody table.odt tbody tr:not([data-odk]):not(.odpr)'))"
               "kvFail('Реализация: число '+b.dataset.od+' — в списке строка без ключа заказа (data-odk)');"
               "else DY(b.dataset.od);"
               "var X2=document.getElementById('drwX');if(X2)X2.click()});"
@@ -382,7 +384,7 @@ def _with_tabs_opened(path: Path) -> Path:
               # nDk) отрисован числом, и оно открывает ровно n строк (ревизия 29.10.2026)
               "try{var WK3=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"week\"]'),CX3=window.__CONTRACTS__;"
               "if(WK3&&CX3&&CX3.ork&&CX3.ork.week&&CX3.ork.week.drill){WK3.click();"
-              "var RW=function(){return document.querySelectorAll('#drwBody table.odt tbody tr').length},"
+              "var RW=function(){return document.querySelectorAll('#drwBody table.odt tbody li.odpi').length||document.querySelectorAll('#drwBody table.odt tbody tr[data-odk]').length},"
               "SH=function(){var D=document.getElementById('drw');return !!D&&D.classList.contains('on')},"
               "XX=function(){var X3=document.getElementById('drwX');if(X3)X3.click()},"
               "EA=function(sel,fn){[].slice.call(document.querySelectorAll('#ctPanel-main '+sel)).forEach(fn)};"
