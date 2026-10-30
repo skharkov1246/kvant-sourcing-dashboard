@@ -273,6 +273,7 @@ try{
   document.querySelector('#tab-contracts [role="tab"][data-sub="week"]').click();
   snap(document.getElementById('orkQb').closest('table'),'queue');
   snap(document.getElementById('orkLed').closest('table'),'ledger');
+  snap(document.getElementById('orkRisk').closest('table'),'risk');
   // список за числом (дровер): в имени файла — подвкладка и направление числа, как у таблиц вкладки
   var od=function(sel,key){var b=document.querySelector(sel+' button[data-od="w:live"]'); b.click();
     var t=document.getElementById('odTable'); snap(t,key); out[key].trs=t.tBodies[0].rows.length; out[key].n=+b.textContent;
@@ -323,16 +324,17 @@ def test_журнал_шагов_в_excel_как_на_странице(page_run)
     s1_over = [x for x in J if x["seg"] == "S1" and x["measurable"] and (x["over"] or 0) > 0]
     j = out["journal"]
     assert out["jbar"] and j["file"] == "КВАНТ_Реализация_Месяц_Журнал шагов_2026-10-29.xlsx"
-    assert j["head"] == ["Сделка", "Заказ", "Шаг", "Начало", "Конец", "Р.д.", "Норма", "Сверх нормы на",
-                         "Отметки", "Хозяин", "Месяц"]
+    assert j["head"] == ["Сделка", "Заказ", "Шаг", "Начало", "Конец", "Шёл, р.д.", "Норма, р.д.",
+                         "Дольше нормы на, р.д.", "Почему не считаем", "Кто отвечал", "Месяц"]
     rows = _rows(j["b64"])
     data = rows[1:1 + j["rows"]]
     assert j["rows"] == len(s1_over) > 0
-    assert all(row[2].startswith("S1 ") and isinstance(row[7], int) and row[7] >= 1 for row in data)
+    assert all(row[2].startswith("Приёмка сделки") and "S1" in row[2] and isinstance(row[7], int) and row[7] >= 1
+               for row in data)
     assert [row[7] for row in data] == sorted((x["over"] for x in s1_over), reverse=True)
     assert all(isinstance(row[5], int) and row[6] == 1 for row in data), "р.д. и норма — числами"
     assert all(re.fullmatch(r"\d\d\.\d\d\.\d{4}", row[4]) and re.fullmatch(r"\d\d\.\d{4}", row[10]) for row in data)
-    assert rows[-1][0].startswith("Отбор: шаг S1 Приёмка сделки") and "только сверх нормы" in rows[-1][0]
+    assert rows[-1][0].startswith("Отбор: Приёмка сделки (шаг 1 · S1)") and "только дольше нормы" in rows[-1][0]
     a = out["journalAll"]
     assert a["rows"] == len(J) and len(_rows(a["b64"])) == 1 + len(J) + 2
 
@@ -343,7 +345,7 @@ def test_очередь_недели_все_строки_а_не_первые_40
     out, r, _m = page_run
     q = out["queue"]
     assert q["shown"] == 40 and q["full"] and q["rows"] > 40
-    assert q["file"].startswith("КВАНТ_Реализация_Неделя руководителя ОРК_Что делать") and "(" not in q["file"]
+    assert q["file"].startswith("КВАНТ_Реализация_Неделя руководителя ОРК_Очередь дел") and "(" not in q["file"]
     assert len(_rows(q["b64"])) == 1 + q["rows"]
 
 
@@ -353,13 +355,13 @@ def test_число_со_списком_заказов_идёт_в_файл(page
     списка), в файле — то же число, а не пустая ячейка."""
     out, r, _m = page_run
     led = out["ledger"]
-    assert led["head"][:3] == ["Шаг", "Исполнитель", "Сейчас"]
+    assert led["head"][:3] == ["Шаг регламента", "Кто делает", "На шаге"]
     L = r["contracts"]["ork"]["week"]["ledger"]
     rows = _rows(led["b64"])[1:1 + led["rows"]]
-    assert led["rows"] == len(L) + 1 and sum(1 for s in L if s["now"]) > 0     # + строка «Итого сейчас»
+    assert led["rows"] == len(L) + 1 and sum(1 for s in L if s["now"]) > 0     # + строка «Итого на шагах»
     for row, s in zip(rows, L):
         assert str(row[2]).split(" · ")[0] == str(s["now"] or 0), (s["no"], row[2])
-    assert rows[-1][0] == "Итого сейчас" and rows[-1][2] == sum(s["now"] or 0 for s in L)
+    assert rows[-1][0] == "Итого на шагах" and rows[-1][2] == sum(s["now"] or 0 for s in L)
 
 
 def test_список_за_числом_имя_файла_с_подвкладкой_и_направлением(page_run):
@@ -370,19 +372,48 @@ def test_список_за_числом_имя_файла_с_подвкладк�
     out, r, _m = page_run
     a, b = out["odMain"], out["odSep"]
     sep = r["contracts"]["sep"]
-    assert a["file"] == "КВАНТ_Реализация_Неделя руководителя ОРК_Живые заказы вида_2026-10-29.xlsx", a["file"]
+    assert a["file"] == "КВАНТ_Реализация_Неделя руководителя ОРК_Заказы в работе_2026-10-29.xlsx", a["file"]
     name = r["contracts"]["head"]["sep"]["name"]                # название второго направления вкладки
-    assert b["file"] == f"КВАНТ_Реализация_Неделя руководителя ОРК {name}_Живые заказы вида_2026-10-29.xlsx", b["file"]
+    assert b["file"] == f"КВАНТ_Реализация_Неделя руководителя ОРК {name}_Заказы в работе_2026-10-29.xlsx", b["file"]
     for x, v in ((a, r["contracts"]), (b, sep)):
         assert x["rows"] == x["trs"] == x["n"] == v["ork"]["week"]["live"] > 0
-        assert len(_rows(x["b64"])) == 1 + x["rows"]
+        rows = _rows(x["b64"])
+        assert len(rows) == 1 + x["rows"]
+        # шапка — столбцы списка без значков сортировки; в ячейках — данные, без ссылок «в Битриксе»
+        # и без подписей для телефона (поставщик под заказом — только столбцом)
+        # ревью 30.10.2026: по столбцу на поле, числа — числами (как в выгрузке до R4: «Шаг», «Р.д.»)
+        H = ["№ заказа", "Сделка", "Заказчик", "Шаг №", "Шаг", "Стадия в Битриксе", "Р.д. на шаге",
+             "Норма, р.д.", "Дней после срока клиента (минус — до срока)", "Срок клиента", "Прогноз доставки",
+             "Что сделать", "Кто отвечает", "Менеджер ОРК", "Ещё пункты очереди"]
+        assert rows[0][:len(H)] == H, rows[0]
+        assert not any("Битрикс" in str(c) or "поставщик:" in str(c) for row in rows[1:] for c in row)
+        col = {h: i for i, h in enumerate(rows[0])}
+        for h in ("Шаг №", "Р.д. на шаге", "Норма, р.д.", "Дней после срока клиента (минус — до срока)"):
+            vals = [row[col[h]] for row in rows[1:] if row[col[h]] not in (None, "")]
+            assert all(isinstance(v, int) for v in vals), (h, vals[:5])
+            assert vals or x is b, h                    # у второго направления заказов мало — типы, не наличие
+        for h in ("Срок клиента", "Прогноз доставки"):
+            assert all(re.fullmatch(r"\d\d\.\d\d\.\d{4}", row[col[h]]) for row in rows[1:] if row[col[h]]), h
+        assert all(isinstance(row[col["Что сделать"]], str) and row[col["Что сделать"]] for row in rows[1:])
+
+
+def test_зона_риска_дни_числом(page_run):
+    """«Срок клиента под угрозой»: «Дней» — числом (ревью 30.10.2026: стало «35 дн. после срока»
+    текстом); смысл дней — в столбце «Что случилось»."""
+    out, r, _m = page_run
+    k = out["risk"]
+    rows = _rows(k["b64"])
+    i = rows[0].index("Дней, кал.")
+    vals = [row[i] for row in rows[1:1 + k["rows"]]]
+    assert k["rows"] == len(r["contracts"]["ork"]["week"]["risk"]) > 0
+    assert all(isinstance(v, int) for v in vals if v not in (None, "")) and any(isinstance(v, int) for v in vals)
 
 
 def test_таблица_сделок_как_на_странице(page_run):
     out, r, _m = page_run
     d = out["deals"]
     assert d["rows"] == d["shown"] > 0 and not d["full"]
-    assert d["head"][0] == "№" and "Сумма сделки" in d["head"]
+    assert d["head"][0] == "№" and "Продажа, €" in d["head"]
     first = _rows(d["b64"])[1]
     assert isinstance(first[0], int), "№ сделки — числом"
 

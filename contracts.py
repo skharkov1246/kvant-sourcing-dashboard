@@ -1140,6 +1140,18 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "stepWhy": (("сделка закрыта: в счёте только шаг 12 (УПД)" if sem != "F" else "сделка проиграна")
                             if ostep_closed else ov["why"] if olive else ""),
             })
+            if olive:
+                # путь живого заказа по шагам регламента (ork.path, владелец 29.10.2026: «провалиться
+                # в процесс, где зависло»): [[шаг, день входа ISO МСК, р.д. на шаге], …] — последняя
+                # запись = step, stepFrom, stepWd; asg — назначение менеджера ОРК, которому верим
+                # (ork.assign_at), utdD — дата подписания УПД (сырая). Ни имён, ни денег
+                _od = ords_det[-1]
+                _od["path"] = ork.path(lo, otrans.get(str(o.get("id"))) or [], ostages, today)
+                _asg = ork.assign_at(lo)
+                if _asg:
+                    _od["asg"] = _asg.isoformat()
+                if lo.get("utdRaw"):
+                    _od["utdD"] = lo["utdRaw"].isoformat()
         # карточка: живые раньше, затем по номеру заказа («900/1», «900/2», «900/10»; владелец
         # 29.10.2026: «сделка одна — заказы разные 1/2/3»), без номера — в конце, по сроку
         ords_det.sort(key=lambda x: (not x["live"], x["ordNo"] is None, x["ordNo"] or 0,

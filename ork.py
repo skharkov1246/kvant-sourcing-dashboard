@@ -719,6 +719,99 @@ def judged(order: dict, today: dt.date, *, in_cat0: bool = True, workdays_fn=Non
 
 
 # --- контрольные точки недели (шаг 7, п. 9.2.4 регламента) --------------------------------
+# --- путь живого заказа по шагам («провалиться в процесс, где зависло», владелец 29.10.2026) --
+# датированные факты, которые поднимают шаг (как FACT_FLOOR у step_now): поле → шаг не ниже.
+# Без даты (оплата поставщику, подтверждение производства, файл УПД) — только у текущего шага
+PATH_FACTS = (("shipFact", 9), ("inbFact", 9), ("delFact", 11), ("utdRaw", 13))
+
+
+def path(order: dict, transitions: list, names: dict, today: dt.date, workdays_fn=None) -> list[list]:
+    """Путь живого заказа по шагам регламента: [[шаг, день входа (ISO, МСК), р.д. на шаге], …]
+    по времени — р.д. до входа в следующую запись, у последней — до today (None — года нет в
+    календаре).
+
+    Шаг в каждый момент — то же правило, что step_now сейчас: по стадии (все переходы истории,
+    STAGE_STEP; стадия не из таблицы шаг не меняет), не ниже датированных фактов (PATH_FACTS:
+    отгрузка или приход на склад — 9, доставка клиенту — 11, УПД — 13), доставлено без УПД —
+    шаг 12; стадия шага 1 после назначения менеджера ОРК (assign_at) — шаг 4 (ASSIGN_FLOOR:
+    приёмку закончило назначение). Соседние одинаковые шаги — одна запись; возврат — новая.
+
+    Последняя запись — текущий шаг заказа (step_now). У шага с нормой — с днём, от которого
+    меряется его срок (clock), — тем же, что stepFrom и stepWd строки заказа: путь и строка
+    говорят одно (шаг 12 — от доставки, шаг 1 — от начала приёмки, шаг 4 — от назначения);
+    записи, начатые позже этого дня, поглощаются им. У шага без нормы — вход по истории (факт
+    поднял шаг — с дня факта), истории шага нет — clock. Истории нет — одна запись: текущий шаг от clock, без него — от создания
+    заказа. Шага нет (step_now — None: стадия не из таблицы, доставки без УПД нет) — путь по истории
+    до дня входа в эту стадию, последний известный шаг кончается в этот день, а последняя запись —
+    [None, день входа, р.д.]: «стадия вне регламента», шаг и норма не выдумываются."""
+    fn = workdays_fn or period_mod.workdays_ru
+    msk = period_mod.MSK
+    day = lambda d: dt.datetime(d.year, d.month, d.day, tzinfo=msk)   # noqa: E731
+    tr = _sorted_tr(transitions)
+    pts: list[tuple[dt.datetime, int | None]] = [(t, stage_step(names.get(s, s))) for s, t in tr]
+    facts = [(day(d), fl, key) for key, fl in PATH_FACTS
+             if (d := _d(order.get(key))) is not None and d <= today]
+    asg = assign_at(order)
+    asg_t = day(asg) if asg else None
+    utd_t = next((t for t, _fl, k in facts if k == "utdRaw"), None)
+    del_t = next((t for t, _fl, k in facts if k == "delFact"), None)
+
+    def at(t: dt.datetime) -> int | None:
+        st = None
+        for tt, s in pts:
+            if tt > t:
+                break
+            if s is not None:
+                st = s
+        if st == 1 and asg_t is not None and asg_t <= t:
+            st = ASSIGN_FLOOR
+        fl = [f for tt, f, _k in facts if tt <= t]
+        if fl:
+            st = max(st or 1, max(fl))
+        if (st is None or st == 11) and del_t is not None and del_t <= t and not (utd_t and utd_t <= t):
+            st = 12
+        return st
+
+    times = sorted({t for t, _ in pts} | {t for t, _f, _k in facts} | ({asg_t} if asg_t else set()))
+    out: list[list] = []                                   # [шаг, день]
+    for t in times:
+        st = at(t)
+        if st is None or (out and out[-1][0] == st):
+            continue
+        out.append([st, t.astimezone(msk).date()])
+    cur = step_now(order)
+    if cur is None:
+        # стадия не из таблицы шагов (и доставки без УПД нет): последний известный шаг кончается в
+        # день входа в эту стадию, дальше — запись [None, день, р.д.] «стадия вне регламента», без
+        # нормы и без выдуманного шага «→ сейчас» (ревью 30.10.2026)
+        u = None
+        for t, st in reversed(pts):
+            if st is not None:
+                break
+            u = t
+        u_day = (u.astimezone(msk).date() if u is not None
+                 else _d(order.get("stageSince")) or _d(order.get("created")) or (out[-1][1] if out else today))
+        out = [e for e in out if e[1] <= u_day]
+        out.append([None, u_day])
+    elif not (cur not in NORM_WD and out and out[-1][0] == cur):
+        # шаг с нормой — день счёта срока (clock), как stepFrom; без нормы — вход по истории
+        since = clock(order, cur)[0]
+        if since is None:
+            since = (out[-1][1] if out and out[-1][0] == cur
+                     else _d(order.get("stepSince")) or _d(order.get("stageSince")) or _d(order.get("created")))
+        if out and out[-1][0] == cur:
+            out[-1][1] = since or out[-1][1]
+        elif since is not None:
+            out.append([cur, since])
+        while len(out) > 1 and out[-2][1] > out[-1][1]:
+            out.pop(-2)                                    # начатые позже дня счёта срока — в нём
+    rows = []
+    for i, (st, d) in enumerate(out):
+        end = out[i + 1][1] if i + 1 < len(out) else today
+        rows.append([st, d.isoformat(), fn(d, end)])
+    return rows
+
+
 def checkpoints(order: dict, week) -> list[dict]:
     """Контрольные точки производства, попадающие в неделю [пн, вс] даты `week`:
     P50 — prodStart + ½(prodEnd − prodStart), для всех заказов; P14 — (shipPlan, иначе

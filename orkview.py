@@ -924,7 +924,24 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
             "fieldsNote": "список для администратора Битрикса; никуда не отправлен",
             "gates": dict(ork.GATES), "gatesNote": ork.GATES_NOTE,
             "norms": {str(k): v for k, v in ork.NORM_WD.items()}, "segNorms": dict(ork.SEG_NORM),
-            "noPause": ork.NO_PAUSE}
+            "noPause": ork.NO_PAUSE, "steps": _how_steps()}
+
+
+def _how_steps() -> list[dict]:
+    """Справочник шагов для «Как считается» (просьба владельца 29.10.2026: «чтобы логика читалась
+    внятно»): у шага — стадии Битрикса, на которых он идёт, стадия, которой он заканчивается, и кому
+    исполнитель эскалирует. Из тех же таблиц, что считают шаг (ork.STAGE_STEP, ork.STEPS), — не из
+    вёрстки (правило 4). Шаги 2–3 у заказа своей стадии не имеют — стадии сделки."""
+    out = []
+    for s in ork.STEPS:
+        no = s["no"]
+        kind = "order" if any(v == no for v in ork.STAGE_STEP["order"].values()) else "deal"
+        table = ork.STAGE_STEP[kind]
+        stages = [k for k, v in table.items() if v == no]
+        nxt = next((k for k, v in table.items() if v > no), "")
+        out.append({"no": no, "kind": kind, "stages": stages, "next": nxt,
+                    "esc": ork.ROLES.get(s["esc"] or "", "")})
+    return out
 
 
 # =============================================================================================
