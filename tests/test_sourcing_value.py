@@ -55,13 +55,11 @@ def test_entry_direct_and_tech_funnel():
     assert sv.realization_entry([("C2:NEW", "2026-05-01T00:00:00+03:00")], set()) == (None, "none")
 
 
-def test_pick_latest_without_lost_and_counts_skipped():
+def test_moved_live_latest_first_without_lost_and_direct():
     rows = [{"deal": str(i), "seq": 100 + i, "lost": i == 3} for i in range(1, 6)]
     e = {str(i): (dt.datetime(2026, 9, i, tzinfo=sv.MSK), "moved") for i in range(1, 6)}
     e["5"] = (dt.datetime(2026, 9, 30, tzinfo=sv.MSK), "direct")
-    got, skipped = sv.pick(rows, e, 2)
-    assert [r["deal"] for r in got] == ["4", "2"]
-    assert skipped == {"lost": 1, "direct": 1}
+    assert [r["deal"] for r in sv.moved_live(rows, e)] == ["4", "2", "1"]
 
 
 def test_parts_single_split():
@@ -174,49 +172,91 @@ def test_card_person_robot_goes_to_deal_sourcer():
     assert sv.card_person({"assignedById": 1, "createdBy": 1}, "", robot) == ""
 
 
-def test_premium_by_person_earned_expected_and_big():
-    premia = {"params": {"eurRub": 100.0}, "deals": [
-        {"id": "1", "st": "d", "p1": 1000, "fl": [], "parts": [["5", "ex", 0.35], ["6", "kam", 0.65]]},
-        {"id": "2", "st": "r", "p1": 2000, "fl": [], "parts": [["5", "ex", 0.35], ["", "kam", 0.65]]},
-        {"id": "3", "st": "r", "p1": 9000, "fl": ["big"], "parts": [["5", "ex", 0.35]]},
-        {"id": "4", "st": "d", "p1": 500, "fl": [], "parts": [["5", "ex", 0.35]]},   # не из выборки
-    ]}
-    out, cov = sv.premium(premia, {"1", "2", "3"}, 0.6)
-    assert cov == {"rows": 3, "big": 1, "eurRub": 100.0}
-    assert round(out["5"]["earned"]) == 210 and round(out["5"]["expected"]) == 420
-    assert out["6"]["roles"] == {"kam"} and round(out[""]["expected"]) == 780
+def _card(cid, sup, uid, created, offer=False, bucket="sent", deal="1"):
+    return {"id": cid, "companyId": sup, "parentId2": deal, "assignedById": uid, "createdTime": created,
+            "_offer": offer, "_bucket": bucket}
 
 
-def test_build_totals_people_and_render():
-    deals = [_deal("1", 901, 2000, 1000, 10), _deal("2", 902, 500, 0, 11)]
-    cards = {"1": [{"id": 11, "companyId": "N", "parentId2": "1", "assignedById": 1, "_bucket": "selected", "_offer": True},
-                   {"id": 12, "companyId": "O", "parentId2": "1", "assignedById": 8, "_bucket": "notsel", "_offer": True}]}
-    orders = [{"parentId2": "1", "companyId": "N", "stageId": "DT172_26:NEW", "opportunity": 1000,
-               "currencyId": "EUR", "createdTime": "2026-09-12T00:00:00+03:00"}]
-    offers = [off("O", "K1", 150, 1500, i=1, deal="1"), off("N", "K1", 100, 1000, i=2, deal="1")]
-    offers[0]["card"], offers[1]["card"] = "12", "11"
-    pn = {"77": "Сорсер А", "8": "Сорсер Б"}
-    # карточка 11 — робота (1): засчитывается сорсеру сделки 77
-    rep = sv.build(deals, cards, orders, {"DT172_26:NEW": "P"}, {"1": {"N"}}, offers, {"1": "77"}, FX(),
-                   service={"1"}, pnames=pn)
+ENTRY = dt.datetime(2026, 9, 10, tzinfo=sv.MSK)
+PRE, POST = "2026-09-01T10:00:00+03:00", "2026-09-20T10:00:00+03:00"
+KP = {"paw", "selected", "notsel"}
+
+
+def test_level_by_seniority():
+    dept = [_card(1, "W", "7", PRE, offer=True), _card(2, "X", "7", PRE)]
+    assert sv.level(dept, {"W": {"7"}}, ENTRY, KP) == "found_pre"
+    assert sv.level(dept, {}, ENTRY, KP) == "kp_pre"                       # КП файлом до выигрыша
+    assert sv.level([_card(2, "X", "7", PRE, bucket="paw")], {}, ENTRY, KP) == "kp_pre"   # стадия КП
+    assert sv.level([_card(2, "X", "7", PRE)], {}, ENTRY, KP) == "ask_pre"
+    # победителя нашёл после выигрыша: карточка ему — позже входа в реализацию
+    assert sv.level([_card(3, "W", "7", POST)], {"W": {"7"}}, ENTRY, KP) == "found_post"
+    assert sv.level([_card(3, "Z", "7", POST)], {}, ENTRY, KP) == "post"
+    assert sv.level([], {}, ENTRY, KP) == "none"
+
+
+def test_found_by_dept_only_dept_cards_to_winner():
+    cards = [_card(1, "W", "7", PRE), _card(2, "W", "9", PRE), _card(3, "X", "7", PRE)]
+    who = {"1": "7", "2": "9", "3": "7"}
+    assert sv.found_by_dept(cards, {"W"}, who, {"7"}) == {"W": {"7"}}
+    assert sv.found_by_dept(cards, {"W"}, who, {"8"}) == {}
+
+
+def _row(did, seq, sale, buy, entry_day):
+    return {"deal": did, "seq": seq, "title": f"{seq}. Тестовая поставка {seq}", "saleEur": sale, "buyEur": buy,
+            "buySrc": "orders", "saleSrc": "file", "saleKnown": True,
+            "_entry": dt.datetime(2026, 9, entry_day, tzinfo=sv.MSK)}
+
+
+def test_money_per_level_against_control():
+    # влияние: сделка 1 — отдел нашёл поставщика до выигрыша (маржа 50 %);
+    # контроль: сделки 2–4 без отдела (маржа 20 %)
+    sample = [_row("1", 901, 1000, 500, 12)] + [_row(str(i), 900 + i, 1000, 800, 11) for i in (2, 3, 4)]
+    cards = {"1": [_card(11, "W", "7", PRE, offer=True, bucket="selected")]}
+    orders = [{"parentId2": "1", "companyId": "W", "stageId": "S1", "opportunity": 500, "currencyId": "EUR",
+               "createdTime": "2026-09-12T00:00:00+03:00"}]
+    rep = sv.build(sample, cards, orders, {"S1": "P"}, {"11": "7"}, {"7"}, {"1": {"W"}}, [], FX(), KP)
     t = sv.totals(rep["rows"])
-    assert t["n"] == 2 and t["sale"] == 2500 and t["nMargin"] == 1 and t["margin"] == 1000
-    assert t["nNew"] == 1 and t["buyNew"] == 1000 and round(t["e3"]) == 500 and t["nCards"] == 1
-    a = rep["people"]["77"]
-    assert a["cards"] == 1 and a["newFound"] == 1 and round(a["e3"]) == 500 and round(a["es"]) == 500
-    assert rep["people"]["8"]["es"] == 0 and rep["people"]["8"]["cards"] == 1
-    prem, cov = sv.premium({"params": {"eurRub": 100.0}, "deals": [
-        {"id": "1", "st": "d", "p1": 10000, "fl": [], "parts": [["9", "ex", 0.35], ["8", "kam", 0.65]]}]}, {"1", "2"}, 0.6)
-    ppl = sv.people_rows(rep["people"], prem, {**pn, "9": "Исполнитель В"}, 100.0)
-    assert ppl[0]["name"] == "Сорсер А" and ppl[0]["prize"] == 0
-    b = next(x for x in ppl if x["uid"] == "8")
-    assert b["roles"] == "вёл запросы, КАМ" and round(b["earned"]) == 3900
-    meta = {"today": dt.date(2026, 10, 30), "skipped": {"lost": 0, "direct": 0}, "ordersSince": "01.06.2024",
-            "priceRows": 2, "offers": 2, "why": {}, "fxSrc": "ряды cbr.ru", "people": ppl, "k": 0.6,
-            "premCov": cov, "eurRub": 100.0}
-    h = sv.render(rep, t, meta, {"N": "Новый поставщик"})
-    assert "901" in h and "902" in h and "Сорсер А" in h and "Исполнитель В" in h and "Новый поставщик" in h
-    # стиль ведомости: ни жирного, ни плашек (навык tkp-vedomost)
+    lv = t["levels"]
+    assert lv["found_pre"]["n"] == 1 and lv["none"]["n"] == 3
+    assert abs(t["ctrlRate"] - 0.2) < 1e-9
+    assert round(lv["found_pre"]["benefit"]) == 300          # (0,5 − 0,2) × 1 000
+    assert round(t["benefit"]) == 300 and round(t["upper"]) == 500
+    assert t["nNew"] == 1 and round(t["marginNew"]) == 500
+    a = rep["people"]["7"]
+    assert a["kpDeals"] == {"1"} and a["foundDeals"] == {"1"} and a["newFound"] == 1 and round(a["margin"]) == 500
+    t["months"], t["eurRub"] = 1.0, 100.0
+    dr = sv.dept_rows(rep["people"], {"7": {"name": "Сорсер А", "active": True},
+                                      "8": {"name": "Сорсер Б", "active": True},
+                                      "9": {"name": "Ушедший В", "active": False}})
+    assert [x["name"] for x in dr] == ["Сорсер А", "Сорсер Б"]   # ушедший без запросов — не в таблице
+    meta = {"today": dt.date(2026, 10, 30), "head": "Руководитель Г", "deptN": 3, "dept": dr, "lost": 0,
+            "ordersSince": "01.06.2024", "priceRows": 0, "offers": 0, "why": {}, "fxSrc": "ряды cbr.ru"}
+    h = sv.render(rep, t, meta, {"W": "Новый поставщик"}, {"7": "Сорсер А"})
+    assert "901" in h and "904" in h and "Новый поставщик" in h and "Руководитель Г" in h
+    assert "30 000 ₽" in h                         # польза 300 € × 100 ₽
     assert "<b>" not in h and "<strong" not in h and h.count("background") == 1
-    pr = sv.proposals(t, meta)
-    assert any("положение не оплачивает" in x for x in pr)
+    pr = sv.proposals(t, dr)
+    assert any(x.startswith("Окупаемость отдела") for x in pr)
+    assert any("без единого запроса" in x for x in pr)       # Сорсер Б без запросов
+
+
+def test_no_estimate_when_control_too_small():
+    sample = [_row("1", 901, 1000, 500, 12), _row("2", 902, 1000, 800, 11)]
+    cards = {"1": [_card(11, "W", "7", PRE, offer=True)]}
+    rep = sv.build(sample, cards, [], {}, {"11": "7"}, {"7"}, {}, [], FX(), KP)
+    t = sv.totals(rep["rows"])
+    assert t["ctrlN"] == 1 and t["ctrlRate"] is None and t["benefit"] is None and round(t["upper"]) == 500
+
+
+def test_negative_benefit_says_no_margin_gain():
+    # влияние с маржой 10 % против контроля 20 %: прибавки нет, польза — только верхней границей
+    sample = [_row("1", 901, 1000, 900, 12)] + [_row(str(i), 900 + i, 1000, 800, 11) for i in (2, 3, 4)]
+    cards = {"1": [_card(11, "W", "7", PRE, offer=True)]}
+    rep = sv.build(sample, cards, [], {}, {"11": "7"}, {"7"}, {}, [], FX(), KP)
+    t = sv.totals(rep["rows"])
+    t["months"], t["eurRub"] = 1.0, None
+    assert round(t["benefit"]) == -100 and round(t["upper"]) == 100
+    assert sv.proposals(t, [])[0].startswith("Прибавки к марже от отдела на этих сделках нет")
+    meta = {"today": dt.date(2026, 10, 30), "head": "", "deptN": 1, "dept": [], "lost": 0,
+            "ordersSince": "", "priceRows": 0, "offers": 0, "why": {}, "fxSrc": ""}
+    assert "Прибавки к марже от отдела" in sv.render(rep, t, meta, {}, {})
