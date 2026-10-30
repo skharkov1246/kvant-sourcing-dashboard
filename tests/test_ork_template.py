@@ -6,6 +6,7 @@ _orkMonth, _orkHow) исполняются в node:vm на данных smoke-с
 from __future__ import annotations
 
 import copy
+import re
 import json
 import shutil
 import subprocess
@@ -42,13 +43,17 @@ const box = {document, window: {__ORKMONTH__: inp.orkMonth, __DEALCTX__: inp.dc 
 vm.createContext(box);
 vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + inp.unpack + '\n' + (inp.dcCode || 'function _dcData(){return null;}') + '\n' + inp.code
   + '\nthis._orkWeek=_orkWeek; this._orkMonth=_orkMonth; this._orkHow=_orkHow;'
+  + ' this._orkWeekCtx=_orkWeekCtx; this._wkGroups=_wkGroups; this._wkgDetail=_wkgDetail;'
   + ' this._orkJData=_orkJData; this._orkJPick=_orkJPick; this._orkJRow=_orkJRow; this._orkJEmpty=_orkJEmpty;'
   + ' this._orkJNote=_orkJNote;', box);
 const out = {};
 for (const [k, X] of Object.entries(inp.views)) {
   const el = node();
   box._orkWeek(X, X.ork, el, '');
-  out[k] = {week: el.innerHTML + Object.values(byId).map(n => n.innerHTML).join(''),
+  // «Что сделать сегодня»: все группы раскрыты целиком — строки всех пунктов (как в панели за числом)
+  const C = box._orkWeekCtx(X, X.ork);
+  const today = box._wkGroups(C, {role: '', who: ''}).GS.map(g => box._wkgDetail(C, g, true)).join('');
+  out[k] = {week: el.innerHTML + Object.values(byId).map(n => n.innerHTML).join(''), today,
             ids: Object.fromEntries(Object.entries(byId).map(([i, n]) => [i, n.innerHTML])),
             month: box._orkMonth(X, X.ork), how: box._orkHow(X, X.ork)};
   for (const id of Object.keys(byId)) delete byId[id];
@@ -61,7 +66,7 @@ def _plain(html: str) -> str:
     """Число со списком заказов за ним — кнопка (решение владельца 29.10.2026): для сверки
     подписей кнопка снимается, число остаётся."""
     import re
-    return re.sub(r'<button type="button" class="odn[^"]*"[^>]*>(.*?)</button>', r"\1", html)
+    return re.sub(r'<button type="button" class="odn[^"]*"[^>]*>(.*?)</button>', r"\1", html, flags=re.S)
 
 
 def _line(prefix: str) -> str:
@@ -96,9 +101,8 @@ def built():
 
 
 def test_контрольные_точки_нет_данных_не_ноль(built):
-    """W5 «Нет данных» (в производстве есть, плановых дат нет) — таблица точек не «· 0» и не
-    «точек нет»: заголовок «· —» и подпись плитки. Пустые списки W1/W2/W3 при «Нет данных»
-    — подпись плитки, а не «пусто — всё в норме»."""
+    """W5 «Нет данных» (в производстве есть, плановых дат нет) — звонки «нет данных», не «0» и не
+    «звонков нет»; W2/W3 «Нет данных» — подпись плитки, а не «в норме» и не «под угрозой ничего»."""
     ct = copy.deepcopy(built["contracts"])
     sep = ct["sep"]
     sep["dir"] = "sep"
@@ -111,25 +115,25 @@ def test_контрольные_точки_нет_данных_не_ноль(bui
                          "need": f"стадия не из таблицы шагов ({k})"}
     w["overByWho"], w["risk"] = [], []
     sep["life"] = {**(sep.get("life") or {}), "queue": []}
-    out = _render({"sep": sep}, built["ork_month"])["sep"]["week"]
-    assert "Контрольные точки недели · —" in out and "Контрольные точки недели · 0" not in out
-    assert "на этой неделе контрольных точек нет" not in out
-    assert "Нет данных: нет плановых дат производства" in out
+    out = _plain(_render({"sep": sep}, built["ork_month"])["sep"]["week"])
+    assert "Звонки поставщикам на неделе: нет данных" in out and "Звонки поставщикам на неделе: 0" not in out
+    assert "Звонков поставщикам на этой неделе нет" not in out
+    assert "нет плановых дат производства у заказов шагов 6–7" in out
     for k in ("W2", "W3"):
-        assert f"Нет данных: стадия не из таблицы шагов ({k})" in out, k
-    assert "никого — все шаги ОРК в норме" not in out and "сроки клиентов не под угрозой" not in out
+        assert f"стадия не из таблицы шагов ({k})" in out, k
+    assert "Все шаги отдела в норме" not in out and "Под угрозой ничего нет" not in out and "Сорванных сроков нет" not in out
 
 
 def test_контрольные_точки_известный_ноль(built):
-    """W5 показан и точек нет — «точек нет» (известный ноль); у части заказов нет дат —
-    строка «точки известны не у всех»."""
+    """W5 показан и точек нет — «звонков нет» (известный ноль); у части заказов нет дат —
+    строка «без плановых дат производства: 2 из 5»."""
     ct = copy.deepcopy(built["contracts"])
     w = ct["ork"]["week"]
     w["tiles"]["W5"] = {**w["tiles"]["W5"], "state": "show", "value": 0, "noDates": 2, "prod": 5}
     w["checkpoints"] = []
-    out = _render({"main": ct}, built["ork_month"])["main"]["week"]
-    assert "Контрольные точки недели · 0" in out and "на этой неделе контрольных точек нет" in out
-    assert "без плановых дат — 2 из 5" in out
+    out = _plain(_render({"main": ct}, built["ork_month"])["main"]["week"])
+    assert "Звонков поставщикам на этой неделе нет" in out
+    assert "Без плановых дат производства: 2 из 5" in out
 
 
 def test_месяц_без_права_нет_доступа(built):
@@ -148,52 +152,53 @@ def test_месяц_без_права_нет_доступа(built):
 
 
 def test_ждём_упд_от_клиента_отдельно_от_сверх_нормы(built):
-    """Решение владельца 27.10.2026, Б: шаг 12 больше 10 р.д. без УПД — «ждём УПД от клиента»
-    в ведомости (вместо числа «сверх нормы») и своим столбцом у «Сверх нормы по менеджерам»;
-    в подписи W2 шага 12 нет. Числа — те же, что в данных недели (одно правило ork.judged)."""
+    """Решение владельца 27.10.2026, Б: шаг 12 больше 10 р.д. без УПД — «ждём УПД» в ведомости
+    (вместо «дольше нормы»), своим столбцом в «Кто сколько ведёт» и счётчиком рядом с плитками;
+    в W2 шага 12 нет. Числа — те же, что в данных недели (одно правило ork.judged)."""
     ct = copy.deepcopy(built["contracts"])
     w = ct["ork"]["week"]
     n = w["waitUtd"]["n"]
     assert n > 0 and w["ledger"][11]["no"] == 12 and w["ledger"][11]["waitUtd"] == n
     out = _plain(_render({"main": ct}, built["ork_month"])["main"]["week"])
-    assert f"ждём УПД от клиента {n}</span>" in out, "ведомость, шаг 12"
-    assert "<th class=\"r\">Ждём УПД от клиента</th>" in out, "столбец по менеджерам"
-    assert f"Ждём подписанный УПД от клиента: {n} — больше" in out, "подпись W2 («как посчитано»)"
+    led = out[out.index('id="orkLed"'):]
+    row12 = led[led.index('<span class="wkstn">12</span>'):]
+    row12 = row12[:row12.index("</tr>")]
+    assert f'УПД</abbr> {n}</span>' in row12, "ведомость, шаг 12"
+    ppl = out[out.index('id="wkPeople"'):]
+    assert "Ждём <abbr" in ppl[:ppl.index("</thead>")], "столбец «Ждём УПД» в «Кто сколько ведёт»"
+    assert f"<td class=\"r\"><b>{n}</b></td></tr></tfoot>" in ppl, "итог столбца «Ждём УПД» = n"
+    assert f"<b>{w['tiles']['W2']['value']}</b></td>" in ppl, "итог «дольше нормы» = W2"
+    raw = _render({"main": ct}, built["ork_month"])["main"]["week"]
+    assert re.search(r'data-od="w:waitUtd"[^>]*>' + str(n) + '</button>', raw[raw.index('id="wkMore"'):]), "счётчик «Ждём УПД»"
     assert "УПД (12):" not in out and "(эскалация УПД)" not in out
-    # итог столбцов: Σ «сверх нормы» = W2, Σ «ждём УПД» = n
-    tot = f'<td class="r mono"><b>{w["tiles"]["W2"]["value"]}</b></td><td></td><td class="r mono"><b>{n}</b></td>'
-    assert tot in out
 
 
 def test_ждём_упд_ноль_при_неизвестном_сроке_прочерк():
-    """Все заказы шага 12 вида — срок не посчитать (нет факта доставки): в «Сверх нормы»
-    ведомости — «—», а не «ждём УПД от клиента 0» (ноль за неизвестное, правило 15); рядом
-    «? N — срок неизвестен», в подписи W2 — «срок УПД неизвестен: N». Корпус —
-    fixture.Шаг12Направления через настоящий contracts.compute; затем тот же вывод на
-    ручной строке (waitUtd 0, overUnknown == now)."""
-    import re
+    """Все заказы шага 12 вида — срок не посчитать (нет факта доставки): в ведомости — «—», а не
+    «ждём УПД 0» (ноль за неизвестное, правило 15); рядом «срок не посчитать: N», у счётчика
+    «Ждём УПД» — тоже. Корпус — fixture.Шаг12Направления через настоящий contracts.compute; затем
+    тот же вывод на ручной строке (waitUtd 0, overUnknown == now)."""
     data = fixture.build_contracts(stub=fixture.Шаг12Направления(wait=False))
     sep = json.loads(json.dumps(data["sep"], ensure_ascii=False, default=str))
     sep["dir"] = "sep"
 
     def cell(view):
         out = _plain(_render({"v": view}, None)["v"]["week"])
-        i = out.index('data-step="12"')
+        i = out.index('<span class="wkstn">12</span>')
         row = out[i:out.index("</tr>", i)]
-        return out, re.findall(r'<td class="r mono[^"]*">(.*?)</td>', row)[1]
+        return out, re.findall(r'<td class="r">(.*?)</td>', row)[1]
     out, c = cell(sep)
-    assert "ждём УПД от клиента 0" not in c and ">—</span>" in c and "срок не посчитать: 1" in c, c
-    assert "Срок УПД не посчитать (нет даты доставки или календаря года): 1" in out
-    # ручная строка: у шага 12 2 заказа, оба без срока, один «не в счёте» нет — тоже «—»
+    assert "УПД</abbr> <span" not in c and ">—</span>" in c and "срок не посчитать: 1" in c, c
+    assert "срок не посчитать: 1" in out[out.index('id="wkMore"'):]
     v = copy.deepcopy(sep)
     r12 = next(r for r in v["ork"]["week"]["ledger"] if r["no"] == 12)
     r12.update(now=2, over=0, waitUtd=0, overUnknown=2, notCounted=0)
     _o, c = cell(v)
-    assert "ждём УПД от клиента 0" not in c and ">—</span>" in c, c
-    # известный ноль (срок есть, ждать нечего) — «ждём УПД от клиента 0», не прочерк
+    assert ">—</span>" in c and 'rzfinal">0<' not in c, c
+    # известный ноль (срок есть, ждать нечего) — «ждём УПД 0», не прочерк
     r12.update(now=2, over=0, waitUtd=0, overUnknown=1, notCounted=0)
     _o, c = cell(v)
-    assert "ждём УПД от клиента 0" in c, c
+    assert 'УПД</abbr> <span class="rzfinal">0</span>' in c, c
 
 
 def test_что_важно_сегодня_в_неделе_под_очередью(built):
@@ -207,7 +212,7 @@ def test_что_важно_сегодня_в_неделе_под_очередь�
     sep["dir"], sep["seg"] = "sep", "16"          # как renderContracts: вид направления помечен seg
     out = _render({"main": ct, "sep": sep}, built["ork_month"], dc=dc)
     week = out["main"]["week"]
-    assert week.index("orkQs") < week.index("ctImpS"), "блок — под очередью"
+    assert week.index("orkTodayS") < week.index("ctImpS"), "блок — под «Что сделать сегодня»"
     assert week.count('<tbody id="ctImp">') == 1
     for x in dc["important"]:
         assert f'data-ct="{x["deal"]}"' in week[week.index("ctImpS"):] and x["text"] in week
@@ -271,37 +276,27 @@ def _kq_body(K: dict) -> str:
 
 
 def test_неделя_строки_с_номером_заказа_поставщиком_и_сроком(три):
-    """Очередь «Недели» и зона риска: у каждой строки заказа — «№990/1» (как в Битриксе), поставщик
-    этого заказа и срок, по которому строка считана; у шага — «с дд.мм (…)». Три заказа одной
-    сделки — три разные строки. Поставщика нет в данных страницы — строки без него."""
+    """«Что сделать сегодня»: у каждой строки заказа — «990/1» (как в Битриксе), поставщик этого
+    заказа и срок, по которому строка считана; у шага — «с дд.мм (…)». Три заказа одной сделки —
+    три разные строки. Поставщика нет в данных страницы — строки без него."""
     ct, om = три
     v = copy.deepcopy(ct)
     v["life"]["queue"] = [x for x in v["life"]["queue"] if x["seq"] in (990, 933, 991)]
-    ids = _render({"main": v}, om)["main"]["ids"]
-    qb, rk = _rows(ids["orkQb"]), _rows(ids["orkRisk"])
+    qb = _rows(_render({"main": v}, om)["main"]["today"])
     for lbl, sup, ref in (("990/1", "Компания 401", "срок 14.10.2025"), ("990/2", "Компания 404", "срок 29.09.2026"),
                           ("990/3", "Компания 407", "срок 09.10.2026")):
-        r = [x for x in qb if f"№{lbl}<" in x and "срок клиента прошёл" in x]
+        r = [x for x in qb if f">{lbl} ›<" in x and "просрочен на" in x]
         assert len(r) == 1 and sup in r[0] and ref in r[0], lbl
-        r = [x for x in rk if f"№{lbl}<" in x]
-        assert len(r) == 1 and sup in r[0], lbl
-    r = [x for x in qb if "№933/3<" in x and "договор с поставщиком дольше 2 р.д." in x]
-    assert len(r) == 1 and "с 14.10 (назначение)" in r[0] and "менеджер ОРК" in r[0]
-    assert not [x for x in qb if "№933/3<" in x and "не приняли в работу" in x]
-    r = [x for x in qb if "№991/1<" in x and "сделку не приняли в работу дольше 1 р.д." in x]
-    assert len(r) == 1 and "с 15.10 (создан заказ)" in r[0]
-    # «Моя приёмка» — та же строка с номером и началом счёта
-    mine = _nos(_render({"main": v}, om)["main"]["week"])
-    mine = mine[mine.index('id="orkMine"'):]
-    assert "№991/1" in mine[:mine.index("</tbody>")] and "с 15.10 (создан заказ)" in mine[:mine.index("</tbody>")]
+    r = [x for x in qb if ">933/3 ›<" in x and "с 14.10 (назначение)" in x]
+    assert len(r) == 1 and "Менеджер ОРК" in r[0]
+    r = [x for x in qb if ">991/1 ›<" in x and "с 15.10 (создан заказ)" in x]
+    assert len(r) == 1 and "Руководитель ОРК" in r[0]
     # поставщика в данных нет — строка без него, номер и срок остаются
     for x in v["life"]["queue"]:
         x["sup"] = ""
-    for x in v["ork"]["week"]["risk"]:
-        x["sup"] = ""
-    ids = _render({"main": v}, om)["main"]["ids"]
-    assert "Компания 40" not in ids["orkQb"] and "Компания 40" not in ids["orkRisk"]
-    assert "№990/2" in _nos(ids["orkQb"]) and "срок 29.09.2026" in ids["orkQb"]
+    today = _render({"main": v}, om)["main"]["today"]
+    assert "Компания 40" not in today
+    assert ">990/2 ›<" in today and "срок 29.09.2026" in today
 
 
 def test_карточка_заказа_номер_и_начало_счёта(три):
@@ -372,30 +367,31 @@ def test_очередь_кама_заказы_строками(три):
 # ── ревью 29.10.2026: номер чужой сделки, W1, сделка без КАМа, право на поставщика ────────────
 def test_номер_чужой_сделки_и_без_номера(три):
     """Номер в названии карточки — от другой сделки (карточку скопировали): строка под №990
-    показывает «№990 · 905/2», а не «№905/2»; без номера — «№990 · id …»."""
+    показывает «990 · 905/2», а не «905/2»; без номера — «990 · id …»."""
     ct, om = три
     v = copy.deepcopy(ct)
     q = [x for x in v["life"]["queue"] if x["seq"] == 990 and x["code"] == "late"]
     q[1]["ordLbl"], q[2]["ordLbl"] = "905/2", "id 99502"
     v["life"]["queue"] = q
-    qb = _nos(_render({"main": v}, om)["main"]["ids"]["orkQb"])
-    assert "№990/1<" in qb and "№990 · 905/2" in qb and "№990 · id 99502" in qb
-    assert "№905/2" not in qb
+    qb = _render({"main": v}, om)["main"]["today"]
+    assert ">990/1 ›<" in qb and ">990 · 905/2 ›<" in qb and ">990 · id 99502 ›<" in qb
+    assert ">905/2 ›<" not in qb
 
 
 def test_w1_закончено_назначением_из_n(три):
-    """Плитка W1: «закончено назначением» — из того же n, что «в срок за 20 р.д.» (не путается с
-    k); «Заказ создан» с датой назначения не в счёте — по причинам."""
+    """Приёмка (W1): «закончено назначением» — из того же n, что «в срок за 20 р.д.» (не путается
+    с k); «Заказ создан» с датой назначения не в счёте — по причинам (ключи Д-9)."""
     ct, om = три
     v = copy.deepcopy(ct)
     T1 = v["ork"]["week"]["tiles"]["W1"]
     T1["recent"] = {**(T1.get("recent") or {}), "state": "show", "k": 1, "n": 5}
     T1.update(byAssign=2, assignStale=1, assignNoMgr=3)
-    out = _render({"main": v}, om)["main"]["week"]
-    assert "Принято за 1 р.д. за последние 20 р.д. (около 4 недель): <b>1</b> из 5. Из 5 приёмку закрыло назначение менеджера ОРК: 2." in out
-    assert "Назначение не засчитано («Заказ создан»): дата раньше начала приёмки — 1, назначен не сотрудник ОРК — 3." in out
+    out = _plain(_render({"main": v}, om)["main"]["week"])
+    assert "за 20 раб. дн. принято в срок 1 из 5" in out
+    assert "из них приёмку закрыло назначение менеджера <abbr" in out and "</abbr> — 2." in out
+    assert "Назначение не засчитано («Заказ создан»): дата раньше начала приёмки — 1, назначен не сотрудник <abbr" in out
     T1.update(byAssign=0, assignStale=0, assignNoMgr=0)
-    out = _render({"main": v}, om)["main"]["week"]
+    out = _plain(_render({"main": v}, om)["main"]["week"])
     assert "приёмку закрыло назначение" not in out and "Назначение не засчитано" not in out
 
 

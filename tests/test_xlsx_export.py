@@ -271,9 +271,8 @@ try{
   var al=document.getElementById('orkJAll');al.checked=true;al.dispatchEvent(new Event('change'));
   snap(tj,'journalAll');
   document.querySelector('#tab-contracts [role="tab"][data-sub="week"]').click();
-  snap(document.getElementById('orkQb').closest('table'),'queue');
+  snap(document.getElementById('orkPulseB').closest('table'),'people');
   snap(document.getElementById('orkLed').closest('table'),'ledger');
-  snap(document.getElementById('orkRisk').closest('table'),'risk');
   // список за числом (дровер): в имени файла — подвкладка и направление числа, как у таблиц вкладки
   var od=function(sel,key){var b=document.querySelector(sel+' button[data-od="w:live"]'); b.click();
     var t=document.getElementById('odTable'); snap(t,key); out[key].trs=t.tBodies[0].rows.length; out[key].n=+b.textContent;
@@ -339,29 +338,34 @@ def test_журнал_шагов_в_excel_как_на_странице(page_run)
     assert a["rows"] == len(J) and len(_rows(a["b64"])) == 1 + len(J) + 2
 
 
-def test_очередь_недели_все_строки_а_не_первые_40(page_run):
-    """Очередь «Что делать» показывает первые 40 и «Показать все»; кнопка выгружает весь отбор —
-    в файле столько строк, сколько пунктов в очереди вида."""
+def test_кто_сколько_ведёт_все_люди_и_итог(page_run):
+    """«Кто сколько ведёт» (R4: одна таблица вместо «Пульса» и «Сверх нормы»): в файле — строка на
+    человека и итог; «Заказов в работе» — числом, сумма строк = итог = заказы в работе вида."""
     out, r, _m = page_run
-    q = out["queue"]
-    assert q["shown"] == 40 and q["full"] and q["rows"] > 40
-    assert q["file"].startswith("КВАНТ_Реализация_Неделя руководителя ОРК_Очередь дел") and "(" not in q["file"]
-    assert len(_rows(q["b64"])) == 1 + q["rows"]
+    p = out["people"]
+    assert p["file"].startswith("КВАНТ_Реализация_Неделя руководителя ОРК_Кто сколько ведёт")
+    rows = _rows(p["b64"])
+    i = rows[0].index("Заказов в работе")
+    body = rows[1:1 + p["rows"]]
+    assert body[-1][0] == "Итого"
+    live = r["contracts"]["ork"]["week"]["live"]
+    assert body[-1][i] == live and sum(x[i] for x in body[:-1]) == live
+    assert all(isinstance(x[i], int) for x in body)
 
 
 def test_число_со_списком_заказов_идёт_в_файл(page_run):
     """Число «Реализации» со списком заказов за ним — кнопка (.odn): в файле оно есть, как на
-    странице. Ведомость 13 шагов: «Сейчас» каждой строки — число живых заказов на шаге (кнопка
-    списка), в файле — то же число, а не пустая ячейка."""
+    странице. Ведомость 13 шагов: «Заказов на шаге» каждой строки — число живых заказов на шаге
+    (кнопка списка), в файле — то же число, а не пустая ячейка."""
     out, r, _m = page_run
     led = out["ledger"]
-    assert led["head"][:3] == ["Шаг регламента", "Кто делает", "На шаге"]
+    assert led["head"][:3] == ["Шаг", "Кто делает", "Заказов на шаге"]
     L = r["contracts"]["ork"]["week"]["ledger"]
     rows = _rows(led["b64"])[1:1 + led["rows"]]
-    assert led["rows"] == len(L) + 1 and sum(1 for s in L if s["now"]) > 0     # + строка «Итого на шагах»
+    assert led["rows"] == len(L) + 1 and sum(1 for s in L if s["now"]) > 0     # + строка «Всего на шагах»
     for row, s in zip(rows, L):
         assert str(row[2]).split(" · ")[0] == str(s["now"] or 0), (s["no"], row[2])
-    assert rows[-1][0] == "Итого на шагах" and rows[-1][2] == sum(s["now"] or 0 for s in L)
+    assert rows[-1][0] == "Всего на шагах" and rows[-1][2] == sum(s["now"] or 0 for s in L)
 
 
 def test_список_за_числом_имя_файла_с_подвкладкой_и_направлением(page_run):
@@ -397,16 +401,20 @@ def test_список_за_числом_имя_файла_с_подвкладк�
         assert all(isinstance(row[col["Что сделать"]], str) and row[col["Что сделать"]] for row in rows[1:])
 
 
-def test_зона_риска_дни_числом(page_run):
-    """«Срок клиента под угрозой»: «Дней» — числом (ревью 30.10.2026: стало «35 дн. после срока»
-    текстом); смысл дней — в столбце «Что случилось»."""
+def test_кто_сколько_ведёт_числа_числами(page_run):
+    """«Кто сколько ведёт»: «Дольше нормы на его шагах», «Срок клиента сорван», «Ждём УПД» — числами,
+    итоги = W2, сорванные заказы (Д-1, по заказам) и «ждём УПД» вида."""
     out, r, _m = page_run
-    k = out["risk"]
-    rows = _rows(k["b64"])
-    i = rows[0].index("Дней, кал.")
-    vals = [row[i] for row in rows[1:1 + k["rows"]]]
-    assert k["rows"] == len(r["contracts"]["ork"]["week"]["risk"]) > 0
-    assert all(isinstance(v, int) for v in vals if v not in (None, "")) and any(isinstance(v, int) for v in vals)
+    rows = _rows(out["people"]["b64"])
+    h = rows[0]
+    body = rows[1:1 + out["people"]["rows"]]
+    w = r["contracts"]["ork"]["week"]
+    for name, want in (("Дольше нормы на его шагах", w["tiles"]["W2"]["value"]),
+                       ("Срок клиента сорван", w["tiles"]["W3"]["byOrders"]["late"]),
+                       ("Ждём УПД", w["waitUtd"]["n"])):
+        i = h.index(name)
+        assert all(isinstance(x[i], int) for x in body), name
+        assert body[-1][i] == want == sum(x[i] for x in body[:-1]), name
 
 
 def test_таблица_сделок_как_на_странице(page_run):

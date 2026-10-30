@@ -265,13 +265,16 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
         waits = s["role"] if s["role"] in ork.ADJACENT else (
             s["waits"] if s["norm"] is None and s["waits"] in ork.ADJACENT else None)
         req = miss = 0
+        miss_o: set = set()                 # Д-5а: разные заказы без файла (пар может быть больше)
         for a in ork.ARTIFACTS:
             if a["step"] != no:
                 continue
             for o in U:
                 if ork.art_required(o, a, reach_of.get(o["id"])):
                     req += 1
-                    miss += not (o.get("art") or {}).get(a["key"])
+                    if not (o.get("art") or {}).get(a["key"]):
+                        miss += 1
+                        miss_o.add(o["id"])
         if waits:
             adjacent[waits] += len(here)
         doc = ork.NORM_DOC.get(no, ("", "none", ""))
@@ -285,7 +288,10 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                        "overUnknown": sum(1 for o in here if ov[o["id"]]["termUnknown"]) if normed else None,
                        # на шаге, но не в счёте «сверх нормы»: гигиена, приёмка вне «Реализации»
                        "notCounted": sum(1 for o in here if not_counted(o)) if normed else None,
-                       "artReq": req, "artMiss": miss, "waits": waits or "",
+                       "artReq": req, "artMiss": miss, "artOrders": len(miss_o), "waits": waits or "",
+                       # Д-6: дольше всех на шаге с нормой — р.д. самого долгого заказа в счёте
+                       "maxWd": max((ov[o["id"]]["wd"] for o in here if ov[o["id"]]["counted"]
+                                     and ov[o["id"]]["wd"] is not None), default=None) if normed else None,
                        # шаг 7 регламент не нормирует: «дольше P80 S5» — сигнал, не «сверх нормы»
                        "longP80": (long_p80["k"] if long_p80["state"] in ("show", "prelim") else None)
                        if no == 7 else None,
@@ -355,6 +361,16 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                 src="late, risk, forecast",
                 extra={"by": {c: qcodes.get(c, 0) for c in ("late", "risk", "forecast")},
                        "label": "результат поставщика и логистики"})
+    # Д-1 (R4): плитки «Срок клиента сорван» и «Срок под угрозой» — каждый заказ один раз, по
+    # самому тяжёлому виду (важность lifecycle.EXC); сумма частей = W3.value (тот же ключ заказа)
+    heavy = w3_heavy(risk_q)
+    w3_deals: dict[str, set] = defaultdict(set)
+    deal_of = {q.get("order"): q.get("deal") for q in risk_q}
+    for k, c in heavy.items():
+        w3_deals[c].add(str(deal_of.get(k)))
+    if W3.get("state") in ("show", "prelim"):
+        W3["byOrders"] = {c: sum(1 for v in heavy.values() if v == c) for c in W3_CODES}
+        W3["byDeals"] = {c: len(w3_deals.get(c, ())) for c in W3_CODES}
     risk_list = [{"deal": q.get("deal"), "seq": q.get("seq"), "order": q.get("order"), "code": q["code"],
                   "ordLbl": q.get("ordLbl") or "", "sup": q.get("sup") or "", "ref": q.get("ref") or "",
                   "days": q.get("days"), "dl": q.get("dl") or "", "fc": q.get("fc") or "",
@@ -374,7 +390,10 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
         for p in ork.checkpoints(o, today):
             cps.append({"deal": o.get("deal"), "seq": o.get("seq"), "order": o["id"], "kind": p["kind"],
                         "ordLbl": o.get("lbl") or "", "sup": o.get("sup") or "",
-                        "date": p["date"], "who": (o.get("own") or {}).get("who") or ""})
+                        "date": p["date"], "who": (o.get("own") or {}).get("who") or "",
+                        # Д-8: плановые даты точки — «середина производства 10.10 (план 01.09–20.10)»
+                        "prodStart": _iso(o.get("prodStart")), "prodEnd": _iso(o.get("prodEnd")),
+                        "shipPlan": _iso(o.get("shipPlan"))})
     cps.sort(key=lambda x: (x["date"], x["kind"]))
     w5_n = len(prod) + unk_n
     # prod — в производстве (шаги 6–7), без дат — у них точки неизвестны; стадии не из таблицы — отдельно
@@ -436,8 +455,15 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     # отставшей стадией (шаг 12) в счёте ЕСТЬ и в скобки не идёт
     hc_excl = Counter(k for x in hyg_items if x["excl"] for k in x["kinds"])
 
+    # --- R4: неоплата (Д-3), сорванный срок по исполнителю (Д-7), история сорванных (Д-12) ---
+    unpaid = _unpaid(q_by.get("unpaid", []), deal_by, today)
+    late_who = Counter((q.get("who") or PULSE_NONE) for q in risk_q
+                       if heavy.get(q.get("order")) == "late" and q["code"] == "late")
+    late_tile = {"hist": late_hist(orders, deal_by, today), "fridays": [d.isoformat() for d in _fridays(today)],
+                 "label": "переносы срока не хранятся — по нынешнему сроку клиента"}
     week = {"mon": mon.isoformat(), "sun": sun.isoformat(),
-            "tiles": {"W1": W1, "W2": W2, "W3": W3, "W4": W4, "W5": W5},
+            "tiles": {"W1": W1, "W2": W2, "W3": W3, "W4": W4, "W5": W5, "unpaid": unpaid, "late": late_tile},
+            "lateByWho": dict(late_who),
             "ledger": ledger, "unknown": unk_n, "unknownStages": dict(unknown.most_common(20)),
             # живые заказы ведомости: открытых сделок и шаг 12 закрытых (closed12 из них)
             "live": len(L), "closed12": len(C12), "dealsNoOrder": len(no_order),
@@ -463,6 +489,24 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                             hyg_items=hyg_items, no_order=no_order, risk_q=risk_q, reach_of=reach_of,
                             measure=measure, today=today, ledger=ledger, s1_recent_o=s1_recent_o,
                             recent=recent))
+    # Д-9 и R4: ключи за счётами подписей «Недели» (каждый — непустой список при счёте > 0)
+    D = week["drill"]
+    D["W3p"] = w3_parts(risk_q, heavy)
+    D["unpaid"] = {"k": unpaid.pop("keys"), "t": unpaid.pop("tags")}
+    D["W1byAssign"] = [str(o["id"]) for o in s1_recent_o
+                       if _clean(o["_segs"]["segs"]["S1"]) and o["_segs"]["segs"]["S1"].get("wd") is not None
+                       and o["_segs"]["segs"]["S1"].get("endBy") == "назначение"]
+    D["W1assignStale"] = [str(o["id"]) for o in st1 if ork.assign_stale(o)]
+    D["W1assignNoMgr"] = [str(o["id"]) for o in st1 if ork.assign_no_mgr(o)]
+    D["noCal"] = [str(o["id"]) for o in L if step[o["id"]] in ork.OVER_CODE
+                  and ov[o["id"]]["why"] == "год без производственного календаря"]
+    D["W5prod"] = [str(o["id"]) for o in prod]
+    D["W5noDates"] = [str(o["id"]) for o in prod if not (o.get("prodStart") and o.get("prodEnd"))]
+    # Д-7: сорванный срок по исполнителю пункта — ключи рядом с «дольше нормы» и «ждём УПД»
+    for q in risk_q:
+        if q["code"] == "late" and heavy.get(q.get("order")) == "late":
+            D["who"].setdefault(q.get("who") or PULSE_NONE, {"over": [], "wait": []}) \
+                .setdefault("late", []).append(str(q.get("order") or ""))
 
     month, month_people, journal = _month(orders, U, today, otd, ov, deal_ok_all={
         d["deal"]: d.get("inCat0", True) for d in deals}, ork_head=ork_head)
@@ -522,6 +566,8 @@ def _long_p80(prod: list[dict], s5: dict, today: dt.date) -> dict:
         days = (today - start).days
         if days > p8:
             items.append({"deal": o.get("deal"), "seq": o.get("seq"), "order": o["id"], "days": days,
+                          # Д-8: с какого дня в производстве и плановый конец
+                          "since": start.isoformat(), "prodEnd": _iso(o.get("prodEnd")),
                           "ordLbl": o.get("lbl") or "", "ordNo": o.get("ordNo"),
                           "sup": o.get("sup") or "", "who": (o.get("own") or {}).get("who") or ""})
     # заказы одной сделки — подряд (по самому долгому из них), затем по номеру заказа
@@ -1072,6 +1118,102 @@ def unpack(rows: list[dict], strs: list[str]) -> list[dict]:
     return [get(r) for r in rows]
 
 
+# --- R4 «Неделя» (WP-B): части W3, неоплата, история сорванных, причина заказа ----------------
+W3_CODES = ("late", "risk", "forecast")
+# кого ждёт шаг (ork.STEPS[].waits): kam — шаги 1–3, 10, 12, 13; oss — 6; sup — 7; log — 9, 11
+STEP_WAITS = {s["no"]: s["waits"] or "" for s in ork.STEPS}
+OUR_CODES = frozenset(ork.OVER_CODE.values()) | {"noOrder"}
+# причина заказа (Д-4, порядок — решение R4, «Как считается»): первая подходящая — cause, вторая —
+# cause2. our — шаг ОРК дольше нормы; sup — производство дольше плана или шаг ждёт поставщика;
+# log / kam / oss — шаг ждёт этот отдел; nodata — нет плановых дат или срока, шаг неизвестен;
+# ничего не подошло — мяч у ОРК на его шаге в норме (our)
+CAUSES = ("our", "sup", "log", "kam", "oss", "nodata")
+
+
+def order_cause(codes, step, over: bool = False) -> tuple[str, str]:
+    """(cause, cause2) заказа «Недели»: одна причина на заказ — сумма причин по любому списку
+    равна числу заказов в нём (инвариант Д-4)."""
+    cs = set(codes or ())
+    w = STEP_WAITS.get(step, "") if step is not None else ""
+    hit = [c for c, ok in (("our", over or bool(cs & OUR_CODES)),
+                           ("sup", "prodDev" in cs or w == "sup"),
+                           ("log", w == "log"), ("kam", w == "kam"), ("oss", w == "oss"),
+                           ("nodata", step is None or bool(cs & {"noPlanDates", "noDl"}))) if ok]
+    if not hit:
+        hit = ["our"]
+    return hit[0], (hit[1] if len(hit) > 1 else "")
+
+
+def w3_heavy(risk_q: list[dict]) -> dict:
+    """Заказ → самый тяжёлый вид пункта W3 (важность lifecycle.EXC: late < risk < forecast)."""
+    sev = {c: lifecycle.EXC[c][0] for c in W3_CODES}
+    out: dict = {}
+    for q in risk_q:
+        k, c = q.get("order"), q["code"]
+        if k not in out or sev[c] < sev[out[k]]:
+            out[k] = c
+    return out
+
+
+def w3_parts(risk_q: list[dict], heavy: dict) -> dict:
+    """Ключи частей W3 по заказам (Д-1): late, risk, forecast и threat = risk + forecast."""
+    P: dict = {c: {"k": [], "t": []} for c in (*W3_CODES, "threat")}
+    seen: set = set()
+    for q in risk_q:
+        k = q.get("order")
+        if k in seen or heavy.get(k) != q["code"]:
+            continue
+        seen.add(k)
+        for part in (q["code"], "threat") if q["code"] != "late" else ("late",):
+            P[part]["k"].append(str(k or ""))
+            P[part]["t"].append(q["code"])
+    return P
+
+
+def _unpaid(items: list[dict], deal_by: dict, today: dt.date) -> dict:
+    """Д-3: «Клиент не оплатил в срок» — разные заказы пунктов unpaid, их сделки, продажа этих
+    сделок в € без НДС (это не долг: оплату в деньгах портал не видит — решение Р-2), старейший
+    срок оплаты; ключи и подписи — в drill (их забирает build)."""
+    seen: dict = {}
+    for q in items:
+        k = q.get("order")
+        if k and (k not in seen or (q.get("days") or 0) > (seen[k].get("days") or 0)):
+            seen[k] = q
+    deals = {str(q.get("deal")) for q in seen.values()}
+    sale = sum((deal_by.get(d) or {}).get("saleEur") or 0 for d in deals
+               if (deal_by.get(d) or {}).get("saleKnown", True))
+    days = [q.get("days") for q in seen.values() if q.get("days") is not None]
+    oldest = (today - dt.timedelta(days=max(days))).isoformat() if days else ""
+    return {"orders": len(seen), "deals": len(deals), "saleEur": round(sale), "oldest": oldest,
+            "label": "продажа сделок без НДС, не сумма долга", "keys": [str(k) for k in seen],
+            "tags": [q.get("ref") or "" for q in seen.values()]}
+
+
+def _fridays(today: dt.date, n: int = 12) -> list[dt.date]:
+    """n прошлых пятниц (строго раньше сегодня), от старой к новой."""
+    last = today - dt.timedelta(days=(today.weekday() - 4) % 7 or 7)
+    return [last - dt.timedelta(weeks=i) for i in range(n - 1, -1, -1)]
+
+
+def late_hist(orders: list[dict], deal_by: dict, today: dt.date) -> list[int]:
+    """Д-12: «срок клиента сорван» на каждую из 12 прошлых пятниц t — заказы непроигранных
+    сделок, не проваленные, созданные не позже t, у которых срок клиента раньше t, а доставки
+    к t нет. Переносы срока не хранятся — по нынешнему сроку (оговорка у спарклайна)."""
+    out = []
+    for t in _fridays(today):
+        n = 0
+        for o in orders:
+            d = deal_by.get(o.get("deal"))
+            if not d or d.get("lost") or not (o.get("live") or o.get("success")):
+                continue
+            cr, dl = _d(o.get("created")), _d(o.get("dl"))
+            fact = _d(o.get("delFact")) or _d(o.get("utdDate"))
+            if dl and dl < t and (cr is None or cr <= t) and (fact is None or fact > t):
+                n += 1
+        out.append(n)
+    return out
+
+
 def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p80, cps, hyg_items,
                 no_order, risk_q, reach_of, measure, today, ledger, s1_recent_o, recent) -> dict:
     """Строки заказов и сделок «Недели», ключи каждого числа и «Пульс ОРК». Множества — те же,
@@ -1126,7 +1268,12 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
              "over": v.get("over") is True, "wu": bool(v.get("waitUtd")), "tu": bool(v.get("termUnknown")),
              "nc": nc(o), "hyg": h.get("kinds") or [], "hw": h.get("why") or "",
              "waits": waits_of.get(st, "") if st else "",
-             "c12": oid in c12, "p80": str(oid) in p80s}
+             "c12": oid in c12, "p80": str(oid) in p80s,
+             # почему срок не посчитать / не в счёте (ork.judged, гигиена) — Д-9
+             "why": v.get("why") or "" if (v.get("termUnknown") or nc(o)) else "",
+             "ncWhy": (h.get("why") or v.get("why") or "") if nc(o) else ""}
+        # одна причина на заказ (Д-4): у WP-C — «Почему» списка, у WP-D — путь заказа
+        r["cause"], r["cause2"] = order_cause(codes_of.get(str(oid), []), st, v.get("over") is True)
         if v.get("wd") is None and st is not None:
             since = _d(o.get("stepSince")) or _d(o.get("stageSince"))
             if since:
@@ -1172,6 +1319,11 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
                     ak.append(str(o["id"]))
                     at.append("нет: " + a["name"])
         e["art"] = {"k": ak, "t": at}
+        # Д-5а: те же пары — по заказу (ledger.artOrders): строка — заказ, подпись — каких файлов нет
+        ao: dict[str, list] = {}
+        for k, t in zip(ak, at):
+            ao.setdefault(k, []).append(t.removeprefix("нет: "))
+        e["artO"] = {"k": list(ao), "t": ["нет: " + ", ".join(v) for v in ao.values()]}
         if no == 12:
             e["closed"] = keys(C12)
         if no == 7:
