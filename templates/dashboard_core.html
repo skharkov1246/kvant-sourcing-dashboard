@@ -2050,105 +2050,165 @@
   @media(prefers-reduced-motion:reduce){
     *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
   }
-  /* ---- B3 · путь заказа по шагам (_opOpen) — только в дровере «Реализации» (.drw.rz) и только
-     пока в нём путь (#opRoot): ширина дровера и всё оформление пути. Цвета — переменные темы */
-  .drw.rz .op{--op-tone:var(--mut);font-family:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:var(--rz-md,14px);line-height:1.5;color:var(--ink);font-variant-numeric:tabular-nums lining-nums}
-  :where(.drw.rz .op) p{margin:0}
-  .drw.rz .op h4{font-family:inherit;font-size:var(--rz-lg,16px);font-weight:600;line-height:1.35;letter-spacing:0;text-transform:none;color:var(--strong);margin:0 0 10px;display:flex;align-items:center;gap:8px}
-  .drw.rz .op-cnt{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 7px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:var(--rz-xs,12px);font-weight:600;color:var(--mut)}
-  .drw.rz .op-nav{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:0 0 14px}
-  .drw.rz .op-links{display:flex;flex-wrap:wrap;gap:4px 16px;margin-left:auto}
-  .drw.rz .op-back,.drw.rz .op-cardbtn,.drw.rz .op-chip{font-family:inherit;font-size:var(--rz-sm,13px);font-weight:500;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;cursor:pointer;transition:background .12s,border-color .12s}
-  .drw.rz .op-back{min-height:36px;padding:6px 12px;text-align:left;max-width:100%;overflow-wrap:anywhere}
-  .drw.rz .op-back:hover,.drw.rz .op-cardbtn:hover,.drw.rz .op-chip:hover{background:var(--hov);border-color:var(--ctl)}
+  /* ---- путь заказа по шагам (_opOpen) — только в дровере «Реализации» (.drw.rz) и только
+     пока в нём заказ (#opRoot): ширина дровера и всё оформление уровней «Заказ» и «Шаг» */
+  /* ==== R4:WP-D ==== уровни «Заказ» (У4) и «Шаг» (У5), спецификация R4 3.8: без карточек в
+     карточке и заливок; серый — данные, красный — только «дольше нормы», «просрочен», «нет»
+     (всегда словом); янтарный — «не назначен», «позже срока», «не называть»; кегль ≥ 13 px */
+  .drw.rz .op{--op-red:var(--warn);--op-amb:var(--a);--op-data:#6e7781;--op-track:#e6eaef;--op-sel:var(--ink);
+    font-family:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:var(--rz-md,14px);line-height:1.5;color:var(--ink);font-variant-numeric:tabular-nums lining-nums}
+  :root[data-theme="dark"] .drw.rz .op{--op-data:#8b97a6;--op-track:#2a323d}
+  .drw.rz .op-no{font-family:var(--mono);font-weight:600;font-size:max(13px,.94em);letter-spacing:0}
+  .drw.rz .op p{margin:0}
+  .drw.rz .op .op-h{font-family:inherit;font-size:var(--rz-lg,16px);font-weight:600;line-height:1.35;letter-spacing:0;text-transform:none;color:var(--strong);margin:0 0 8px}
+  .drw.rz .op abbr[title]{text-decoration:none;border-bottom:1px dotted currentColor;cursor:help}
+  .drw.rz .op a:focus-visible,.drw.rz .op button:focus-visible{outline:2px solid var(--a);outline-offset:2px;border-radius:6px}
+  .drw.rz #drwName:focus{outline:none}
+  .drw.rz #drwName:focus-visible{outline:2px solid var(--a);outline-offset:3px;border-radius:4px}
+  .drw.rz .op-vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  /* крошки и «‹ N из M ›» */
+  .drw.rz .op-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin:-4px 0 6px}
+  .drw.rz .op-crumbs{min-width:0;flex:1 1 320px}
+  .drw.rz .op-crumbs ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;align-items:center;font-size:var(--rz-sm,13px);color:var(--mut)}
+  .drw.rz .op-crumbs li{display:flex;align-items:center;min-width:0}
+  .drw.rz .op-crumbs li+li::before{content:"›";margin:0 6px;color:var(--mut)}
+  .drw.rz .op-crumbs [aria-current]{color:var(--ink);font-weight:600}
+  .drw.rz .op-cr{font:inherit;font-size:var(--rz-sm,13px);color:var(--b);background:none;border:0;padding:8px 2px;min-height:36px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;text-align:left}
+  .drw.rz .op-cr:hover{color:var(--b2)}
+  .drw.rz .op-pager{display:flex;align-items:center;gap:4px;margin-left:auto}
+  .drw.rz .op-pg{width:40px;height:36px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font:inherit;font-size:18px;line-height:1;cursor:pointer}
+  .drw.rz .op-pg:hover:not([disabled]){background:var(--hov);border-color:var(--ctl)}
+  .drw.rz .op-pg[disabled]{color:var(--mut);opacity:.5;cursor:default}
+  .drw.rz .op-pgn{font-size:var(--rz-sm,13px);color:var(--mut);min-width:64px;text-align:center}
+  /* переходы: заказ в Битриксе — первым, сделка, сделка в Битриксе */
+  .drw.rz .op-acts{display:flex;flex-wrap:wrap;align-items:center;gap:4px 18px;margin:0 0 14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
   .drw.rz .op-ext{display:inline-flex;align-items:center;min-height:36px;font-size:var(--rz-sm,13px);font-weight:500;color:var(--b);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
   .drw.rz .op-ext:hover{color:var(--b2)}
-  .drw.rz .op a:focus-visible,.drw.rz .op button:focus-visible{outline:2px solid var(--a);outline-offset:2px}
-  .drw.rz .op-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
-  .drw.rz .op-main,.drw.rz .op-side{display:flex;flex-direction:column;gap:14px;min-width:0}
-  @media(min-width:1000px){.drw.rz .op-grid{grid-template-columns:minmax(0,1fr) 290px;align-items:start}.drw.rz .op-side{position:sticky;top:0}}
-  .drw.rz .op-card{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:16px 18px}
+  .drw.rz .op-ext1{font-weight:600}
+  .drw.rz .op-cardbtn,.drw.rz .op-chip{font-family:inherit;font-size:var(--rz-sm,13px);font-weight:500;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;cursor:pointer;transition:background .12s,border-color .12s}
+  .drw.rz .op-cardbtn{min-height:36px;padding:0;border:0;background:none;font-weight:600;color:var(--b);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+  .drw.rz .op-cardbtn:hover{color:var(--b2)}
+  .drw.rz .op-chip:hover{background:var(--hov);border-color:var(--ctl)}
+  /* сетка: слева — где застрял, что сделать, что сказать, путь; справа — даты и заказы сделки */
+  .drw.rz .op-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:0 32px}
+  .drw.rz .op-main,.drw.rz .op-side{display:flex;flex-direction:column;min-width:0}
+  @media(min-width:1000px){.drw.rz .op-grid{grid-template-columns:minmax(0,1fr) 280px;align-items:start}.drw.rz .op-side{position:sticky;top:0}}
+  /* раздел — поле и линия сверху, без рамки и заливки (table-design: группы — полем) */
+  .drw.rz .op-card{padding:14px 0 16px;border-top:1px solid var(--line2)}
+  .drw.rz .op-main>.op-card:first-child,.drw.rz .op-side>.op-card:first-child{border-top:0;padding-top:2px}
   .drw.rz .op-line{font-size:var(--rz-md,14px);color:var(--ink2)}
+  .drw.rz .op-line+.op-line{margin-top:6px}
   .drw.rz .op-mut{color:var(--mut)}
-  .drw.rz .op-bad{color:var(--nr);font-weight:600}
-  .drw.rz .op-warn{color:var(--a2);font-weight:600}
-  .drw.rz .op-good{color:var(--ok);font-weight:600}
-  .drw.rz .op-tag{display:inline-block;padding:1px 8px;border-radius:999px;border:1px solid var(--line);background:var(--panel2);font-size:var(--rz-xs,12px);font-weight:500;color:var(--mut);vertical-align:1px}
-  /* «Где застрял»: тон — состояние срока шага, всегда со словами */
-  .drw.rz .op-stuck{border-left:4px solid var(--op-tone);background:color-mix(in srgb,var(--op-tone) 5%,var(--panel))}
-  .drw.rz .op-stuck.is-over{--op-tone:var(--nr)}
-  .drw.rz .op-stuck.is-wait{--op-tone:var(--a2)}
-  .drw.rz .op-stuck.is-ok{--op-tone:var(--ok)}
-  .drw.rz .op-stuck .op-eye{font-size:var(--rz-sm,13px);font-weight:600;color:var(--op-tone);margin:0 0 6px}
-  .drw.rz .op-ttl{font-size:var(--rz-xl,20px);font-weight:600;line-height:1.3;color:var(--strong);margin:0 0 6px}
-  .drw.rz .op-stepk{display:block;font-size:var(--rz-sm,13px);font-weight:500;color:var(--mut);margin-bottom:2px}
-  .drw.rz .op-big{font-size:var(--rz-lg,16px);line-height:1.45;color:var(--ink2);margin:0 0 12px}
-  .drw.rz .op-num{font-size:28px;font-weight:600;line-height:1.1;color:var(--strong)}
-  .drw.rz .op-of{color:var(--mut)}
-  .drw.rz .op-kv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 16px;margin:0;padding-top:12px;border-top:1px solid color-mix(in srgb,var(--op-tone) 25%,var(--line2))}
-  .drw.rz .op-kv>div{display:contents}
-  .drw.rz .op-kv dt{font-size:var(--rz-sm,13px);color:var(--mut)}
-  .drw.rz .op-kv dd{margin:0;font-size:var(--rz-md,14px);color:var(--ink)}
-  .drw.rz .op-kv dd b{font-weight:600}
-  /* «Что сделать» */
-  .drw.rz .op-todo{list-style:none;margin:0;padding:0;counter-reset:op}
-  .drw.rz .op-todo-i{position:relative;padding:10px 0 10px 34px;border-top:1px solid var(--line2);counter-increment:op}
-  .drw.rz .op-todo-i:first-child{border-top:0;padding-top:2px}
-  .drw.rz .op-todo-i::before{content:counter(op);position:absolute;left:0;top:10px;width:24px;height:24px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:var(--rz-xs,12px);font-weight:600;color:var(--mut);display:flex;align-items:center;justify-content:center}
-  .drw.rz .op-todo-i:first-child::before{top:2px}
-  .drw.rz .op-what{font-weight:600;color:var(--strong)}
-  .drw.rz .op-act{color:var(--ink2);margin-top:2px}
+  .drw.rz .op-bad{color:var(--op-red);font-weight:600}
+  .drw.rz .op-warn{color:var(--op-amb);font-weight:600}
+  .drw.rz .op-tag{display:inline-block;padding:0 8px;border-radius:999px;border:1px solid var(--line);font-size:var(--rz-sm,13px);font-weight:500;color:var(--mut);line-height:1.5}
+  .drw.rz .op-me{display:inline-block;padding:0 8px;margin-right:2px;border-radius:999px;background:var(--panel2);font-size:var(--rz-sm,13px);font-weight:600;color:var(--ink)}
+  /* «Где застрял»: шаг, число раб. дн. и буллет против нормы, с какого дня, кто */
+  .drw.rz .op-ttl{font-size:var(--rz-lg,16px);font-weight:600;line-height:1.35;color:var(--strong)}
+  .drw.rz .op-stepk{font-weight:600}
+  .drw.rz .op-big{font-size:var(--rz-md,14px);line-height:1.45;color:var(--ink2);margin-top:8px}
+  .drw.rz .op-num{font-size:30px;font-weight:600;line-height:1;color:var(--strong);margin-right:2px}
+  .drw.rz .op-bul{position:relative;height:16px;max-width:320px;margin:8px 0 2px;background:var(--op-track);border-radius:2px}
+  .drw.rz .op-bul-v,.drw.rz .op-bul-o{position:absolute;top:4px;bottom:4px;left:0}
+  .drw.rz .op-bul-v{background:var(--op-sel)}
+  .drw.rz .op-bul-o{background:var(--op-red)}
+  .drw.rz .op-bul-n{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--strong)}
+  .drw.rz .op-meta{font-size:var(--rz-sm,13px);color:var(--mut);margin-top:6px}
   .drw.rz .op-who{font-size:var(--rz-sm,13px);color:var(--ink2);margin-top:4px}
-  /* путь: вертикальный степпер 13 шагов */
-  .drw.rz .op-lead{margin:-4px 0 12px}
+  .drw.rz .op-who b{font-weight:600;color:var(--ink)}
+  .drw.rz .op-stuck .op-line{margin-top:6px}
+  /* «Что сделать» — действие первым, почему, кто делает и кто в курсе */
+  .drw.rz .op-todo{list-style:none;margin:0;padding:0}
+  .drw.rz .op-todo-i{padding:8px 0;border-top:1px solid var(--line2)}
+  .drw.rz .op-todo-i:first-child{border-top:0;padding-top:0}
+  .drw.rz .op-act{font-weight:600;color:var(--strong)}
+  .drw.rz .op-why{font-size:var(--rz-sm,13px);color:var(--ink2);margin-top:2px}
+  /* «Что сказать клиенту» */
+  .drw.rz .op-say{font-size:15px;line-height:1.45;color:var(--ink);margin:0 0 8px}
+  .drw.rz .op-sayd{font-size:20px;font-weight:600;color:var(--strong);white-space:nowrap}
+  .drw.rz .op-kv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 16px;margin:0}
+  .drw.rz .op-kv>div{display:contents}
+  .drw.rz .op-kv dt{font-size:var(--rz-sm,13px);color:var(--mut);padding-top:1px}
+  .drw.rz .op-kv dd{margin:0;font-size:var(--rz-md,14px);color:var(--ink2);min-width:0;overflow-wrap:anywhere}
+  .drw.rz .op-plus{color:var(--mut);font-weight:600;padding:0 1px}
+  .drw.rz .op-hint{font-size:var(--rz-sm,13px);color:var(--ink2);margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
+  .drw.rz .op-hint .op-ext{min-height:0}
+  /* «Путь по шагам»: строка шага — кнопка, раскрывает «Шаг»; текущий — рамкой без заливки */
+  .drw.rz .op-lead{font-size:var(--rz-sm,13px);color:var(--mut);margin:-4px 0 8px}
   .drw.rz .op-steps{list-style:none;margin:0;padding:0}
-  .drw.rz .op-s{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;padding:0 0 14px}
-  .drw.rz .op-s::before{content:"";position:absolute;left:14px;top:32px;bottom:2px;width:2px;border-radius:2px;background:var(--line2)}
-  .drw.rz .op-s:last-child{padding-bottom:0}
-  .drw.rz .op-s.is-quiet{padding-bottom:8px}
-  .drw.rz .op-s.is-quiet .op-sb{padding-top:5px}
-  .drw.rz .op-in{font-size:var(--rz-sm,13px);font-weight:400;color:var(--mut)}
-  .drw.rz .op-s:last-child::before{display:none}
-  .drw.rz .op-s.is-done::before{background:color-mix(in srgb,var(--ok) 45%,var(--line2))}
-  .drw.rz .op-dot{width:30px;height:30px;border-radius:999px;border:2px solid var(--line);background:var(--panel);display:flex;align-items:center;justify-content:center;font-size:var(--rz-sm,13px);font-weight:600;color:var(--mut)}
-  .drw.rz .op-s.is-done .op-dot{border-color:var(--ok);color:var(--ok)}
-  .drw.rz .op-s.has-bad .op-dot{border-color:var(--nr);color:var(--nr)}
-  .drw.rz .op-s.is-back .op-dot{border-color:var(--a2);color:var(--a2);border-style:dashed}
-  .drw.rz .op-s.is-skip .op-dot,.drw.rz .op-s.is-deal .op-dot,.drw.rz .op-s.is-nohist .op-dot,.drw.rz .op-s.is-next .op-dot{border-style:dashed;border-color:var(--ctl)}
-  .drw.rz .op-s.is-cur .op-dot{border-color:var(--op-cur,var(--b));background:var(--op-cur,var(--b));color:var(--panel)}
-  .drw.rz .op-s.is-cur.has-bad{--op-cur:var(--nr)}
-  .drw.rz .op-s.is-cur.is-wait{--op-cur:var(--a2)}
-  .drw.rz .op-s.is-cur.is-fine{--op-cur:var(--ok)}
-  .drw.rz .op-sb{min-width:0;padding-top:4px}
-  .drw.rz .op-s.is-cur .op-sb{margin:-6px 0 0;padding:9px 12px 10px;border-radius:10px;border:1px solid color-mix(in srgb,var(--op-cur,var(--b)) 40%,var(--line));background:color-mix(in srgb,var(--op-cur,var(--b)) 6%,var(--panel))}
-  .drw.rz .op-sn{font-size:var(--rz-md,14px);font-weight:500;color:var(--ink);line-height:1.4}
+  .drw.rz .op-s,.drw.rz .op-fut{border-top:1px solid var(--line2)}
+  .drw.rz .op-steps>li:first-child{border-top:0}
+  .drw.rz .op-s.is-cur{border:1px solid var(--op-sel);border-radius:8px}
+  .drw.rz .op-s.is-cur+li{border-top-color:transparent}
+  .drw.rz .op-s.is-next{display:none}
+  .drw.rz .op-steps.fut-on .op-s.is-next{display:block}
+  .drw.rz .op-sh,.drw.rz .op-futb{display:grid;grid-template-columns:26px minmax(0,1fr) auto 14px;align-items:center;gap:2px 10px;width:100%;min-height:44px;margin:0;padding:6px 6px;border:0;border-radius:8px;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+  .drw.rz .op-futb{grid-template-columns:minmax(0,1fr) 14px;padding-left:42px;font-size:var(--rz-sm,13px);color:var(--mut)}
+  .drw.rz .op-sh:hover,.drw.rz .op-futb:hover{background:var(--hov)}
+  .drw.rz .op-dot{width:24px;height:24px;border-radius:999px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:var(--rz-sm,13px);font-weight:600;color:var(--mut)}
+  .drw.rz .op-s.is-done .op-dot,.drw.rz .op-s.is-back .op-dot{border-color:var(--op-data);color:var(--ink)}
+  .drw.rz .op-s.is-cur .op-dot{background:var(--op-sel);border-color:var(--op-sel);color:var(--panel)}
+  .drw.rz .op-s.is-skip .op-dot,.drw.rz .op-s.is-deal .op-dot,.drw.rz .op-s.is-nohist .op-dot,.drw.rz .op-s.is-next .op-dot{border-style:dashed}
+  .drw.rz .op-sn{font-size:var(--rz-md,14px);font-weight:500;color:var(--ink);line-height:1.35}
   .drw.rz .op-s.is-cur .op-sn{font-weight:600;color:var(--strong)}
-  .drw.rz .op-s.is-skip .op-sn,.drw.rz .op-s.is-deal .op-sn,.drw.rz .op-s.is-nohist .op-sn,.drw.rz .op-s.is-next .op-sn{color:var(--mut)}
-  .drw.rz .op-vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  .drw.rz .op-now{display:inline-block;padding:1px 8px;border-radius:999px;background:var(--op-cur,var(--b));color:var(--panel);font-size:var(--rz-xs,12px);font-weight:600;vertical-align:1px}
-  .drw.rz .op-sm{font-size:var(--rz-sm,13px);color:var(--mut);margin-top:1px}
-  .drw.rz .op-sv{list-style:none;margin:3px 0 0;padding:0;font-size:var(--rz-sm,13px);color:var(--ink2)}
-  .drw.rz .op-sv li{padding:1px 0}
-  .drw.rz .op-sv b{font-weight:600;color:var(--ink)}
-  .drw.rz .op-sx{font-size:var(--rz-sm,13px);color:var(--ink2);margin-top:3px}
-  /* ключевые даты */
+  .drw.rz .op-s.is-skip .op-sn,.drw.rz .op-s.is-deal .op-sn,.drw.rz .op-s.is-nohist .op-sn,.drw.rz .op-s.is-next .op-sn{color:var(--mut);font-weight:400}
+  .drw.rz .op-now{display:inline-block;margin-left:4px;padding:0 7px;border:1px solid var(--op-sel);border-radius:999px;font-size:var(--rz-sm,13px);font-weight:600;line-height:1.4;color:var(--ink)}
+  .drw.rz .op-sm{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:baseline;gap:0 14px;font-size:var(--rz-sm,13px);color:var(--ink2);text-align:right}
+  .drw.rz .op-sd,.drw.rz .op-sw,.drw.rz .op-sv{white-space:nowrap}
+  .drw.rz .op-sd{color:var(--mut)}
+  .drw.rz .op-sw b{font-weight:600;color:var(--ink)}
+  .drw.rz .op-sv:empty{display:none}
+  .drw.rz .op-pl{flex-basis:100%;color:var(--mut)}
+  .drw.rz .op-chev{color:var(--mut);font-size:16px;line-height:1;transition:transform .15s}
+  .drw.rz .op-s.is-open .op-chev,.drw.rz .op-futb[aria-expanded="true"] .op-chev{transform:rotate(90deg)}
+  .drw.rz .op-sx{padding:2px 8px 12px 42px}
+  .drw.rz .op-sx .op-kv dd{font-size:var(--rz-sm,13px)}
+  .drw.rz .op-files{list-style:none;margin:0;padding:0}
+  .drw.rz .op-unk{margin-bottom:8px}
+  /* «Ключевые даты»: план → факт; пустое поле — «нет в Битриксе» */
   .drw.rz .op-kd{margin:0}
-  .drw.rz .op-kd>div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;border-top:1px solid var(--line2)}
+  .drw.rz .op-kd>div{padding:7px 0;border-top:1px solid var(--line2)}
   .drw.rz .op-kd>div:first-child{border-top:0;padding-top:0}
   .drw.rz .op-kd dt{font-size:var(--rz-sm,13px);color:var(--mut)}
-  .drw.rz .op-kd dd{margin:0;text-align:right;font-weight:500;color:var(--ink)}
-  .drw.rz .op-rel{display:block;font-size:var(--rz-xs,12px);font-weight:500;color:var(--mut)}
-  .drw.rz .op-rel.op-bad{color:var(--nr);font-weight:600}
-  /* заказы сделки и карточка */
+  .drw.rz .op-kd dd{margin:1px 0 0;font-size:var(--rz-md,14px);color:var(--ink)}
+  .drw.rz .op-fv{font-weight:600}
+  .drw.rz .op-ar{color:var(--mut)}
+  .drw.rz .op-miss{font-size:var(--rz-sm,13px);color:var(--mut);font-style:italic}
+  .drw.rz .op-rel{display:block;font-size:var(--rz-sm,13px);color:var(--mut)}
+  .drw.rz .op-rel.op-bad{color:var(--op-red)}
+  .drw.rz .op-rel.op-warn{color:var(--op-amb);font-weight:500}
+  /* заказы сделки */
   .drw.rz .op-chips{display:flex;flex-wrap:wrap;gap:8px}
-  .drw.rz .op-chip{display:inline-flex;flex-direction:column;align-items:flex-start;min-height:44px;min-width:76px;padding:5px 10px;line-height:1.3}
+  .drw.rz .op-chip{display:inline-flex;flex-direction:column;align-items:flex-start;min-height:44px;min-width:84px;padding:5px 10px;line-height:1.3;text-align:left}
   .drw.rz .op-chip .op-id{font-family:var(--mono);font-size:var(--rz-sm,13px);font-weight:600;color:var(--strong)}
-  .drw.rz .op-chip .op-cs{font-size:var(--rz-xs,12px);color:var(--mut)}
-  .drw.rz .op-chip .op-cs.op-bad{color:var(--nr)}
-  .drw.rz .op-chip.on{border-color:var(--a);background:color-mix(in srgb,var(--fa) 10%,var(--panel));box-shadow:inset 0 0 0 1px var(--a);cursor:default}
-  .drw.rz .op-cardbtn{min-height:44px;padding:10px 14px;text-align:left;font-weight:600}
-  @media(max-width:520px){.drw.rz .op-card{padding:14px}.drw.rz .op-links{margin-left:0}.drw.rz .op-ttl{font-size:18px}.drw.rz .op-num{font-size:26px}
-    .drw.rz .op-kv{grid-template-columns:minmax(0,1fr)}.drw.rz .op-kv dd{margin-bottom:4px}}
+  .drw.rz .op-chip .op-cs{font-size:var(--rz-sm,13px);color:var(--mut)}
+  .drw.rz .op-chip.on{border-color:var(--op-sel);box-shadow:inset 0 0 0 1px var(--op-sel);cursor:default}
+  .drw.rz .op-keys{font-size:var(--rz-sm,13px);color:var(--mut);margin-top:14px;padding-top:10px;border-top:1px solid var(--line2)}
+  /* телефон: крошка — одна («‹ к списку»), строка шага — две строки, подписи слева */
+  @media(max-width:520px){
+    .drw.rz .op-crumbs li{display:none}
+    .drw.rz .op-crumbs li:nth-last-child(2){display:flex}
+    .drw.rz .op-crumbs li:nth-last-child(2)::before{content:"‹";margin:0 6px 0 0;color:var(--b)}
+    .drw.rz .op-crumbs li:only-child{display:flex}
+    .drw.rz .op-top{margin-top:-8px;flex-wrap:nowrap;gap:8px}
+    .drw.rz .op-crumbs{flex:1 1 0}
+    .drw.rz .op-pgn{min-width:0;padding:0 2px}
+    .drw.rz .op-acts{gap:0 14px;margin-bottom:10px;padding-bottom:6px}
+    .drw.rz .op-num{font-size:28px}
+    .drw.rz .op-sh{grid-template-columns:26px minmax(0,1fr) 14px}
+    .drw.rz .op-sm{grid-column:2;grid-row:2;justify-content:flex-start;text-align:left;gap:0 10px}
+    .drw.rz .op-chev{grid-column:3;grid-row:1}
+    .drw.rz .op-sx{padding-left:8px}
+    .drw.rz .op-kv{grid-template-columns:minmax(0,1fr);gap:0}
+    .drw.rz .op-kv dd{margin-bottom:6px}
+    .drw.rz .op-pg{width:44px;height:44px}
+    .drw.rz .op-cr{min-height:44px}
+    .drw.rz .op-acts .op-ext,.drw.rz .op-cardbtn{min-height:44px}
+    /* шапка заказа на телефоне — «Заказ в Битриксе ↗» и «Сделка №… →» (спецификация 3.8); сделка в
+       Битриксе — в карточке сделки */
+    .drw.rz .op-acts .op-ext:last-child{display:none}
+  }
+  /* ==== /R4:WP-D ==== */
   /* R4 · первый экран «Реализации» (ревью 30.10.2026, dataink правило 2): шапка вкладки — одной строкой,
      направление — в строке подвкладки, «Неделя»: плитки и «Сегодня» — на первом экране 1280×800;
      на телефоне «Сегодня» первым, плитки — сеткой в два столбца */
@@ -7312,14 +7372,18 @@ function _odBind(el,X,O){
         if(r.n) _odOpenAddr(r); else if(r.o&&typeof _opOpen==='function'&&!_opOpen(r.o,{back:''})) _odNotFound(`Заказа id ${r.o}`);},0);}}
 }
 // ==== /R4:WP-C (JS) ====
-// ---- B3 · путь заказа по шагам регламента ОРК (владелец 29.10.2026: «нельзя провалиться в процессы,
-// где зависло»). _opOpen(k, opts) рисует в #drwBody того же дровера: где застрял (шаг, р.д. против
-// нормы, с какого дня и чем дан, хозяин, кого ждём) → что сделать (пункты очереди заказа по
-// приоритету, иначе действие шага) → путь по 13 шагам (пройденные с датами и р.д. против нормы,
-// текущий, впереди — с плановыми датами) → ключевые даты → другие заказы сделки → карточка сделки.
-// Данные — contracts: orders[].path ([шаг, день входа ISO, р.д.]; последняя запись = step, stepFrom,
-// stepWd), asg, utdD; строка «Недели» (прогноз fc, кого ждём); очередь life.queue. opts.back:
-// 'list' — «← к списку» (_odShow, _OD.scroll), 'deal' — «← к сделке» (openContract / _odCard).
+// ---- R4 · WP-D «Заказ и шаг» (У4, У5; спецификация R4, раздел 3.8). Владелец 29.10.2026: «нельзя
+// провалиться в процессы, где зависло». _opOpen(k, opts) рисует в #drwBody того же дровера уровень
+// «Заказ»: крошки и «‹ N из M ›» (соседний заказ списка) → «Где застрял» (шаг, раб. дн. против нормы
+// буллетом, с какого дня, кто делает и кто в курсе, кого ждём) → «Что сделать» (пункты очереди
+// заказа) → «Что сказать клиенту» (реальная дата и из чего она, причина, что делаем, следующая
+// проверка; дата из одних медиан — «не называть клиенту») → «Путь по шагам» (строка шага раскрывает
+// уровень «Шаг»: вход и выход, срок, чем кончается, кто, чего ждёт, файлы шага, пункты очереди) →
+// «Ключевые даты» (план → факт; пустое поле — «нет в Битриксе») → «Заказы сделки».
+// Данные — contracts: orders[] (path [шаг, день входа ISO, р.д.]; step…; art, fcp, cps, плановые
+// даты — Д-5, Д-1а), строка «Недели» (fc, waits, cause — WP-B), очередь life.queue, каталог artCat.
+// Помощники WP-A (_rzAbbr, _rzGloss, _rzDays, _rzKam, _rzRoute, CT_GLOSS) — только с проверкой
+// наличия и своим запасным видом того же смысла (спецификация 5.3).
 const _OP={};
 const _OP_BX='https://kvantpro.bitrix24.ru/crm/';
 // действие шага по регламенту — когда пунктов очереди у заказа нет
@@ -7328,22 +7392,92 @@ const _OP_DO={1:'принять сделку и назначить менедж�
   6:'запустить производство: оплата и подтверждение поставщика',7:'вести производство: статус у поставщика в середине срока и за 14 дней до отгрузки',
   8:'собрать отгрузочные документы и передать логистике',9:'передать груз логистике',10:'согласовать доставку с заказчиком',
   11:'получить транспортную накладную',12:'получить подписанный УПД',13:'закрыть заказ: оплата клиента и документы'};
+// чем кончается шаг (выход по регламенту и таблице «стадия → шаг», ork.STAGE_STEP)
+const _OP_END={1:'назначен менеджер ОРК или стадия заказа «Заказ направлен»',2:'договор с заказчиком согласован (по сделке, ведёт КАМ)',
+  3:'стадия сделки «Договор с заказчиком подписан»',4:'стадия заказа «Сформирован РО/Подготовка описаний»',
+  5:'стадия «Оплата поставщику / агенту»: PO/OC и спецификация в заказе, предоплата проведена',
+  6:'стадия «Производство заказа»: поставщик оплачен и подтвердил производство',7:'стадия «Заказ готов»',
+  8:'стадия «Подготовка к отгрузке»: Packing list, фото груза, документы для логистики',9:'стадия «Заказ отгружен» или «Подготовка груза/Поиск транспорта»',
+  10:'стадия «Заказ получен клиентом»',11:'дата «Customer delivery date, actual» в заказе',12:'подписанный УПД в заказе',
+  13:'платёжка клиента в заказе и стадия «Закрытие заказа»'};
 const _OP_BY={'начало приёмки':'начало приёмки','назначение':'назначение менеджера ОРК','вход в шаг':'вход в шаг','доставка':'доставка клиенту'};
+// кого ждёт шаг — винительный падеж («Ждём: логистику»)
+const _OP_WAIT={kam:'клиента и КАМа',oss:'ОСС',log:'логистику',sup:'поставщика'};
+// главная причина (week.orders[].cause, WP-B; без неё — по пунктам заказа и шагу), запасные подписи
+const _OP_CAUSE={our:'наш шаг дольше нормы',sup:'у поставщика',log:'у логистики',kam:'у клиента и КАМа',oss:'у ОСС',nodata:'не определить: в заказе нет дат'};
+// сокращения панели — запасной словарь (основной — CT_GLOSS, WP-A)
+const _OP_AB={'ОРК':'отдел реализации контрактов','КАМ':'менеджер клиента (key account manager)','ОСС':'сопровождение сделки',
+  'УПД':'универсальный передаточный документ: клиент подписывает его при приёмке','PO/OC':'заказ поставщику (purchase order) и его подтверждение (order confirmation)',
+  'раб. дн.':'рабочие дни по календарю РФ; паузы в Битриксе не ведутся и не вычтены'};
+// поля Битрикса для пустых дат «Ключевых дат» (contracts.py: SHIP_PLAN, PROD_START, …)
+const _OP_FIELD={prod:'Production start date, budget / Production end date, budget',shipPlan:'Supplier Shipment Date, planned',
+  inb:'Inbound Delivery Date, planned',delPlan:'Customer delivery date, planned',payPlan:'Planned payment term',dl:'Date of deadline to customer'};
 // «дд.мм.гггг» и «гггг-мм-дд…» → «гггг-мм-дд» (сравнение строкой)
 const _opIso=s=>{s=String(s||''); let m=/^(\d{4})-(\d\d)-(\d\d)/.exec(s); if(m) return m[0]; m=/^(\d\d)\.(\d\d)\.(\d{4})$/.exec(s); return m?`${m[3]}-${m[2]}-${m[1]}`:'';};
 const _opDd=s=>{const i=_opIso(s); return i?_orkD(i):'';};
+const _opDm=s=>{const i=_opIso(s); return i?_orkDm(i):'';};
 const _opDays=(a,b)=>Math.round((Date.parse(_opIso(b)+'T00:00:00Z')-Date.parse(_opIso(a)+'T00:00:00Z'))/864e5);
+// сокращение — <abbr> с расшифровкой (WP-A _rzAbbr; нет — свой словарь)
+function _opAb(t){
+  if(typeof _rzAbbr==='function'){try{const r=_rzAbbr(t); if(typeof r==='string'&&/<abbr/.test(r)) return r;}catch(e){}}
+  let g=typeof CT_GLOSS==='object'&&CT_GLOSS?CT_GLOSS[t]:null;
+  g=typeof g==='string'?g:(g&&(g.decode||g.title||g.text))||_OP_AB[t]||'';
+  return g?`<abbr title="${_esc(g)}">${_esc(t)}</abbr>`:_esc(t);
+}
+// текст с сокращениями: экранирование + <abbr> у ОРК, КАМ, ОСС, УПД, PO/OC
+// «р.д.» из подписей данных — «раб. дн.» (спецификация 0.3: одно сокращение рабочих дней)
+const _opT=s=>_esc(String(s==null?'':s).replace(/(^|[^А-Яа-яЁё])р\.\s?д\./g,'$1раб. дн.')).replace(/(^|[^А-Яа-яЁёA-Za-z/])(PO\/OC|ОРК|КАМ|ОСС|УПД)(?![А-Яа-яЁёA-Za-z/])/g,(m,p,t)=>p+_opAb(t));
+const _opWdU=()=>_opAb('раб. дн.');
+// дни пункта очереди — род дней в ячейке (спецификация 2.7; WP-A _rzDays(code,n,{norm}) — текст)
+function _opDayTxt(code,n,norm){
+  if(n==null||n==='') return '';
+  if(typeof _rzDays==='function'){try{const r=_rzDays(code,n,{norm}); if(typeof r==='string'&&r&&!/</.test(r)) return _esc(r);}catch(e){}}
+  const wd=_opWdU();
+  if(code==='late') return `просрочен на ${n} дн.`;
+  if(code==='risk') return +n===0?'срок сегодня':`до срока ${n} дн.`;
+  if(code==='forecast'||code==='planAfterDl') return `прогноз позже срока на ${n} дн.`;
+  if(code==='prodDev') return `${n} дн. после плана производства`;
+  if(/^s\dOver$/.test(code)) return `${n} ${wd}${norm!=null?' при норме '+norm:''}`;
+  if(code==='noUtd') return `${n} ${wd} от доставки`;
+  if(code==='unpaid') return `не оплачено ${n} дн. после срока`;
+  if(code==='noOrder') return `${n} ${wd} без заказа`;
+  return `${n} дн.`;
+}
+// «роль имя» — роль один раз; не назначен; уволен (спецификация 2.7, «Ответственный»)
+function _opWho(who,role){
+  const R=_OD_ROLE[role]||String(role||''), w=String(who==null?'':who).trim();
+  if(!w||w==='не назначен') return `${_opT(R)} <span class="op-warn">не назначен</span>${role==='orkMgr'?` — назначает рук. ${_opAb('ОРК')}`:''}`;
+  const gone=/\(уволен\)\s*$/.test(w);
+  // подпись роли в скобках у имени («Борис (КАМ)») — роль уже названа словом перед именем
+  const nm=w.replace(/\s*\(уволен\)\s*$/,'').replace(/\s*\([^()]*\)\s*$/,'');
+  return `${_opT(R)} <b>${_esc(nm)}</b>${gone?` <span class="op-warn">уволен</span> — переназначить (рук. ${_opAb('ОРК')})`:''}`;
+}
+// роль копии пункта: copyRole, иначе подпись в скобках у имени
+const _opCopyRole=x=>{if(x.copyRole) return x.copyRole; const m=/\(([^()]*)\)\s*$/.exec(String(x.escalateTo||'')), r=m?m[1]:'';
+  return Object.keys(_OD_ROLE).find(k=>_OD_ROLE[k]===r)||r;};
+// «Смотреть как» (WP-A): метка «вы делаете» / «вы в курсе» первой в строке
+function _opMine(x){
+  const K=typeof _rzKam==='function'?(()=>{try{return String(_rzKam()||'');}catch(e){return '';}})():'';
+  if(!K) return '';
+  if(x.whoId!=null&&String(x.whoId)===K) return '<span class="op-me">вы делаете</span> ';
+  if((x.kamId!=null&&String(x.kamId)===K)||(x.escalateToId!=null&&String(x.escalateToId)===K)) return '<span class="op-me">вы в курсе</span> ';
+  return '';
+}
+// адрес уровня (WP-A _rzRoute.set(patch,{push})); без него история не трогается
+function _opRoute(patch,push){
+  try{if(typeof _rzRoute!=='undefined'&&_rzRoute&&typeof _rzRoute.set==='function') _rzRoute.set(patch,{push:!!push});}catch(e){}
+}
 function _opData(){
   const C=window.__CONTRACTS__||{}, S=C.sep||{};
   const led=(((C.ork||{}).week||{}).ledger)||(((S.ork||{}).week||{}).ledger)||[];
-  return {C,S,SN:Object.fromEntries(led.map(s=>[s.no,s])),asOf:(C.ork||{}).asOf||(S.ork||{}).asOf||''};
+  return {C,S,SN:Object.fromEntries(led.map(s=>[s.no,s])),asOf:(C.ork||{}).asOf||(S.ork||{}).asOf||'',art:Array.isArray(C.artCat)?C.artCat:[]};
 }
 function _opFind(k){
   const R=Array.isArray((window.__CONTRACTS__||{}).rows)?window.__CONTRACTS__.rows:[];
   for(const d of R) for(const o of (d.orders||[])) if(String(o.id)===String(k)) return {o,d};
   return null;
 }
-// строка «Недели» заказа (прогноз, кого ждёт шаг, хозяин) — основной вид или направление
+// строка «Недели» заказа (прогноз, кого ждёт шаг, причина) — основной вид или направление
 function _opWeek(k){
   const D=_opData();
   for(const O of [D.C.ork,D.S.ork]){const W=O&&O.week; if(!W) continue; const r=_odRows(W).orders.find(x=>String(x.k)===String(k)); if(r) return r;}
@@ -7376,76 +7510,202 @@ function _opVisits(P){
 }
 const _opNormOf=s=>s&&s.normState==='norm'&&s.norm!=null?s.norm:null;
 function _opVerdict(wd,norm){
-  if(wd==null) return '';
-  if(norm==null) return '';
-  return wd>norm?`<span class="op-bad">дольше нормы на ${wd-norm} р.д.</span>`:`<span class="op-good">в норме</span>`;
+  if(wd==null||norm==null) return '';
+  return wd>norm?`<span class="op-bad">дольше нормы на ${wd-norm} ${_opWdU()}</span>`:'<span class="op-ok">в норме</span>';
 }
-function _opStuck(o,S,P,w,D){
+// главная причина заказа: week.orders[].cause (WP-B, Д-4) или по пунктам заказа и шагу
+function _opCause(o,w,Q,S){
+  let c=w&&w.cause?String(w.cause):'';
+  if(!c){
+    const C=new Set((Q.ord||[]).map(x=>x.code)), s=o.step!=null?S[o.step]:null, wt=(w&&w.waits)||(s&&s.waits!==s.role?s.waits:'')||'';
+    if(o.stepOver||[...C].some(x=>/^s\dOver$/.test(x)||x==='noOrder')) c='our';
+    else if(C.has('prodDev')||wt==='sup') c='sup';
+    else if(wt==='log'||wt==='kam'||wt==='oss') c=wt;
+    else if(C.has('noPlanDates')||C.has('noDl')||o.step==null) c='nodata';
+  }
+  let t=typeof CT_GLOSS==='object'&&CT_GLOSS?CT_GLOSS['cause.'+c]:null;
+  t=typeof t==='string'?t:(t&&(t.decode||t.title||t.text))||_OP_CAUSE[c]||'';
+  return {c,t};
+}
+// буллет «раб. дн. на шаге против нормы» (dataink: значение, черта нормы, красная часть сверх нормы)
+function _opBullet(wd,norm){
+  const mx=Math.max(wd,norm)*1.08||1, pv=x=>Math.max(0,Math.min(100,x/mx*100)).toFixed(1);
+  const ok=Math.min(wd,norm), over=Math.max(0,wd-norm);
+  return `<div class="op-bul" aria-hidden="true"><span class="op-bul-v" style="width:${pv(ok)}%"></span>`
+    +(over?`<span class="op-bul-o" style="left:${pv(norm)}%;width:${pv(over)}%"></span>`:'')
+    +`<span class="op-bul-n" style="left:${pv(norm)}%"></span></div>`;
+}
+function _opStuck(o,S,P,w,D,d){
   const s=o.step!=null?S[o.step]:null, last=P.length?P[P.length-1]:null;
-  if(!o.live) return `<section class="op-card op-stuck" aria-labelledby="opStuckH"><h4 class="op-eye" id="opStuckH">Заказ закрыт</h4>`
-    +`<p class="op-line">${o.delivered?`Доставлен клиенту ${_esc(o.delivered)}${o.delUtd?' (по дате УПД)':''}.`:'Даты доставки клиенту нет.'} Путь по шагам ведётся только у живых заказов.</p></section>`;
-  if(o.step==null) return `<section class="op-card op-stuck is-over" aria-labelledby="opStuckH"><h4 class="op-eye" id="opStuckH">Где застрял</h4>`
+  if(!o.live){
+    const dl=_opIso(o.dl), dv=_opIso(o.delivered), late=dl&&dv&&dv>dl?_opDays(dl,dv):0;
+    return `<section class="op-card op-stuck" aria-labelledby="opStuckH"><h3 class="op-h" id="opStuckH">Заказ закрыт</h3>`
+      +`<p class="op-line">${o.delivered?`Доставлен клиенту ${_esc(o.delivered)}${o.delUtd?' (по дате УПД)':''}${dl?(late?` — <span class="op-bad">позже срока клиента ${_esc(o.dl)} на ${_ctN(late,'день','дня','дней')}</span>`:` — к сроку клиента ${_esc(o.dl)}`):''}.`:'Даты доставки клиенту нет.'}</p>`
+      +`<p class="op-line op-mut">Путь по шагам ведётся только у живых заказов.</p></section>`;
+  }
+  if(o.step==null) return `<section class="op-card op-stuck is-over" aria-labelledby="opStuckH"><h3 class="op-h" id="opStuckH">Где застрял</h3>`
     +`<p class="op-ttl">Стадия «${_esc(o.stageName||'—')}» неизвестна регламенту</p><p class="op-line">Её нет в таблице «стадия Битрикса → шаг регламента», поэтому шаг и срок не определить — сверить стадию заказа в Битриксе.</p></section>`;
-  const wd=o.stepWd!=null?o.stepWd:(last&&last[0]===o.step?last[2]:null), norm=o.stepNorm;
-  const tone=o.stepOver?'is-over':o.stepWaitUtd?'is-wait':(norm!=null&&wd!=null&&!o.stepHyg&&!o.stepClosed)?'is-ok':'';
-  let big;
+  const wd=o.stepWd!=null?o.stepWd:(last&&last[0]===o.step?last[2]:null), norm=o.stepNorm, U=_opWdU();
+  const tone=o.stepOver?'is-over':o.stepWaitUtd?'is-wait':'';
+  // «Где застрял» — шаг дольше нормы, заказ просрочен или производство дольше обычного; иначе «Где сейчас»
+  const stuck=tone==='is-over'||o.late||!!_rzP80(o.id);
+  let big, bar='';
   if(norm!=null&&wd!=null){
-    big=`<b class="op-num">${wd} р.д.</b> <span class="op-of">на шаге при норме ${norm} р.д.</span>`
-      +(o.stepOver?` — <span class="op-bad">дольше нормы на ${wd-norm} р.д.</span>`
+    bar=_opBullet(wd,norm);
+    big=`<b class="op-num">${wd}</b> ${U} на шаге при норме ${norm}`
+      +(o.stepOver?` — <span class="op-bad">дольше нормы на ${wd-norm} ${U}</span>`
         :o.stepWaitUtd?` — <span class="op-warn">ждём УПД от клиента</span>`
-        :wd>norm?` — <span class="op-warn">дольше нормы на ${wd-norm} р.д., но срок не считаем</span>`
-        :` — <span class="op-good">в норме${norm-wd>0?`, запас ${norm-wd} р.д.`:', сегодня последний день'}</span>`);
+        :wd>norm?` — дольше нормы на ${wd-norm} ${U}, но срок не в счёте`
+        :` — в норме${norm-wd>0?`, запас ${norm-wd} ${U}`:', сегодня последний день'}`);
   } else if(wd!=null){
-    big=`<b class="op-num">${wd} р.д.</b> <span class="op-of">на шаге · ${o.stepNormState==='nodata'?`норма ${_esc(o.stepNormDoc||'')} — не меряем: нужных дат в заказе нет`:'нормы у шага нет'}</span>`;
-  } else big=`<span class="op-of">Срок шага не посчитать: ${_esc(_rzRef(o.stepWhy||'нет даты входа в шаг'))}</span>`;
-  const p8=o.live?_rzP80(o.id):null;
-  if(p8) big+=`<span class="op-of op-p80"><br><span class="op-warn">Производство дольше обычного:</span> ${_esc(_rzP80T(p8))}. Нормы у шага нет — это сигнал, не нарушение.</span>`;
+    big=`<b class="op-num">${wd}</b> ${U} на шаге · <span class="op-mut">${o.stepNormState==='nodata'?`норма ${_opT(o.stepNormDoc||'')} — не меряем: нужных дат в заказе нет`:'норму шага регламент не задаёт'}</span>`;
+  } else big=`<span class="op-mut">Срок шага не посчитать: ${_opT(_rzRef(o.stepWhy||'нет даты входа в шаг'))}</span>`;
+  const p8=_rzP80(o.id);
+  const sig=p8?`<p class="op-line"><span class="op-warn">Производство дольше обычного:</span> ${_esc(_rzP80T(p8))}. Нормы у шага нет — это сигнал, не нарушение.</p>`:'';
   const from=o.stepFrom||(last&&last[0]===o.step?last[1]:''), by=o.stepFromBy||(from?'вход в шаг':'');
-  const why=(o.stepHyg||o.stepClosed)&&o.stepWhy?`<p class="op-line op-mut">Срок не считаем: ${_esc(_rzRef(o.stepWhy).replace(/^гигиена карточки:\s*/,'карточка с ошибкой — '))}</p>`:'';
-  const waits=w&&w.waits&&_ORK_ADJ[w.waits]?_ORK_ADJ[w.waits]:(s&&s.waitsName&&s.waits&&s.waits!==s.role?s.waitsName:'');
-  const role=_OD_ROLE[o.stepRole]||(s&&s.roleName)||'';
-  return `<section class="op-card op-stuck ${tone}" aria-labelledby="opStuckH"><h4 class="op-eye" id="opStuckH">${tone==='is-over'?'Где застрял — дольше нормы':tone==='is-wait'?'Ждём клиента — подписанный УПД':'Где сейчас'}</h4>`
-    +`<p class="op-ttl"><span class="op-stepk">Шаг ${o.step} из 13</span> ${_esc(s?s.name:'')}</p>`
-    +`<p class="op-big">${big}</p>`+why
-    +`<dl class="op-kv">`
-    +(from?`<div><dt>Считаем с</dt><dd>${_esc(_orkD(from))}${by?` — ${_esc(_OP_BY[by]||by)}`:''}${norm!=null?' · паузы не вычитаем':''}</dd></div>`:'')
-    +`<div><dt>Кто отвечает</dt><dd>${o.stepWho&&o.stepWho!=='не назначен'?`<b>${_orkWho(o.stepWho)}</b>${role?` · ${_esc(role)}`:''}`:`<span class="op-warn">не назначен</span>${role?` · ${_esc(role)} — назначить`:''}`}</dd></div>`
-    +(waits?`<div><dt>От кого зависит</dt><dd>${_esc(waits)}</dd></div>`:'')
-    +(w&&w.mgr&&w.mgr!==o.stepWho&&w.mgr!=='не назначен'&&w.mgr!=='ответственный вне ОРК'?`<div><dt>Менеджер ОРК</dt><dd>${_orkWho(w.mgr)}</dd></div>`:'')
-    +`</dl></section>`;
+  const why=(o.stepHyg||o.stepClosed)&&o.stepWhy?`<p class="op-line op-mut">Срок не в счёте: ${_opT(_rzRef(o.stepWhy).replace(/^гигиена карточки:\s*/,'карточка с ошибкой — '))}</p>`:'';
+  const wt=w&&w.waits&&_OP_WAIT[w.waits]?_OP_WAIT[w.waits]:(s&&s.waits&&s.waits!==s.role&&_OP_WAIT[s.waits]?_OP_WAIT[s.waits]:'');
+  const role=o.stepRole||(s&&s.role)||'';
+  const kam=d&&d.kam&&d.kam!=='—'&&role!=='kam'?String(d.kam):'';
+  const mgr=w&&w.mgr&&w.mgr!==o.stepWho&&w.mgr!=='не назначен'&&w.mgr!=='ответственный вне ОРК'&&role!=='orkMgr'?w.mgr:'';
+  return `<section class="op-card op-stuck ${tone}" aria-labelledby="opStuckH"><h3 class="op-h" id="opStuckH">${tone==='is-wait'?'Ждём клиента: подписанный УПД':stuck?'Где застрял':'Где сейчас'}</h3>`
+    +`<p class="op-ttl"><span class="op-stepk">Шаг ${o.step} из 13</span> · ${_opT(s?s.name:'')}</p>`
+    +`<p class="op-big">${big}</p>${bar}`+why+sig
+    +(from?`<p class="op-meta">с ${_esc(_orkD(from))} · ${_esc(_OP_BY[by]||by)}${norm!=null?' · паузы не вычтены':''}</p>`:'')
+    +`<p class="op-who">Делает: ${_opWho(o.stepWho,role)}${mgr?` · ${_opWho(mgr,'orkMgr')}`:''}${kam?` · <span class="op-mut">в курсе:</span> ${_opWho(kam,'kam')}`:''}</p>`
+    +(wt?`<p class="op-who">Ждём: ${_opT(wt)}</p>`:'')
+    +`</section>`;
+}
+// пункт очереди: действие, почему, кто делает, кто в курсе (роль один раз)
+function _opItem(x,lvl,S){
+  const LB=_rzLB(Object.assign({},(((_opData().C||{}).life)||{}).labels||{},(_dcData()||{}).labels||{}));
+  const what=_orkCap(_RZ_PLAIN[x.code]&&LB[x.code]?LB[x.code]:(x.what||''));
+  const norm=x.step!=null&&S[x.step]?_opNormOf(S[x.step]):null, days=x.days!=null?_opDayTxt(x.code,x.days,norm):'';
+  const cr=x.escalateTo?_opCopyRole(x):'';
+  return `<li class="op-todo-i">`
+    +`<p class="op-act">${_opMine(x)}${_opT(_orkCap(_rzRef(x.act||'')))}</p>`
+    +`<p class="op-why"><span class="op-mut">Почему:</span> ${_opT(what.charAt(0).toLowerCase()+what.slice(1))}${days?` · ${x.code==='late'?`<span class="op-bad">${days}</span>`:days}`:''}${lvl?' · <span class="op-tag">по сделке целиком</span>':''}</p>`
+    +`<p class="op-who">Делает: ${_opWho(x.who,x.role||'')}${x.escalateTo?` · <span class="op-mut">в курсе:</span> ${_opWho(x.escalateTo,cr)}`:''}</p></li>`;
 }
 function _opTodo(o,Q,S){
-  const LB=_rzLB(Object.assign({},(((_opData().C||{}).life)||{}).labels||{},(_dcData()||{}).labels||{}));
-  const one=(x,lvl)=>`<li class="op-todo-i"><p class="op-what">${_esc(_orkCap(_RZ_PLAIN[x.code]&&LB[x.code]?LB[x.code]:(x.what||'')))}${lvl?' <span class="op-tag">по сделке целиком</span>':''}${x.days!=null?` <span class="op-mut">· ${x.days} ${x.inWd?'р.д.':'дн.'} ${_RZ_DW[x.code]||(x.inWd?'на шаге':'')}</span>`:''}</p>`
-    +`<p class="op-act">→ ${_esc(_rzRef(x.act||''))}</p>`
-    +`<p class="op-who">${x.who&&x.who!=='не назначен'?`<b>${_orkWho(x.who)}</b>`:'<span class="op-warn">не назначен</span>'}${x.roleName?` · ${_esc(x.roleName)}`:''}${x.escalateTo?` <span class="op-mut">· в копии ${_orkWho(x.escalateTo)}${x.copyRole&&_OD_ROLE[x.copyRole]&&!String(x.escalateTo).includes('('+_OD_ROLE[x.copyRole]+')')&&!/\([^)]*\)\s*$/.test(String(x.escalateTo))?' ('+_esc(_OD_ROLE[x.copyRole])+')':''}</span>`:''}</p></li>`;
+  const N=Q.ord.length+Q.deal.length;
   let h='';
-  if(Q.ord.length||Q.deal.length) h=`<ol class="op-todo">${Q.ord.map(x=>one(x,0)).join('')}${Q.deal.map(x=>one(x,1)).join('')}</ol>`;
+  if(N) h=`<ol class="op-todo">${Q.ord.map(x=>_opItem(x,0,S)).join('')}${Q.deal.map(x=>_opItem(x,1,S)).join('')}</ol>`;
   else if(o.live&&_rzP80(o.id)){const p8=_rzP80(o.id);
-    h=`<ol class="op-todo"><li class="op-todo-i"><p class="op-what">Производство дольше обычного <span class="op-mut">· ${p8.days} дн. при обычных до ${p8.p80} дн.</span></p><p class="op-act">→ запросить у поставщика статус и новую дату готовности</p>`
-      +`<p class="op-who">${o.stepWho&&o.stepWho!=='не назначен'?`<b>${_orkWho(o.stepWho)}</b> · менеджер ОРК`:'<span class="op-warn">не назначен</span> · менеджер ОРК'}</p></li></ol>`;}
-  else if(o.live&&o.step!=null) h=`<p class="op-line">Отклонений нет. По регламенту на шаге ${o.step}: <b>${_esc(_OP_DO[o.step]||'')}</b>${o.stepWho?` — ${_orkWho(o.stepWho)}`:''}.</p>`;
+    h=`<ol class="op-todo"><li class="op-todo-i"><p class="op-act">Запросить у поставщика статус и новую дату готовности</p>`
+      +`<p class="op-why"><span class="op-mut">Почему:</span> производство дольше обычного · ${p8.days} дн. при обычных до ${p8.p80} дн.</p>`
+      +`<p class="op-who">Делает: ${_opWho(o.stepWho,'orkMgr')}</p></li></ol>`;}
+  else if(o.live&&o.step!=null) h=`<p class="op-line">Отклонений нет. По регламенту на шаге ${o.step}: <b>${_opT(_OP_DO[o.step]||'')}</b>${o.stepWho&&o.stepWho!=='не назначен'?` — ${_orkWho(o.stepWho)}`:''}.</p>`;
   else h=`<p class="op-line op-mut">Отклонений в очереди дел нет.</p>`;
-  return `<section class="op-card" aria-labelledby="opTodoH"><h4 id="opTodoH">Что сделать${Q.ord.length+Q.deal.length?` <span class="op-cnt">${Q.ord.length+Q.deal.length}</span>`:''}</h4>${h}</section>`;
+  return `<section class="op-card" aria-labelledby="opTodoH"><h3 class="op-h" id="opTodoH">Что сделать${N?` — ${N}`:''}</h3>${h}</section>`;
 }
-function _opPath(o,S,P,w,D){
+// из чего сложен прогноз (o.fcp — lifecycle.forecast_parts): опора + опоздание поставщика + транзит +
+// последняя миля = дата; те же слова, что lifecycle.fc_why у пункта очереди
+function _opFcParts(o){
+  const fp=o.fcp; if(!fp) return '';
+  const parts=[];
+  if(fp.baseKind==='prodEnd'&&fp.supSlip) parts.push(`бюджетный конец производства ${_esc(_opDd(o.prodEnd))}`,`обычное опоздание этого поставщика ${fp.supSlip} дн.`);
+  else if(fp.baseKind==='created') parts.push(`создан ${_esc(_opDd(o.created))}`,`обычно до отгрузки ${fp.toShip||0} дн.`);
+  else parts.push(`${{inbFact:'на складе с',shipFact:'отгружено',shipPlan:'плановая отгрузка',prodEnd:'бюджетный конец производства'}[fp.baseKind]||''} ${_esc(_orkD(fp.baseRaw))}`);
+  if(fp.pushed) parts.push(`прошла — считаем от ${_esc(_orkD(fp.base))}`);
+  if(fp.transit!=null) parts.push(`транзит ${fp.transit} дн.`);
+  if(fp.lastMile!=null) parts.push(`последняя миля ${fp.lastMile} дн.`);
+  return parts.map((p,i)=>i?`<span class="op-plus">+</span> ${p}`:p).join(' ');
+}
+// «Что сказать клиенту» (О8, Д-1а): реальная дата и из чего она (lifecycle.forecast_parts — та же
+// дата, что у очереди и списка), причина, что делаем и кто, следующая проверка. Дата без опоры
+// заказа (одни медианы, прошедший план, давно на складе) — «не называть клиенту» и почему
+function _opTell(o,d,w,Q,D,S){
   if(!o.live) return '';
-  if(!P.length) return `<section class="op-card" aria-labelledby="opPathH"><h4 id="opPathH">Путь по шагам</h4><p class="op-line op-mut">Нет данных: истории стадий заказа в сборке нет.</p></section>`;
+  const dl=_opIso(o.dl), asOf=D.asOf, fp=o.fcp||null, ob=`${_OP_BX}type/172/details/${encodeURIComponent(o.id)}/`;
+  const L=[];
+  const row=(k,v)=>L.push(`<div><dt>${k}</dt><dd>${v}</dd></div>`);
+  let head;
+  if(o.delivered){
+    head=`<p class="op-say">Доставлено клиенту ${_esc(o.delivered)}${o.delUtd?' (по дате УПД)':''}.</p>`;
+    if(!o.utdD) row('Сказать',`груз у клиента; ждём подписанный ${_opAb('УПД')} — без него закрыть заказ нельзя`);
+  } else if(!fp){
+    head=`<p class="op-say"><span class="op-warn">Дату не называть клиенту</span>: прогноза нет — не из чего считать (нет плановых дат производства и отгрузки, нет истории звеньев).</p>`;
+  } else {
+    const solid=fp.solid&&!fp.pushed&&!fp.clamped, fc=fp.date;
+    const vs=dl?(fc>dl?` — <span class="op-warn">позже срока клиента ${_esc(_orkD(dl))} на ${_ctN(_opDays(dl,fc),'день','дня','дней')}</span>`
+      :` — к сроку клиента ${_esc(_orkD(dl))}${_opDays(fc,dl)>0?`, запас ${_ctN(_opDays(fc,dl),'день','дня','дней')}`:''}`):' — срока клиента в заказе нет';
+    if(solid) head=`<p class="op-say">Реальная дата <b class="op-sayd">≈ ${_esc(_orkD(fc))}</b>${vs}.</p>`;
+    else {
+      const why=fp.baseKind==='created'?'дата из одних медиан: в заказе нет плановых дат производства и отгрузки'
+        :fp.clamped?`груз ${fp.baseKind==='inbFact'?'на складе':'отгружен'} с ${_esc(_orkD(fp.baseRaw))}, а доставки нет — уточнить у логистики`
+        :`${fp.baseKind==='shipPlan'?'плановая отгрузка':'бюджетный конец производства'} ${_esc(_orkD(fp.baseRaw))} прошёл, новой даты от поставщика нет`;
+      head=`<p class="op-say"><span class="op-warn">Дату не называть клиенту</span>: ${why}. По расчёту — не раньше ${_esc(_orkD(fc))}${vs}.</p>`;
+    }
+    row('Из чего',_opFcParts(o)+`<span class="op-mut"> · транзит и миля — медианы по доставленным за год</span>`);
+  }
+  const C=_opCause(o,w,Q,S), s=o.step!=null?S[o.step]:null;
+  if(C.t){
+    const det=C.c==='our'&&s?`шаг ${o.step} «${_opT(s.name)}» дольше нормы`:C.c==='sup'&&(Q.ord||[]).some(x=>x.code==='prodDev')?'производство не готово к плановому концу'
+      :_opT(C.t)+(s&&C.c!=='nodata'?` <span class="op-mut">· шаг ${o.step} «${_opT(s.name)}»</span>`:'');
+    row('Причина',det+(w&&w.cause2&&_OP_CAUSE[w.cause2]?` <span class="op-mut">· ещё: ${_opT(_OP_CAUSE[w.cause2])}</span>`:''));
+  }
+  const f=(Q.ord||[])[0]||(Q.deal||[])[0];
+  if(f) row('Делаем',`${_opT(_rzRef(f.act||''))} — ${_opWho(f.who,f.role||'')}`);
+  // следующая проверка — ближайшая контрольная точка производства (ork.checkpoint_dates)
+  const cp=(o.cps||[]).filter(x=>!asOf||x.date>=asOf).sort((a,b)=>a.date<b.date?-1:1)[0];
+  if(cp) row('Следующая проверка',`${_esc(_orkD(cp.date))} — ${cp.kind==='P50'?'середина срока производства: статус у поставщика':'за 14 дней до плановой отгрузки: готовность и документы'}`);
+  if(dl&&(o.late||(fp&&fp.date>dl))) L.push(`<p class="op-hint">Новый срок согласован с клиентом — внести его в заказ: поле «Date of deadline to customer» · <a class="op-ext" href="${ob}" target="_blank" rel="noopener">Заказ в Битриксе ↗</a></p>`);
+  const dlk=L.filter(x=>x.startsWith('<div>')).join(''), tail=L.filter(x=>!x.startsWith('<div>')).join('');
+  return `<section class="op-card op-tell" aria-labelledby="opTellH"><h3 class="op-h" id="opTellH">Что сказать клиенту</h3>${head}`
+    +(dlk?`<dl class="op-kv">${dlk}</dl>`:'')+tail+`</section>`;
+}
+// уровень «Шаг» (У5): вход и выход, срок против нормы, чем кончается, кто, чего ждёт, файлы шага,
+// пункты очереди шага; шаг 1 — чем кончилась приёмка, 7 — план производства и точки, 10 — прогноз
+function _opStep(o,n,S,V,D,Q,w){
+  const s=S[n]||{}, v=V[n]||[], norm=_opNormOf(s), U=_opWdU(), cur=n===o.step, R=[];
+  const row=(k,val)=>R.push(`<div><dt>${k}</dt><dd>${val}</dd></div>`);
+  if(v.length) v.forEach((x,i)=>{
+    const wd=x.cur&&cur&&o.stepWd!=null?o.stepWd:x.wd;
+    const by=x.cur&&cur?(_OP_BY[o.stepFromBy]||o.stepFromBy||'смена стадии'):(n===1&&o.created&&_opIso(o.created)===_opIso(x.from)?'создан заказ':'смена стадии');
+    const out=x.to?`${_esc(_orkD(x.to))}${n===1&&o.asg&&_opIso(o.asg)===_opIso(x.to)?' — назначен менеджер '+_opAb('ОРК'):' — смена стадии'}`:'<b>ещё на шаге</b>';
+    row(v.length>1?`Заход ${i+1}`:'Вход и выход',`${_esc(_orkD(x.from))} — ${_esc(by)} → ${out}`);
+    row(v.length>1?`Срок, заход ${i+1}`:'Срок',wd==null?'<span class="op-mut">не посчитать</span>'
+      :`<b>${wd}</b> ${U}${norm!=null?` при норме ${norm} — `+(_opVerdict(wd,norm)):` · ${s.normState==='nodata'?`норма ${_opT(s.normDoc||'')} — не меряем: дат нет`:'норму регламент не задаёт'}`}`);
+  });
+  else row('Заходов не было',_esc(n<(o.step||14)?(n===2||n===3?'по сделке целиком — договор с заказчиком ведёт КАМ':'стадия перепрыгнула шаг или история стадий начинается позже'):'шаг впереди'));
+  if(n===1&&v.length&&v[0].to) row('Чем кончилась приёмка',o.asg&&_opIso(o.asg)===_opIso(v[0].to)?`назначением менеджера ${_opAb('ОРК')} ${_esc(_opDd(o.asg))}`:'сменой стадии заказа');
+  row('Кончается, когда',_opT(_OP_END[n]||''));
+  row('Делает',cur?_opWho(o.stepWho,o.stepRole||s.role):`по регламенту — ${_opT(s.roleName||_OD_ROLE[s.role]||'')}`);
+  const wt=cur&&w&&w.waits?w.waits:(s.waits&&s.waits!==s.role?s.waits:'');
+  if(wt&&_OP_WAIT[wt]) row('Ждём',_opT(_OP_WAIT[wt]));
+  if(n===7){
+    const ps=_opIso(o.prodStart), pe=_opIso(o.prodEnd);
+    row('План производства',ps||pe?`${ps?_esc(_orkD(ps)):'начало не задано'} — ${pe?_esc(_orkD(pe)):'конец не задан'}`
+      :`<span class="op-miss">нет в Битриксе: «${_OP_FIELD.prod}», вносит ${_opAb('ОСС')}</span>`);
+    if((o.cps||[]).length) row('Контрольные точки',(o.cps||[]).map(c=>`${_esc(_orkD(c.date))} — ${c.kind==='P50'?'середина срока: статус у поставщика':'за 14 дней до отгрузки: готовность и документы'}`).join('<br>'));
+    const p8=_rzP80(o.id); if(p8&&cur) row('Сигнал',`<span class="op-warn">дольше обычного</span>: ${_esc(_rzP80T(p8))}`);
+  }
+  if(n===10&&o.fcp) row('Прогноз доставки',`${_esc(_orkD(o.fcp.date))} — ${_opFcParts(o)}`);
+  // файлы шага: o.art — строка по знаку на файл в порядке каталога artCat («y» / «n» / «-»)
+  const A=(D.art||[]).map((a,i)=>[a,i]).filter(([a])=>a.step===n);
+  if(A.length&&typeof o.art==='string') row('Файлы шага',`<ul class="op-files">${A.map(([a,i])=>{const st=o.art.charAt(i);
+    return `<li>${_esc(_orkCap(a.name))} — ${st==='y'?'есть':st==='n'?`<span class="op-bad">нет</span> <span class="op-mut">· обязателен, заказ прошёл шаг</span>`:'<span class="op-mut">не требуется</span>'}</li>`;}).join('')}</ul>`);
+  const QS=(Q.ord||[]).filter(x=>x.step===n);
+  if(QS.length) row('Пункты очереди',QS.map(x=>`${_opT(_orkCap(_rzRef(x.act||'')))} — ${_opWho(x.who,x.role||'')}`).join('<br>'));
+  return `<div class="op-sx" id="opStep${n}"><dl class="op-kv">${R.join('')}</dl></div>`;
+}
+function _opPath(o,S,P,w,D,Q){
+  if(!o.live) return '';
+  if(!P.length) return `<section class="op-card" aria-labelledby="opPathH"><h3 class="op-h" id="opPathH">Путь по шагам</h3><p class="op-line op-mut">Нет данных: истории стадий заказа в сборке нет.</p></section>`;
   // последняя запись [null, день, р.д.] — стадия вне регламента (ork.path): шаг не выдумываем
   const U=P[P.length-1][0]==null?P[P.length-1]:null, PK=U?P.slice(0,-1):P;
-  const V=_opVisits(P.filter(e=>e[0]!=null)), cur=o.step, first=PK.length?PK[0][0]:14, dd=_orkD;
+  const V=_opVisits(P.filter(e=>e[0]!=null)), cur=o.step, first=PK.length?PK[0][0]:14, U2=_opWdU();
   const known=PK.reduce((m,e)=>Math.max(m,e[0]),0);
   if(U) PK.forEach((e,i)=>{const v=V[e[0]]; if(i===PK.length-1&&v&&v.length){v[v.length-1].to=U[1]; v[v.length-1].cur=false;}});
-  const fc=w&&w.fc?w.fc:'', dl=_opIso(o.dl), asOf=D.asOf;
+  const fc=o.fcp?o.fcp.date:(w&&w.fc?w.fc:''), dl=_opIso(o.dl);
   // плановые даты впереди: конец производства, приход на склад, срок клиента и прогноз
   const plan={};
   const pe=_opIso(o.prodEnd), ib=_opIso(o.inb);
-  if(pe) plan[7]=`конец производства по плану ${dd(pe)}${asOf&&pe<asOf&&cur!=null&&cur<=7?' — <span class="op-bad">план прошёл</span>':''}`;
-  if(ib) plan[9]=`приход на склад по плану ${dd(ib)}`;
-  if(dl||fc) plan[10]=[dl?`срок клиента ${dd(dl)}`:'',fc?`прогноз доставки ${dd(fc)}${dl&&fc>dl?' — <span class="op-bad">позже срока</span>':''}`:''].filter(Boolean).join(' · ');
-  const fact={1:o.created?`создан ${dd(o.created)}`:'',4:o.asg?`назначен менеджер ОРК ${dd(o.asg)}`:'',
-    12:o.delivered?`доставлено клиенту ${_esc(o.delivered)}${o.delUtd?' (по УПД)':''}`:'',13:o.utdD?`УПД подписан ${dd(o.utdD)}`:''};
-  const li=[];
+  if(pe) plan[7]=`конец производства по плану ${_orkD(pe)}${D.asOf&&pe<D.asOf&&cur!=null&&cur<=7?' — <span class="op-bad">план прошёл</span>':''}`;
+  if(ib) plan[9]=`приход на склад по плану ${_orkD(ib)}`;
+  if(dl||fc) plan[10]=[dl?`срок клиента ${_orkD(dl)}`:'',fc?`прогноз ${_orkD(fc)}${dl&&fc>dl?' — <span class="op-warn">позже срока</span>':''}`:''].filter(Boolean).join(' · ');
+  const li=[], fut=[];
   for(let n=1;n<=13;n++){
     const s=S[n]||{}, v=V[n]||[], norm=_opNormOf(s);
     let st, note='';
@@ -7453,113 +7713,204 @@ function _opPath(o,S,P,w,D){
     else if(v.length) st=cur!=null&&n>cur?'is-back':'is-done';
     else if(cur!=null&&n>cur) st='is-next';
     else if(U&&n>known) st='is-next';
-    else if(n===2||n===3) {st='is-deal'; note='по сделке целиком — договор с заказчиком ведёт КАМ';}
-    else if(n<first) {st='is-nohist'; note='раньше начала истории стадий в Битриксе';}
+    else if(n===2||n===3) {st='is-deal'; note='по сделке целиком';}
+    else if(n<first) {st='is-nohist'; note='раньше начала истории';}
     else {st='is-skip'; note='пропущен: стадия перепрыгнула шаг';}
+    const lv=v.length?v[v.length-1]:null, wd=lv?(lv.cur&&n===cur&&o.stepWd!=null?o.stepWd:lv.wd):null;
     const bad=v.some(x=>norm!=null&&x.wd!=null&&x.wd>norm&&!(x.cur&&o.stepOver===false));
-    const visit=x=>{
-      const wd=x.cur&&n===cur&&o.stepWd!=null?o.stepWd:x.wd;
-      return `<li>${dd(x.from)}${x.to?' → '+dd(x.to):' → сейчас'} · <b>${wd==null?'—':wd+' р.д.'}</b>`
-        +(x.cur&&n===cur?(o.stepOver?` · <span class="op-bad">дольше нормы на ${wd-norm} р.д.</span>`:o.stepWaitUtd?' · <span class="op-warn">ждём УПД от клиента</span>':norm!=null&&wd!=null&&wd<=norm?' · <span class="op-good">в норме</span>':'')
-          :(' · '+(_opVerdict(wd,norm)||'<span class="op-mut">нормы нет</span>')))+`</li>`;};
-    const meta=[s.roleName||'',norm!=null?`норма ${norm} р.д.`:s.normState==='nodata'?`норма ${s.normDoc||''} — не меряем: дат нет`:''].filter(Boolean).join(' · ');
-    const extra=[fact[n]&&(v.length||n===cur)?fact[n]:'',(st==='is-next'||st==='is-cur')&&plan[n]?plan[n]:''].filter(Boolean);
-    // шаг без захода (впереди, пропущен, по сделке) — одной строкой: имя · исполнитель · норма · почему
-    const quiet=!v.length&&n!==cur, tail=[meta,note].filter(Boolean).join(' · ');
-    li.push(`<li class="op-s ${st}${quiet?' is-quiet':''}${bad?' has-bad':''}${n===cur&&o.stepWaitUtd?' is-wait':''}${n===cur&&!o.stepOver&&!o.stepWaitUtd&&o.stepNorm!=null&&o.stepWd!=null&&o.stepWd<=o.stepNorm?' is-fine':''}"${n===cur?' aria-current="step"':''}><span class="op-dot" aria-hidden="true">${n}</span><div class="op-sb">`
-      +`<p class="op-sn"><span class="op-vh">Шаг ${n}: </span>${_esc(s.name||'Шаг '+n)}${n===cur?' <span class="op-now">сейчас</span>':st==='is-back'?' <span class="op-tag">заказ возвращался сюда</span>':''}`
-      +(quiet&&tail?`<span class="op-in"> · ${_esc(tail)}</span>`:'')+(quiet&&st==='is-next'?'<span class="op-vh"> — впереди</span>':'')+`</p>`
-      +(!quiet&&meta?`<p class="op-sm">${_esc(meta)}</p>`:'')
-      +(v.length?`<ul class="op-sv">${v.map(visit).join('')}</ul>`:'')
-      +(extra.length?`<p class="op-sx">${extra.join(' · ')}</p>`:'')+`</div></li>`);
+    let meta='';
+    if(lv){
+      meta=`<span class="op-sd">${_orkDm(lv.from)} → ${lv.to?_orkDm(lv.to):'сейчас'}${v.length>1?` · заходов ${v.length}`:''}</span>`
+        +`<span class="op-sw">${wd==null?'—':`<b>${wd}</b> ${U2}`}${norm!=null?` · норма ${norm}`:''}</span>`
+        +`<span class="op-sv">${n===cur?(o.stepOver?`<span class="op-bad">дольше нормы на ${wd-norm}</span>`:o.stepWaitUtd?'<span class="op-warn">ждём УПД</span>':norm!=null&&wd!=null&&wd<=norm?'в норме':'')
+          :(bad?`<span class="op-bad">дольше нормы на ${wd-norm}</span>`:'')}</span>`;
+    } else meta=`<span class="op-sd op-mut">${_esc(note||(plan[n]?'':'впереди'))}</span>`;
+    const extra=(st==='is-next'||st==='is-cur')&&plan[n]?`<span class="op-pl">${plan[n]}</span>`:'';
+    const open=_OP.s===n;
+    const item=`<li class="op-s ${st}${bad?' has-bad':''}${n===cur&&o.stepWaitUtd?' is-wait':''}${open?' is-open':''}"${n===cur?' aria-current="step"':''} data-ops="${n}">`
+      +`<button type="button" class="op-sh" data-opstep="${n}" aria-expanded="${open?'true':'false'}" aria-controls="opStep${n}">`
+      +`<span class="op-dot" aria-hidden="true">${n}</span><span class="op-sn"><span class="op-vh">Шаг ${n}: </span>${_opT(s.name||'Шаг '+n)}${n===cur?' <span class="op-now">сейчас</span>':st==='is-back'?' <span class="op-tag">возвращался</span>':''}</span>`
+      +`<span class="op-sm">${meta}${extra}</span><span class="op-chev" aria-hidden="true">›</span></button>`
+      +(open?_opStep(o,n,S,V,D,Q,w):'')+`</li>`;
+    (st==='is-next'?fut:li).push({n,item});
   }
+  // будущие шаги — одной серой строкой; раскрываются по кнопке (или уже открыт один из них)
+  const fo=_OP.fut||fut.some(x=>x.n===_OP.s);
+  const futRow=fut.length?`<li class="op-fut"><button type="button" class="op-futb" data-opfut="1" aria-expanded="${fo?'true':'false'}">`
+    +`<span>Впереди ${fut.length>1?`шаги ${fut[0].n}–${fut[fut.length-1].n}`:`шаг ${fut[0].n}`}: ${fut.map(x=>_opT((S[x.n]||{}).name||'')).slice(0,3).join(', ')}${fut.length>3?' …':''}</span><span class="op-chev" aria-hidden="true">›</span></button></li>`:'';
   const back=PK.some((e,i)=>i&&e[0]<PK[i-1][0]);
-  return `<section class="op-card" aria-labelledby="opPathH"><h4 id="opPathH">Путь по шагам</h4>`
-    +`<p class="op-sm op-lead">Каждый шаг: кто делает, норма, когда вошёл и вышел, сколько рабочих дней. Пунктир — шаг без захода (впереди, пропущен или по сделке).${back?' Заказ возвращался на прежние шаги — каждый заход отдельной строкой.':''}</p>`
-    +(U?`<p class="op-line op-unk">С ${dd(U[1])} заказ в стадии «${_esc(o.stageName||'—')}» — её нет в регламенте${U[2]!=null?` (<b>${U[2]} р.д.</b>)`:''}. Шаг и норму не определить: сверить стадию заказа в Битриксе. Шаги ниже последнего пройденного — без оценки.</p>`:'')
-    +`<ol class="op-steps">${li.join('')}</ol></section>`;
+  return `<section class="op-card op-path" aria-labelledby="opPathH"><h3 class="op-h" id="opPathH">Путь по шагам</h3>`
+    +`<p class="op-lead">Строка шага раскрывает подробности: вход и выход, срок против нормы, кто делает, файлы шага.${back?' Заказ возвращался на прежние шаги — заходы в подробностях шага.':''}</p>`
+    +(U?`<p class="op-line op-unk">С ${_orkD(U[1])} заказ в стадии «${_esc(o.stageName||'—')}» — её нет в регламенте${U[2]!=null?` (<b>${U[2]}</b> ${U2})`:''}. Шаг и норму не определить: сверить стадию заказа в Битриксе. Шаги ниже последнего пройденного — без оценки.</p>`:'')
+    +`<ol class="op-steps${fo?' fut-on':''}">${li.map(x=>x.item).join('')}${futRow}${fut.map(x=>x.item).join('')}</ol></section>`;
 }
+// «Ключевые даты»: план → факт; пустая плановая — «нет в Битриксе: «поле», вносит ОСС»
 function _opDates(o,w,D){
-  const asOf=D.asOf, dl=_opIso(o.dl), fc=w&&w.fc?w.fc:'';
+  const asOf=D.asOf, dl=_opIso(o.dl), fc=o.fcp?o.fcp.date:(w&&w.fc?w.fc:''), live=o.live&&!o.delivered;
   const rel=d=>{if(!asOf||!d) return ''; const n=_opDays(asOf,d); return n>0?`через ${_ctN(n,'день','дня','дней')}`:n<0?`${-n} дн. назад`:'сегодня';};
-  const row=(k,v,sub,cls)=>`<div><dt>${k}</dt><dd>${v}${sub?`<span class="op-rel${cls?' '+cls:''}">${sub}</span>`:''}</dd></div>`;
-  const R=[row('Создан',o.created?_esc(_orkD(o.created)):'—')];
-  if(o.asg) R.push(row('Назначен менеджер ОРК',_esc(_orkD(o.asg))));
-  if(o.prodEnd) R.push(row('Конец производства, план',_esc(o.prodEnd),o.live&&!o.delivered?rel(_opIso(o.prodEnd)):''));
-  if(o.inb) R.push(row('Приход на склад, план',_esc(o.inb),o.live&&!o.delivered?rel(_opIso(o.inb)):''));
-  R.push(dl?row('Срок клиента',_esc(o.dl),o.late?`просрочен на ${_ctN(o.dlDays,'день','дня','дней')}`:o.live&&!o.delivered&&o.dlDays!=null?rel(dl):'',o.late?'op-bad':'')
-    :row('Срок клиента','<span class="op-mut">не задан</span>'));
-  if(fc&&o.live&&!o.delivered) R.push(row('Прогноз доставки',_esc(_orkD(fc)),dl&&fc>dl?`позже срока на ${_ctN(_opDays(dl,fc),'день','дня','дней')}`:'',dl&&fc>dl?'op-bad':''));
-  if(o.delivered) R.push(row('Доставлено клиенту',_esc(o.delivered),o.delUtd?'по дате УПД':''));
-  if(o.utdD) R.push(row('УПД подписан',_esc(_orkD(o.utdD))));
-  return `<section class="op-card" aria-labelledby="opDatesH"><h4 id="opDatesH">Ключевые даты</h4><dl class="op-kd">${R.join('')}</dl></section>`;
+  const miss=f=>`<span class="op-miss">нет в Битриксе: «${_OP_FIELD[f]}», вносит ${_opAb('ОСС')}</span>`;
+  const pf=(p,f,fk,cls)=>{const a=p?`<span class="op-pv">план ${_esc(_orkD(p))}</span>`:(fk?miss(fk):''), b=f?`<span class="op-fv">факт ${_esc(_orkD(f))}</span>`:'';
+    return a+(b?(a?' <span class="op-ar">→</span> ':'')+b:(p&&live&&asOf&&p<asOf?` <span class="op-ar">→</span> <span class="op-mut">факта нет</span>`:''));};
+  const R=[], row=(k,v,sub,cls)=>R.push(`<div><dt>${k}</dt><dd>${v}${sub?`<span class="op-rel${cls?' '+cls:''}">${sub}</span>`:''}</dd></div>`);
+  row('Срок клиента',dl?_esc(_orkD(dl)):miss('dl'),dl?(o.late?`просрочен на ${_ctN(o.dlDays,'день','дня','дней')}`:live&&o.dlDays!=null?rel(dl):''):'',o.late?'op-bad':'');
+  const ps=_opIso(o.prodStart), pe=_opIso(o.prodEnd);
+  row('Производство',ps||pe?`<span class="op-pv">план ${ps?_esc(_orkDm(ps)):'?'} – ${pe?_esc(_orkD(pe)):'?'}</span>`:miss('prod'),pe&&live&&!o.shipFact&&!o.inbFact?rel(pe):'');
+  row('Отгрузка поставщика',pf(_opIso(o.shipPlan),_opIso(o.shipFact),o.shipFact?'':'shipPlan'));
+  row('Приход на склад',pf(_opIso(o.inb),_opIso(o.inbFact),o.inbFact||o.delivered?'':'inb'));
+  row('Доставка клиенту',pf(_opIso(o.delPlan),_opIso(o.delivered),o.delivered?'':'delPlan'),
+    !o.delivered&&fc&&o.live?`прогноз ≈ ${_orkD(fc)}${dl&&fc>dl?` · позже срока на ${_ctN(_opDays(dl,fc),'день','дня','дней')}`:''}`:o.delUtd?'по дате УПД':'',dl&&fc>dl&&!o.delivered?'op-warn':'');
+  if(o.delivered||o.utdD) row(`${_opAb('УПД')} подписан`,o.utdD?_esc(_orkD(o.utdD)):'<span class="op-mut">нет</span>');
+  if(o.delivered||o.payPlan) row('Оплата клиента',(o.payPlan?`<span class="op-pv">срок ${_esc(_orkD(o.payPlan))}</span>`:miss('payPlan'))+(o.paid?' <span class="op-ar">→</span> <span class="op-fv">платёжка есть</span>':''));
+  row('Заказ создан',o.created?_esc(_opDd(o.created)):'—',o.asg?`менеджер ${_opAb('ОРК')} назначен ${_esc(_opDd(o.asg))}`:'');
+  return `<section class="op-card op-dates" aria-labelledby="opDatesH"><h3 class="op-h" id="opDatesH">Ключевые даты</h3><dl class="op-kd">${R.join('')}</dl></section>`;
 }
 function _opSibs(o,d){
   const L=(d.orders||[]); if(L.length<2) return '';
-  return `<section class="op-card" aria-labelledby="opSibH"><h4 id="opSibH">Заказы сделки <span class="op-cnt">${L.length}</span></h4><div class="op-chips">`
-    +L.map(x=>{const on=String(x.id)===String(o.id);
-      return `<button type="button" class="op-chip${on?' on':''}" data-opk="${_esc(String(x.id))}"${on?' aria-current="true"':''} aria-label="${_esc(`Заказ ${x.lbl||'id '+x.id}: ${x.live?(x.step!=null?'шаг '+x.step:'шаг не определён'):'закрыт'}${x.stepOver?', сверх нормы':''}`)}">`
-        +`<span class="op-id">${_esc(x.lbl||'id '+x.id)}</span><span class="op-cs${x.stepOver||x.late?' op-bad':''}">${x.live?(x.step!=null?'шаг '+x.step:'—'):'закрыт'}</span></button>`;}).join('')
+  return `<section class="op-card" aria-labelledby="opSibH"><h3 class="op-h" id="opSibH">Заказы сделки — ${L.length}</h3><div class="op-chips">`
+    +L.map(x=>{const on=String(x.id)===String(o.id), st=x.live?(x.step!=null?'шаг '+x.step:'шаг не определён'):'закрыт';
+      const bad=x.late?'просрочен':x.stepOver?'дольше нормы':'';
+      return `<button type="button" class="op-chip${on?' on':''}" data-opk="${_esc(String(x.id))}"${on?' aria-current="true"':''} aria-label="${_esc(`Заказ ${x.lbl||'id '+x.id}: ${st}${bad?', '+bad:''}`)}">`
+        +`<span class="op-id">${_esc(x.lbl||'id '+x.id)}</span><span class="op-cs">${st}${bad?` · <span class="op-bad">${bad}</span>`:''}</span></button>`;}).join('')
     +`</div></section>`;
+}
+// список, по которому ходят «‹ ›»: явный opts.list или видимые строки-заказы списка за числом
+function _opListOf(){
+  const M=_OD&&_OD.M; if(!M) return null;
+  const it=(M._shown||M.items||[]).filter(x=>!(typeof _odIsDeal==='function'&&_odIsDeal(x))&&!(x.r&&x.r.missing)&&_opFind(x.k));
+  return it.length?it.map(x=>String(x.k)):null;
+}
+// крошки уровня: подвкладка › список или сделка › заказ; справа — «‹ N из M ›»
+function _opNav(o,d){
+  const tab=document.querySelector('#ctTabs [role="tab"][aria-selected="true"]');
+  const root=(tab&&tab.textContent.trim().split(/\s+·\s+|\n/)[0])||'Реализация';
+  const lt=_OP.back==='list'&&_OD.M?String(_OD.M.title||'Список'):'';
+  const mid=lt?`<li><button type="button" class="op-cr" data-opgo="list"${lt.length>48?` title="${_esc(lt)}"`:''}>${_esc(lt.length>48?lt.slice(0,47)+'…':lt)}</button></li>`
+    :_OP.back==='deal'?`<li><button type="button" class="op-cr" data-opgo="deal">Сделка №<span class="op-no">${_esc(String(d.seq||d.deal))}</span></button></li>`:'';
+  const L=_OP.list, i=L?L.indexOf(String(o.id)):-1;
+  const pager=L&&L.length>1&&i>=0?`<div class="op-pager" role="group" aria-label="Соседний заказ списка">`
+    +`<button type="button" class="op-pg" data-opgo="prev"${i?'':' disabled'} aria-label="Предыдущий заказ списка" aria-keyshortcuts="[">‹</button>`
+    +`<span class="op-pgn">${i+1} из ${L.length}</span>`
+    +`<button type="button" class="op-pg" data-opgo="next"${i<L.length-1?'':' disabled'} aria-label="Следующий заказ списка" aria-keyshortcuts="]">›</button></div>`:'';
+  return `<div class="op-top"><nav class="op-crumbs" aria-label="Путь"><ol>`
+    +`<li><button type="button" class="op-cr" data-opgo="close">${_esc(root)}</button></li>${mid}`
+    +`<li aria-current="page"><span>Заказ <span class="op-no">${_esc(o.lbl||'id '+o.id)}</span></span></li></ol></nav>${pager}</div>`;
 }
 function _opHtml(k){
   const F=_opFind(k); if(!F) return null;
   const {o,d}=F, D=_opData(), S=D.SN, P=Array.isArray(o.path)?o.path:[], w=_opWeek(k), Q=_opQueue(k,d.deal);
   const ob=`${_OP_BX}type/172/details/${encodeURIComponent(o.id)}/`, db=`${_OP_BX}deal/details/${encodeURIComponent(d.deal)}/`;
-  const back=_OP.back==='list'&&_OD.M?`<button type="button" class="op-back" data-opgo="list"${_OD.M.title.length>56?` aria-label="${_esc('К списку: '+_OD.M.title)}"`:''}>← к списку: ${_esc(_OD.M.title.length>56?_OD.M.title.slice(0,55)+'…':_OD.M.title)}</button>`
-    :_OP.back==='deal'?`<button type="button" class="op-back" data-opgo="deal">← к сделке №${_esc(String(d.seq||d.deal))}</button>`:'';
-  return `<div class="op" id="opRoot" data-opk="${_esc(String(o.id))}">`
-    +`<nav class="op-nav" aria-label="Переходы">${back}<span class="op-links"><a class="op-ext" href="${ob}" target="_blank" rel="noopener">Заказ в Битриксе ↗</a><a class="op-ext" href="${db}" target="_blank" rel="noopener">Сделка в Битриксе ↗</a></span></nav>`
-    +`<p class="op-gl">${_esc(_RZ_GLOSS)}.</p>`
-    +`<div class="op-grid"><div class="op-main">${_opStuck(o,S,P,w,D)}${_opTodo(o,Q,S)}${_opPath(o,S,P,w,D)}</div>`
-    +`<div class="op-side">${_opDates(o,w,D)}${_opSibs(o,d)}`
-    +`<button type="button" class="op-cardbtn" data-opgo="card">Карточка сделки №${_esc(String(d.seq||d.deal))} →</button></div></div></div>`;
+  return `<div class="op" id="opRoot" data-opk="${_esc(String(o.id))}">`+_opNav(o,d)
+    +`<div class="op-acts"><a class="op-ext op-ext1" href="${ob}" target="_blank" rel="noopener">Заказ в Битриксе ↗</a>`
+    +`<button type="button" class="op-cardbtn" data-opgo="card">Сделка №<span class="op-no">${_esc(String(d.seq||d.deal))}</span> →</button>`
+    +`<a class="op-ext" href="${db}" target="_blank" rel="noopener">Сделка в Битриксе ↗</a></div>`
+    +`<div class="op-grid"><div class="op-main">${_opStuck(o,S,P,w,D,d)}${_opTodo(o,Q,S)}${_opTell(o,d,w,Q,D,S)}${_opPath(o,S,P,w,D,Q)}</div>`
+    +`<div class="op-side">${_opDates(o,w,D)}${_opSibs(o,d)}</div></div>`
+    +`<p class="op-keys">Esc — назад${_OP.list&&_OP.list.length>1?' · [ ] — соседний заказ':''} · строка шага — подробности</p></div>`;
 }
-// фокус — в дровер: на указанный элемент, иначе на первый интерактивный, иначе на заголовок
+// фокус — в дровер: на указанный элемент, иначе на заголовок панели (h3 #drwName, tabindex=-1)
 function _opFocus(el){
-  const drw=document.getElementById('drw'), body=document.getElementById('drwBody');
-  const t=el||(body&&body.querySelector('button,a[href],[tabindex="0"]'))||document.getElementById('drwName');
-  if(!t) return; if(!t.matches('button,a[href],[tabindex]')) t.setAttribute('tabindex','-1');
+  const drw=document.getElementById('drw'), h=document.getElementById('drwName');
+  const t=el||h; if(!t) return;
+  if(!t.matches('button,a[href],[tabindex]')) t.setAttribute('tabindex','-1');
   try{t.focus({preventScroll:true});}catch(e){t.focus();}
   if(drw&&!drw.contains(document.activeElement)&&document.getElementById('drwX')) document.getElementById('drwX').focus();
+}
+// одна фраза о смене уровня — для экранного диктора (aria-live у дровера)
+function _opSay(t){
+  const drw=document.getElementById('drw'); if(!drw) return;
+  let L=document.getElementById('opLive');
+  if(!L){L=document.createElement('p'); L.id='opLive'; L.className='op-vh'; L.setAttribute('aria-live','polite'); drw.appendChild(L);}
+  L.textContent=t;
+}
+function _opSayOrder(o){
+  const s=_opData().SN[o.step]||{};
+  return `Заказ ${o.lbl||o.id}.`+(o.live&&o.step!=null?` Шаг ${o.step} из 13${o.stepOver&&o.stepWd!=null&&o.stepNorm!=null?`, дольше нормы на ${o.stepWd-o.stepNorm} рабочих дней`:''}.`:o.live?'':' Заказ закрыт.')
+    +(s.name&&o.live?` ${s.name}.`:'');
+}
+// раскрыть / свернуть шаг (У5) на месте: перерисовка тела заказа с тем же положением прокрутки
+function _opStepToggle(n,on){
+  const body=document.getElementById('drwBody'); if(!body||!_OP.k) return;
+  const st=body.scrollTop; _OP.s=on?n:null;
+  if(on&&_OP.k){const F=_opFind(_OP.k); if(F&&F.o.step!=null&&n>F.o.step) _OP.fut=1;}
+  body.innerHTML=_opHtml(_OP.k); body.scrollTop=st;
+  const b=body.querySelector(`button[data-opstep="${n}"]`); if(b) _opFocus(b);
+  _opRoute({o:_OP.k,s:on?n:''},!!on);
+  if(on){const F=_opFind(_OP.k), s=_opData().SN[n]||{}; _opSay(`Шаг ${n}: ${s.name||''}.${F&&F.o.step===n?' Текущий шаг.':''}`);}
+}
+function _opNext(dir){
+  const L=_OP.list, i=L?L.indexOf(String(_OP.k)):-1, j=i+dir;
+  if(!L||i<0||j<0||j>=L.length) return false;
+  _opOpen(L[j],{list:L,idx:j,keep:1,pager:dir}); return true;
 }
 function _opWire(){
   if(_OP.wired) return; _OP.wired=1;
   const body=document.getElementById('drwBody'); if(!body) return;
   body.addEventListener('click',e=>{
     const root=body.querySelector('#opRoot'); if(!root||!root.contains(e.target)) return;
-    const g=e.target.closest('[data-opgo]'), c=e.target.closest('button[data-opk]');
-    if(c){e.preventDefault(); if(!c.classList.contains('on')) _opOpen(c.dataset.opk,{back:_OP.back,dealList:_OP.dealList,keep:1}); return;}
+    if(e.target.closest('a[href]')) return;
+    const g=e.target.closest('[data-opgo]'), c=e.target.closest('button[data-opk]'), sh=e.target.closest('button[data-opstep]'), fb=e.target.closest('button[data-opfut]');
+    if(sh){e.preventDefault(); const n=+sh.dataset.opstep; _opStepToggle(n,_OP.s!==n); return;}
+    if(fb){e.preventDefault(); _OP.fut=!_OP.fut; const st=body.scrollTop; body.innerHTML=_opHtml(_OP.k); body.scrollTop=st; _opFocus(body.querySelector('button[data-opfut]')); return;}
+    if(c){e.preventDefault(); if(!c.classList.contains('on')) _opOpen(c.dataset.opk,{back:_OP.back,dealList:_OP.dealList,keep:1,list:null,from:'sib'}); return;}
     if(!g) return; e.preventDefault();
-    const k=_OP.k, F=_opFind(k), did=F?String(F.d.deal):'';
-    if(g.dataset.opgo==='list'){_OP.k=null; _odShow(); body.scrollTop=_OD.scroll||0;
-      _opFocus(body.querySelector(`tr[data-odk="${CSS&&CSS.escape?CSS.escape(String(k)):k}"]`)||body.querySelector('[data-odf]')); return;}
-    // карточка сделки: из списка — _odCard (у карточки своё «← к списку»), иначе openContract
-    const card=()=>{_OP.k=null; const sc=_OD.scroll;
-      if(_OP.back==='list'||_OP.dealList){_odCard(did); _OD.scroll=sc; body.scrollTop=0; _opFocus(body.querySelector('[data-odback]')); return;}
-      if(typeof openContract==='function'&&(_OP.deal||F)) openContract(_OP.deal||F.d);   // класс rz ставит сама openContract
-      // назад в карточку — на то же место и на ту же кнопку «Путь заказа →» (ревью 30.10.2026)
-      const ret=body._ctRet, esc=v=>CSS&&CSS.escape?CSS.escape(v):v, ob=body.querySelector(`[data-ctop="${esc(String(k))}"]`);
-      if(ret&&ret.k===String(k)) body.scrollTop=ret.top; else if(ob&&ob.scrollIntoView) {body.scrollTop=0; ob.scrollIntoView({block:'center'});} else body.scrollTop=0;
-      _opFocus(ob||null);};
-    if(g.dataset.opgo==='deal'||g.dataset.opgo==='card') card();
+    _opGo(g.dataset.opgo);
   });
+  // клавиши уровня (раньше общего Esc дровера): Esc — на уровень вверх (шаг → заказ → список или
+  // сделка), «[» и «]» — соседний заказ списка
+  window.addEventListener('keydown',e=>{
+    const drw=document.getElementById('drw'), root=document.getElementById('opRoot');
+    if(!drw||!drw.classList.contains('on')||!root||!body.contains(root)||e.altKey||e.ctrlKey||e.metaKey) return;
+    const t=e.target, typing=t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);
+    if(e.key==='Escape'){
+      if(_OP.s!=null){e.preventDefault(); e.stopPropagation(); _opStepToggle(_OP.s,false); return;}
+      if(_OP.back==='list'&&_OD.M||_OP.back==='deal'){e.preventDefault(); e.stopPropagation(); _opGo(_OP.back); return;}
+      return;                                         // уровня выше нет — общий Esc закрывает панель
+    }
+    if(typing) return;
+    if(e.key==='['||e.key===']'){if(_opNext(e.key===']'?1:-1)){e.preventDefault(); e.stopPropagation();}}
+  },true);
 }
-// k — id заказа (ключ строки списка). opts: back — 'list' (строка списка заказов), 'deal' (кнопка
-// «Путь заказа →» карточки сделки), '' (номер заказа в очереди «Недели»); по умолчанию — что сейчас
-// в дровере (список заказов — 'list'); deal — строка сделки, к которой вернуть «← к сделке»;
-// trigger — куда вернуть фокус после закрытия; dealList — карточка сделки открыта из списка
+// переходы уровня: list — к списку за числом, deal/card — к сделке, close — закрыть панель, prev/next
+function _opGo(to){
+  const body=document.getElementById('drwBody'); if(!body) return;
+  const k=_OP.k, F=_opFind(k), did=F?String(F.d.deal):'';
+  if(to==='prev'||to==='next'){_opNext(to==='next'?1:-1); return;}
+  if(to==='close'){_OP.k=null; _OP.s=null; if(typeof _odClose==='function'&&document.getElementById('drw').dataset.od==='1') _odClose(true); else if(typeof closeDrw==='function') closeDrw(); return;}
+  if(to==='list'&&_OD.M){_OP.k=null; _OP.s=null; _odShow(); body.scrollTop=_OD.scroll||0; _opRoute({o:'',s:''},false);
+    _opFocus(body.querySelector(`tr[data-odk="${CSS&&CSS.escape?CSS.escape(String(k)):k}"]`)||body.querySelector('[data-odf]')); return;}
+  if(to!=='deal'&&to!=='card') return;
+  // карточка сделки: из списка — _odCard (у карточки своё «← к списку»), иначе openContract
+  _OP.k=null; _OP.s=null; _opRoute({o:'',s:''},false);
+  if(_OP.back==='list'||_OP.dealList){const sc=_OD.scroll; _odCard(did); _OD.scroll=sc; body.scrollTop=0; _opFocus(body.querySelector('[data-odback]')); return;}
+  if(typeof openContract==='function'&&(_OP.deal||F)) openContract(_OP.deal||F.d);   // класс rz ставит сама openContract
+  // назад в карточку — на то же место и на ту же кнопку «Путь заказа →» (ревью 30.10.2026)
+  const ret=body._ctRet, esc=v=>CSS&&CSS.escape?CSS.escape(v):v, ob=body.querySelector(`[data-ctop="${esc(String(k))}"]`);
+  if(ret&&ret.k===String(k)) body.scrollTop=ret.top; else if(ob&&ob.scrollIntoView) {body.scrollTop=0; ob.scrollIntoView({block:'center'});} else body.scrollTop=0;
+  _opFocus(ob||null);
+}
+// Открыть заказ (контракт 5.3): _opOpen(orderId, {list:[ids], idx, step, from:'list'|'deal'|'month'}).
+// Прежние вызовы тоже: back — 'list' (строка списка заказов), 'deal' (кнопка «Путь заказа →»
+// карточки сделки), '' (номер заказа в очереди «Недели»); по умолчанию — что сейчас в дровере
+// (список заказов — 'list'); deal — строка сделки, к которой вернуть «Сделка №…»; trigger — куда
+// вернуть фокус после закрытия; dealList — карточка сделки открыта из списка; keep — тот же
+// уровень (соседний заказ, заказ той же сделки). list — порядок «‹ ›»; без списка стрелок нет.
+// step — раскрыть шаг (У5, адрес &s=). → true, если заказ найден и показан
 function _opOpen(k,opts){
   opts=opts||{};
   const drw=document.getElementById('drw'), ovl=document.getElementById('ovl'), body=document.getElementById('drwBody');
   if(!drw||!ovl||!body||!_opFind(k)) return false;
   const open=drw.classList.contains('on'), inList=open&&!!body.querySelector('[data-odf]')&&!body.querySelector('#opRoot');
   if(!opts.keep){
-    _OP.back=opts.back!=null?opts.back:(inList?'list':'');
+    const fr=opts.from==='list'?'list':opts.from==='deal'?'deal':opts.from?'':null;
+    _OP.back=opts.back!=null?opts.back:fr!=null?fr:(inList?'list':'');
     _OP.dealList=!!(opts.dealList||(_OP.back==='deal'&&body.querySelector('[data-odback]')));
     _OP.deal=_OP.back==='deal'&&opts.deal?opts.deal:null;          // карточка сделки, из которой пришли (C1)
     if(inList) _OD.scroll=body.scrollTop;
-  }
+    // «‹ ›» — по явному списку или по видимым строкам списка за числом; из сделки — без стрелок
+    _OP.list=Array.isArray(opts.list)?opts.list.map(String):(_OP.back==='list'?_opListOf():null);
+    _OP.fut=0;
+  } else if(opts.list!==undefined) _OP.list=Array.isArray(opts.list)?opts.list.map(String):null;
+  _OP.s=opts.step!=null&&+opts.step>=1&&+opts.step<=13?+opts.step:null;
   // дровер не открыт или открыт не как список — свои aria (dialog) и data-od, чтобы Esc и Tab работали
   if(drw.dataset.od!=='1'){
     _OD.aria=Object.fromEntries(_OD_ARIA.map(a=>[a,drw.getAttribute(a)]));
@@ -7571,8 +7922,10 @@ function _opOpen(k,opts){
   if(typeof _rzDrw==='function') _rzDrw(true);
   const F=_opFind(k), o=F.o, d=F.d;
   _OP.k=String(k);
-  document.getElementById('drwName').textContent=`Заказ ${o.lbl||'id '+o.id}${d.customer&&d.customer!=='—'?' · '+d.customer:''}`;
-  document.getElementById('drwSub').textContent=[`сделка №${d.seq||d.deal}`,o.stageName?`стадия в Битриксе «${o.stageName}»`:'',o.sup&&o.sup!=='—'?'поставщик '+o.sup:''].filter(Boolean).join(' · ');
+  const nm=document.getElementById('drwName');
+  nm.innerHTML=`Заказ <span class="op-no">${_esc(o.lbl||'id '+o.id)}</span>${d.customer&&d.customer!=='—'?' · '+_esc(d.customer):''}`;
+  nm.setAttribute('tabindex','-1');
+  document.getElementById('drwSub').textContent=[`сделка №${d.seq||d.deal}`,o.sup&&o.sup!=='—'?'поставщик '+o.sup:'',o.stageName?`стадия в Битриксе «${o.stageName}»`:''].filter(Boolean).join(' · ');
   body.innerHTML=_opHtml(k);
   ovl.classList.add('on'); drw.classList.add('on'); drw.setAttribute('aria-hidden','false');
   drw.setAttribute('role','dialog'); drw.setAttribute('aria-modal','true'); drw.setAttribute('aria-labelledby','drwName');
@@ -7580,7 +7933,11 @@ function _opOpen(k,opts){
   if(typeof _odWire==='function') _odWire();
   _opWire();
   body.scrollTop=0;
-  _opFocus(opts.keep?body.querySelector('button.op-chip.on'):body.querySelector('[data-opgo="list"],[data-opgo="deal"]'));
+  if(_OP.s!=null){const sx=body.querySelector(`#opStep${_OP.s}`); if(sx&&sx.scrollIntoView) sx.scrollIntoView({block:'center'});}
+  _opFocus(opts.pager?body.querySelector(`button[data-opgo="${opts.pager>0?'next':'prev'}"]:not([disabled])`)||null
+    :opts.keep&&!opts.list?body.querySelector('button.op-chip.on'):_OP.s!=null?body.querySelector(`button[data-opstep="${_OP.s}"]`):null);
+  _opRoute({o:String(o.id),s:_OP.s!=null?_OP.s:''},!opts.keep);
+  _opSay(_opSayOrder(o));
   return true;
 }
 

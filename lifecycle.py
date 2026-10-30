@@ -200,38 +200,130 @@ def speeds(orders: list[dict], today: dt.date) -> tuple[dict, dict]:
     return lead, sup_rel
 
 
-def forecast(o: dict, today: dt.date, med: dict, sup_slip: dict) -> dt.date | None:
-    """Прогноз доставки клиенту живого заказа: от последнего факта (приход на склад,
-    отгрузка) или — не отгружен — от позднейшей из дат: плановая отгрузка, бюджетный
-    конец производства + обычное опоздание ЭТОГО поставщика, сегодня; плюс медианы
-    оставшихся звеньев. None — не из чего считать."""
+# опора прогноза (forecast_parts → baseKind): факт или план самого заказа — дату можно назвать
+# клиенту; «created» — дата создания + медиана «заказ → отгрузка», то есть из одних медиан
+FC_BASE = {
+    "inbFact": "приход на склад (факт)",
+    "shipFact": "отгрузка поставщика (факт)",
+    "shipPlan": "плановая отгрузка поставщика",
+    "prodEnd": "бюджетный конец производства",
+    "created": "дата создания заказа + обычный срок до отгрузки",
+}
+FC_SOLID = ("inbFact", "shipFact", "shipPlan", "prodEnd")
+
+
+def forecast_parts(o: dict, today: dt.date, med: dict, sup_slip: dict) -> dict | None:
+    """Прогноз доставки клиенту живого заказа по частям (правило 16 — храни, почему получилось
+    значение; спецификация R4, Д-1а): от последнего факта (приход на склад, отгрузка) или — не
+    отгружен — от позднейшей из дат: плановая отгрузка, бюджетный конец производства + обычное
+    опоздание ЭТОГО поставщика, сегодня; плюс медианы оставшихся звеньев. None — не из чего
+    считать.
+
+    → {date, base, baseKind, baseRaw, transit, lastMile, supSlip, toShip, pushed, clamped}:
+    base — дата, от которой пошли звенья (после «не раньше сегодня»), baseRaw — сама опора;
+    baseKind — ключ FC_BASE; transit и lastMile — звенья в целых днях, transit + lastMile =
+    прибавленное к base (transit None — звено не нужно: заказ уже на складе); supSlip —
+    обычное опоздание поставщика в днях, прибавленное к концу производства (0 — не
+    прибавлялось или поставщик в срок); toShip — дни «заказ → отгрузка» у опоры «created»; pushed — опора в прошлом, а факта нет: считаем от сегодня;
+    clamped — опора и звенья дали прошедший день, прогноз поднят до сегодня."""
     if not o.get("live") or delivered(o):
         return None
     tr, lm = med.get("transit"), med.get("lastMile")
+    slip = 0
+    to_ship = None
+    pushed = False
     if o.get("inbFact"):
-        base, rest = o["inbFact"], lm
+        base, rest, kind = o["inbFact"], lm, "inbFact"
+        raw, tr_used = base, None
     elif o.get("shipFact"):
-        base, rest = o["shipFact"], (tr + lm if tr is not None and lm is not None else None)
+        base, rest, kind = o["shipFact"], (tr + lm if tr is not None and lm is not None else None), "shipFact"
+        raw, tr_used = base, tr
     else:
         rest = tr + lm if tr is not None and lm is not None else None
         кандидаты = []
         if o.get("shipPlan"):
-            кандидаты.append(o["shipPlan"])
+            кандидаты.append((o["shipPlan"], "shipPlan", 0.0))
         if o.get("prodEnd"):
-            кандидаты.append(o["prodEnd"] + dt.timedelta(
-                days=max(0.0, sup_slip.get(o.get("sup") or "", 0.0) or 0.0)))
+            s = max(0.0, sup_slip.get(o.get("sup") or "", 0.0) or 0.0)
+            кандидаты.append((o["prodEnd"] + dt.timedelta(days=s), "prodEnd", s))
         if not кандидаты and o.get("created") and med.get("toShip") is not None:
-            кандидаты.append(o["created"] + dt.timedelta(days=med["toShip"]))
+            кандидаты.append((o["created"] + dt.timedelta(days=med["toShip"]), "created", 0.0))
         if not кандидаты:
             return None
-        base = max(кандидаты)
+        # позднейшая опора; при равных датах — первая по порядку (как max() по датам)
+        raw, kind, _ = max(кандидаты, key=lambda c: c[0])
+        # в днях, которые реально прибавились к дате (timedelta к date берёт целые сутки)
+        if kind == "prodEnd":
+            slip = (raw - o["prodEnd"]).days
+        elif kind == "created":
+            to_ship = (raw - o["created"]).days
         # не отгружен: путь к клиенту не начнётся раньше сегодняшнего дня — иначе
         # прошедшая плановая отгрузка тянула прогноз назад и сигнал молчал там,
         # где он нужнее всего
-        base = max(base, today)
+        base = max(raw, today)
+        pushed = base > raw
+        tr_used = tr
     if rest is None:
         return None
-    return max(today, base + dt.timedelta(days=round(rest)))
+    end = base + dt.timedelta(days=round(rest))
+    # звенья в целых днях так, чтобы сумма сходилась с прибавленным (round(транзит + миля)):
+    # миля — остаток, иначе «12 + 3» на странице и 16 дней в дате
+    tr_d = round(tr_used) if tr_used is not None else None
+    lm_d = round(rest) - (tr_d or 0)
+    return {"date": max(today, end), "base": base, "baseKind": kind, "baseRaw": raw,
+            "transit": tr_d, "lastMile": lm_d, "supSlip": slip, "toShip": to_ship,
+            "pushed": pushed, "clamped": end < today}
+
+
+def forecast_inputs(measure: list[dict], today: dt.date) -> tuple[dict, dict]:
+    """Мерило прогноза: медианы звеньев (дн.) и обычное опоздание поставщиков (от SUP_MIN
+    отгрузок) по заказам `measure` — то, что build передаёт в forecast. Одна функция у очереди
+    и карточки заказа (contracts), чтобы дата прогноза в них была одна."""
+    lead, sup_rel = speeds(measure, today)
+    med = {k: _median(v) for k, v in lead.items()}
+    sup_slip = {k: _median(v) for k, v in sup_rel.items() if len(v) >= SUP_MIN}
+    return med, sup_slip
+
+
+def forecast(o: dict, today: dt.date, med: dict, sup_slip: dict) -> dt.date | None:
+    """Прогноз доставки клиенту живого заказа — дата из forecast_parts (одно правило, части —
+    там). None — не из чего считать."""
+    p = forecast_parts(o, today, med, sup_slip)
+    return p["date"] if p else None
+
+
+def _dd(d: dt.date | None) -> str:
+    return d.strftime("%d.%m.%Y") if d else ""
+
+
+def fc_why(p: dict | None) -> str:
+    """Из чего сложен прогноз — словами, для пункта очереди и карточки заказа: «плановая
+    отгрузка поставщика 05.11.2026 + транзит 12 дн. + последняя миля 3 дн.». Пусто — прогноза
+    нет."""
+    if not p:
+        return ""
+    kind = p["baseKind"]
+    if kind == "prodEnd" and p.get("supSlip"):
+        head = (f"бюджетный конец производства {_dd(p['baseRaw'] - dt.timedelta(days=p['supSlip']))}"
+                f" + обычное опоздание поставщика {p['supSlip']} дн.")
+    elif kind == "created":
+        head = (f"дата создания заказа {_dd(p['baseRaw'] - dt.timedelta(days=p.get('toShip') or 0))}"
+                f" + обычный срок до отгрузки {p.get('toShip') or 0} дн.")
+    else:
+        head = f"{FC_BASE[kind]} {_dd(p['baseRaw'])}"
+    if p.get("pushed"):
+        head += f" — прошла, считаем от {_dd(p['base'])}"
+    parts = [head]
+    if p.get("transit") is not None:
+        parts.append(f"транзит {p['transit']} дн.")
+    if p.get("lastMile") is not None:
+        parts.append(f"последняя миля {p['lastMile']} дн.")
+    s = " + ".join(parts)
+    if kind not in FC_SOLID:
+        s += " — дата из одних медиан"
+    if p.get("clamped"):
+        s += " — должно было прийти раньше, ставим сегодня"
+    return s
 
 
 # даты заказа, от которых прогноз доставки годится для срока оплаты (pay_eta): без них
@@ -493,8 +585,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         return name.endswith("(уволен)")      # contracts.who подписывает ушедших так
 
     lead, sup_rel = speeds(orders if measure is None else measure, today)
-    med = {k: _median(v) for k, v in lead.items()}
-    sup_slip = {k: _median(v) for k, v in sup_rel.items() if len(v) >= SUP_MIN}
+    med, sup_slip = forecast_inputs(orders if measure is None else measure, today)
     # 75-й процентиль звена за год — только справочное число: «сверх нормы» с 26.10.2026 —
     # по нормам регламента в рабочих днях (over_norm, ork.NORM_WD)
     norm_ship = _p75(lead.get("toShip", []))
@@ -524,7 +615,9 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
             continue
         in_scope.append((o, d))
         p = phase(o, today, warranty_months)
-        fc = forecast(o, today, med, sup_slip)
+        fcp = forecast_parts(o, today, med, sup_slip)
+        fc = fcp["date"] if fcp else None
+        fcw = fc_why(fcp)
         # приёмка — от входа сделки в «Реализацию» (Рег. 3.3): сделка вне воронки — не приёмка
         exc = order_exceptions(o, today, fc, nocal=nocal, in_cat0=d.get("inCat0", True))
         if d.get("closed"):
@@ -559,6 +652,8 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
                           "title": o.get("title") or "", "sup": o.get("sup") or "—",
                           "dl": o["dl"].strftime("%d.%m.%Y") if o.get("dl") else "",
                           "fc": fc.strftime("%d.%m.%Y") if fc else "",
+                          # из чего сложен прогноз (Д-1а): опора и звенья словами
+                          "fcWhy": fcw,
                           # КАМ клиента (поле «КАМ») — в копию: оплата и перенос срока — его разговор с клиентом
                           "kam": _nm(d.get("kam")), "kamId": _nm(d.get("kamId")),
                           # дата доставки взята из подписи УПД (delivered) — пометка «по УПД»

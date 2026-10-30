@@ -817,6 +817,16 @@ def checkpoints(order: dict, week) -> list[dict]:
     P50 — prodStart + ½(prodEnd − prodStart), для всех заказов; P14 — (shipPlan, иначе
     prodEnd) − 14 дн., если производство дольше 30 дн. Заказ уже готов или отгружен
     (шаг ≥ 8 по стадии и фактам) — точек нет: контроль производства пройден."""
+    w = _d(week)
+    mon = w - dt.timedelta(days=w.weekday())
+    sun = mon + dt.timedelta(days=6)
+    return [{"kind": k, "date": d.isoformat()} for k, d in checkpoint_dates(order) if mon <= d <= sun]
+
+
+def checkpoint_dates(order: dict) -> list[tuple[str, dt.date]]:
+    """Все контрольные точки производства заказа — [(P50 | P14, дата)], без окна недели: то же
+    правило, что у checkpoints (одна функция). Карточка заказа берёт из них ближайшую
+    («Следующая проверка»), неделя — попавшие в неделю. Готов или отгружен — точек нет."""
     ps, pe = _d(order.get("prodStart")), _d(order.get("prodEnd"))
     if not ps or not pe or pe < ps:
         return []
@@ -825,14 +835,11 @@ def checkpoints(order: dict, week) -> list[dict]:
     st = step_of(order.get("stage"), order) if order.get("stage") else None
     if st is not None and st >= 8:
         return []
-    w = _d(week)
-    mon = w - dt.timedelta(days=w.weekday())
-    sun = mon + dt.timedelta(days=6)
     pts = [("P50", ps + dt.timedelta(days=int((pe - ps).days * CHECKPOINT["half"])))]
     if (pe - ps).days > CHECKPOINT["long_days"]:
         base = _d(order.get("shipPlan")) or pe
         pts.append(("P14", base - dt.timedelta(days=CHECKPOINT["before_days"])))
-    return [{"kind": k, "date": d.isoformat()} for k, d in pts if mon <= d <= sun]
+    return pts
 
 
 # --- гигиена карточки ----------------------------------------------------------------------

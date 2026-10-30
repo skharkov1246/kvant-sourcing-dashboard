@@ -43,8 +43,10 @@ vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + inp.unpack + '\nfunction _dcDa
   + '\nthis._opHtml=_opHtml; this._OP=_OP; this._opFind=_opFind;', box);
 const out = {};
 for (const d of inp.ct.rows) for (const o of (d.orders || [])) {
-  box._OP.back = '';
+  box._OP.back = ''; box._OP.s = null;
   out[o.id] = box._opHtml(String(o.id));
+  // уровень «Шаг» (У5): раскрыт текущий шаг
+  if (o.live && o.step != null) { box._OP.s = o.step; out['s:' + o.id] = box._opHtml(String(o.id)); box._OP.s = null; }
 }
 box._OP.back = 'deal';
 out.__deal = box._opHtml(String(inp.k0));
@@ -77,7 +79,8 @@ def run():
 
 
 def _text(h: str) -> str:
-    return re.sub(r"<[^>]+>", " ", h)
+    # <abbr> — внутри слова и фразы: снимается без пробела
+    return re.sub(r"<[^>]+>", " ", re.sub(r"</?abbr[^>]*>", "", h))
 
 
 def test_каждый_живой_заказ_путь_из_13_шагов(run):
@@ -99,7 +102,7 @@ def test_каждый_живой_заказ_путь_из_13_шагов(run):
                 continue
             live += 1
             assert h.count('<li class="op-s ') == 13, o["id"]
-            cur = re.findall(r'<li class="op-s ([^"]*)" aria-current="step"><span class="op-dot" aria-hidden="true">(\d+)</span>', h)
+            cur = re.findall(r'<li class="op-s ([^"]*)" aria-current="step" data-ops="\d+"><button [^>]*><span class="op-dot" aria-hidden="true">(\d+)</span>', h)
             if o["step"] is None:
                 assert not cur and "неизвестна регламенту" in h and "сверить стадию заказа в Битриксе" in h
                 continue
@@ -107,15 +110,19 @@ def test_каждый_живой_заказ_путь_из_13_шагов(run):
             assert f"Шаг {o['step']} из 13" in h
             if o["stepWd"] is not None:
                 seg = h[h.index('aria-current="step"'):]
-                seg = seg[:seg.index("</li></ul>")]
-                assert f"<b>{o['stepWd']} р.д.</b>" in seg, o["id"]
-                assert f'<b class="op-num">{o["stepWd"]} р.д.</b>' in h
+                seg = seg[:seg.index("</li>")]
+                assert f"<b>{o['stepWd']}</b> <abbr" in seg, o["id"]
+                assert f'<b class="op-num">{o["stepWd"]}</b> <abbr' in h
             if o["stepOver"]:
                 assert "дольше нормы на" in h and "op-stuck is-over" in h and "Где застрял" in h
-            # пройденные шаги пути — с датами входа
+            # пройденные шаги пути — с датами входа (строка шага — «дд.мм»)
             for st, day, _wd in o["path"][:-1]:
                 y, m, dd = day.split("-")
-                assert f"{dd}.{m}.{y}" in h, (o["id"], st, day)
+                assert f"{dd}.{m}" in h, (o["id"], st, day)
+            # слова раунда R4: «раб. дн.», без «р.д.», «хозяин», «в копии»; роль не повторяется
+            for bad in ("р.д.", "хозяин", "в копии"):
+                assert bad not in t, (o["id"], bad)
+            assert not re.search(r"\((КАМ|ОРК|рук\. ОРК)\)\s*\(", t), o["id"]
     assert live > 10
 
 
@@ -130,7 +137,8 @@ def test_что_сделать_пункты_очереди_заказа(run):
         todo = unq(_text(h[h.index('id="opTodoH"'):h.index('id="opPathH"') if 'id="opPathH"' in h else len(h)]))
         # «Рег. 9.2.5» — словами (шаблон, _rzRef): «п. 9.2.5 регламента ОРК»
         act = re.sub(r"Ан\. §([\d.]*\d)", r"разд. \1 аналитики ОРК", re.sub(r"Рег\. ([\d.]*\d)", r"п. \1 регламента ОРК", x["act"]))
-        assert "→ " + act in todo, (x["order"], x["code"])
+        act = re.sub(r"(^|[^А-Яа-яЁё])р\.\s?д\.", r"\1раб. дн.", act)
+        assert re.sub(r"\s+", " ", act[:1].upper() + act[1:]) in re.sub(r"\s+", " ", todo), (x["order"], x["code"])
     # без пунктов заказа и сделки — действие шага по регламенту
     busy = {str(x["order"]) for x in q}
     busy_d = {str(x["deal"]) for x in allq if not x.get("order")}
@@ -149,6 +157,66 @@ def test_заказы_сделки_и_возврат(run):
     chips = re.findall(r'data-opk="([^"]+)"', h)
     assert set(chips) >= {str(x["id"]) for x in d["orders"]}
     assert h.count('aria-current="true"') == 1
-    assert 'data-opgo="deal">← к сделке №' in out["__deal"]
-    assert 'data-opgo="card">Карточка сделки №' in h
+    assert 'data-opgo="deal">Сделка №' in out["__deal"]
+    assert 'data-opgo="card">Сделка №' in h
     assert out["__none"] is None
+
+
+def _dd(iso: str) -> str:
+    y, m, d = iso.split("-")
+    return f"{d}.{m}.{y}"
+
+
+def test_что_сказать_клиенту_та_же_дата_и_опора(run):
+    """«Что сказать клиенту» (Д-1а): дата — fcp.date карточки (= fc пункта очереди и строки «Недели»,
+    tests/test_rz_wpd.py); опора заказа — «Реальная дата ≈ …» и «Из чего»; дата из одних медиан,
+    прошедший план или давняя опора — «Дату не называть клиенту»."""
+    ct, out = run
+    n_solid = n_not = 0
+    for d in ct["rows"]:
+        for o in d.get("orders") or []:
+            if not o.get("live") or o.get("delivered"):
+                continue
+            t = re.sub(r"\s+", " ", _text(out[str(o["id"])]))
+            assert "Что сказать клиенту" in t
+            fp = o.get("fcp")
+            if not fp:
+                assert "Дату не называть клиенту" in t
+                continue
+            assert _dd(fp["date"]) in t, o["id"]
+            assert "Из чего" in t and "последняя миля" in t
+            if fp["solid"] and not fp["pushed"] and not fp["clamped"]:
+                assert f"Реальная дата ≈ {_dd(fp['date'])}" in t, o["id"]
+                assert "не называть" not in t
+                n_solid += 1
+            else:
+                assert "Дату не называть клиенту" in t, o["id"]
+                if fp["baseKind"] == "created":
+                    assert "дата из одних медиан" in t
+                n_not += 1
+    assert n_solid and n_not
+
+
+def test_шаг_раскрыт_файлы_и_чем_кончается(run):
+    """Уровень «Шаг» (У5): вход и выход, «Кончается, когда», кто делает; файлы шага — по art
+    карточки и каталогу artCat («есть» / «нет» / «не требуется»)."""
+    ct, out = run
+    cat = ct["artCat"]
+    n = 0
+    for d in ct["rows"]:
+        for o in d.get("orders") or []:
+            h = out.get("s:" + str(o["id"]))
+            if not h:
+                continue
+            sx = h[h.index(f'id="opStep{o["step"]}"'):]
+            sx = re.sub(r"\s+", " ", _text(sx[:sx.index("</dl></div>")]))
+            assert "Кончается, когда" in sx and "Делает" in sx, o["id"]
+            for i, a in enumerate(cat):
+                if a["step"] != o["step"]:
+                    continue
+                st = o["art"][i]
+                word = {"y": "есть", "n": "нет", "-": "не требуется"}[st]
+                nm = a["name"][:1].upper() + a["name"][1:]
+                assert re.search(re.escape(nm) + r" — " + word, sx), (o["id"], a["key"], st)
+                n += 1
+    assert n > 5

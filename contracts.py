@@ -164,6 +164,47 @@ BENCH_DAYS = 365
 BENCH_MIN = 5
 
 
+def _order_card(lo: dict, today: dt.date, med: dict, sup_slip: dict) -> dict:
+    """Поля карточки заказа (У4 «Заказ», У5 «Шаг»; спецификация R4, Д-5 и Д-1а) живого заказа —
+    из уже прочитанных полей заказа (life_orders), без новых чтений портала. Ни имён, ни денег.
+
+    - плановые и фактические даты (ISO; пустые не пишутся): отгрузка поставщика план/факт,
+      начало производства, приход на склад факт, доставка клиенту план, срок оплаты клиента;
+      paid — платёжка клиента в заказе есть (файлом — без даты);
+    - art — файлы шагов строкой по одному знаку в порядке ork.ARTIFACTS (каталог — artCat
+      данных вкладки): «y» есть, «n» нет и обязателен (ork.art_required — одно правило с
+      ведомостью и M2), «-» нет и не требуется;
+    - fcp — прогноз доставки по частям (lifecycle.forecast_parts); слова «из чего» складывает
+      страница из частей (у пункта очереди — fcWhy); дата — та же, что у пункта очереди и строки
+      «Недели» (мерило одно — forecast_inputs);
+    - cps — контрольные точки производства (ork.checkpoint_dates): середина срока и «за 14 дней
+      до отгрузки»."""
+    iso = (lambda d: d.isoformat() if d else "")
+    out: dict = {}
+    for k in ("shipPlan", "shipFact", "prodStart", "inbFact", "delPlan", "payPlan"):
+        if lo.get(k):
+            out[k] = iso(lo[k])
+    if lo.get("clientPaid"):
+        out["paid"] = True
+    have = lo.get("art") or {}
+    out["art"] = "".join("y" if have.get(a["key"]) else ("n" if ork.art_required(lo, a) else "-")
+                         for a in ork.ARTIFACTS)
+    p = lifecycle.forecast_parts(lo, today, med, sup_slip)
+    if p:
+        out["fcp"] = {"date": iso(p["date"]), "base": iso(p["base"]), "baseKind": p["baseKind"],
+                      "baseRaw": iso(p["baseRaw"]), "transit": p["transit"], "lastMile": p["lastMile"],
+                      "supSlip": p["supSlip"], "toShip": p["toShip"], "pushed": p["pushed"],
+                      "clamped": p["clamped"], "solid": p["baseKind"] in lifecycle.FC_SOLID}
+    cps = ork.checkpoint_dates(lo)
+    if cps:
+        out["cps"] = [{"kind": k, "date": d.isoformat()} for k, d in cps]
+    return out
+
+
+# каталог файлов шагов для карточки заказа (У5): ключ, имя поля, шаг, с какого шага обязателен
+ART_CAT = [{"key": a["key"], "name": a["name"], "step": a["step"], "need": a["need"]} for a in ork.ARTIFACTS]
+
+
 def _regno(*titles) -> int:
     """Порядковый номер сделки в реализации — число В НАЧАЛЕ названия, за которым идёт точка:
     «871. …» у сделки, «871/1. …» у заказа. 0 — если номера нет."""
@@ -863,6 +904,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         a["prodConf"], a["utd"], a["dl"] = lo["prodConf"], lo["utd"], bool(lo["dl"])
         life_orders.append(lo)
     lo_by_id = {lo["id"]: lo for lo in life_orders}
+    # прогноз доставки по частям для карточки заказа (Д-1а): то же мерило, что у очереди и
+    # «Недели» (lifecycle.build и orkview меряют звенья и опоздание поставщика по всем заказам,
+    # measure = life_orders) — дата в карточке совпадает с датой пункта и строки списка
+    _fc_med, _fc_slip = lifecycle.forecast_inputs(life_orders, today)
     # 6. строки: одна строка = одна сделка воронки реализации (или с заказами)
     rows = []
     n_plan_norate = 0
@@ -1156,6 +1201,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                     _od["asg"] = _asg.isoformat()
                 if lo.get("utdRaw"):
                     _od["utdD"] = lo["utdRaw"].isoformat()
+                _od.update(_order_card(lo, today, _fc_med, _fc_slip))
         # карточка: живые раньше, затем по номеру заказа («900/1», «900/2», «900/10»; владелец
         # 29.10.2026: «сделка одна — заказы разные 1/2/3»), без номера — в конце, по сроку
         ords_det.sort(key=lambda x: (not x["live"], x["ordNo"] is None, x["ordNo"] or 0,
@@ -1849,6 +1895,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         # все сделки вкладки — и основного вида, и отдельных направлений (признак seg):
         # премии, очередь КАМа и письма о новых сделках читают их все
         "rows": rows,
+        # файлы шагов регламента (ork.ARTIFACTS) — подписи к rows[].orders[].art в карточке заказа
+        "artCat": ART_CAT,
         **{k: main_view[k] for k in ("funnel", "head", "kpis", "deadlines")},
         # источник курса (ЦБ РФ на дату КП или курсы Битрикса с плашкой), период дат пересчёта,
         # дата КП и НДС по правилу — счётчиками (_fx_head)
