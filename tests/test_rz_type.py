@@ -80,8 +80,12 @@ def test_rz_drawer_switch():
     # карточка сделки — первая строка openContract
     oc = TPL[TPL.index("function openContract(x){"):]
     assert oc.split("\n")[1].strip() == "if(typeof _rzDrw==='function') _rzDrw(true);"
-    # панели других вкладок снимают класс
-    for fn in ("function openDrw(", "function openDeals(", "function openUncovered(", "function openDir(", "function openPeopleDeals("):
+    # панели «Сорсинга» (запросы сорсера, сделки без запроса, список за числом) — та же шкала
+    # (portal-ui §5б, 30.10.2026); панели прочих вкладок снимают класс
+    for fn in ("function openDrw(", "function openUncovered(", "function _soOpen("):
+        body = TPL[TPL.index(fn):]
+        assert "_rzDrw(true)" in body[:body.index("\n}\n")], fn
+    for fn in ("function openDeals(", "function openDir(", "function openPeopleDeals("):
         body = TPL[TPL.index(fn):]
         head = body[:body.index("\n", body.index("\n") + 1)]
         assert "_rzDrw(false)" in head, fn
