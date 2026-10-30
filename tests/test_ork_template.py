@@ -552,7 +552,11 @@ def test_журнал_отбор_строки_и_пусто(built):
     assert d["n"] == d["k"] == len(s1) > 0 and d["segs"] == ["S1"]
     assert d["overs"] == sorted(d["overs"], reverse=True)
     for r in s1:
-        assert f'data-ct="{r["deal"]}"' in d["html"] and f'>{r["over"]}<span class="ctm-s">дольше нормы</span></td>' in d["html"]
+        # строка — шаг заказа (E52 спецификации «сделка и заказ»): путь заказа (data-jrow), первой
+        # колонкой — заказ, сделка — серым во второй
+        assert f'data-jrow="{r["order"]}"' in d["html"] and f'>{r["over"]}<span class="ctm-s">дольше нормы</span></td>' in d["html"]
+        tr = d["html"].split(f'data-jrow="{r["order"]}"', 1)[1]
+        assert tr.index("Заказ ") < tr.index("сделка №")
         # R4: номер заказа — кнопка пути заказа (У4), «в Битриксе ↗» — рядом
         assert f'data-jop="{r["order"]}"' in d["html"]
     assert d["html"].count("<tr ") == len(s1) and "р.д." not in d["html"]
@@ -567,6 +571,7 @@ def test_журнал_отбор_строки_и_пусто(built):
     # имени руководителя ОРК в справочнике нет — роль один раз, а не «руководитель ОРК руководитель ОРК»
     nh = out["noHead"]
     assert nh.count("руководитель ОРК") == 1 and "имени в справочнике нет" in nh
-    # сделки нет в виде — строка не «кликабельна»: ни drill, ни tabindex, ни data-ct
-    assert 'class="drill"' in out["card"] and 'tabindex="0"' in out["card"]
-    assert "drill" not in out["noCard"] and "tabindex" not in out["noCard"] and "data-ct" not in out["noCard"]
+    # строка шага заказа ведёт в путь заказа и тогда, когда карточки сделки в виде нет; номер сделки —
+    # кнопка карточки (data-jct) только у сделки из вида
+    assert 'class="drill"' in out["card"] and 'tabindex="0"' in out["card"] and "data-jct" in out["card"]
+    assert "data-jrow" in out["noCard"] and "data-jct" not in out["noCard"] and "data-ct" not in out["noCard"]

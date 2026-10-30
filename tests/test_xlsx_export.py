@@ -330,7 +330,8 @@ def test_журнал_шагов_в_excel_как_на_странице(page_run)
     s1_over = [x for x in J if x["seg"] == "S1" and x["measurable"] and (x["over"] or 0) > 0]
     j = out["journal"]
     assert out["jbar"] and j["file"] == "КВАНТ_Реализация_Месяц_Журнал шагов_2026-10-29.xlsx"
-    assert j["head"] == ["Сделка", "Заказ", "Шаг", "Начало", "Конец", "Шёл, раб. дн.", "Норма, раб. дн.",
+    # E52 (спецификация «сделка и заказ»): строка — шаг заказа, первым столбцом — заказ, сделка — вторым
+    assert j["head"] == ["Заказ", "Сделка", "Шаг", "Начало", "Конец", "Шёл, раб. дн.", "Норма, раб. дн.",
                          "Дольше нормы, раб. дн.", "Почему не считаем", "Кто делал", "Месяц"]
     rows = _rows(j["b64"])
     data = rows[1:1 + j["rows"]]
@@ -347,10 +348,11 @@ def test_журнал_шагов_в_excel_как_на_странице(page_run)
 
 def test_журнал_номер_заказа_в_каждой_строке(page_run):
     """Ревью раунда 3: номер заказа — кнопка, её выгрузка пропускала, и строки одной сделки в файле
-    не различались. Столбец «Заказ» — «933/1 · название · поставщик»."""
+    не различались. Столбец «Заказ» (первый) — «933/1 · название · поставщик», «Сделка» — «сделка №933 · заказчик»."""
     out, _r, _m = page_run
     rows = _rows(out["journalAll"]["b64"])[1:1 + out["journalAll"]["rows"]]
-    assert rows and all(re.match(r"(\d+/\d+|id \d+)( · |$)", str(row[1] or "")) for row in rows), rows[:3]
+    assert rows and all(re.match(r"(\d+/\d+|id \d+)( · |$)", str(row[0] or "")) for row in rows), rows[:3]
+    assert all(str(row[1] or "").startswith("сделка №") for row in rows), rows[:3]
 
 
 def test_доли_и_оговорки_одной_ячейкой_не_склеиваются(page_run):
@@ -366,9 +368,10 @@ def test_доли_и_оговорки_одной_ячейкой_не_склеи�
     pv = [row[j] for row in art[1:1 + out["howArt"]["rows"]] if row[j] not in (None, "—")]
     assert pv and all(isinstance(v, int) for v in pv), pv
     q = _rows(out["qRange"]["b64"])
-    k = next(x for x, h in enumerate(q[0]) if str(h).startswith("Заказов в расчёте"))
+    # E49: «В расчёте» — с единицей словами (у звена «вся сделка» — сделки, у прочих — заказы)
+    k = next(x for x, h in enumerate(q[0]) if str(h).startswith("В расчёте"))
     qv = [row[k] for row in q[1:1 + out["qRange"]["rows"]] if row[k] is not None]
-    assert qv and all(isinstance(v, int) or re.fullmatch(r"\d+ \(мало данных\)", str(v)) for v in qv), qv
+    assert qv and all(re.fullmatch(r"\d+ (заказ|заказа|заказов|сделка|сделки|сделок)( \(мало данных\))?", str(v)) for v in qv), qv
     assert not any(re.search(r"\d(мало|меньше)", str(v)) for v in qv + pv + vals)
 
 
