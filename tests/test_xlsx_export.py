@@ -421,8 +421,9 @@ def test_кто_сколько_ведёт_числа_числами(page_run):
 def test_таблица_сделок_как_на_странице(page_run):
     out, r, _m = page_run
     d = out["deals"]
-    assert d["rows"] == d["shown"] > 0 and not d["full"]
-    assert d["head"][0] == "№" and "Продажа, €" in d["head"]
+    # R4: итог по видимым строкам — в tfoot (под автофильтром): строк файла = видимые + строка итога
+    assert d["nData"] == d["shown"] > 0 and d["rows"] == d["shown"] + 1 and not d["full"]
+    assert d["head"][0] == "№" and "Продажа, € тыс." in d["head"]
     first = _rows(d["b64"])[1]
     assert isinstance(first[0], int), "№ сделки — числом"
 

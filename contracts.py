@@ -1494,6 +1494,18 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     orphan_eur = [_o_eur(o) for o in orphan]
     orphan_buy = sum(v for v in orphan_eur if v)
     orphan_norate = sum(1 for v in orphan_eur if v is None)
+    # заказы без сделки — строками (R4, Д-11: число «Заказы без сделки» открывает их список с действием
+    # «привязать к сделке»): id карточки СП-172 (ссылка в Битрикс), номер как у прочих заказов
+    # (ork.order_label), поставщик и стадия — те же поля, что у заказов сделок; закупка — та же
+    # оценка, что в сумме (курса нет — без числа). Порядок — от давних к новым
+    orphan_rows = []
+    for o, v in sorted(zip(orphan, orphan_eur), key=lambda z: (str(z[0].get("createdTime") or ""), str(z[0].get("id")))):
+        _oid = str(o.get("id") or "")
+        orphan_rows.append({"id": _oid, "lbl": ork.order_label(o.get("title"), _oid)[0],
+                            "sup": supl.get(str(o.get("companyId"))) or "",
+                            "stageName": _stage_name(str(o.get("stageId") or "")),
+                            "created": str(o.get("createdTime") or "")[:10],
+                            "buy": _money(v) if v else "", "noRate": v is None})
 
     ork_month: dict[str, dict] = {}         # «Месяц» (отдел и поимённо) — по виду, под правом
 
@@ -1922,7 +1934,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "_orkHead": ork_head,
         # заказов без курса на дату заказа — не в сумме, счётом (поле — только когда есть)
         "orphan": {"n": len(orphan), "buy": _money(orphan_buy),
-                   **({"noRate": orphan_norate} if orphan_norate else {})},
+                   **({"noRate": orphan_norate} if orphan_norate else {}),
+                   # строки за числом n: ids — ключи (len(ids) == n), lbl — номера в том же порядке
+                   "ids": [r["id"] for r in orphan_rows], "lbl": [r["lbl"] for r in orphan_rows],
+                   "rows": orphan_rows},
         "suppliers": {
             "label": f"на {today.strftime('%d.%m.%Y')}",
             "rows": sup_rows,

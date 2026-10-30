@@ -316,7 +316,7 @@ vm.runInContext(inp.esc + '\n' + inp.helpers + '\nconst _stShort=n=>String(n||""
 process.stdout.write(JSON.stringify(out));
 """)
     helpers = "\n".join(_line(p) for p in ("const _orkD=", "const _orkDm=", "const _orkDy=", "const _ctBxOrd=",
-                                           "const _CT_ROLE="))
+                                           "const _CT_ROLE=", "const _ctdNm=", "const _ctdT=", "const _ctdL="))
     rows = [r for r in ct["rows"] if r["deal"] == "6090" or r["seq"] == 933]
     inp = {"esc": _line("const _esc="), "helpers": helpers + "\n" + _fn("_ctStepNm"), "fn": _fn("_ctOrdHtml"),
            "rows": rows, "ork": ct["ork"]}
@@ -337,8 +337,9 @@ process.stdout.write(JSON.stringify(out));
     o933 = [h for h in out[next(r["deal"] for r in rows if r["seq"] == 933)] if ">933/3<" in h]
     # номер шага — всегда со словом: имя шага из ведомости «Недели» (ork.STEPS)
     nm4 = next(s["name"] for s in ct["ork"]["week"]["ledger"] if s["no"] == 4)
-    assert len(o933) == 1 and f"шаг 4 «{nm4}» · 3 р.д. на шаге при норме 2" in o933[0] and "с 14.10 (назначение)" in o933[0]
-    assert "исполнитель шага: " in o933[0]
+    # R4: «раб. дн.» вместо «р.д.» (спецификация 2.7), «Делает:» вместо «исполнитель шага:»
+    assert len(o933) == 1 and f"шаг 4 «{nm4}» · 3 раб. дн. на шаге при норме 2" in o933[0] and "с 14.10 (назначение)" in o933[0]
+    assert "Делает: " in o933[0] and "р.д." not in o933[0]
     assert 'data-ctop="' in out["withPath"] and "Путь заказа →" in out["withPath"]
 
 

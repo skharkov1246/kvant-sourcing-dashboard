@@ -79,7 +79,7 @@ def test_labels_reset_inside_scope():
 def test_rz_drawer_switch():
     assert "function _rzDrw(on){" in TPL
     # карточка сделки — первая строка openContract
-    oc = TPL[TPL.index("function openContract(x){"):]
+    oc = TPL[TPL.index("function openContract(x,opt){"):]
     assert oc.split("\n")[1].strip() == "if(typeof _rzDrw==='function') _rzDrw(true);"
     # панели других вкладок снимают класс
     for fn in ("function openDrw(", "function openDeals(", "function openUncovered(", "function openDir(", "function openPeopleDeals("):
@@ -87,4 +87,4 @@ def test_rz_drawer_switch():
         head = body[:body.index("\n", body.index("\n") + 1)]
         assert "_rzDrw(false)" in head, fn
     # _rzDrw объявлен до openContract (новый регион прямо перед ним)
-    assert TPL.index("function _rzDrw(on){") < TPL.index("function openContract(x){")
+    assert TPL.index("function _rzDrw(on){") < TPL.index("function openContract(x,opt){")
