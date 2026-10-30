@@ -301,6 +301,19 @@ def _with_tabs_opened(path: Path) -> Path:
               "if(N.length)kvFail('Excel, '+w+': таблиц без кнопки выгрузки '+N.length);"
               "if(B.length)kvFail('Excel, '+w+': метка есть, кнопки над таблицей нет у '+B.length)}"
               "catch(e){kvFail('Excel, '+w+': '+e)}}"
+              # «Сорсинг» (30.10.2026, принцип «Реализации»): в «Сегодня» не больше 6 дел; каждое
+              # число вкладки (строки «Сегодня» и «Порядка в карточках», плитки, «Что сделать» у
+              # сорсера) открывает ровно столько строк списка; непустая очередь — непустое «Сегодня»
+              "try{var SOD=document.getElementById('drw'),SOR=function(){return [].slice.call(document.querySelectorAll("
+              "'#drwBody table.solst tbody tr')).filter(function(t){return !t.querySelector('td[colspan]')}).length};"
+              "if(document.querySelectorAll('#soToday tr[data-sq]').length>6)kvFail('Сорсинг: в «Сегодня» больше 6 дел');"
+              "if(typeof SOQ!=='undefined'&&SOQ.items.length&&!document.querySelector('#soToday tr[data-sq]'))"
+              "kvFail('Сорсинг: «Сегодня» пусто при непустой очереди');"
+              "[].slice.call(document.querySelectorAll('#tab-sourcing [data-so]')).forEach(function(b){"
+              "var n=parseInt(b.textContent,10)||parseInt((b.querySelector('.v')||{}).textContent,10);b.click();var r=SOR();"
+              "if(!SOD.classList.contains('on')||r!==n)kvFail('Сорсинг: число '+b.dataset.so+' = '+n+', а в списке строк '+r);"
+              "else if(!/^#sourcing\\//.test(location.hash))kvFail('Сорсинг: у списка '+b.dataset.so+' нет адреса');"
+              "document.getElementById('drwX').click()})}catch(e){kvFail('Сорсинг, «Сегодня» и списки за числом: '+e)}"
               "try{[%s].forEach(function(t){try{window.ensureTab&&window.ensureTab(t)}"
               "catch(e){kvFail('вкладка '+t+': '+e)}})}catch(e){kvFail('ensureTab: '+e)}"
               # «Доход» (kaminc.py) открывается первым разделом «Key-аккаунтов и продуктов»:
