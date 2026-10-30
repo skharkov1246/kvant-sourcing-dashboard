@@ -270,6 +270,12 @@ try{
   var ov=document.getElementById('orkJOver');ov.checked=false;ov.dispatchEvent(new Event('change'));
   var al=document.getElementById('orkJAll');al.checked=true;al.dispatchEvent(new Event('change'));
   snap(tj,'journalAll');
+  // «Как считается» и «Квартал»: ячейки «доля + k из n» и «число + мало данных» (data-xlv, раунд 3)
+  document.querySelector('#tab-contracts [role="tab"][data-sub="how"]').click();
+  snap(document.getElementById('ctmHowMet').nextElementSibling.querySelector('table'),'howMet');
+  snap(document.getElementById('ctmHowArt').nextElementSibling.querySelector('table'),'howArt');
+  document.querySelector('#tab-contracts [role="tab"][data-sub="quarter"]').click();
+  snap(document.querySelector('#tab-contracts table.ctm-rg'),'qRange');
   document.querySelector('#tab-contracts [role="tab"][data-sub="week"]').click();
   snap(document.getElementById('orkPulseB').closest('table'),'people');
   snap(document.getElementById('orkLed').closest('table'),'ledger');
@@ -337,6 +343,33 @@ def test_журнал_шагов_в_excel_как_на_странице(page_run)
     assert rows[-1][0].startswith("Отбор: Приёмка сделки — S1 (шаг 1)") and "только дольше нормы" in rows[-1][0]
     a = out["journalAll"]
     assert a["rows"] == len(J) and len(_rows(a["b64"])) == 1 + len(J) + 2
+
+
+def test_журнал_номер_заказа_в_каждой_строке(page_run):
+    """Ревью раунда 3: номер заказа — кнопка, её выгрузка пропускала, и строки одной сделки в файле
+    не различались. Столбец «Заказ» — «933/1 · название · поставщик»."""
+    out, _r, _m = page_run
+    rows = _rows(out["journalAll"]["b64"])[1:1 + out["journalAll"]["rows"]]
+    assert rows and all(re.match(r"(\d+/\d+|id \d+)( · |$)", str(row[1] or "")) for row in rows), rows[:3]
+
+
+def test_доли_и_оговорки_одной_ячейкой_не_склеиваются(page_run):
+    """Ревью раунда 3: «75 %3 из 4», «10меньше 80 %», «28мало данных» — две величины в одной ячейке
+    уходили склейкой. Теперь — data-xlv: «75 (3 из 4)», число «10», «28 (мало данных)»."""
+    out, _r, _m = page_run
+    met = _rows(out["howMet"]["b64"])
+    i = next(j for j, h in enumerate(met[0]) if str(h).startswith("С датами"))
+    vals = [row[i] for row in met[1:1 + out["howMet"]["rows"]] if row[i] not in (None, "—")]
+    assert vals and all(re.fullmatch(r"\d+ \(\d+ из \d+\)", str(v)) for v in vals), vals
+    art = _rows(out["howArt"]["b64"])
+    j = next(k for k, h in enumerate(art[0]) if "%" in str(h))
+    pv = [row[j] for row in art[1:1 + out["howArt"]["rows"]] if row[j] not in (None, "—")]
+    assert pv and all(isinstance(v, int) for v in pv), pv
+    q = _rows(out["qRange"]["b64"])
+    k = next(x for x, h in enumerate(q[0]) if str(h).startswith("Заказов в расчёте"))
+    qv = [row[k] for row in q[1:1 + out["qRange"]["rows"]] if row[k] is not None]
+    assert qv and all(isinstance(v, int) or re.fullmatch(r"\d+ \(мало данных\)", str(v)) for v in qv), qv
+    assert not any(re.search(r"\d(мало|меньше)", str(v)) for v in qv + pv + vals)
 
 
 def test_кто_сколько_ведёт_все_люди_и_итог(page_run):

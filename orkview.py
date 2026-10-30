@@ -1191,15 +1191,18 @@ CAUSES = ("our", "sup", "log", "kam", "oss", "nodata")
 
 def order_cause(codes, step, over: bool = False) -> tuple[str, str]:
     """(cause, cause2) заказа «Недели»: одна причина на заказ — сумма причин по любому списку
-    равна числу заказов в нём (инвариант Д-4)."""
+    равна числу заказов в нём (инвариант Д-4). Порядок: our (шаг ОРК дольше нормы) → sup → log →
+    kam → oss → nodata; ни одна не подошла — ork (на шаге ОРК, срок в норме)."""
     cs = set(codes or ())
     w = STEP_WAITS.get(step, "") if step is not None else ""
     hit = [c for c, ok in (("our", over or bool(cs & OUR_CODES)),
                            ("sup", "prodDev" in cs or w == "sup"),
                            ("log", w == "log"), ("kam", w == "kam"), ("oss", w == "oss"),
                            ("nodata", step is None or bool(cs & {"noPlanDates", "noDl"}))) if ok]
+    # остаток — заказ на шаге ОРК, срок шага в норме (или шаг без нормы): не «дольше нормы» (ревью
+    # раунда 3: «our» без превышения читался как «наш шаг дольше нормы»)
     if not hit:
-        hit = ["our"]
+        hit = ["ork"]
     return hit[0], (hit[1] if len(hit) > 1 else "")
 
 

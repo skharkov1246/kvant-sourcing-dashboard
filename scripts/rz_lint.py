@@ -47,6 +47,9 @@ FORBIDDEN: list[tuple[str, str, str]] = [
                  r"|noOrder|noDl|noFact|chatDue|chatRisk|chatReply|contractRisk|contractMissing|econGap|waitUtd"
                  r"|stepWaitUtd|orkMgr|orkHead|ork\.\w+|lifecycle\.\w+)\b", "слова, а не имя кода"),
     ("S-код без шага", r"(?<![\w-])S(?:10|[1-9])(?![\w])(?!\s*\(шаг)", "«S3 (шаг 5)»"),
+    # ревью раунда 3: «13 из 2 раб. дн.» читалось как «13 из 2»; «Пункты очереди» — жаргон (rz_decode)
+    ("N из M раб. дн.", r"\d+ из \d+ раб\. дн\.", "«13 раб. дн. при норме 2»"),
+    ("Пункты очереди", r"Пункты очереди", "«Что сделать по этому шагу»"),
 ]
 _FORB = [(n, re.compile(rx), h) for n, rx, h in FORBIDDEN]
 
@@ -185,17 +188,43 @@ def lint_drawer(html: Path, exe: str | None = None) -> dict:
             r["total"] -= len(r["abbrFirst"])
             r["abbrFirst"] = []
             res[name] = r
-        pg.goto(url + "#contracts/week")
-        pg.wait_for_timeout(300)
-        pg.click('#tab-contracts [data-kpi-rank="1"]')
-        one("панель: список")
-        pg.click("#drwBody #odTable [data-odgo]")
-        one("панель: заказ")
+        # каждый список за числом «Недели», «Квартала» и «Месяца» (ревью раунда 3: прежняя выборка — один
+        # список, один заказ, одна сделка — пропускала «Рег.», «13 из 2» и «Пункты очереди»), первый заказ
+        # каждого списка и его текущий шаг (У5); затем сделки «Сделок и денег»
+        SEL = ("#tab-contracts [role=tabpanel]:not([hidden]) :is(button.rzn[data-of],button[data-od])")
+        seen: set = set()
+        for sub in ("week", "quarter", "month"):
+            pg.goto("about:blank")
+            pg.goto(url + "#contracts/" + sub)
+            pg.wait_for_timeout(300)
+            keys = pg.evaluate(f"""[...document.querySelectorAll('{SEL}')].map(b=>(b.dataset.of||b.dataset.od||'')+'|'+(b.dataset.f||''))""")
+            for i, key in enumerate(keys):
+                if key in seen:
+                    continue
+                seen.add(key)
+                pg.evaluate("(()=>{const d=document.getElementById('drw'); if(d&&d.classList.contains('on')) document.getElementById('drwX').click();})()")
+                pg.wait_for_timeout(40)
+                pg.evaluate(f"(i=>{{const b=document.querySelectorAll('{SEL}')[i]; if(b){{b.scrollIntoView({{block:'center'}}); b.click();}}}})", i)
+                pg.wait_for_timeout(120)
+                if not pg.evaluate("document.getElementById('drw').classList.contains('on')"):
+                    continue
+                one(f"{sub}: список {key.split('|')[0]}")
+                if pg.query_selector("#drwBody #odTable [data-odgo]") and len([k for k in res if k.startswith("заказ")]) < 60:
+                    pg.click("#drwBody #odTable [data-odgo]")
+                    one(f"заказ из {key.split('|')[0]}")
+                    st = pg.query_selector('#drwBody li[aria-current="step"] > button[data-opstep]')
+                    if st:
+                        st.click()
+                        one(f"шаг заказа из {key.split('|')[0]}")
         pg.goto("about:blank")
         pg.goto(url + "#contracts/main")
         pg.wait_for_timeout(300)
-        pg.click("#ctBody tr[data-ct] button.ctd-no")
-        one("панель: сделка")
+        n = min(pg.evaluate("document.querySelectorAll('#ctBody tr[data-ct] button.ctd-no').length"), 12)
+        for i in range(n):
+            pg.evaluate("(()=>{const d=document.getElementById('drw'); if(d&&d.classList.contains('on')) document.getElementById('drwX').click();})()")
+            pg.wait_for_timeout(40)
+            pg.evaluate(f"(()=>{{const b=document.querySelectorAll('#ctBody tr[data-ct] button.ctd-no')[{i}]; b.scrollIntoView({{block:'center'}}); b.click();}})()")
+            one(f"сделка {i + 1}")
         b.close()
     return res
 

@@ -250,8 +250,9 @@ def test_пульс_отрисован_и_ушедший_помечен(run):
     assert "(уволен)</th>" not in body and "(уволен) <span" not in body.split("data-od")[0]
     P = r["contracts"]["ork"]["week"]["pulse"]
     assert gone.count('data-od="w:pulse/') == sum(1 for p in P["rows"] if p["n"])
+    # строка «не назначен» открывает и «Без менеджера ОРК» в выводе и счётчике (одно множество, раунд 3)
     week = [f for f in out["main"]["found"] if f["sub"] == "week" and f["id"].startswith("w:pulse/")]
-    assert len(week) == sum(1 for p in P["rows"] if p["n"])
+    assert len({f["id"] for f in week}) == sum(1 for p in P["rows"] if p["n"])
     assert all(f["items"] == P["rows"][int(f["id"].split("/")[1])]["n"] for f in week)
 
 
