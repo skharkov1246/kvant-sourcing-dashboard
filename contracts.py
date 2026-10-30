@@ -476,6 +476,77 @@ def _utd_date(o: dict, today: dt.date) -> dt.date | None:
     return d if d and d <= today else None
 
 
+def _nm_or_empty(v) -> str:
+    return v if v not in (None, "", "—") else ""
+
+
+def _dkey(s: str) -> str:
+    """«дд.мм.гггг» → ключ сравнения гггг-мм-дд."""
+    return s[6:] + s[3:5] + s[:2]
+
+
+# --- сделка сводит свои заказы (спецификация «сделка и заказ поставщика», §1.6) -------------
+# Единица каждого счёта строки сделки — заказ; признак сделки — «хотя бы один её заказ».
+def deal_orders_summary(ords: list[dict]) -> dict:
+    """Заказы сделки (orders[] строки contracts.compute) → поля строки сделки:
+
+    dlNextOpen, dlNextLbl, dlNextOrder — ближайший срок клиента среди живых НЕДОСТАВЛЕННЫХ
+      заказов и номер того заказа (§1.6 п. 3, E33): прошедший срок уже доставленного заказа как
+      срок сделки не показывается. Нет такого заказа — пусто;
+    ordStat — заказов, не считая проваленных: n — всего, delivered — доставлено (факт доставки
+      или подпись УПД), ontime — доставлено не позже своего срока, late — срок сорван: доставлен
+      позже срока или срок прошёл, а заказ не доставлен (признак late заказа). Заказ без срока —
+      ни в ontime, ни в late;
+    ossOrders — ОСС живых заказов с номером заказа (E41): «ОСС заказа 955/2», не склейка;
+    respGoneOrders — живые заказы, ответственный которых уволен (E8)."""
+    open_ = [o for o in ords if o.get("live") and o.get("dl") and not o.get("delivered")]
+    nxt = min(open_, key=lambda o: (_dkey(o["dl"]), o.get("ordNo") is None, o.get("ordNo") or 0), default=None)
+    counted = [o for o in ords if not o.get("lost")]
+    deliv = [o for o in counted if o.get("delivered")]
+    ontime = sum(1 for o in deliv if o.get("dl") and _dkey(o["delivered"]) <= _dkey(o["dl"]))
+    late_deliv = sum(1 for o in deliv if o.get("dl") and _dkey(o["delivered"]) > _dkey(o["dl"]))
+    return {
+        "dlNextOpen": nxt["dl"] if nxt else "", "dlNextLbl": (nxt.get("lbl") or "") if nxt else "",
+        "dlNextOrder": nxt["id"] if nxt else "",
+        "ordStat": {"n": len(counted), "delivered": len(deliv), "ontime": ontime,
+                    "late": late_deliv + sum(1 for o in counted if o.get("late") and not o.get("delivered"))},
+        "ossOrders": [{"order": o["id"], "lbl": o.get("lbl") or "", "who": o["oss"], "gone": bool(o.get("ossGone"))}
+                      for o in ords if o.get("live") and o.get("oss")],
+        "respGoneOrders": [o["id"] for o in ords if o.get("live") and o.get("respGone")],
+    }
+
+
+# единицы счётов сводок вида (спецификация §1.8: каждое число называет единицу словами)
+DEADLINE_UNITS = {"lateDeals": "deal", "lateOrders": "order", "depth": "order", "noDl": "order",
+                  "liveOrders": "order", "prodAfterDl": "order", "lateNoSum": "order"}
+GONE_UNITS = {"deals": "deal", "byManager": "deal", "byOss": "deal", "byResp": "deal",
+              "orders": "order", "late": "deal", "people": "person"}
+PHASE_UNITS = {"n": "deal", "orders": "order", "late": "order", "risk": "order", "over": "order"}
+
+
+def life_bucket_counts(life: dict | None) -> dict | None:
+    """Счёт очереди вида по частям (§2.1) — из lifecycle (bucketCounts), а нет его — по
+    полям bucket и unit пунктов (dealctx.bucket_counts). У пунктов нет bucket — None."""
+    if not life:
+        return None
+    if life.get("bucketCounts") is not None:
+        return life["bucketCounts"]
+    return dealctx.bucket_counts(life.get("queue") or [])
+
+
+def unpaid_orders(queue: list[dict]) -> set[str]:
+    """Заказы с долгом клиента (пункт unpaid очереди lifecycle): пункт заказа — его order;
+    пункт сделки, свёрнутый по заказам (PY-2, unit = deal), — id из ords."""
+    out: set[str] = set()
+    for q in queue or []:
+        if q.get("code") != "unpaid":
+            continue
+        if q.get("order"):
+            out.add(str(q["order"]))
+        out.update(str(x.get("id")) for x in q.get("ords") or [] if x.get("id"))
+    return out
+
+
 def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             people: dict[str, dict] | None = None, service_ids: set[str] | None = None,
             chat_reader: chat_activity.Reader | None = None,
@@ -1161,6 +1232,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "ossGone": who(o.get(OSS_F))[1],
                 # подпись ответственного заказа в строку не идёт: только признак ухода
                 "respGone": o_resp_gone,
+                # менеджер ОРК ЗАКАЗА (спецификация «сделка и заказ», §1.3; решение 26.10.2026, п. 1):
+                # ответственный заказа из отдела ОРК, иначе «Ответственный за реализацию» сделки,
+                # иначе '' («не назначен»). Пункт сделки (dealctx) менеджера ОРК хозяином не берёт:
+                # он перечисляет менеджеров её заказов
+                "orkMgr": _nm_or_empty(lo.get("orkMgr")) or _nm_or_empty(d_people["dealOrk"]),
+                # заказ провален (семантика F): в «доставлено N из M» сделки не входит
+                "lost": _osem(osid) == "F",
                 "prodEnd": pend.strftime("%d.%m.%Y") if pend else "",
                 # план производства заканчивается позже обещания клиенту — план сам себе противоречит
                 "prodAfterDl": bool(pend and dl and pend > dl),
@@ -1265,24 +1343,34 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         _all_done = bool(not closed and ords and all(_osem(o.get("stageId")) == "S" for o in ords))
         # оговорка к «закрыть сделку» (Рег. 15.6, 14.6): та же, что у пункта dealClose очереди
         _close_note = lifecycle.close_note([lo_by_id[str(o.get("id"))] for o in ords]) if paid else ""
+        # шаги живых заказов с номерами (спецификация, §1.6 п. 4): «шаг 12 · 955/2», ниже — «ещё N
+        # заказов на шагах …»; шаг сделки из шага одного заказа без номера не показывается
+        _cell_orders = [{"order": x["id"], "lbl": x["lbl"], "step": x["step"]}
+                        for x in sorted(_live_st, key=lambda x: (x["step"], x["ordNo"] is None, x["ordNo"] or 0))]
         if _cand and (any(x["stepOver"] or x["stepWaitUtd"] for x in _cand) or not paid):
             c = min(_cand, key=lambda x: (not x["stepOver"], not x["stepWaitUtd"], x["step"]))
             step_cell = {"step": c["step"], "role": c["stepRole"], "who": c["stepWho"], "wd": c["stepWd"],
                          "norm": c["stepNorm"], "over": c["stepOver"], "waitUtd": c["stepWaitUtd"],
                          "normDoc": c["stepNormDoc"],
                          "normState": c["stepNormState"], "hyg": c["stepHyg"], "why": c["stepWhy"],
-                         "label": ork.NO_PAUSE, "close": "paid" if paid else "", "closeNote": _close_note}
+                         "label": ork.NO_PAUSE, "close": "paid" if paid else "", "closeNote": _close_note,
+                         # шаг взят у этого заказа: номер — рядом с шагом (E32)
+                         "unit": "order", "order": c["id"], "lbl": c["lbl"], "orders": _cell_orders}
         elif paid or _all_done:
             _o = ork.owner(13, d_people)
             step_cell = {"step": 13, "role": _o["role"], "who": _o["who"], "wd": None, "norm": None,
                          "over": None, "waitUtd": False, "normDoc": "", "normState": "none", "hyg": False, "why": "",
-                         "label": "закрыть сделку", "close": "paid" if paid else "open", "closeNote": _close_note}
+                         "label": "закрыть сделку", "close": "paid" if paid else "open", "closeNote": _close_note,
+                         # шаг 13 — шаг сделки (закрыть сделку), а не заказа
+                         "unit": "deal", "order": "", "lbl": "", "orders": _cell_orders}
         elif not closed and in_cat0 and not ords:
             _h = ork.owner(1, d_people)
             step_cell = {"step": 1, "role": _h["role"], "who": _h["who"], "wd": no_order_wd,
                          "norm": ork.NORM_WD[1], "over": no_orders_slow if no_order_wd is not None else None, "waitUtd": False,
                          "normDoc": ork.NORM_DOC[1][0], "normState": "norm", "hyg": False, "why": "",
-                         "label": ork.NO_PAUSE, "close": "", "closeNote": ""}
+                         "label": ork.NO_PAUSE, "close": "", "closeNote": "",
+                         # приёмка сделки без заказа — шаг сделки
+                         "unit": "deal", "order": "", "lbl": "", "orders": []}
         else:
             step_cell = None
         _dmax = [x for x in (deal_step_max.get(did), d_step) if x is not None]
@@ -1386,6 +1474,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "noDl": no_dl,
             "dlNext": min((o["dl"] for o in ords_det if o["live"] and o["dl"]),
                           key=lambda s: s[6:] + s[3:5] + s[:2], default=""),
+            # ближайший срок НЕДОСТАВЛЕННОГО заказа с его номером, счёт заказов «доставлено N из M,
+            # к сроку K», ОСС заказов и заказы с уволенным ответственным (спецификация §1.6 п. 3,
+            # E33, E41, E8): dlNext выше — прежнее поле (минимум по живым, с доставленными)
+            **deal_orders_summary(ords_det),
             "firstLag": first_lag,
             "timeline": timeline, "orders": ords_det,
             "hasSale": bool(d.get("OPPORTUNITY")),
@@ -1469,6 +1561,14 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     life_sep = (lifecycle.build(sep_orders, sep_rows, today, measure=life_orders, ork_head=ork_head,
                                 cust_contract=cust_contract, ork_head_id=ork_head_uid or "")
                 if sep_rows else None)
+    # деньги долга клиента — доля неоплаченных заказов (спецификация §1.5, E35): оценка по доле
+    # закупки (orders[].revEur), а не сумма всей сделки. Единица unpaidN — заказы
+    _unpaid = unpaid_orders(list((life or {}).get("queue") or []) + list((life_sep or {}).get("queue") or []))
+    for r in rows:
+        _uo = [o for o in r["orders"] if o["id"] in _unpaid]
+        r["unpaidN"] = len(_uo)
+        r["unpaidRev"] = sum(o["revEur"] for o in _uo)
+        r["unpaidRevLbl"] = _money(r["unpaidRev"]) if _uo else ""
 
     # 7. скорость: сводные метрики
     # полный цикл заказа: создание карточки → SUCCESS, по заказам, закрытым за последние
@@ -1716,7 +1816,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "lateNoSum": late_nosum_n, "costTop": cost_top,
             # разрезы просрочки по ответственному и ОСС (byManager, byOss) сняты 27.10.2026:
             # страница их не рисовала — просрочку по людям показывает очередь по исполнителю шага
+            # единица каждого счёта (спецификация §1.8, E37): depth — заказы, хотя блок — о сделках
+            "units": DEADLINE_UNITS,
         }
+        gone["units"] = GONE_UNITS
+        if life_v is not None:
+            # фазы lifecycle: n — сделки, остальное — заказы (E37); числа те же, единица названа
+            life_v["phaseUnits"] = PHASE_UNITS
 
         # аддитивно: все прежние KPI сохранены, новые добавлены следом
         kpis = [
@@ -1838,8 +1944,14 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "name": ", ".join(str(cat_names.get(c) or f"воронка {c}") for c in cats),
             "deals": len(sep_rows), "live": sep_head.get("live", 0),
             "orders": sum(1 for r in sep_rows if not r["closed"] for o in r["orders"] if o["live"]),
-            "late": sep_late, "lateDeals": sep_head.get("lateDeals", 0),
+            # late — пункты «срок клиента сорван» = заказы (у заказа один такой пункт); lateOrders —
+            # то же число под именем своей единицы (E37), late — прежнее имя на один выпуск
+            "late": sep_late, "lateOrders": ((life_sep or {}).get("ordCounts") or {}).get("late", sep_late),
+            "lateDeals": sep_head.get("lateDeals", 0),
+            # queue — пункты очереди направления (прежнее имя на один выпуск); bucketCounts — счёт
+            # по частям очереди в своих единицах (§2.1): шаблон читает его, а не queue
             "queue": len((life_sep or {}).get("queue") or []),
+            "bucketCounts": life_bucket_counts(life_sep),
             "sale": sep_head.get("sale", _money(0)),
             "companies": len({c for c, k in sep_company.items() if k in cats}),
         }

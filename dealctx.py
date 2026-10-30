@@ -194,6 +194,28 @@ EXC = {
                            "без пароля; длинный — частями"),
 }
 
+# Сделка и заказ поставщика (спецификация «сделка и заказ», 30.10.2026, §1.4, §2.2; решения
+# владельца 30.10.2026). Единица пункта (unit) и часть очереди (bucket): exec — «Дела по
+# заказам», deal — «Дела по сделкам», hyg — «Порядок в карточках Битрикса» (вне дневного счёта).
+# Ключ — (код или код:сторона, единица); правило 4 — таблица, а не ветвления
+BUCKET = {
+    ("chatReply", "deal"): "deal", ("chatRisk", "deal"): "deal", ("chatDue", "deal"): "deal",
+    # риск сверки договоров: флаг с заказом — пункт этого заказа (E10), без заказа — сделки
+    ("contractRisk", "order"): "exec", ("contractRisk", "deal"): "deal",
+    # договор заказчика — обязательство перед клиентом (КАМ); договора поставщика без заказа
+    # не привязать к заказу — порядок в карточках сделки
+    ("contractMissing:customer", "deal"): "deal", ("contractMissing:both", "deal"): "deal",
+    ("contractMissing:supplier", "deal"): "hyg", ("contractMissing:supplier", "order"): "exec",
+    ("econGap", "deal"): "hyg", ("contractUnreadable", "deal"): "hyg",
+}
+BUCKETS = ("exec", "deal", "hyg")
+# шаг пункта сделки — шаг стадии сделки только там, где шаг — сделки (Рег.: 1 — приёмка, 2–3 —
+# договор с заказчиком, 13 — закрытие); шаги 4–12 — шаги заказов (§1.6 п. 4): у пункта сделки
+# их нет, заказы — своим списком
+DEAL_STEPS = (1, 2, 3, 13)
+NOT_SET = "не назначен"
+ORDER_UNKNOWN = "заказ не определён"
+
 
 # ── чтение ключа ────────────────────────────────────────────────────────────────
 
@@ -621,34 +643,70 @@ def _person(r: dict, role: str) -> str:
 
 
 def _people(r: dict, ork_head: str) -> dict:
-    """Люди сделки для ork.owner: менеджер ОРК — исполнитель шага живого заказа с ролью
-    «менеджер ОРК» (ответственный заказа из отдела ОРК, иначе поле сделки «Ответственный за
-    реализацию» — contracts.py), иначе поле сделки; руководитель ОРК — по справочнику отделов;
-    КАМ и ОСС — поля сделки."""
-    mgr = next((o.get("stepWho") for o in r.get("orders") or []
-                if o.get("live") and o.get("stepRole") == "orkMgr" and _nm(o.get("stepWho"))
-                and o.get("stepWho") != "не назначен"), "")
-    return {"orkMgr": _nm(mgr), "dealOrk": _nm(r.get("orkResp")), "orkHead": _nm(ork_head),
+    """Люди СДЕЛКИ для ork.owner (спецификация «сделка и заказ», §1.3, E9): руководитель ОРК —
+    по справочнику отделов, КАМ и ОСС сделки — поля сделки. Менеджер ОРК — роль ЗАКАЗА: у
+    пункта сделки его нет (до 30.10.2026 брался исполнитель шага первого попавшегося живого
+    заказа). Пункт заказа берёт менеджера своего заказа (_reg с order)."""
+    return {"orkMgr": "", "dealOrk": "", "orkHead": _nm(ork_head),
             "kam": _nm(r.get("kam")), "ossOrder": "", "ossDeal": _nm(r.get("ossDeal"))}
 
 
+def ord_mgrs(r: dict) -> list[dict]:
+    """Менеджеры ОРК живых заказов сделки: [{who, n}] — n заказов у каждого, «не назначен»
+    отдельной строкой; больше заказов — выше. Менеджер заказа — orders[].orkMgr строки
+    (contracts.compute: ответственный заказа из ОРК, иначе «Ответственный за реализацию»)."""
+    c = Counter(_nm(o.get("orkMgr")) or NOT_SET for o in r.get("orders") or [] if o.get("live"))
+    return [{"who": w, "n": n} for w, n in sorted(c.items(), key=lambda x: (-x[1], x[0] == NOT_SET, x[0]))]
+
+
+def ord_mgrs_text(mg: list[dict]) -> str:
+    """«менеджеры заказов: Пётр (2), не назначен (1)» (спецификация §1.3); заказов нет — ''."""
+    return ("менеджеры заказов: " + ", ".join(f"{m['who']} ({m['n']})" for m in mg)) if mg else ""
+
+
 def _step_now(r: dict) -> int | None:
-    """Шаг сделки: ячейка шага (самый ранний шаг живых заказов), иначе шаг по стадии сделки."""
-    return (r.get("stepCell") or {}).get("step") or r.get("dealStep")
+    """Шаг СДЕЛКИ (спецификация §1.6 п. 4, §4.3): приёмка (1) — сделка в реализации без
+    заказа; иначе шаг стадии сделки, если он — шаг сделки (DEAL_STEPS: 1–3, 13); шаги 4–12 —
+    шаги заказов, у пункта сделки шага нет (None). Шаг одного заказа без номера пункту сделки
+    не ставится (до 30.10.2026 — ячейка шага строки, самый ранний шаг живых заказов)."""
+    if not r.get("closed") and r.get("inCat0", True) and not r.get("norders") and not r.get("orders"):
+        return 1
+    st = r.get("dealStep")
+    return st if st in DEAL_STEPS else None
 
 
-def _reg(code: str, r: dict, ppl: dict, key: str | None = None) -> dict:
+def _reg(code: str, r: dict, ppl: dict, key: str | None = None, order: dict | None = None) -> dict:
     """Хозяин пункта по регламенту (решение владельца 26.10.2026, п. 1; ork.ITEM): шаг, роль,
-    исполнитель, копия."""
+    исполнитель, копия.
+
+    order — пункт ЗАКАЗА (строка orders[] сделки): шаг — шаг этого заказа сейчас, менеджер ОРК
+    и ОСС — этого заказа. Без order — пункт СДЕЛКИ (§1.6 п. 5): хозяин — роль сделки; где
+    регламент даёт пункт менеджеру ОРК (чаты, договор поставщика), хозяин — руководитель ОРК, а
+    менеджеры заказов сделки — в копии списком («менеджеры заказов: …»); шаг — шаг сделки."""
+    if order is not None:
+        pp = {**ppl, "orkMgr": _nm(order.get("orkMgr")), "ossOrder": _nm(order.get("oss"))}
+        ow = ork.item_owner(code, order.get("step"), pp, key=key)
+        return {"step": order.get("step"), "role": ow["role"], "roleName": ork.ROLES.get(ow["role"], ""),
+                "who": ow["who"], "escalateTo": ow["copy"], "copyRole": ow["copyRole"]}
     st = _step_now(r)
-    # «документы» из чата у сделки на шаге 13 (оплата получена, закрыть сделку — ОСС): после
-    # доставки документы — УПД, шаг 12 менеджера ОРК (Рег. 14). ОСС пункт не получает: со
-    # сторонами не говорит (Рег. 1.11), а «подтвердить у второй стороны» — разговор
-    if key == "chatDue:документы" and st == 13:
-        st = 12
     ow = ork.item_owner(code, st, ppl, key=key)
-    return {"step": ow["step"], "role": ow["role"], "roleName": ork.ROLES.get(ow["role"], ""),
-            "who": ow["who"], "escalateTo": ow["copy"], "copyRole": ow["copyRole"]}
+    role, who, copy, copy_role = ow["role"], ow["who"], ow["copy"], ow["copyRole"]
+    mg = ord_mgrs(r)
+    also: dict = {}
+    if role == "orkMgr":
+        # менеджер ОРК — роль заказа: пункт сделки ведёт руководитель ОРК, менеджеры — в копии;
+        # заказов нет — копия по таблице ITEM. Прежняя копия (КАМ) не теряется: alsoCopy
+        head = ork.owner(None, ppl, role="orkHead", esc=None)
+        role, who = "orkHead", head["who"]
+        if mg:
+            if copy_role:
+                also = {"alsoCopy": copy, "alsoCopyRole": copy_role}
+            copy, copy_role = ord_mgrs_text(mg), "orkMgr"
+    elif copy_role == "orkMgr":
+        copy = ord_mgrs_text(mg) or NOT_SET
+    return {"step": st, "role": role, "roleName": ork.ROLES.get(role, ""),
+            "who": who, "escalateTo": copy, "copyRole": copy_role,
+            **({"ordMgrs": mg} if copy_role == "orkMgr" else {}), **also}
 
 
 def _by_person(role: str, who: str, r: dict) -> dict:
@@ -664,22 +722,81 @@ def _resp(r: dict) -> dict:
 
 
 def _item(code: str, r: dict, own: dict, act: str = "", days: int | None = None, what: str = "",
-          conf: float | None = None) -> dict:
-    """Пункт очереди; own — хозяин (_reg, _by_person): шаг, роль, исполнитель и копия."""
+          conf: float | None = None, *, key: str | None = None, order: dict | None = None) -> dict:
+    """Пункт очереди; own — хозяин (_reg, _by_person): шаг, роль, исполнитель и копия.
+
+    order — строка orders[] сделки: пункт ЗАКАЗА (unit = order) с номером, поставщиком и сроком
+    этого заказа; без него — пункт СДЕЛКИ (unit = deal). bucket — часть очереди по таблице
+    BUCKET (ключ — key, иначе код). Поля — по договору полей спецификации, §4.3."""
     sev, what0, act0 = EXC[code]
     what = what or what0
     if code.startswith("chat"):
         # пункт по чату — оценка модели, а не факт: уверенность — в самом пункте
         what += " — оценка модели" + (f", уверенность {round(conf * 100)} %" if conf is not None else "")
     who = own["who"]
+    unit = "order" if order is not None else "deal"
+    o = order or {}
     return {"code": code, "sev": sev, "what": what, "act": act or act0, "days": days,
             **own, "whoGone": _gone(who), "inWd": False,
             **({"signal": SIGNAL} if code in ("chatDue", "chatRisk") else {}),
+            **({"itemKey": key} if key else {}),
+            "unit": unit, "bucket": BUCKET[(key or code, unit)],
             "kam": _nm(r.get("kam")), "kamId": _nm(r.get("kamId")),
             "deal": r["deal"], "seq": r.get("seq") or 0, "customer": r.get("customer") or "—",
-            "order": "", "title": r.get("title") or "", "sup": "", "dl": "", "phase": "",
+            "order": str(o.get("id") or ""), "ordLbl": o.get("lbl") or "", "ordNo": o.get("ordNo"),
+            "title": r.get("title") or "", "sup": (o.get("sup") or "—") if order is not None else "",
+            "dl": o.get("dl") or "", "phase": "",
             # отдельное направление (contracts.ОТДЕЛЬНЫЕ_ВОРОНКИ): пункт — в его очереди
             "seg": r.get("seg")}
+
+
+def _unit_payload(queue: list[dict], prefix: str) -> dict:
+    """{ordCounts, dealCounts, bucketCounts} очереди; prefix «sep» — sepOrdCounts и т. д."""
+    oc, dc = unit_counts(queue)
+    name = (lambda k: prefix + k[0].upper() + k[1:]) if prefix else (lambda k: k)
+    return {name("ordCounts"): oc, name("dealCounts"): dc, name("bucketCounts"): bucket_counts(queue)}
+
+
+def unit_counts(queue: list[dict]) -> tuple[dict, dict]:
+    """(ordCounts, dealCounts): по коду — разных заказов у пунктов заказа и разных сделок у
+    пунктов сделки (спецификация §1.8 п. 4: счёт — число разных объектов своей единицы, а не
+    длина списка). Единица пункта — unit, нет его — заказ, если у пункта есть order."""
+    o: dict[str, set] = {}
+    d: dict[str, set] = {}
+    for q in queue:
+        if (q.get("unit") or ("order" if q.get("order") else "deal")) == "order":
+            o.setdefault(q["code"], set()).add(str(q["order"]))
+        else:
+            d.setdefault(q["code"], set()).add(str(q["deal"]))
+    return {k: len(v) for k, v in o.items()}, {k: len(v) for k, v in d.items()}
+
+
+def bucket_counts(queue: list[dict]) -> dict | None:
+    """Счёт очереди по частям (§2.1, §4.3) в своих единицах: exec — разных заказов, сделок этих
+    заказов и людей-хозяев; deal — разных сделок и людей; hyg — разных заказов (у пунктов заказа)
+    и разных сделок (у пунктов сделки) двумя числами. Пункты без bucket — вне счёта; ни у одного
+    пункта его нет — None (очередь ещё без частей). «не назначен» человеком не считается."""
+    if not any(q.get("bucket") for q in queue):
+        return None
+    acc = {b: {"orders": set(), "deals": set(), "people": set()} for b in BUCKETS}
+    for q in queue:
+        a = acc.get(q.get("bucket"))
+        if a is None:
+            continue
+        unit = q.get("unit") or ("order" if q.get("order") else "deal")
+        if unit == "order":
+            a["orders"].add(str(q["order"]))
+            if q.get("bucket") == "exec":
+                a["deals"].add(str(q["deal"]))
+        else:
+            a["deals"].add(str(q["deal"]))
+        w = _nm(q.get("whoId")) or (_nm(q.get("who")) if q.get("who") != NOT_SET else "")
+        if w:
+            a["people"].add(w)
+    return {"exec": {"orders": len(acc["exec"]["orders"]), "deals": len(acc["exec"]["deals"]),
+                     "people": len(acc["exec"]["people"])},
+            "deal": {"deals": len(acc["deal"]["deals"]), "people": len(acc["deal"]["people"])},
+            "hyg": {"orders": len(acc["hyg"]["orders"]), "deals": len(acc["hyg"]["deals"])}}
 
 
 def _chat_cell(a: dict, cur: dict | None, r: dict, now: dt.datetime) -> dict:
@@ -742,13 +859,26 @@ def _econ_cell(e: dict, r: dict) -> dict:
             "over": verdict in (ECON_OVER, ECON_PRE_REBID)}
 
 
-def _contract_cell(c: dict) -> dict:
+def _flag_order(f: dict, r: dict | None) -> dict | None:
+    """Заказ сделки, к которому разбор договоров отнёс флаг (f.order — id СП-172); id нет или
+    заказа с таким id у сделки нет — None («заказ не определён»)."""
+    if f.get("order") is None or not r:
+        return None
+    return next((o for o in r.get("orders") or [] if str(o.get("id")) == str(f["order"])), None)
+
+
+def _contract_cell(c: dict, r: dict | None = None) -> dict:
+    """Ячейка договоров карточки сделки. r — строка сделки: у флага с заказом — номер заказа
+    («950/1») и поставщик (E38: «у флагов договора — f.order»)."""
     missing = [s for s in SIDE_LBL if not c["read"][s]] if c["outcome"] in NO_PAIR else []
+    flags = []
+    for f in c["flags"]:
+        o = _flag_order(f, r)
+        flags.append({"code": f["code"], "text": contract_b2b.FLAG_TEXT[f["code"]],
+                      "short": FLAG_SHORT.get(f["code"], f["code"]), "order": f["order"], "days": f["days"],
+                      "ordLbl": (o.get("lbl") or "") if o else "", "sup": (o.get("sup") or "") if o else ""})
     return {"at": c["at"].strftime("%d.%m.%Y"), "outcome": c["outcome"], "missing": missing,
-            "read": c["read"],
-            "flags": [{"code": f["code"], "text": contract_b2b.FLAG_TEXT[f["code"]],
-                       "short": FLAG_SHORT.get(f["code"], f["code"]), "order": f["order"], "days": f["days"]}
-                      for f in c["flags"]]}
+            "read": c["read"], "flags": flags}
 
 
 def _to_sub(cur: str, e: dict) -> float | None:
@@ -865,15 +995,43 @@ def _facts_cell(f: dict, r: dict, e: dict | None, today: dt.date, ppl: dict | No
     return out
 
 
+def imp_orders(keys: list[str], r: dict) -> list[dict]:
+    """Заказы строки сделки по ключам сводки o1…o8 «главного»: oN — N-я строка заказов сводки
+    сделки (dealdigest.build: живые заказы в порядке строки, первые ORDERS_MAX, пустые строки
+    выпадают). Сводка пишется каждой сборкой, оценка читает последнюю: порядок живых заказов
+    тот же, пока заказ не закрыт и не заведён новый между сборкой и оценкой. Ключа нет или он
+    дальше заказов строки — заказа нет."""
+    import dealdigest
+    live = [o for o in r.get("orders") or [] if o.get("live")][:dealdigest.ORDERS_MAX]
+    shown = [o for o in live if dealdigest._order(o)]
+    out = []
+    for k in keys:
+        m = re.fullmatch(r"o([1-9])", k)
+        if m and int(m.group(1)) <= len(shown):
+            o = shown[int(m.group(1)) - 1]
+            if o not in out:
+                out.append(o)
+    return out
+
+
 def _imp_item(x: dict, r: dict, today: dt.date, ppl: dict) -> dict:
     """Пункт «главного» с хозяином по регламенту (IMP_OWNER → ork.ITEM): шаг, роль, копия."""
     key = IMP_OWNER[x["kind"]]
-    own = _resp(r) if key == "dealResp" else _reg("imp", r, ppl, key=key)
+    # заказы, на строки сводки которых сослалась модель (o1…o8): один заказ — пункт этого заказа
+    # (его менеджер ОРК и шаг), иначе — сделки (E9, E38)
+    ords = imp_orders(x.get("keys") or [], r)
+    one = ords[0] if len(ords) == 1 else None
+    own = _resp(r) if key == "dealResp" else _reg("imp", r, ppl, key=key, order=one)
     who = own["who"]
     ev = x.get("ev")
     return {"kind": x["kind"], "lbl": IMP_LBL[x["kind"]], "sev": x["sev"], "text": x["text"],
+            "unit": "order" if one is not None else "deal",
+            "order": str(one.get("id")) if one is not None else "", "ordLbl": (one.get("lbl") or "") if one else "",
+            "orders": [{"order": str(o.get("id")), "lbl": o.get("lbl") or ""} for o in ords],
             "role": own["roleName"], "roleKey": own["role"], "step": own["step"], "who": who,
-            "whoGone": _gone(who), "copy": own["escalateTo"], "copyRole": own["copyRole"], "basis": list(x["keys"]),
+            "whoGone": _gone(who), "copy": own["escalateTo"], "copyRole": own["copyRole"],
+            **({"alsoCopy": own["alsoCopy"], "alsoCopyRole": own["alsoCopyRole"]} if own.get("alsoCopy") else {}),
+            "basis": list(x["keys"]),
             "ev": _msk_day(ev).strftime("%d.%m.%Y") if ev else "",
             "fresh": bool(ev) and (today - _msk_day(ev)).days <= IMP_MAX_DAYS}
 
@@ -896,7 +1054,12 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
     чату — менеджер ОРК, КАМ в копии; ОСС их не получает (Рег. 1.11). Договор заказчика не
     найден — КАМ, поставщика — менеджер ОРК; риск сверки договоров — руководитель ОРК
     (ork_head — по справочнику отделов, иначе подпись роли). Ответ в чате — тот, на ком мяч по
-    оценке; «Сумма» и файл договора — ответственный сделки."""
+    оценке; «Сумма» и файл договора — ответственный сделки.
+
+    Сделка и заказ (спецификация 30.10.2026, §1.6, E9, E10): пункт сделки (unit = deal) — у роли
+    сделки; где таблица даёт менеджера ОРК, хозяин — руководитель ОРК, менеджеры заказов — в
+    копии списком; шаг — шаг сделки (_step_now). Флаг сверки договоров с заказом — пункт этого
+    заказа (unit = order: номер, поставщик, шаг и менеджер ОРК заказа)."""
     if ctx is None:
         return None, None
     now = now.astimezone(MSK)
@@ -951,15 +1114,30 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
         c = cons.get(did)
         if c:
             n["contractSeen"] += 1
-            cell = _contract_cell(c)
+            cell = _contract_cell(c, r)
             rec["contract"] = cell
             n["outcome:" + c["outcome"]] += 1
             if cell["flags"]:
                 n["risk"] += 1
                 n["flags"] += len(cell["flags"])
-                shorts = list(dict.fromkeys(f["short"] for f in cell["flags"]))
-                queue.append(_item("contractRisk", r, _reg("contractRisk", r, ppl),
-                                   act="допсоглашение с поставщиком: " + ", ".join(shorts)))
+                # флаг с заказом — пункт ЭТОГО заказа (номер, поставщик, шаг заказа; E10): один
+                # пункт на заказ; флаги без заказа (или с заказом не этой сделки) — один пункт сделки
+                by_ord: dict[str, list] = {}
+                for f in c["flags"]:
+                    o = _flag_order(f, r)
+                    by_ord.setdefault(str(o["id"]) if o else "", []).append(f)
+                o_by_id = {str(o.get("id")): o for o in r.get("orders") or []}
+                for oid, fl in by_ord.items():
+                    shorts = ", ".join(dict.fromkeys(FLAG_SHORT.get(f["code"], f["code"]) for f in fl))
+                    if oid:
+                        o = o_by_id[oid]
+                        queue.append(_item("contractRisk", r, _reg("contractRisk", r, ppl, order=o),
+                                           act=f"допсоглашение с поставщиком по заказу {o.get('lbl') or oid}: {shorts}",
+                                           order=o))
+                    else:
+                        queue.append(_item("contractRisk", r, _reg("contractRisk", r, ppl),
+                                           what=f"{EXC['contractRisk'][1]} — {ORDER_UNKNOWN}",
+                                           act="допсоглашение с поставщиком: " + shorts))
             if c["outcome"] == UNREADABLE:
                 # файла нет у портала (404, пуст), формат не читается или длиннее предела чтения —
                 # следующий прогон не вылечит: перезалить — тому же, кто ищет договор
@@ -971,10 +1149,14 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
                 if need:
                     whose = " и ".join(SIDE_LBL[s] for s in need)
                     side = "both" if len(need) > 1 else need[0]
+                    # разбор договоров не говорит, у какого заказа нет договора поставщика: пункт
+                    # сделки, заказ не определён (E10)
                     queue.append(_item("contractMissing", r, _reg("contractMissing", r, ppl,
                                                                   key=f"contractMissing:{side}"),
-                                       what=SIDE_MISSING.format(whose=whose),
-                                       act=f"найти договор {whose} и загрузить файл в карточку"))
+                                       what=SIDE_MISSING.format(whose=whose)
+                                       + (f" — {ORDER_UNKNOWN}" if "supplier" in need else ""),
+                                       act=f"найти договор {whose} и загрузить файл в карточку",
+                                       key=f"contractMissing:{side}"))
         e = econ.get(did)
         if e:
             n["econSeen"] += 1
@@ -1017,7 +1199,10 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
                     key=lambda q: (q["sev"], -(q["days"] or 0))):
         did = str(q["deal"])
         if did not in first:
-            first[did] = {"who": q["who"], "act": q["act"], "what": q["what"], "code": q["code"]}
+            # пункт заказа — с номером заказа (E38: «у „что делать первым“ — order»)
+            first[did] = {"who": q["who"], "act": q["act"], "what": q["what"], "code": q["code"],
+                          "unit": q.get("unit") or ("order" if q.get("order") else "deal"),
+                          "order": str(q.get("order") or ""), "ordLbl": q.get("ordLbl") or ""}
     for did, f in first.items():
         deals.setdefault(did, {})["todo"] = f
     at = ctx.get("at")
@@ -1051,8 +1236,13 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
         return [{k: v for k, v in x.items() if k != "_t"} for x in items[:IMP_TOP]]
     payload = {"at": head["at"], "deals": deals, "queue": queue,
                "labels": {k: v[1] for k, v in EXC.items()},
+               # counts — пункты по коду (прежнее, на один выпуск: тесты и KV); в своих единицах —
+               # ordCounts (разных заказов), dealCounts (разных сделок), bucketCounts — по частям
+               # очереди (спецификация §4.3). Шаблон читает их, а не counts
                "counts": dict(Counter(q["code"] for q in queue if not q.get("seg"))),
                "sepCounts": dict(Counter(q["code"] for q in queue if q.get("seg"))),
+               **_unit_payload([q for q in queue if not q.get("seg")], ""),
+               **_unit_payload([q for q in queue if q.get("seg")], "sep"),
                # «Что важно сегодня» руководителю реализации — основной вид и вкладка направления
                "important": _top(important[False]), "sepImportant": _top(important[True]),
                "impLabels": dict(IMP_LBL),
