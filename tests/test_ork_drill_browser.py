@@ -189,7 +189,8 @@ def test_клавиатура_карточка_и_отборы_в_списке(b
     row.focus()
     pg.keyboard.press("Enter")
     pg.wait_for_selector("#drw.on")
-    assert pg.evaluate("document.activeElement.id") == "drwX"
+    # фокус — на заголовке панели (R4, 2.8), не на «×» и не на внешней ссылке
+    assert pg.evaluate("document.activeElement.id") == "drwName"
     assert pg.evaluate("document.getElementById('drw').getAttribute('role')") == "dialog"
     assert "drwBody" in pg.evaluate("window.__xl"), "после отрисовки списка не позван _xlMark"
     assert pg.locator("#drwBody table.odt").get_attribute("data-xl-name")
@@ -202,22 +203,19 @@ def test_клавиатура_карточка_и_отборы_в_списке(b
     pg.locator("#drwX").focus()
     pg.keyboard.press("Shift+Tab")
     assert pg.evaluate("document.getElementById('drw').contains(document.activeElement)")
-    # отбор по шагу: строк — сколько на фишке; снять — все
-    # шаги с числами — в «Разрезах» под таблицей (полосы по убыванию), отбор по клику
-    pg.locator("#drwBody details.odcuts > summary").click()
-    chip = pg.locator("#drwBody .odcuts [data-odf^='step:']").nth(0)
-    want = int(chip.locator("b").inner_text())
+    # отбор по шагу: столбец гистограммы «На каких шагах» — строк столько, сколько над столбцом; снять — все
+    chip = pg.locator("#drwBody .odcol:not([aria-disabled])").nth(0)
+    want = int(chip.locator(".odcol-n").inner_text())
     chip.click()
     assert pg.locator(ROWS).count() == want
     pg.locator("#drwBody [data-odf='rm:step']").click()
     assert pg.locator(ROWS).count() == total
     # строка заказа — путь заказа по шагам (_opOpen), строка уровня сделки — карточка сделки;
-    # «← к списку» — тот же список
+    # назад к тому же списку — крошкой (у пути заказа — и своей кнопкой)
     first = pg.locator(ROWS).first
-    is_order = first.get_attribute("data-odk") is not None
-    first.focus()
+    first.locator("[data-odgo]").focus()
     pg.keyboard.press("Enter")
-    back = "#drwBody [data-opgo=list]" if is_order else "#drwBody [data-odback]"
+    back = "#drwCrumbs .odcrb[data-odcr=list]"
     assert pg.locator(back).count() == 1 and pg.locator(ROWS).count() == 0
     pg.locator(back).click()
     assert pg.locator(ROWS).count() == total
@@ -266,16 +264,17 @@ def test_телефон_390_без_сдвига_вбок(browser, page_url):
     assert pg.evaluate("Math.round(document.getElementById('drw').getBoundingClientRect().width)") == 390
     # строки — карточками: таблица не шире дровера
     assert pg.evaluate("document.querySelector('#odTable').scrollWidth<=document.getElementById('drwBody').clientWidth")
-    # телефон: отбор свёрнут (первый экран — «Что делать» и первые заказы); раскрыт — шаг списком
-    # выбора, отбор им — столько строк, сколько в шаге (число — в «Разрезах» под таблицей)
-    sel = pg.locator("#drwBody select[data-odsel='step']")
-    assert not sel.is_visible() and pg.locator("#drwBody details.odtd > summary").is_visible()
+    # телефон: отбор и шаги свёрнуты (первый экран — «Почему», «Что делать» и первые заказы); шаги —
+    # строками «шаг · число», отбор ими — столько строк, сколько в шаге
+    srch = pg.locator("#drwBody input[data-odsearch]")
+    assert not srch.is_visible() and pg.locator("#drwBody details.odtd > summary").is_visible()
     pg.locator("#drwBody details.odtd > summary").click()
-    assert sel.is_visible()
-    v = sel.locator("option").nth(1).get_attribute("value")
-    want = pg.evaluate("v=>[...document.querySelectorAll('#drwBody .odcuts [data-odf]')].find(b=>b.dataset.odf==='step:'+v).querySelector('b').textContent", v)
-    sel.select_option(v)
-    assert pg.locator(ROWS).count() == int(want)
+    assert srch.is_visible()
+    pg.locator("#drwBody details.odstp > summary").click()
+    row = pg.locator("#drwBody .odsr").first
+    want = int(row.locator("b").inner_text())
+    row.click()
+    assert pg.locator(ROWS).count() == want
     assert not errs, errs
 
 
@@ -285,13 +284,13 @@ def test_разбор_числа_что_делать_отборы_сортиро
     (aria-pressed), повторный клик снимает; поставщик — списком выбора; поиск не теряет фокус;
     сортировка — кнопкой в шапке с aria-sort; «Разрезы» под таблицей и не закрываются при
     отборе; строка заказа — путь заказа (_opOpen, когда он есть), ссылка в Битрикс — своя;
-    дровер min(1200px, 100vw), ничего не обрезано справа."""
+    панель одной ширины (R4, 2.1: 1280 — 980 px, 1920 — 1200 px), ничего не обрезано справа."""
     pg, errs = _open(browser, page_url, width=width)
     pg.evaluate("window.__op=[]; window._opOpen=(k,o)=>window.__op.push([k,(o||{}).back]); 0")   # 0: функцию evaluate вызвал бы сам
     tile = pg.locator("#ctPanel-main [data-kpi-rank='1']")
     total = _expect(tile)
     _clicked_rows(pg, tile)
-    assert pg.evaluate("Math.round(document.getElementById('drw').getBoundingClientRect().width)") == min(1200, width)
+    assert pg.evaluate("Math.round(document.getElementById('drw').getBoundingClientRect().width)") == {1280: 980, 1920: 1200}[width]
     assert pg.evaluate("(()=>{const b=document.getElementById('drwBody'), r=b.getBoundingClientRect();"
                        "return b.scrollWidth<=b.clientWidth&&[...b.querySelectorAll('#odTable th,#odTable td')]"
                        ".every(c=>c.getBoundingClientRect().right<=r.right+0.5)})()"), "обрезано справа"
@@ -306,19 +305,19 @@ def test_разбор_числа_что_делать_отборы_сортиро
     assert pg.evaluate("document.activeElement.classList.contains('odact')"), "фокус остался на группе"
     pg.locator("#drwBody .odact").first.click()
     assert pg.locator(ROWS).count() == total
-    # «Разрезы» открыты — остаются открытыми после отбора; отбор из разреза — снимаемой фишкой
-    pg.locator("#drwBody details.odcuts summary").click()
-    row = pg.locator("#drwBody details.odcuts .odrow").first
-    n = int(row.locator("b").inner_text())
-    row.click()
-    assert pg.locator(ROWS).count() == n and pg.locator("#drwBody details.odcuts[open]").count() == 1
+    # «Почему»: сумма причин = число списка; причина отбирает свои строки
+    why = [int(x) for x in pg.locator("#drwBody .odwb b").all_inner_texts()]
+    assert sum(why) == total
+    pg.locator("#drwBody .odwb").first.click()
+    assert pg.locator(ROWS).count() == why[0] and pg.locator("#drwBody [data-odf='rm:cause']").count() == 1
     pg.locator("#drwBody [data-odf='reset']").first.click()
     assert pg.locator(ROWS).count() == total
-    # поставщик — списком выбора
-    sel = pg.locator("#drwBody select[data-odsel='sup']")
-    opt = sel.locator("option").nth(1)
-    want = int(opt.inner_text().rsplit("—", 1)[1])
-    sel.select_option(opt.get_attribute("value"))
+    # поставщик — строкой «имя · число» (число сразу за именем, не обрезано краем)
+    chip = pg.locator("#drwBody .odsupb").first
+    want = int(chip.locator("b").inner_text())
+    assert pg.evaluate("(()=>{const r=document.getElementById('drw').getBoundingClientRect();"
+                       "return [...document.querySelectorAll('#drwBody .odsupb b')].every(b=>b.getBoundingClientRect().right<=r.right)})()")
+    chip.click()
     assert pg.locator(ROWS).count() == want and pg.locator("#drwBody [data-odf='rm:sup']").count() == 1
     pg.locator("#drwBody [data-odf='rm:sup']").click()
     assert pg.locator(ROWS).count() == total
@@ -349,7 +348,7 @@ def test_разбор_числа_что_делать_отборы_сортиро
     # строка заказа — путь заказа: _opOpen(ключ заказа)
     r0 = pg.locator(ROWS).first
     k = r0.get_attribute("data-odk")
-    r0.focus()
+    r0.locator("[data-odgo]").focus()
     pg.keyboard.press("Enter")
     assert pg.evaluate("window.__op") == [[k, "list"]]
     pg.keyboard.press("Escape")

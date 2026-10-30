@@ -358,12 +358,12 @@ def _with_tabs_opened(path: Path) -> Path:
               "try{var WK2=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"week\"]'),CX2=window.__CONTRACTS__;"
               "if(WK2&&CX2&&CX2.ork&&CX2.ork.week&&CX2.ork.week.drill){WK2.click();"
               "var NB=[].slice.call(document.querySelectorAll('#ctPanel-main button.odn[data-od]')).slice(0,60);"
-              # одно число дней (ревью R4, 30.10.2026): «р.д. на шаге» строки списка = число «Пути заказа»
+              # одно число дней (ревью R4, 30.10.2026): «раб. дн. на шаге» строки списка (единица — R4, 2.7) = число «Пути заказа»
               # (o.stepWd, у шага без нормы — последняя запись ork.path на текущем шаге), та же единица
               "var OI={};[].concat(CX2.rows||[],(CX2.sep||{}).rows||[]).forEach(function(d){(d.orders||[]).forEach(function(o){OI[String(o.id)]=o})});"
               "var DY=function(id){var bad=[];[].slice.call(document.querySelectorAll('#drwBody table.odt tbody tr[data-odk]')).forEach(function(tr){"
               "var o=OI[tr.dataset.odk],e=tr.querySelector('.odc2 .oddays b');if(!o||!e)return;var P=o.path||[],l=P[P.length-1],"
-              "w=o.stepWd!=null?o.stepWd:(l&&l[0]===o.step?l[2]:null);if(w!=null&&e.textContent.trim()!==w+' р.д.')bad.push(tr.dataset.odk+': '+e.textContent.trim()+' ≠ '+w+' р.д.')});"
+              "w=o.stepWd!=null?o.stepWd:(l&&l[0]===o.step?l[2]:null);if(w!=null&&e.textContent.trim()!==w+' раб. дн.')bad.push(tr.dataset.odk+': '+e.textContent.trim()+' ≠ '+w+' раб. дн.')});"
               "if(bad.length)kvFail('Реализация: число '+id+' — дни на шаге в списке не те, что в пути заказа: '+bad.slice(0,3).join('; '))};"
               "if(!NB.length)kvFail('Реализация: в «Неделе» нет чисел со списком заказов');"
               "NB.forEach(function(b){var n=parseInt(b.textContent,10),D=document.getElementById('drw');b.click();"

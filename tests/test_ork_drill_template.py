@@ -284,20 +284,20 @@ def test_у_каждого_списка_в_данных_есть_число_на
 
 def test_закрытые_пусто_гигиена_и_дубль_для_телефона(run):
     """Список: закрытый заказ — корзиной «заказ закрыт», не «стадия не из таблицы»; в «Квартале» —
-    без «По менеджерам ОРК»; за числом без заказов — «За этим числом заказов нет»; у гигиены —
-    вид и почему (hw); дубль «стадия · поставщик» для узкого экрана — атрибутом, не текстом ячейки."""
+    без отбора «Менеджер ОРК»; за числом без заказов — «За этим числом заказов нет»; у гигиены —
+    вид и почему (hw); поставщик — строкой в ячейке заказа и отбором «Поставщик» (R4, 3.7)."""
     import re
     r, out = run
     ex = out["main"]["extra"]
     assert 'data-odf="step:x"' in ex["qall"] and "заказ закрыт" in ex["qall"]
-    assert "По менеджерам ОРК" not in ex["qall"] and "По поставщикам" in ex["qall"]
+    assert 'data-odsel="mgr"' not in ex["qall"] and 'class="odsupf"' in ex["qall"]
     assert "За этим числом заказов нет." in ex["empty"] and "отбору" not in ex["empty"]
     w = r["contracts"]["ork"]["week"]
     import orkview
     hw = [x["hw"] for x in orkview.unpack(w["orders"], w["strs"]) if x.get("hw") and x.get("hyg")]
     assert hw and htmlmod.escape(hw[0], quote=False) in ex["hyg"].replace("&quot;", '"')
-    assert re.search(r'class="dep odm" data-odm="[^"]+"></div>', ex["hyg"])
-    assert "По менеджерам ОРК" in ex["hyg"], "«Неделя»: менеджеры ОРК в списке есть"
+    assert re.search(r'<div class="dep odsup">поставщик: [^<]+</div>', ex["hyg"])
+    assert 'data-odsel="mgr"' in ex["hyg"], "«Неделя»: менеджеры ОРК в списке есть"
 
 
 def test_строка_списка_номер_заказа_и_день_отсчёта(run):
@@ -352,8 +352,9 @@ def test_разбор_числа_что_делать_худшие_сверху_�
     links = re.findall(r'<a class="odbx"[^>]*>', h)
     assert links and all('target="_blank"' in a and 'rel="noopener"' in a and 'data-xlv=""' in a for a in links)
     # шапка выгрузки — по столбцу на поле (ревью 30.10.2026): видимые столбцы и скрытые рядом
-    for t in ("№ заказа", "Сделка", "Шаг №", "Р.д. на шаге", "Норма, р.д.", "Срок клиента", "Что сделать", "Кто отвечает", "Поставщик"):
+    for t in ("№ заказа", "Сделка", "Шаг №", "Раб. дн. на шаге", "Норма, раб. дн.", "Срок клиента", "Почему", "Что сделать", "Кто делает", "Поставщик"):
         assert f'data-xlv="{t}"' in h, t
     assert "клик — фильтр" not in h and "Что делать" in h
-    assert h.index("<table") < h.index("По поставщикам") and '<details class="odcuts"' in h
+    # порядок экрана (R4, 3.7): сверка → «Почему» → «Что делать» → шаги → отборы → таблица
+    assert h.index('class="odrec"') < h.index('id="odWhyH"') < h.index('id="odActH"') < h.index('id="odStpH"') < h.index('class="odsupf"') < h.index("<table")
     assert "просрочен на " in h

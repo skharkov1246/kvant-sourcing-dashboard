@@ -80,7 +80,8 @@ def test_строка_списка_открывает_путь_и_назад(bro
     row.click()
     pg.wait_for_selector("#opRoot")
     assert pg.locator("#opRoot").get_attribute("data-opk") == k
-    assert pg.evaluate("document.activeElement.dataset.opgo") == "list"
+    # фокус — на заголовке панели (R4, 2.8: не на ссылке и не на кнопке «назад»)
+    assert pg.evaluate("document.activeElement.id") == "drwName"
     assert pg.locator("#opRoot .op-steps > li").count() == 13
     o = pg.evaluate("k=>{for(const d of window.__CONTRACTS__.rows) for(const o of d.orders||[]) if(String(o.id)===k) return o;}", k)
     if o["step"] is not None:
@@ -97,9 +98,11 @@ def test_строка_списка_открывает_путь_и_назад(bro
     pg.wait_for_selector("#odTable")
     assert not pg.locator("#opRoot").count()
     assert pg.evaluate("document.activeElement.dataset.odk") == k
-    # Enter на строке — путь; Esc — закрыть, фокус на число
+    # Enter на строке — путь; Esc — уровень вверх (к списку), второй Esc — закрыть, фокус на число
     pg.keyboard.press("Enter")
     pg.wait_for_selector("#opRoot")
+    pg.keyboard.press("Escape")
+    assert pg.evaluate("document.getElementById('drw').classList.contains('on')") and pg.locator("#odTable").count() == 1
     pg.keyboard.press("Escape")
     assert not pg.evaluate("document.getElementById('drw').classList.contains('on')")
     assert pg.evaluate("el=>document.activeElement===el", num.element_handle())
@@ -299,7 +302,9 @@ def test_дни_на_шаге_в_списке_как_в_пути(browser, page_u
               m=/Считаем с (\\d\\d\\.\\d\\d\\.\\d{4})/.exec(R.textContent); return [b?b.textContent.trim():'', m?m[1]:'']}""")
             if hero[0]:
                 checked += 1
-                assert days.split(" на шаге")[0].split(" при норме")[0].strip() == hero[0], (k, days, hero)
+                # одно число рабочих дней (единица — «раб. дн.» в списке, путь заказа — свой пакет)
+                assert re.match(r"\d+", days).group() == re.match(r"\d+", hero[0]).group(), (k, days, hero)
+                assert "раб. дн." in days and re.search(r"р\.д\.|раб\. дн\.", hero[0]), (k, days, hero)
                 if since and hero[1]:
                     assert since == hero[1], (k, since, hero)
             pg.locator("[data-opgo=list]").click()
