@@ -6430,7 +6430,7 @@ function _orkWeekToday(C,F){
 
 // ---- C1. Где сейчас заказы: гистограмма и ведомость 13 шагов ----
 function _orkWeekLedger(C){
-  const {W,LG,nw}=C, UP=(C.T.unpaid||{}), sumNow=LG.reduce((a,s)=>a+(s.now||0),0), sumOver=LG.reduce((a,s)=>a+(s.over||0),0);
+  const {W,LG,nw}=C, UP=(C.T.unpaid||{}), sumNow=LG.reduce((a,s)=>a+(s.unit==='deal'?(s.ordersNow||0):(s.now||0)),0), sumOver=LG.reduce((a,s)=>a+(s.unit==='deal'?0:(s.over||0)),0);
   const top=LG.filter(s=>s.over).sort((a,b)=>b.over-a.over||b.now-a.now)[0]||LG.slice().sort((a,b)=>(b.now||0)-(a.now||0))[0];
   const ttl=!top||!top.now?'Заказов на шагах регламента нет'
     :top.over?`Застревают на шаге ${top.no}: ${top.now} ${_wkPl(top.now,'заказ','заказа','заказов')}, ${top.over===top.now?'все':top.over} дольше нормы`
@@ -6515,7 +6515,7 @@ function _orkWeekWait(C){
   const NM={kam:_wkAbbr('КАМ'),oss:_wkAbbr('ОСС'),log:'Логистика',sup:'Поставщик'};
   const rs=Object.keys(_ORK_ADJ).map(r=>{const SS=LG.filter(s=>s.waits===r), K=((W.drill||{}).adj||{})[r]||[];
     const cd=K.map(k=>(byK.get(String(k))||{}).cd).filter(v=>v!=null), mx=cd.length?Math.max(...cd):null;
-    return {r,SS,n:AJ[r]||0,mx,since:mx!=null&&asOf!=null?_odDM(asOf-mx*864e5).slice(0,5):''};}).filter(x=>x.SS.length);
+    return {r,SS,n:(AJ[r]&&typeof AJ[r]==='object'?AJ[r].orders:AJ[r])||0,mx,since:mx!=null&&asOf!=null?_odDM(asOf-mx*864e5).slice(0,5):''};}).filter(x=>x.SS.length);
   const top=rs.slice().sort((a,b)=>b.n-a.n)[0];
   const ttl=top&&top.n?`Ждём другие отделы: ${top.n} ${_wkPl(top.n,'заказ','заказа','заказов')} у ${top.r==='log'?'логистики':top.r==='sup'?'поставщика':top.r==='kam'?'КАМа':'ОСС'}`:'Другие отделы ничего не держат';
   const p80=LP.state!=='nodata'?Math.round(LP.p80||0):null, it=LP.items||[];
@@ -6582,7 +6582,7 @@ function _orkWeekSep(C){
         +`<button type="button" class="wkstb" data-opk="${_esc(String(o.id))}" data-ops="${o.step!=null?o.step:''}" aria-label="${_esc(`Заказ ${o.lbl||o.id}: шаг ${o.step!=null?o.step:'неизвестен'} из 13${s?' — '+s.name:''}${over?', дольше нормы':''} — путь заказа`)}">${_wkStrip(o,over)}<span class="wkstl">${o.step!=null?`шаг ${o.step} · ${_esc(s?s.name:'')}`:'шаг неизвестен'}${over?' · <span class="wkred">дольше нормы</span>':''}</span></button>`
         +`<div class="wkdoa">${act}</div></li>`;}).join('');
     return `<article class="wkdl">${head}<ol class="wkdos">${li||'<li class="wkmut">живых заказов нет</li>'}</ol></article>`;}).join('');
-  const T=C.T, ok=C.ok, clean=[[ok(T.W1)&&!T.W1.value,'приёмка'],[ok(T.W2)&&!T.W2.value,'шаги ОРК'],[!['kam','oss','log'].some(r=>(W.adjacent||{})[r]),'другие отделы'],[!((W.longP80||{}).k),'производство'],[!((W.waitUtd||{}).n),'УПД'],[!((T.unpaid||{}).orders),'оплата клиента']].filter(x=>x[0]).map(x=>x[1]);
+  const T=C.T, ok=C.ok, clean=[[ok(T.W1)&&!T.W1.value,'приёмка'],[ok(T.W2)&&!T.W2.value,'шаги ОРК'],[!['kam','oss','log'].some(r=>(x=>x&&typeof x==='object'?x.orders:x)((W.adjacent||{})[r])),'другие отделы'],[!((W.longP80||{}).k),'производство'],[!((W.waitUtd||{}).n),'УПД'],[!((T.unpaid||{}).orders),'оплата клиента']].filter(x=>x[0]).map(x=>x[1]);
   return `<section class="wksec wkhead wksep" id="orkWeekS" aria-labelledby="wkLead"><h2 class="wklead" id="wkLead">${lead}</h2>`
     +`<p class="wksub">Неделя ${_orkDm(W.mon)}–${_orkDm(W.sun)} · ${nmS} считается отдельно, в основное не входит · полоска — 13 шагов регламента, клик — путь заказа</p>`
     +`<div class="wkdls" id="orkTiles">${cards||_wkState('empty',{what:'Сделок с заказами в работе нет.'})}</div>`

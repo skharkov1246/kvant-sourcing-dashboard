@@ -399,7 +399,9 @@ def test_число_со_списком_заказов_идёт_в_файл(page
     assert led["rows"] == len(L) + 1 and sum(1 for s in L if s["now"]) > 0     # + строка «Всего на шагах»
     for row, s in zip(rows, L):
         assert str(row[2]).split(" · ")[0] == str(s["now"] or 0), (s["no"], row[2])
-    assert rows[-1][0] == "Всего на шагах" and rows[-1][2] == sum(s["now"] or 0 for s in L)
+    # итог — заказы: у шагов сделки (1–3, 13; решение 30.10.2026) в нём живые заказы шага (ordersNow)
+    assert rows[-1][0] == "Всего на шагах" and rows[-1][2] == sum(
+        (s.get("ordersNow") if s.get("unit") == "deal" else s["now"]) or 0 for s in L)
 
 
 def test_список_за_числом_имя_файла_с_подвкладкой_и_направлением(page_run):

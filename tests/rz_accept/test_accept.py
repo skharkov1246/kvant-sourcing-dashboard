@@ -250,7 +250,8 @@ def test_p09_адрес_открывает_уровни(open_page, cfg, browser,
              (f"#contracts/main?d={ids['d']}", "deal", "main", "main"),
              (f"#contracts/main/sep?d={ids['sd']}", "deal", "main", "sep"),
              (f"#contracts/main/sep?d={ids['sd']}&o={ids['so']}", "order", "main", "sep"),
-             ("#contracts/month?n=m%3A0.S1", "list", "month", "main"),
+             # приёмка — одна на сделку (30.10.2026): в текущем месяце корпуса первой приёмки нет — список прошлого
+             ("#contracts/month?n=m%3A1.S1", "list", "month", "main"),
              ("#contracts/week?o=99999999", "notfound", "week", "main"),
              ("#contracts/sep", "none", "main", "sep")]
     bad = []

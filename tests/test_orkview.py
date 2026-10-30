@@ -63,7 +63,7 @@ def test_сейчас_на_шаге_сходится_с_живыми_заказ�
     вселенная, что «живых заказов» вкладки) — и в основном виде, и в виде направления."""
     for view in (ct, ct["sep"]):
         w = view["ork"]["week"]
-        assert sum(r["now"] for r in w["ledger"]) + w["unknown"] == w["live"]
+        assert sum(r["now"] if r["unit"] == "order" else r["ordersNow"] for r in w["ledger"]) + w["unknown"] == w["live"]
         # ведомость — живые заказы открытых сделок и шаг 12 закрытых (closed12, Рег. 14.2.4)
         assert w["live"] - w["closed12"] == view["deadlines"]["liveOrders"]
     assert ct["ork"]["trust"]["mapped"] + ct["ork"]["trust"]["unknown"] == ct["ork"]["week"]["live"]
@@ -79,11 +79,13 @@ def test_неделя_все_блоки_с_данными(ct):
     # (решение владельца 27.10.2026, Б); счёт — тот же, что пункты очереди
     c = ct["life"]["counts"]
     # пункты в единицах «заказ × код» (lifecycle.per_order): приёмка сделки — по заказу, ordAssign
-    # (новый заказ принятой сделки) — тот же срок шага 1 (решение владельца 30.10.2026, п. 1)
+    # (новый заказ принятой сделки) — шаг 1, в W1/W1o, не в W2 (решение владельца 30.10.2026, п. 1)
     PQ = lifecycle.per_order(ct["life"]["queue"])
     assert t["W2"]["value"] == sum(len({q["order"] for q in PQ if q["code"] == k and q.get("w2")})
-                                   for k in ("s1Over", "ordAssign", "s2Over", "s3Over", "s6Over"))
-    assert set(t["W2"]["byStep"]) == {1, 4, 5, 8} and t["W2"]["label"].endswith(ork.NO_PAUSE)
+                                   for k in ("s2Over", "s3Over", "s6Over"))
+    assert not [q for q in PQ if q["code"] in ("s1Over", "ordAssign") and q.get("w2")]
+    # шаг 1 — приёмка СДЕЛКИ (решение 30.10.2026, В1 а): в W1 (сделки) и W1o (заказы), не в W2
+    assert set(t["W2"]["byStep"]) == {4, 5, 8} and t["W2"]["label"].endswith(ork.NO_PAUSE)
     assert "noUtd" not in t["W2"]["src"] and t["W2"]["waitUtd"] == w["waitUtd"]["n"] > 0
     assert t["W1"]["noOrder"] == c.get("noOrder", 0) >= 1
     assert t["W3"]["by"]["late"] == c["late"] and t["W3"]["label"] == "результат поставщика и логистики"
@@ -91,7 +93,7 @@ def test_неделя_все_блоки_с_данными(ct):
     assert len(led) == 13 and led[5]["roleName"] == "менеджер ОРК" and led[1]["roleName"] == "руководитель ОРК"
     assert led[7]["over"] is None and led[7]["waits"] == "sup", "производство не нормируется — ждём поставщика"
     assert led[5]["artReq"] >= led[5]["artMiss"] > 0
-    assert w["adjacent"]["log"] > 0 and w["overByWho"] and w["risk"]
+    assert w["adjacent"]["log"]["orders"] > 0 and w["overByWho"] and w["risk"]
     assert any(p["kind"] == "P50" for p in w["checkpoints"]) and any(p["kind"] == "P14" for p in w["checkpoints"])
     mon, sun = dt.date.fromisoformat(w["mon"]), dt.date.fromisoformat(w["sun"])
     assert all(mon <= dt.date.fromisoformat(p["date"]) <= sun for p in w["checkpoints"])
@@ -315,7 +317,7 @@ def _инварианты(view: dict, rows: list | None = None, sep: bool = Fals
             assert r["over"] <= r["now"], (r["no"], r["over"], r["now"])
     W2 = w["tiles"]["W2"]
     assert W2["value"] <= (W2["n"] or 0), W2
-    assert sum(r["now"] for r in w["ledger"]) + w["unknown"] == w["live"]
+    assert sum(r["now"] if r["unit"] == "order" else r["ordersNow"] for r in w["ledger"]) + w["unknown"] == w["live"]
     assert sum(m["n"] for m in w["overByWho"]) == W2["value"], "поимённо — тот же счёт, что у W2"
     # W2 = Σ «сверх нормы» по менеджерам = пункты очереди с w2 (решение 27.10.2026, Б: шаг 12 — нет)
     # пункты в единицах «заказ × код» (lifecycle.per_order): приёмка сделки — по своим заказам
@@ -837,7 +839,7 @@ def test_шаг12_закрытой_сделки_одна_совокупност�
     assert [(m["who"], m["n"], m["waitUtd"], m["byStep"]) for m in ow] == [("Пётр", 0, 2, {})]
     assert v["week"]["closed12"] == 1 and v["week"]["live"] == 2
     # прочие шаги закрытой сделки — не отклонения: W1 и шаги 1/4/5/8 их не видят
-    assert W2["byStep"][1] == W2["byStep"][5] == 0
+    assert W2["byStep"][5] == 0 and 1 not in W2["byStep"] and v["week"]["tiles"]["W1"]["value"] == 0
 
 
 def test_месяц_вычитание_не_раскрывает_скрытую_ячейку():
@@ -962,13 +964,19 @@ def test_приёмка_по_назначению_w1_w2_на_корпусе(ct):
     data, _o = _orders(fixture.ТриЗаказа())
     w0, w1 = ct["ork"]["week"], data["ork"]["week"]
     T0, T1 = w0["tiles"], w1["tiles"]
-    assert (T1["W1"]["value"], T1["W1"]["orders"]) == (T0["W1"]["value"], T0["W1"]["orders"])
+    # приёмка — СДЕЛКИ (решение 30.10.2026, В1 а): 991/1 — единственный заказ своей сделки, она на
+    # приёмке дольше 1 р.д. — W1 +1 сделка; 933/3 — новый заказ давно принятой сделки 933: был в W1o
+    # (назначить менеджера ОРК на новый заказ), ушёл на шаг 4. Его назначение — не приёмка сделки:
+    # «в срок за 20 р.д.» (byAssign) не растёт
+    assert (T1["W1"]["value"], T1["W1"]["accept"]) == (T0["W1"]["value"] + 1, T0["W1"]["accept"] + 1)
+    assert T0["W1o"]["value"] == 1 and T1["W1o"].get("value") in (None, 0)
     assert T1["W1"]["assignStale"] == 1 and T0["W1"]["assignStale"] == 0
-    assert T1["W1"]["byAssign"] == T0["W1"]["byAssign"] + 1
+    assert T1["W1"]["byAssign"] == T0["W1"]["byAssign"]
     assert T1["W2"]["value"] == T0["W2"]["value"] + 1
-    assert T1["W2"]["byStep"][4] == T0["W2"]["byStep"][4] + 1 and T1["W2"]["byStep"][1] == T0["W2"]["byStep"][1]
+    assert T1["W2"]["byStep"][4] == T0["W2"]["byStep"][4] + 1 and 1 not in T1["W2"]["byStep"]
     led0, led1 = ({r["no"]: r for r in w["ledger"]} for w in (w0, w1))
-    assert led1[4]["now"] == led0[4]["now"] + 1 and led1[1]["now"] == led0[1]["now"]
+    assert led1[4]["now"] == led0[4]["now"] + 1 and led1[1]["now"] == led0[1]["now"] + 1
+    assert led1[1]["unit"] == "deal" and led1[1]["ordersNow"] == led0[1]["ordersNow"]
     q = lifecycle.per_order(data["life"]["queue"])     # приёмка — пункт сделки, заказы в ords
     s1 = {x["ordLbl"]: x for x in q if x["code"] == "s1Over"}
     s2 = {x["ordLbl"]: x for x in q if x["code"] == "s2Over"}

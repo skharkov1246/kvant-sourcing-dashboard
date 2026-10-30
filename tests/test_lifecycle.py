@@ -189,7 +189,8 @@ def test_решения_владельца_хозяин_поля_сделка_в
     ]
     сделки = [{"deal": d, "seq": 900 + i, "closed": False} for i, d in enumerate(("100", "101", "102", "103"))]
     life = lc.build(заказы, сделки, СЕГОДНЯ)
-    assert life["otd"]["deals90"] == {"n": 2, "ontime": 1, "pct": 50}
+    assert {k: life["otd"]["deals90"][k] for k in ("n", "ontime", "pct")} == {"n": 2, "ontime": 1, "pct": 50}
+    assert life["otd"]["deals90"]["unit"] == "deal" and len(life["otd"]["deals90"]["keys"]["k"]) == 2
     assert life["otd"]["last90"]["n"] == 4 and life["otd"]["last90"]["ontime"] == 3
     assert life["norms"]["toShip"] == 61
     ф = {p["key"]: p for p in life["phases"]}

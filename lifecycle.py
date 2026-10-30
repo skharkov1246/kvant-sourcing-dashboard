@@ -1064,13 +1064,18 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     for o, d in in_scope:
         по_сделке[o.get("deal")].append(o)
     deals90 = [0, 0]
+    d90k: list[str] = []
+    d90t: list[str] = []
     for did, os_ in по_сделке.items():
         if not os_ or not all(o.get("delFact") and o.get("dl") for o in os_):
             continue
         last = max(o["delFact"] for o in os_)
         if 0 <= (today - last).days <= 90:
+            on = all(o["delFact"] <= o["dl"] for o in os_)
             deals90[0] += 1
-            deals90[1] += all(o["delFact"] <= o["dl"] for o in os_)
+            deals90[1] += on
+            d90k.append(f"d:{did}")
+            d90t.append(f"{'к сроку' if on else 'позже срока'} · заказов {len(os_)} · последняя доставка {last:%d.%m}")
     # Д-2 (R4, 30.10.2026): «доставлено к сроку» со знаменателем «срок наступил» — по месяцу СРОКА
     # клиента, а не доставки. Доля по доставленным (n, ontime выше) прятала сорванные: заказ после
     # срока, ещё не доставленный, в неё не входил, и рядом с «100 % в срок» стояли 19 сорванных
@@ -1104,6 +1109,44 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         b["due"] += 1
         b["k"].append(str(o.get("id")))
         b["t"].append(t)
+    # E44 (30.10.2026, «сделка и заказ»): доставка к сроку в СДЕЛКАХ — сделка в месяце срока своего
+    # последнего заказа (наибольший срок клиента среди её заказов со сроком; как Д-2 — срок наступил,
+    # раньше сегодня). К сроку — все её заказы со сроком доставлены не позже своего срока (решение
+    # 19.10.2026, п. 3, как deals90); иначе позже: доставлен после срока или не доставлен (открытый
+    # заказ после срока — open). Заказ закрыт без даты доставки или сделка закрыта без неё — сделка
+    # не в знаменателе (skip, как dueSkip). Инвариант: n == ontime + late; open ≤ late.
+    # Ключи — «d:<id>», подпись — заказы сделки с номерами
+    по_сделке_dl: dict[str, list] = defaultdict(list)
+    for o, d in in_scope:
+        if o.get("dl"):
+            по_сделке_dl[o.get("deal")].append((o, d))
+    due_deals: dict[dt.date, dict] = {m: {"n": 0, "ontime": 0, "late": 0, "open": 0, "skip": 0, "orders": 0,
+                                          "k": [], "t": []} for m in months}
+    for did, od in по_сделке_dl.items():
+        last = max(o["dl"] for o, _d in od)
+        if last >= today:
+            continue
+        b = due_deals.get(dt.date(last.year, last.month, 1))
+        if b is None:
+            continue
+        st = []
+        for o, d in od:
+            f = delivered(o)
+            st.append("on" if f and f <= o["dl"] else "late" if f else
+                      "open" if o.get("live") and not d.get("closed") else "skip")
+        if "skip" in st:
+            b["skip"] += 1
+            continue
+        on = all(x == "on" for x in st)
+        b["n"] += 1
+        b["orders"] += len(od)
+        b["ontime" if on else "late"] += 1
+        b["open"] += "open" in st
+        lbl = ", ".join((o.get("lbl") or f"id {o.get('id')}") for o, _d in od[:2]) + (
+            f" и ещё {len(od) - 2}" if len(od) > 2 else "")
+        b["k"].append(f"d:{did}")
+        b["t"].append(("к сроку" if on else "не доставлен" if "open" in st else "позже срока")
+                      + f" · заказов {len(od)}: {lbl} · последний срок {last:%d.%m}")
     otd_rows = [{"m": m.strftime("%m.%Y"), "n": v[0], "ontime": v[1],
                  "pct": round(v[1] / v[0] * 100) if v[0] else None,
                  "medLate": _median(v[2]),
@@ -1112,7 +1155,16 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
                  "dueSkip": due[m]["dueSkip"],
                  "duePct": round(due[m]["dueOnTime"] / due[m]["due"] * 100) if due[m]["due"] else None,
                  # заказы за долей — ключи и подписи строк списка («Разбор числа»), класс первым
-                 "keys": {"k": due[m]["k"], "t": due[m]["t"]}} for m, v in otd.items()]
+                 "keys": {"unit": "order", "k": due[m]["k"], "t": due[m]["t"]},
+                 # сделки, у которых срок последнего заказа наступил в месяце (E44) — главная доля
+                 # «Месяца»; заказы — рядом (due); единица — сделка
+                 "dueDeals": {"n": due_deals[m]["n"], "ontime": due_deals[m]["ontime"],
+                              "late": due_deals[m]["late"], "open": due_deals[m]["open"],
+                              "skip": due_deals[m]["skip"], "orders": due_deals[m]["orders"],
+                              "pct": round(due_deals[m]["ontime"] / due_deals[m]["n"] * 100)
+                              if due_deals[m]["n"] else None, "unit": "deal",
+                              "keys": {"unit": "deal", "k": due_deals[m]["k"], "t": due_deals[m]["t"]}}}
+                for m, v in otd.items()]
     lead_out = {k: {"med": _median(v), "p75": _p75(v), "n": len(v)} for k, v in lead.items()}
     sup_all = {k: {"n": len(v), "ontime": sum(1 for x in v if x <= 0),
                    "pct": round(sum(1 for x in v if x <= 0) / len(v) * 100),
@@ -1144,12 +1196,16 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     end30 = [o for o in in_w if w_end[str(o.get("id"))] <= today + dt.timedelta(days=30)]
     warranty = {"months": warranty_months, "assumed": True, "active": len(in_w),
                 "ending30": len(end30),
+                # E54: «5 заказов (N сделок) на гарантии» — active/ending30 в заказах, deals — сделки
+                "deals": len({str(o.get("deal")) for o in in_w}),
+                "deals30": len({str(o.get("deal")) for o in end30}),
+                "units": {"active": "order", "ending30": "order", "deals": "deal", "deals30": "deal"},
                 "claims": None,
                 # Д-10 (R4): заказы за числами — «гарантия до ДД.ММ.ГГГГ (допущение N мес.)»
-                "keys": {"k": [str(o.get("id")) for o in in_w],
+                "keys": {"unit": "order", "k": [str(o.get("id")) for o in in_w],
                          "t": [f"гарантия до {w_end[str(o.get('id'))]:%d.%m.%Y} (допущение {warranty_months} мес.)"
                                for o in in_w]},
-                "keys30": {"k": [str(o.get("id")) for o in end30],
+                "keys30": {"unit": "order", "k": [str(o.get("id")) for o in end30],
                            "t": [f"гарантия до {w_end[str(o.get('id'))]:%d.%m.%Y} (допущение {warranty_months} мес.)"
                                  for o in end30]}}
     return {
@@ -1164,7 +1220,10 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         "otd": {"months": otd_rows, "last90": {"n": last90[0], "ontime": last90[1],
                                                "pct": round(last90[1] / last90[0] * 100) if last90[0] else None},
                 "deals90": {"n": deals90[0], "ontime": deals90[1],
-                            "pct": round(deals90[1] / deals90[0] * 100) if deals90[0] else None}},
+                            "pct": round(deals90[1] / deals90[0] * 100) if deals90[0] else None,
+                            "unit": "deal", "keys": {"unit": "deal", "k": d90k, "t": d90t}},
+                # единицы долей «Месяца»: months[].n/ontime/due — заказы; months[].dueDeals — сделки
+                "units": {"months": "order", "last90": "order", "deals90": "deal", "dueDeals": "deal"}},
         "norms": {"toShip": norm_ship, "path": norm_path},
         # заказов вида, у которых даты доставки нет и она взята из подписи УПД (delivered)
         "byUtd": sum(1 for o, _ in in_scope if not o.get("delFact") and o.get("utdDate")),

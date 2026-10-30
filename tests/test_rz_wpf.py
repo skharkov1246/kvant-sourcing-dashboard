@@ -180,9 +180,13 @@ def test_месяц_доля_к_сроку_из_life_и_списки(built):
             else:
                 assert f"y.{m}" not in D
         # строки списков «Месяца» — для каждого ключа, с датами срока и доставки
-        rows = {x["k"] for x in mo["orders"]}
+        rows = {x["k"] for x in mo["orders"]} | {x["k"] for x in mo.get("deals") or []}
         ks = {k for v in D.values() for k in v["k"]}
         assert ks <= rows | {str(o["id"]) for d in built["contracts"]["rows"] for o in d.get("orders") or []}, view
+        # E44 (30.10.2026): ключ сделки — только в списке сделок, заказа — только в списке заказов
+        for key, v in D.items():
+            assert v["unit"] in ("order", "deal", "segment", "file"), (view, key)
+            assert all(k.startswith("d:") == (v["unit"] == "deal") for k in v["k"]), (view, key)
 
 
 def test_квартал_сроки_звеньев_и_хвост_p80(built):

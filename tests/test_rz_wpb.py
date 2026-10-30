@@ -90,11 +90,16 @@ def test_д3_в_сборке(built):
     for nm, v in _views(built):
         W = v["ork"]["week"]
         U = W["tiles"]["unpaid"]
-        # unpaid — пункт сделки с заказами в ords (решение 30.10.2026): плитка — в заказах
+        # unpaid — пункт сделки с заказами в ords (решение 30.10.2026): заказы — по копиям per_order
         want = {q["order"] for q in lifecycle.per_order(v["life"]["queue"]) if q["code"] == "unpaid"}
+        # «Клиент не оплатил» — сделки (решение 30.10.2026: долг один на сделку), заказы — рядом
         assert U["orders"] == len(want) == len(W["drill"]["unpaid"]["k"]), nm
         assert set(W["drill"]["unpaid"]["k"]) == {str(k) for k in want}, nm
-        assert "keys" not in U and "label" in U
+        wd = {str(q["deal"]) for q in v["life"]["queue"] if q["code"] == "unpaid"}
+        assert U["deals"] == len(wd) == len(W["drill"]["unpaidDeals"]["k"]), nm
+        assert set(W["drill"]["unpaidDeals"]["k"]) == {f"d:{d}" for d in wd}, nm
+        assert W["drill"]["unpaidDeals"]["unit"] == "deal" and W["drill"]["unpaid"]["unit"] == "order"
+        assert "keys" not in U and "dkeys" not in U and "label" in U
 
 
 # ── Д-4: одна причина на заказ ──────────────────────────────────────────────────────────────
@@ -125,8 +130,10 @@ def test_д4_в_сборке_сумма_причин_равна_числу(built
         assert all(r["cause"] in orkview.CAUSES for r in rows), nm
         by = {r["k"]: r["cause"] for r in rows}
         # по каждому списку заказов «Недели»: сумма причин = длина списка (ключи заказов)
-        lists = [W["drill"]["W2"], W["drill"]["W3p"]["late"]["k"], W["drill"]["W3p"]["threat"]["k"], W["drill"]["live"]]
-        lists += [e["now"] for e in W["drill"]["step"].values()]
+        lists = [W["drill"]["W2"]["k"], W["drill"]["W3p"]["late"]["k"], W["drill"]["W3p"]["threat"]["k"],
+                 W["drill"]["live"]["k"]]
+        lists += [e["now"]["k"] for e in W["drill"]["step"].values() if e["now"]["unit"] == "order"]
+        lists += [e["orders"]["k"] for e in W["drill"]["step"].values() if "orders" in e]
         for L in lists:
             ks = [k for k in L if k in by]
             assert sum(Counter(by[k] for k in ks).values()) == len(ks), nm
@@ -146,8 +153,10 @@ def test_д5а_д6_в_сборке(built):
             if s["no"] not in ork.NORM_WD:
                 assert s["maxWd"] is None
                 continue
-            # второй способ: максимум р.д. по строкам заказов шага в счёте (не «срок неизвестен», не «не в счёте»)
-            wd = [r["wd"] for r in rows if r.get("step") == s["no"] and r.get("wd") is not None
+            # второй способ: максимум р.д. по строкам заказов шага в счёте (не «срок неизвестен», не «не в счёте»);
+            # у шага сделки (1) — по строкам сделок шага (week.deals)
+            src = rows if s["unit"] == "order" else orkview.unpack(W["deals"], W["strs"])
+            wd = [r["wd"] for r in src if r.get("step") == s["no"] and r.get("wd") is not None
                   and not r.get("tu") and not r.get("nc")]
             assert s["maxWd"] == (max(wd) if wd else None), (nm, s["no"])
         assert any(s["maxWd"] is not None for s in W["ledger"]) or nm == "sep"
@@ -189,12 +198,12 @@ def test_д9_ключи_за_счётами(built):
     for nm, v in _views(built):
         W = v["ork"]["week"]
         D, T1, T5 = W["drill"], W["tiles"]["W1"], W["tiles"]["W5"]
-        assert len(D["W1byAssign"]) == T1.get("byAssign", 0), nm
-        assert len(D["W1assignStale"]) == T1.get("assignStale", 0), nm
-        assert len(D["W1assignNoMgr"]) == T1.get("assignNoMgr", 0), nm
-        assert len(D["W5prod"]) == (T5.get("prod") or 0), nm
-        assert len(D["W5noDates"]) == (T5.get("noDates") or 0), nm
-        assert len(D["noCal"]) == v["ork"]["trust"]["noCalendar"], nm
+        assert len(D["W1byAssign"]["k"]) == T1.get("byAssign", 0), nm
+        assert len(D["W1assignStale"]["k"]) == T1.get("assignStale", 0), nm
+        assert len(D["W1assignNoMgr"]["k"]) == T1.get("assignNoMgr", 0), nm
+        assert len(D["W5prod"]["k"]) == (T5.get("prod") or 0), nm
+        assert len(D["W5noDates"]["k"]) == (T5.get("noDates") or 0), nm
+        assert len(D["noCal"]["k"]) == v["ork"]["trust"]["noCalendar"], nm
         rows = orkview.unpack(W["orders"], W["strs"])
         assert all(("why" not in r) or r["why"] for r in rows)
         assert all(r.get("ncWhy") for r in rows if r.get("nc")), "у «не в счёте» — почему"
