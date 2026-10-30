@@ -41,7 +41,9 @@ def smoke(tmp_path_factory):
     return out.resolve().as_uri()
 
 
-@pytest.fixture(scope="session")
+# браузер — на модуль, не на сессию: живой sync_playwright до конца сессии ломает браузерные тесты
+# других модулей («Sync API inside the asyncio loop») при общем прогоне pytest (preflight)
+@pytest.fixture(scope="module")
 def browser():
     pw = pytest.importorskip("playwright.sync_api")
     with pw.sync_playwright() as p:

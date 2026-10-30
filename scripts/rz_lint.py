@@ -12,6 +12,7 @@
 Запуск:
   python scripts/rz_lint.py smoke/index.html            # все подвкладки обоих видов, браузер
   python scripts/rz_lint.py smoke/index.html --scope frame --max 0   # только шапка и строка подвкладок
+  python scripts/rz_lint.py smoke/index.html --scope drawer --max 0  # основные экраны панели: список, заказ, сделка
   python scripts/rz_lint.py --text файл.txt             # правило 1 по готовому тексту, без браузера
 Код возврата 1 — нарушений больше --max (по умолчанию 0). --json путь — подробности в файл.
 Ядро (forbidden, abbr_check, code_check) — чистые функции: их проверяют тесты без браузера.
@@ -134,13 +135,69 @@ COLLECT = r"""(scope)=>{
   const root=document.getElementById('tab-contracts'); if(!root) return [];
   const pick=scope==='frame'?[...root.querySelectorAll(':scope > header, :scope > .ctbar, :scope > .rzalarm, :scope > .rzkamnote')]:[root];
   const out=[];
-  const vis=el=>{for(let e=el;e&&e!==document.body;e=e.parentElement){if(e.hidden||e.classList.contains('ctvh')||e.classList.contains('orkvh')) return false;}
+  const vis=el=>{for(let e=el;e&&e!==document.body;e=e.parentElement){if(e.hidden||e.classList.contains('ctvh')||e.classList.contains('orkvh')) return false;
+      if(e.tagName==='DETAILS'&&!e.open&&!el.closest('summary')) return false;}
     return el.getClientRects().length>0;};
   pick.forEach(r=>{const w=document.createTreeWalker(r,NodeFilter.SHOW_TEXT);
     for(let n=w.nextNode();n;n=w.nextNode()){const t=n.nodeValue; if(!t||!t.trim()) continue; const el=n.parentElement;
       if(!el||el.closest('script,style,select')||!vis(el)) continue;
       const gl=!!el.closest('.rzgl-l'); out.push({t:t.replace(/\s+/g,' '),abbr:gl||!!el.closest('abbr.rzabbr,abbr[data-tip]'),code:gl||!!el.closest('.rzcode')});}});
   return out;}"""
+
+
+# панель (основные экраны П-5: список за числом У3, заказ У4, сделка У4д): текст #drw без шапки-крошек.
+# Первое появление сокращения считается на подвкладке, с которой открыта панель, — здесь только
+# запрещённые слова, сокращения вне <abbr> и коды вне хвоста
+COLLECT_DRW = r"""()=>{
+  const root=document.getElementById('drw'); if(!root||!root.classList.contains('on')) return [];
+  const out=[];
+  const vis=el=>{for(let e=el;e&&e!==document.body;e=e.parentElement){if(e.hidden||e.classList.contains('odvh')||e.classList.contains('op-vh')||e.classList.contains('ctvh')) return false;
+      if(e.tagName==='DETAILS'&&!e.open&&!el.closest('summary')) return false;}
+    return el.getClientRects().length>0;};
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+  for(let n=w.nextNode();n;n=w.nextNode()){const t=n.nodeValue; if(!t||!t.trim()) continue; const el=n.parentElement;
+    if(!el||el.closest('script,style,select')||!vis(el)) continue;
+    out.push({t:t.replace(/\s+/g,' '),abbr:!!el.closest('abbr.rzabbr,abbr[data-tip]'),code:!!el.closest('.rzcode')});}
+  return out;}"""
+
+
+def lint_drawer(html: Path, exe: str | None = None) -> dict:
+    from playwright.sync_api import sync_playwright
+    url = html.resolve().as_uri()
+    res: dict = {}
+    with sync_playwright() as p:
+        kw = {"executable_path": exe} if exe else {}
+        try:
+            b = p.chromium.launch(**kw)
+        except Exception:                                    # noqa: BLE001 — своя сборка Chromium не скачана
+            sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+            from scripts.validate_dashboard import find_chrome
+            e, _v = find_chrome()
+            if not e:
+                raise SystemExit("нет браузера для Playwright")
+            b = p.chromium.launch(executable_path=e)
+        pg = b.new_page(viewport={"width": 1280, "height": 900})
+
+        def one(name):
+            pg.wait_for_timeout(250)
+            segs = pg.evaluate(COLLECT_DRW)
+            r = lint_segments(segs)
+            r["total"] -= len(r["abbrFirst"])
+            r["abbrFirst"] = []
+            res[name] = r
+        pg.goto(url + "#contracts/week")
+        pg.wait_for_timeout(300)
+        pg.click('#tab-contracts [data-kpi-rank="1"]')
+        one("панель: список")
+        pg.click("#drwBody #odTable [data-odgo]")
+        one("панель: заказ")
+        pg.goto("about:blank")
+        pg.goto(url + "#contracts/main")
+        pg.wait_for_timeout(300)
+        pg.click("#ctBody tr[data-ct] button.ctd-no")
+        one("панель: сделка")
+        b.close()
+    return res
 
 
 def lint_page(html: Path, scope: str = "all", exe: str | None = None) -> dict:
@@ -176,7 +233,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("html", nargs="?")
     ap.add_argument("--text", help="проверить готовый текст (только правило 1)")
-    ap.add_argument("--scope", choices=["all", "frame"], default="all",
+    ap.add_argument("--scope", choices=["all", "frame", "drawer"], default="all",
                     help="frame — только шапка, строка подвкладок и тревоги (каркас WP-A)")
     ap.add_argument("--max", type=int, default=0, help="допустимо нарушений (по умолчанию 0)")
     ap.add_argument("--json", help="подробности в файл")
@@ -190,7 +247,7 @@ def main(argv=None) -> int:
         return 1 if len(f) > a.max else 0
     if not a.html:
         ap.error("нужен путь к странице или --text")
-    res = lint_page(Path(a.html), a.scope, a.chrome)
+    res = lint_drawer(Path(a.html), a.chrome) if a.scope == "drawer" else lint_page(Path(a.html), a.scope, a.chrome)
     total = 0
     for scr, r in res.items():
         total += r["total"]

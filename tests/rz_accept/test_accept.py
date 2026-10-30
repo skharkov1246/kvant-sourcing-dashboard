@@ -113,13 +113,27 @@ def test_p03_от_числа_до_битрикса(open_page, cfg, sub):
 
 
 # ---------------------------------------------------------------- П-4 тупики
+# Число — счёт множества («19 заказов», «3 сделки», «4 пункта») или голая мера в ячейке («12», «25 %»,
+# «3 из 12»): за ним стоит список (спец. 2.1, П-4). Не числа-тупики: даты, номера, годы, пороги и нормы
+# («≤ 14 дн.», «1 раб. день»), имена из корпуса («Компания 302»), ноль (за нулём списка нет — спец. 2.4,
+# «ноль — не кнопка»), подписи-рисунки (aria-hidden), строки таблиц, которые сами открываются, итог
+# таблицы (tfoot — сумма её строк), заголовок-вывод и строка-расшифровка над списком, который открывается.
 DEAD = r"""(()=>{const root=document.querySelector('#tab-contracts'); const out=[];
+  const CNT=/(^|[^\d\/.,])\d[\d\u00a0\u202f ]*\s*(заказ|сдел|пункт|заказчик|человек|файл|строк|позици|отрез|поставщик|случа|карточ)/i;
+  const BARE=/^\s*[≤≥~≈]?\s*\d[\d\u00a0\u202f ]*(,\d+)?\s*(%|из\s+\d+)?\s*$/;
+  const DRILL='button.rzn,button.odn,[data-od],[data-of],tr[data-odk],tr[data-ct],tr.drill,[data-ctk],[data-m]';
   const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
   for(let t=w.nextNode();t;t=w.nextNode()){ const s=t.nodeValue; const el=t.parentElement;
-    if(!el||!el.getClientRects().length||el.closest('script,style,select,option,.ctvh,.orkvh,[hidden]')) continue;
-    const x=s.replace(/\b\d{1,2}\.\d{1,2}(\.\d{4})?\b/g,'').replace(/\b(19|20)\d\d\b/g,'').replace(/№\s?\d+(\/\d+)?/g,'').replace(/\b\d+\/\d+\b/g,'');
-    if(!/\d/.test(x)) continue;
-    if(el.closest('button,a[href],[data-od],[data-of],.rzfinal,.rzcode,abbr,.rzn0,.rznd,th,thead,caption,.rzgl-l,summary,label')) continue;
+    if(!el||!el.getClientRects().length||el.closest('script,style,select,option,.ctvh,.orkvh,[hidden],[aria-hidden="true"]')) continue;
+    {const d=el.closest('details'); if(d&&!d.open&&!el.closest('summary')) continue;}
+    const x=s.replace(/\b\d{1,2}\.\d{1,2}(\.\d{4})?\b/g,'').replace(/\b(19|20)\d\d\b/g,'').replace(/№\s?\d+(\/\d+)?/g,'').replace(/\b\d+\/\d+\b/g,'')
+      .replace(/(Компания|Поставщик|Менеджер|КАМ|Клиент)\s+\d+/g,'');
+    if(!CNT.test(x)&&!BARE.test(x)) continue;
+    if(/^\s*0\s*$/.test(x)) continue;
+    if(el.closest('button,a[href],[data-od],[data-of],.rzfinal,.rzcode,abbr,.rzn0,.rznd,th,thead,tfoot,caption,.rzgl-l,summary,label')) continue;
+    const tr=el.closest('tr'); if(tr&&(tr.matches('[data-odk],[data-ct],[data-od],.drill,[data-adj]')||tr.querySelector('button,a[href]'))) continue;
+    const hd=el.closest('h1,h2,h3,h4')||(()=>{const p=el.closest('p,div'); const pr=p&&p.previousElementSibling; return pr&&/^H[1-4]$/.test(pr.tagName)?p:null;})();
+    if(hd){const box=hd.closest('section,.card,details,.wksec,.ctd-d,.ctd-a')||hd.parentElement; if(box&&box.querySelector(DRILL)) continue;}
     out.push(s.trim().slice(0,40)); }
   return out;})()"""
 

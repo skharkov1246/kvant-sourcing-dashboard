@@ -274,7 +274,8 @@ try{
   snap(document.getElementById('orkPulseB').closest('table'),'people');
   snap(document.getElementById('orkLed').closest('table'),'ledger');
   // список за числом (дровер): в имени файла — подвкладка и направление числа, как у таблиц вкладки
-  var od=function(sel,key){var b=document.querySelector(sel+' button[data-od="w:live"]'); b.click();
+  // «N заказов в работе» — в шапке вкладки (R4, WP-A), по выбранному направлению; в панели — если есть
+  var od=function(sel,key){var b=document.querySelector(sel+' button[data-od="w:live"]')||document.querySelector('#ctLive button[data-od="w:live"]'); b.click();
     var t=document.getElementById('odTable'); snap(t,key); out[key].trs=t.tBodies[0].rows.length; out[key].n=+b.textContent;
     _odClose(false);};
   od('#ctPanel-main','odMain');

@@ -605,7 +605,7 @@ class ContractsStub:
             {"ID": "6032", "TITLE": "932. Поставка принята вчера", "OPPORTUNITY": "25000", "CURRENCY_ID": "EUR",
              "COMPANY_ID": "303", "STAGE_ID": "C0:NEW", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
              "DATE_CREATE": t(0.2), "ASSIGNED_BY_ID": "11", ct.OSS_DEAL: ["22"], ct.KAM_F: "12"},
-            {"ID": "6033", "TITLE": "933. Узлы гигиены", "OPPORTUNITY": "50000", "CURRENCY_ID": "EUR",
+            {"ID": "6033", "TITLE": "933. Узлы смазки", "OPPORTUNITY": "50000", "CURRENCY_ID": "EUR",
              "COMPANY_ID": "304", "STAGE_ID": "C0:EXECUTING", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
              "DATE_CREATE": t(160), "ASSIGNED_BY_ID": "12", ct.OSS_DEAL: ["23"], ct.KAM_F: "10",
              ct.ORK_RESP: "31"},
@@ -646,7 +646,7 @@ class ContractsStub:
         )
         for k, (target, age, last, extra) in enumerate(special):
             oid += 1
-            self.orders.append({"id": oid, "title": f"933/{k + 1}. Узел гигиены", "companyId": "402",
+            self.orders.append({"id": oid, "title": f"933/{k + 1}. Узел смазки", "companyId": "402",
                                 "parentId2": 6033, "opportunity": 8_000, "currencyId": "EUR",
                                 "stageId": f"DT172_26:{target}", "createdTime": t(age), "movedTime": t(last),
                                 ct.OSS_F: "23", ct.DL_CUSTOMER: d(-90), "assignedById": "31", **extra})

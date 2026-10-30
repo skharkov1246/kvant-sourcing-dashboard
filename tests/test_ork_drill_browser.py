@@ -83,6 +83,9 @@ def _expect(el) -> int:
 def _clicked_rows(pg, el) -> int:
     el.scroll_into_view_if_needed()
     el.click()
+    # указатель уходит с панели: под ним бывает сокращение <abbr> с подсказкой, а Esc сначала закрывает
+    # подсказку (WCAG 1.4.13), и только следующий Esc — список
+    pg.mouse.move(0, 0)
     pg.wait_for_selector("#drw.on")
     return pg.locator(ROWS).count()
 

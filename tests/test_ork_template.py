@@ -219,10 +219,13 @@ def test_что_важно_сегодня_в_неделе_под_очередь�
         assert x["role"] in week[week.index("ctImpS"):]
     assert not any(x["text"] in week for x in dc["sepImportant"]), "пункты направления — не в основном виде"
     assert all(x["text"] in out["sep"]["week"] for x in dc["sepImportant"])
-    # «в копии» — как в очереди недели (ревью 28.10.2026): у срыва срока направления КАМ в копии
+    # «в курсе» (R4, 2.7: «в копии» запрещено) — как в очереди недели: у срыва срока направления КАМ в курсе,
+    # роль один раз — словом перед именем, без «(КАМ)» после
     с_копией = [x for x in dc["sepImportant"] if x.get("copy")]
-    assert с_копией and all(f"в копии: {x['copy']}" in out["sep"]["week"] for x in с_копией)
-    assert "(КАМ)" in out["sep"]["week"][out["sep"]["week"].index("ctImpS"):]
+    role = r"\s*\((КАМ|ОСС|ОРК|рук\. ОРК|руководитель ОРК|менеджер ОРК)\)\s*$"
+    assert с_копией and all("в курсе: " in out["sep"]["week"] and re.sub(role, "", x["copy"]) in out["sep"]["week"]
+                            for x in с_копией)
+    assert "в курсе: КАМ " in out["sep"]["week"][out["sep"]["week"].index("ctImpS"):]
     # без закрытой части — ни заголовка, ни строк
     bare = _render({"main": ct}, built["ork_month"])["main"]["week"]
     assert "ctImpS" not in bare and "Что важно сегодня" not in bare

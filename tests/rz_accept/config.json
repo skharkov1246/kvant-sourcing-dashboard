@@ -2,13 +2,13 @@
   "_": "Приёмка «Реализации» R4 (спецификация R4, раздел 7). enforce=true — проверка роняет тест; false — меряет и помечает xfail с замером, пока пакет-владелец не сдан. Интегратор после сведения пакетов включает enforce по разделам пакетов.",
   "viewports": {"desktop": [1280, 800], "phone": [390, 844]},
   "P1": {"owner": "все", "note": "тест 5 секунд — люди (владелец + один со стороны); тест только снимает экраны, если задан RZ_SHOTS"},
-  "P2": {"owner": "WP-A каркас; WP-B..F — первые экраны", "enforce_frame": true, "enforce_kpi": false},
-  "P3": {"owner": "WP-C, WP-D, WP-E", "enforce": false, "max_actions": 3, "per_screen_cap": 40},
-  "P4": {"owner": "все", "enforce": false, "dead_max": 0},
-  "P5": {"owner": "WP-A каркас; все — свои экраны", "enforce_frame": true, "enforce_tab": false, "tab_max": 10},
-  "P6": {"owner": "WP-A каркас и токены; все — свои классы", "enforce_frame": true, "enforce_tab": false, "min_px": 13, "tap_px": 44},
-  "P7": {"owner": "WP-A токены", "enforce": true, "text": 4.5, "mark": 3.0, "enforce_red": false, "red_max": 0.10},
+  "P2": {"owner": "WP-A каркас; WP-B..F — первые экраны", "enforce_frame": true, "enforce_kpi": true},
+  "P3": {"owner": "WP-C, WP-D, WP-E", "enforce": true, "max_actions": 3, "per_screen_cap": 40},
+  "P4": {"owner": "все", "enforce": true, "dead_max": 0},
+  "P5": {"owner": "WP-A каркас; все — свои экраны", "enforce_frame": true, "enforce_tab": true, "tab_max": 10},
+  "P6": {"owner": "WP-A каркас и токены; все — свои классы", "enforce_frame": true, "enforce_tab": true, "min_px": 13, "tap_px": 44},
+  "P7": {"owner": "WP-A токены", "enforce": true, "text": 4.5, "mark": 3.0, "enforce_red": true, "red_max": 0.10},
   "P8": {"owner": "WP-A правила вкладки; WP-F доли «k из n»", "enforce": true},
   "P9": {"owner": "WP-A", "enforce": true},
-  "P10": {"owner": "WP-B", "enforce": false, "max_1280": 3200, "max_390": 7000}
+  "P10": {"owner": "WP-B", "enforce": true, "max_1280": 3200, "max_390": 7000}
 }

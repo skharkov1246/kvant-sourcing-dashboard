@@ -104,8 +104,10 @@ out.peopleTitle = box._odTitle(Object.assign(MP, {id: 'w:who/x/all'})).txt;
 out.colonTitle = box._odTitle(Object.assign(box._odModel(X, O, {keys: {k: ['9001'], t: null}, pre: 'w', title: 'Ждём: КАМ (шаги 2, 3, 10)'}), {})).txt;
 out.f = {parse: box._odFParse('part.late|risk,cause.our,step.5,sup.12'), str: box._odFStr({part: ['late'], cause: ['sup'], step: '7'})};
 out.addr = box._odAddr('#contracts/week/sep?n=w%3AW3&f=part.late&o=9001&s=5');
-out.days = ['late', 'risk', 'forecast', 'prodDev', 's3Over', 'noUtd', 'unpaid', 'noOrder'].map(c => box._odDays(c, 7, {norm: 9}));
-out.days0 = box._odDays('risk', 0);
+// неразрывный пробел каркаса (WP-A: «7 дн.» не рвётся строкой) сравниваем как обычный
+const sp = s => String(s).replace(/\u00a0/g, ' ');
+out.days = ['late', 'risk', 'forecast', 'prodDev', 's3Over', 'noUtd', 'unpaid', 'noOrder'].map(c => sp(box._odDays(c, 7, {norm: 9})));
+out.days0 = sp(box._odDays('risk', 0));
 out.labels = ['our', 'sup', 'log', 'kam', 'oss', 'nodata'].map(c => box._odCauseL(c));
 process.stdout.write(JSON.stringify(out));
 """

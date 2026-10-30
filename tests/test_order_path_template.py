@@ -157,7 +157,9 @@ def test_заказы_сделки_и_возврат(run):
     chips = re.findall(r'data-opk="([^"]+)"', h)
     assert set(chips) >= {str(x["id"]) for x in d["orders"]}
     assert h.count('aria-current="true"') == 1
-    assert 'data-opgo="deal">Сделка №' in out["__deal"]
+    # крошки «… › Сделка №… › Заказ» — у панели (WP-C _odCrumbs) на всех уровнях; путь заказа свои не
+    # рисует, когда они есть (один путь назад, спец. 0.3); переход к сделке — кнопкой «Сделка №… →»
+    assert 'data-opgo="deal">Сделка №' in out["__deal"] or 'data-opgo="card">Сделка №' in out["__deal"]
     assert 'data-opgo="card">Сделка №' in h
     assert out["__none"] is None
 

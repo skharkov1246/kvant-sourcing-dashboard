@@ -94,10 +94,10 @@ def test_строка_списка_открывает_путь_и_назад(bro
         pg.keyboard.press("Tab")
         assert pg.evaluate("document.getElementById('drw').contains(document.activeElement)")
     # «← к списку» — тот же список, фокус на той же строке
-    pg.locator("[data-opgo=list]").click()
+    pg.locator("#drwCrumbs [data-odcr=list]").first.click()
     pg.wait_for_selector("#odTable")
     assert not pg.locator("#opRoot").count()
-    assert pg.evaluate("document.activeElement.dataset.odk") == k
+    assert pg.evaluate("(document.activeElement.closest('tr')||document.activeElement).dataset.odk") == k
     # Enter на строке — путь; Esc — на уровень вверх (к списку, фокус на строке), ещё Esc — закрыть,
     # фокус на число
     pg.keyboard.press("Enter")
@@ -105,7 +105,7 @@ def test_строка_списка_открывает_путь_и_назад(bro
     pg.keyboard.press("Escape")
     pg.wait_for_selector("#odTable")
     assert not pg.locator("#opRoot").count()
-    assert pg.evaluate("document.activeElement.dataset.odk") == k
+    assert pg.evaluate("(document.activeElement.closest('tr')||document.activeElement).dataset.odk") == k
     pg.keyboard.press("Escape")
     assert not pg.evaluate("document.getElementById('drw').classList.contains('on')")
     assert pg.evaluate("el=>document.activeElement===el", num.element_handle())
@@ -129,11 +129,11 @@ def test_заказы_сделки_и_карточка(browser, page_url):
     assert pg.evaluate("document.getElementById('drw').classList.contains('on')")
     pg.evaluate("k=>_opOpen(k,{back:'deal'})", k)
     pg.wait_for_selector("#opRoot")
-    back = pg.locator("[data-opgo=deal]")
+    back = pg.locator("#drwCrumbs .odcrb[data-odcr=deal]")
     assert back.inner_text().startswith("Сделка №")
     assert pg.evaluate("document.activeElement.id") == "drwName"
     # из сделки — без «‹ ›»: соседние заказы ходят только по списку за числом
-    assert not pg.locator("#opRoot [data-opgo=next]").count()
+    assert not pg.locator("#drwNav:not([hidden]) [data-odnav]").count()
     back.click()
     pg.wait_for_function("!document.getElementById('opRoot')")
     assert pg.evaluate("document.getElementById('drw').contains(document.activeElement)")
@@ -185,7 +185,7 @@ def test_карточка_из_таблицы_путь_назад_esc(browser, p
         top = pg.evaluate("document.getElementById('drwBody').scrollTop")
         pg.keyboard.press("Enter")
         pg.wait_for_selector("#opRoot")
-        pg.locator("[data-opgo=deal]").click()
+        pg.locator("#drwCrumbs [data-odcr=deal]").first.click()
         pg.wait_for_function("!document.getElementById('opRoot')")
         assert pg.evaluate("document.activeElement.dataset.ctop") == k
         assert pg.evaluate("document.getElementById('drwBody').scrollTop") == top
@@ -233,7 +233,7 @@ def test_производство_дольше_обычного_не_откло�
         pg.wait_for_selector("#opRoot")
         t = pg.locator("#opRoot").inner_text()
         assert "Отклонений нет" not in t and "статус и новую дату" in t
-        pg.locator("[data-opgo=list]").click()
+        pg.locator("#drwCrumbs [data-odcr=list]").first.click()
         pg.wait_for_selector("#odTable")
     assert not errs, errs
     pg.close()
@@ -265,7 +265,7 @@ def test_ведомость_13_шагов_без_прокрутки(browser, pag
     """Ревью R4: ведомость «Где сейчас заказы: 13 шагов» умещается в свою обёртку — подзаголовок
     столбца «Нет файлов шага» переносится, а не растягивает таблицу."""
     pg, errs = _open(browser, page_url, w)
-    r = pg.evaluate("()=>{const t=document.querySelector('#tab-contracts table.orkled'), x=t.closest('.twrap'); return [x.scrollWidth, x.clientWidth]}")
+    r = pg.evaluate("()=>{const t=document.querySelector('#tab-contracts table.wkled'), x=t.closest('.twrap'); return [x.scrollWidth, x.clientWidth]}")
     assert r[0] <= r[1] + 1, r
     assert not errs, errs
     pg.close()
@@ -292,7 +292,7 @@ def test_дни_на_шаге_в_списке_как_в_пути(browser, page_u
     import re
     pg, errs = _open(browser, page_url)
     seen, checked = set(), 0
-    for sel in ("#tab-contracts .actile[data-of=w3]", "#ctPanel-main button.odn[data-od='w:live']"):
+    for sel in ("#tab-contracts button.rzn[data-kpi-rank='1']", "#ctPanel-main button.odn[data-od='w:live']"):
         b = pg.locator(sel).first
         if not b.count():
             continue
@@ -314,7 +314,7 @@ def test_дни_на_шаге_в_списке_как_в_пути(browser, page_u
                 assert "раб. дн." in days, (k, days)
                 if since and hero[1]:
                     assert since == hero[1], (k, since, hero)
-            pg.locator("[data-opgo=list]").click()
+            pg.locator("#drwCrumbs [data-odcr=list]").first.click()
             pg.wait_for_selector("#odTable")
         pg.keyboard.press("Escape")
     assert checked >= 5, checked
@@ -342,11 +342,11 @@ def test_шаг_раскрывается_esc_и_соседний_заказ(brow
     assert pg.evaluate("document.activeElement.dataset.opstep") == st
     if n > 1:
         first = pg.locator("#opRoot").get_attribute("data-opk")
-        assert pg.locator("#opRoot .op-pgn").inner_text().startswith("1 из ")
+        assert pg.locator("#drwNav .odnc").inner_text().startswith("1 из ")
         pg.keyboard.press("]")
         pg.wait_for_function("k=>document.getElementById('opRoot').dataset.opk!==k", arg=first)
-        assert pg.locator("#opRoot .op-pgn").inner_text().startswith("2 из ")
-        pg.locator("#opRoot [data-opgo=prev]").click()
+        assert pg.locator("#drwNav .odnc").inner_text().startswith("2 из ")
+        pg.locator("#drwNav [data-odnav='-1']").click()
         pg.wait_for_function("k=>document.getElementById('opRoot').dataset.opk===k", arg=first)
     pg.keyboard.press("Escape")
     pg.wait_for_selector("#odTable")

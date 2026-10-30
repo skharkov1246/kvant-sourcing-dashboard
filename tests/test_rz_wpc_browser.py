@@ -23,7 +23,8 @@ sys.modules.setdefault("dotenv", types.SimpleNamespace(load_dotenv=lambda *a, **
 pw = pytest.importorskip("playwright.sync_api")
 
 ROWS = "#drwBody #odTable tbody tr"
-TILE = "#tab-contracts .actile[data-of='w3']"
+# плитка «Срок клиента сорван · W3» (WP-B: число-кнопка ранга 1, список w:W3p/late)
+TILE = "#tab-contracts button.rzn[data-kpi-rank='1']"
 
 
 @pytest.fixture(scope="module")
@@ -150,13 +151,13 @@ def test_крошки_соседний_заказ_esc_и_назад(browser, pag
 
 
 def test_адрес_открывает_те_же_уровни(browser, page_url):
-    pg, errs = _open(browser, page_url, hash_="#contracts/week?n=w%3AW3&f=part.late")
+    pg, errs = _open(browser, page_url, hash_="#contracts/week?n=w%3AW3p%2Flate&f=part.late")
     pg.wait_for_selector("#drw.on")
     late = pg.locator(ROWS).count()
     assert late > 0 and pg.locator("#drwBody [data-odf='rm:part']").count() == 1
     k = pg.locator(ROWS).first.get_attribute("data-odk")
     pg.close()
-    pg, errs2 = _open(browser, page_url, hash_=f"#contracts/week?n=w%3AW3&f=part.late&o={k}")
+    pg, errs2 = _open(browser, page_url, hash_=f"#contracts/week?n=w%3AW3p%2Flate&f=part.late&o={k}")
     pg.wait_for_selector("#opRoot")
     assert pg.locator("#opRoot").get_attribute("data-opk") == k
     assert pg.locator("#drwNav .odnc").inner_text() == f"1 из {late}"
