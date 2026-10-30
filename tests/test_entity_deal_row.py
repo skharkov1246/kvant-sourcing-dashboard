@@ -22,6 +22,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import contracts  # noqa: E402
 import dealctx  # noqa: E402
+import lifecycle  # noqa: E402
 from tests import fixture  # noqa: E402
 
 NOW = dt.datetime.fromisoformat(fixture.CT_NOW)
@@ -109,7 +110,8 @@ def test_деньги_долга_клиента_доля_неоплаченны�
     ords), даёт те же заказы, что пункты заказов."""
     ct = R["contracts"]
     queue = list(ct["life"]["queue"]) + list((ct.get("sep") or {}).get("life", {}).get("queue") or [])
-    unpaid = {str(q["order"]) for q in queue if q["code"] == "unpaid"}
+    # пункт unpaid — сделки, заказы строками ords (свёртка lifecycle._fold_deal_codes)
+    unpaid = {o for q in queue if q["code"] == "unpaid" for o in lifecycle.item_orders(q)}
     assert unpaid, "корпус: долг клиента есть"
     for x in ct["rows"]:
         mine = [o for o in x["orders"] if o["id"] in unpaid]

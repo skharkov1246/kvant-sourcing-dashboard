@@ -93,8 +93,11 @@ def test_приёмка_сделки_одна_на_сделку(built):
     _o_, _d_, life, v, _m = built
     w = v["week"]
     T1, T1o, T2 = w["tiles"]["W1"], w["tiles"]["W1o"], w["tiles"]["W2"]
-    # пунктов s1Over у сделки A три (по заказу), а сделка — одна; D — без заказа дольше 1 р.д.
-    assert sum(1 for q in life["queue"] if q["code"] == "s1Over" and q["deal"] == "A") == 3
+    # у сделки A три заказа на приёмке — пункт s1Over один, пункт СДЕЛКИ с тремя заказами в ords
+    # (свёртка lifecycle._fold_deal_codes); по заказам (per_order) — три; D — без заказа дольше 1 р.д.
+    A1 = [q for q in life["queue"] if q["code"] == "s1Over" and q["deal"] == "A"]
+    assert len(A1) == 1 and A1[0]["unit"] == "deal" and len(A1[0]["ords"]) == 3
+    assert sum(1 for q in lifecycle.per_order(life["queue"]) if q["code"] == "s1Over" and q["deal"] == "A") == 3
     assert (T1["unit"], T1["value"], T1["accept"], T1["noOrder"]) == ("deal", 2, 1, 1)
     assert sorted(_k(w["drill"]["W1"])) == ["d:A", "d:D"] and w["drill"]["W1"]["unit"] == "deal"
     # n — сделки на шаге 1 в счёте: A, D и F (F — в норме)
@@ -155,7 +158,10 @@ def test_кого_ждём_заказы_и_сделки(built):
 def test_клиент_не_оплатил_в_сделках(built):
     _o_, _d_, life, v, _m = built
     U = v["week"]["tiles"]["unpaid"]
-    assert sum(1 for q in life["queue"] if q["code"] == "unpaid") == 2
+    # долг по договору — пункт сделки E с двумя заказами в ords (свёртка); по заказам — два
+    E1 = [q for q in life["queue"] if q["code"] == "unpaid"]
+    assert len(E1) == 1 and E1[0]["unit"] == "deal" and sorted(r["id"] for r in E1[0]["ords"]) == ["e1", "e2"]
+    assert sum(1 for q in lifecycle.per_order(life["queue"]) if q["code"] == "unpaid") == 2
     # один долг по договору — одна сделка; заказы — в скобках; деньги — доля этих заказов
     assert (U["unit"], U["deals"], U["orders"], U["rev"]) == ("deal", 1, 2, 500)
     D = v["week"]["drill"]
@@ -312,7 +318,7 @@ def test_доставка_к_сроку_в_сделках():
     d90 = life["otd"]["deals90"]
     assert (d90["n"], d90["ontime"], d90["unit"]) == (2, 1, "deal") and sorted(d90["keys"]["k"]) == ["d:G", "d:H"]
     assert sum(m["dueDeals"]["n"] for m in life["otd"]["months"][-3:]) == d90["n"]
-    # «Месяц»: доля в сделках рядом с заказами, список сделок собран (dkNext — пока страница не выводит)
+    # «Месяц»: доля в сделках рядом с заказами, список сделок собран, у показателя — dk (число на странице)
     month, _p, _j = orkview._month(orders, [], T0, life["otd"], {})
     row = next(r for r in month["rows"] if r["m"] == "09.2026")
     assert (row["otdDueDeals"]["n"], row["otdDueDeals"]["k"], row["otdDueDeals"]["unit"]) == (2, 1, "deal")

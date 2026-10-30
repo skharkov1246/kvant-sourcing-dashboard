@@ -301,6 +301,8 @@ def test_неделя_строки_с_номером_заказа_поставщ
     # поставщика в данных нет — строка без него, номер и срок остаются
     for x in v["life"]["queue"]:
         x["sup"] = ""
+        for o in x.get("ords") or []:          # заказы пункта сделки (свёртка) — тоже без поставщика
+            o["sup"] = ""
     today = _render({"main": v}, om)["main"]["today"]
     assert "Компания 40" not in today
     assert ">990/2 ›<" in today and "срок 29.09.2026" in today

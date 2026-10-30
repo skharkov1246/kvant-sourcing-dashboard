@@ -744,7 +744,9 @@ def queue_counts(queue: list[dict]) -> dict:
     заказов на код (пункты заказа), dealCounts — разных сделок на код (пункты сделки),
     bucketCounts — по частям: exec {orders, deals, people} — разные заказы, их сделки и хозяева;
     deal {deals, people}; hyg {orders, deals} — заказы пунктов заказа и сделки пунктов сделки.
-    Люди — разные хозяева (who), кроме «не назначен». Заказы и сделки не складываются."""
+    Люди — разные хозяева (whoId, иначе who), кроме «не назначен». Заказы и сделки не
+    складываются. Единственное определение счёта по частям: dealctx.bucket_counts и
+    contracts.life_bucket_counts зовут эту функцию."""
     oc: dict[str, set] = defaultdict(set)
     dc: dict[str, set] = defaultdict(set)
     B: dict[str, dict[str, set]] = {"exec": {"orders": set(), "deals": set(), "people": set()},
@@ -766,8 +768,10 @@ def queue_counts(queue: list[dict]) -> dict:
             b["orders"].add(str(q.get("order")))
         if "deals" in b and (unit == "deal" or bucket == "exec"):
             b["deals"].add(did)
-        w = str(q.get("who") or "")
-        if "people" in b and w and w != "не назначен":
+        # человек — whoId, иначе имя; «не назначен» человеком не считается (одно определение
+        # с dealctx.bucket_counts: тот вызывает эту функцию)
+        w = str(q.get("whoId") or "") or (str(q.get("who") or "") if q.get("who") != "не назначен" else "")
+        if "people" in b and w:
             b["people"].add(w)
     return {"ordCounts": {k: len(v) for k, v in sorted(oc.items())},
             "dealCounts": {k: len(v) for k, v in sorted(dc.items())},

@@ -36,6 +36,8 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.modules.setdefault("dotenv", types.SimpleNamespace(load_dotenv=lambda *a, **k: None))
 
+import lifecycle  # noqa: E402
+
 PROBE = r"""<script>(function(){
 var out={};
 function txt(e){return e?(e.textContent||'').replace(/\s+/g,' ').trim():'';}
@@ -117,11 +119,15 @@ def _contract_fields(r):
     q = C["life"]["queue"]
     u = next(x for x in q if x["code"] == "unpaid" and x["deal"] == "6005")
     o1 = next(o for o in rows["6005"]["orders"] if o["lbl"] == "955/1")
-    o2 = next(o for o in rows["6005"]["orders"] if str(o["id"]) == str(u["order"]))
+    # после свёртки (lifecycle._fold_deal_codes) пункт unpaid — сделки, его заказ — в ords
+    oid = u.get("order") or u["ords"][0]["id"]
+    o2 = next(o for o in rows["6005"]["orders"] if str(o["id"]) == str(oid))
     item = dict(u, unit="deal", bucket="deal", order="", ordLbl="", ordNo=None,
                 ords=[{"id": o2["id"], "lbl": o2["lbl"], "due": "04.09.2026", "days": 45, "revEur": o2["revEur"]},
                       {"id": o1["id"], "lbl": o1["lbl"], "due": "20.09.2026", "days": 30, "revEur": o1["revEur"]}])
     q[q.index(u)] = item
+    # «Клиент не оплатил» — одно значение на подвкладках: плитка «Недели» (расчёт) знает второй заказ
+    C["ork"]["week"]["tiles"]["unpaid"]["orders"] += 1
     for x in q:
         x.setdefault("unit", "order" if x.get("order") else "deal")
     # строка сделки с полями расчёта: срок открытого заказа и шаг — с номером
@@ -219,7 +225,7 @@ def test_плитки_сделки_заказы_и_доля_денег(page):
     live = [x for x in C["rows"] if not x["closed"] and not x.get("seg")]
     q = C["life"]["queue"]
     unp = {x["deal"] for x in live if any(i["code"] == "unpaid" and i["deal"] == x["deal"] for i in q)}
-    unp_o = {i["order"] for i in q if i["code"] == "unpaid" and i["deal"] in unp}
+    unp_o = {o for i in q if i["code"] == "unpaid" and i["deal"] in unp for o in lifecycle.item_orders(i)}
     T = {t["m"]: t for t in out["tiles"]}
     assert T["unpaid"]["v"].startswith(f"{len(unp)} сдел"), T["unpaid"]
     assert f"({len(unp_o)} заказ" in T["unpaid"]["v"], T["unpaid"]
@@ -300,6 +306,8 @@ def test_путь_заказа_только_дела_заказа(page):
     r, out = page
     C = r["contracts"]
     q = C["life"]["queue"] + (((C.get("sep") or {}).get("life") or {}).get("queue") or [])
+    # пункты закрытой части с заказом (сверка договоров с f.order — пункт заказа, PY-3) — дела заказа
+    q = q + [i for i in ((r.get("dealctx") or {}).get("queue") or []) if i.get("order")]
     for x in C["rows"]:
         dq = [i for i in q + ((r.get("dealctx") or {}).get("queue") or []) if i["deal"] == x["deal"] and not i.get("order")]
         for o in x["orders"]:
@@ -317,10 +325,13 @@ def test_путь_заказа_только_дела_заказа(page):
     # заказ 933/3 добавлен в давно принятую сделку: шаг 1 — назначение менеджера ОРК, не приёмка
     o3 = next(o for x in C["rows"] for o in x["orders"] if o["lbl"] == "933/3")
     h = out["path"][str(o3["id"])]
-    assert "сделка принята с заказом 933/2" in h and "назначение менеджера" in h, h[:400]
+    # сделку приняли с заказом, ушедшим дальше шага 1 (933/5 — самый ранний из них); признак — из расчёта
+    # (строка «Недели» asg, lifecycle._deal_accept), а не «первый созданный заказ»
+    assert "сделка принята с заказом 933/5" in h and "назначение менеджера" in h, h[:400]
     assert "у этого заказа — назначение менеджера" in out["path"]["s1:" + str(o3["id"])]
+    # 933/2 создан раньше всех, но сделку уже приняли с другими заказами: у него — тоже назначение
     o2 = next(o for x in C["rows"] for o in x["orders"] if o["lbl"] == "933/2")
-    assert "этот заказ в сделке первый" in out["path"]["s1:" + str(o2["id"])]
+    assert "у этого заказа — назначение менеджера" in out["path"]["s1:" + str(o2["id"])]
 
 
 def test_смотреть_как_дело_человека(page):

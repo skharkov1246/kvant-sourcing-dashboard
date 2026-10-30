@@ -869,6 +869,9 @@ def _month(orders: list[dict], U: list[dict], today: dt.date, otd: dict | None, 
         # их сумма и M2 — работа менеджеров: меньше трёх человек за ячейкой — не показываем
         m1s = {c: _probe_cap("M1", _timeliness(by_seg[c], c, agree=agree_s1 if c == "S1" else None))
                for c in ("S1", "S2", "S3", "S6")}
+        # S1 — приёмка СДЕЛКИ (решение 30.10.2026, п. 1; first_accept): отрезок — один на сделку,
+        # счёт k из n — сделки (страница подписывает «Приёмка сделки», а не «по заказам»)
+        m1s["S1"]["unit"] = "deal"
         for c in ("S2", "S3", "S6"):
             _people_gate(m1s[c], seg_who[c])
         allm = [s for c in ("S2", "S3", "S6") for s in by_seg[c]]
@@ -949,7 +952,7 @@ def _month(orders: list[dict], U: list[dict], today: dt.date, otd: dict | None, 
              "pop": {"M1": f"заказы, созданные с {ork.ORK_SINCE:%d.%m.%Y}",
                      "M2": f"заказы, созданные с {ork.ORK_SINCE:%d.%m.%Y}",
                      "otd": "все заказы вида", "otdDueDeals": "все сделки вида"},
-             "units": {"M1": "segment", "M2": "file", "otdDue": "order", "otdDueDeals": "deal",
+             "units": {"M1": "segment", "S1": "deal", "M2": "file", "otdDue": "order", "otdDueDeals": "deal",
                        "deals90": "deal", "M3": "order"},
              # ключи «Доставки к сроку по месяцам» (12 месяцев lifecycle.otd) — _month_drill кладёт их
              # в drill «y.<мм.гггг>» и убирает это поле
@@ -1358,7 +1361,7 @@ def _compact(r: dict) -> dict:
 
 
 def _dk(st: dict, drill: dict, key: str, keys: list, tags: list | None = None, *, prefix: str,
-        head: str = "", unit: str = "order", link: bool = True) -> None:
+        head: str = "", unit: str = "order") -> None:
     """Показатель с заказами за ним: ключи — drill[key] ({unit, k, t, h}: единица строки списка,
     ключи, подписи строк, заголовок списка), у показателя — dk «<prefix>:<key>». Только у
     показанного (show, prelim): у «не показываем» и «Нет данных» списка нет. Единица (§1.8):
@@ -1367,10 +1370,8 @@ def _dk(st: dict, drill: dict, key: str, keys: list, tags: list | None = None, *
     if not isinstance(st, dict) or st.get("state") not in ("show", "prelim"):
         return
     drill[key] = {"unit": unit, "k": keys, "t": tags, "h": head}
-    # link=False — число новое (спецификация 30.10.2026), страница его ещё не выводит: список
-    # собран, ссылка — dkNext (dk ставит сведение, когда вёрстка выведет число: проверка
-    # validate_dashboard требует число на странице у каждого dk)
-    st["dk" if link else "dkNext"] = f"{prefix}:{key}"
+    # у каждого dk число на странице (validate_dashboard: список собран — число выведено)
+    st["dk"] = f"{prefix}:{key}"
 
 
 def _hist_row(o: dict, *, with_mgr: bool = True) -> dict:
@@ -1528,8 +1529,9 @@ def deal_steps(orders: list[dict], deals: list[dict], U: list[dict], step: dict,
     Шаг 1 «Приёмка сделки» (В1 а): открытая сделка «Реализации» без заказа (no_order) или с
     живыми заказами, из которых ни один не ушёл дальше шага 1 и ни один не исполнен (accept);
     сделка, где живые заказы только со стадией не из таблицы, — unk (может быть на приёмке).
-    Сделка с заказом дальше шага 1 или исполненным — принята: её заказ на шаге 1 — назначение
-    менеджера ОРК на новый заказ (W1o), а не приёмка сделки. Шаги 2–3 — открытые сделки на стадии
+    Сделка с заказом дальше шага 1 или исполненным — принята (то же правило, что у очереди:
+    lifecycle._deal_accept — по нему s1Over заказа принятой сделки становится ordAssign): её заказ
+    на шаге 1 — назначение менеджера ОРК на новый заказ (W1o), а не приёмка сделки. Шаги 2–3 — открытые сделки на стадии
     договора с заказчиком (dealStep 2 или 3; у шага 3 своей стадии сделки в Битриксе нет). Шаг 13
     — сделки к закрытию: пункты dealClose («Оплата получена», сделка не закрыта) и dealOpen (все
     заказы исполнены, сделка открыта)."""
@@ -1537,6 +1539,9 @@ def deal_steps(orders: list[dict], deals: list[dict], U: list[dict], step: dict,
     for o in U:
         u_by[o.get("deal")].append(o)
     done = {o.get("deal") for o in orders if o.get("success")}
+    all_by: dict = defaultdict(list)                    # все заказы сделки — как у lifecycle.build
+    for o in orders:
+        all_by[o.get("deal")].append(o)
     close: dict = {}
     for q in queue:
         if q.get("code") in CLOSE_CODES and q.get("deal") is not None and not q.get("order"):
@@ -1549,7 +1554,12 @@ def deal_steps(orders: list[dict], deals: list[dict], U: list[dict], step: dict,
         if d.get("closed") or d.get("lost") or did in close:
             continue
         os_ = u_by.get(did) or []
-        past = did in done or any(step.get(o["id"]) not in (1, None) for o in os_)
+        # принята — по фактам шагов; у сделки с заказом на шаге 1 — тем же правилом, что очередь
+        # (lifecycle._deal_accept: по нему срок шага 1 — s1Over приёмки или ordAssign нового
+        # заказа), чтобы W1/W1o и пункты очереди не расходились. Без заказа на шаге 1 стадия не из
+        # таблицы — «срок неизвестен» (unk), а не «принята» (правило 15)
+        past = did in done or any(step.get(o["id"]) not in (1, None) for o in os_) or (
+            any(step.get(o["id"]) == 1 for o in os_) and lifecycle._deal_accept(all_by.get(did) or []))
         if past:
             accepted.add(did)
         at1 = False
@@ -1729,6 +1739,9 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
              # назначение менеджера ОРК на новый заказ (W1 / W1o), не «дольше нормы» менеджера
              "over": v.get("over") is True and st not in DEAL_STEPS,
              "over1": v.get("over") is True and st == 1,
+             # шаг 1 заказа уже принятой сделки — назначение менеджера ОРК на новый заказ (ordAssign,
+             # W1o), не приёмка сделки: путь заказа и карточка говорят то же, что очередь
+             "asg": st == 1 and o.get("deal") in DS["accepted"],
              "wu": bool(v.get("waitUtd")), "tu": bool(v.get("termUnknown")),
              "nc": nc(o), "hyg": h.get("kinds") or [], "hw": h.get("why") or "",
              "waits": waits_of.get(st, "") if st else "",
@@ -2070,9 +2083,8 @@ def _quarter_drill(quarter: dict, measure: list[dict], today: dt.date) -> None:
     st = Q2.get("cycleDeal") or {}
     _dk(st, drill, "Q2.cycleDeal", [f"d:{d}" for d, _v in cyc],
         [f"{v['cd']} дн. · заказов {v['n']} · последняя доставка {v['last']:%d.%m.%Y}" for _d0, v in cyc],
-        prefix="q", head="Сроки за год · сделка: от входа в «Реализацию» до последней доставки", unit="deal",
-        link=False)
-    if st.get("dkNext") and st.get("p80") is not None:
+        prefix="q", head="Сроки за год · сделка: от входа в «Реализацию» до последней доставки", unit="deal")
+    if st.get("dk") and st.get("p80") is not None:
         tail = [(d, v) for d, v in cyc if v["cd"] > st["p80"]]
         if tail:
             drill["Q2.cycleDeal.tail"] = {"unit": "deal", "k": [f"d:{d}" for d, _v in tail],
@@ -2233,7 +2245,7 @@ def _month_drill(month: dict, people: list[dict], orders: list[dict], U: list[di
         if DD.get("n") == len(dd_k.get("k") or []):
             _dk(DD, drill, f"{mi}.dueDeals", list(dd_k.get("k") or []), list(dd_k.get("t") or []) or None,
                 prefix="m", head=f"Срок последнего заказа сделки · {mw}: сделки к сроку, позже и не доставлены",
-                unit="deal", link=False)
+                unit="deal")
     live_era = [o for o in U if _d(o.get("created")) and _d(o["created"]) >= ork.ORK_SINCE]
     for pi, p in enumerate(people):
         who = p.get("who")
@@ -2281,7 +2293,7 @@ def _month_drill(month: dict, people: list[dict], orders: list[dict], U: list[di
     if (month.get("deals90") or {}).get("n") and len(d90.get("k") or []) == month["deals90"]["n"]:
         drill["deals90"] = {"unit": "deal", "k": list(d90["k"]), "t": list(d90.get("t") or []) or None,
                             "h": "Сделки в срок за 90 дней: все заказы сделки доставлены не позже своего срока"}
-        month["deals90"]["dkNext"] = "m:deals90"
+        month["deals90"]["dk"] = "m:deals90"
     want = {k for v in drill.values() for k in (v["k"] if isinstance(v, dict) else v)}
     month["drill"] = drill
     month["orders"] = [_hist_row(o) for k, o in used.items() if k in want]

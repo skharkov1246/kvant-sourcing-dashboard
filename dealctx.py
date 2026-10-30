@@ -67,6 +67,7 @@ from collections import Counter
 
 import chat_activity
 import contract_b2b
+import lifecycle
 import ork
 
 VERSION = 1
@@ -197,17 +198,8 @@ EXC = {
 # Сделка и заказ поставщика (спецификация «сделка и заказ», 30.10.2026, §1.4, §2.2; решения
 # владельца 30.10.2026). Единица пункта (unit) и часть очереди (bucket): exec — «Дела по
 # заказам», deal — «Дела по сделкам», hyg — «Порядок в карточках Битрикса» (вне дневного счёта).
-# Ключ — (код или код:сторона, единица); правило 4 — таблица, а не ветвления
-BUCKET = {
-    ("chatReply", "deal"): "deal", ("chatRisk", "deal"): "deal", ("chatDue", "deal"): "deal",
-    # риск сверки договоров: флаг с заказом — пункт этого заказа (E10), без заказа — сделки
-    ("contractRisk", "order"): "exec", ("contractRisk", "deal"): "deal",
-    # договор заказчика — обязательство перед клиентом (КАМ); договора поставщика без заказа
-    # не привязать к заказу — порядок в карточках сделки
-    ("contractMissing:customer", "deal"): "deal", ("contractMissing:both", "deal"): "deal",
-    ("contractMissing:supplier", "deal"): "hyg", ("contractMissing:supplier", "order"): "exec",
-    ("econGap", "deal"): "hyg", ("contractUnreadable", "deal"): "hyg",
-}
+# Таблица кодов → часть — одна на «Реализацию»: lifecycle.UNIT / BUCKET / BUCKET_ORDER (коды
+# закрытой части в ней же); правило 4 — таблица, а не ветвления
 BUCKETS = ("exec", "deal", "hyg")
 # шаг пункта сделки — шаг стадии сделки только там, где шаг — сделки (Рег.: 1 — приёмка, 2–3 —
 # договор с заказчиком, 13 — закрытие); шаги 4–12 — шаги заказов (§1.6 п. 4): у пункта сделки
@@ -721,13 +713,18 @@ def _resp(r: dict) -> dict:
     return _by_person("dealResp", _nm(r.get("manager")), r)
 
 
+def _bucket(code: str, key: str | None, unit: str) -> str:
+    """Часть очереди пункта по таблице lifecycle (unit_bucket): пункт заказа — с заказом."""
+    return lifecycle.unit_bucket(code, key, "1" if unit == "order" else None)[1]
+
+
 def _item(code: str, r: dict, own: dict, act: str = "", days: int | None = None, what: str = "",
           conf: float | None = None, *, key: str | None = None, order: dict | None = None) -> dict:
     """Пункт очереди; own — хозяин (_reg, _by_person): шаг, роль, исполнитель и копия.
 
     order — строка orders[] сделки: пункт ЗАКАЗА (unit = order) с номером, поставщиком и сроком
     этого заказа; без него — пункт СДЕЛКИ (unit = deal). bucket — часть очереди по таблице
-    BUCKET (ключ — key, иначе код). Поля — по договору полей спецификации, §4.3."""
+    lifecycle.BUCKET (ключ — key, иначе код). Поля — по договору полей спецификации, §4.3."""
     sev, what0, act0 = EXC[code]
     what = what or what0
     if code.startswith("chat"):
@@ -740,7 +737,7 @@ def _item(code: str, r: dict, own: dict, act: str = "", days: int | None = None,
             **own, "whoGone": _gone(who), "inWd": False,
             **({"signal": SIGNAL} if code in ("chatDue", "chatRisk") else {}),
             **({"itemKey": key} if key else {}),
-            "unit": unit, "bucket": BUCKET[(key or code, unit)],
+            "unit": unit, "bucket": _bucket(code, key, unit),
             "kam": _nm(r.get("kam")), "kamId": _nm(r.get("kamId")),
             "deal": r["deal"], "seq": r.get("seq") or 0, "customer": r.get("customer") or "—",
             "order": str(o.get("id") or ""), "ordLbl": o.get("lbl") or "", "ordNo": o.get("ordNo"),
@@ -760,43 +757,20 @@ def _unit_payload(queue: list[dict], prefix: str) -> dict:
 def unit_counts(queue: list[dict]) -> tuple[dict, dict]:
     """(ordCounts, dealCounts): по коду — разных заказов у пунктов заказа и разных сделок у
     пунктов сделки (спецификация §1.8 п. 4: счёт — число разных объектов своей единицы, а не
-    длина списка). Единица пункта — unit, нет его — заказ, если у пункта есть order."""
-    o: dict[str, set] = {}
-    d: dict[str, set] = {}
-    for q in queue:
-        if (q.get("unit") or ("order" if q.get("order") else "deal")) == "order":
-            o.setdefault(q["code"], set()).add(str(q["order"]))
-        else:
-            d.setdefault(q["code"], set()).add(str(q["deal"]))
-    return {k: len(v) for k, v in o.items()}, {k: len(v) for k, v in d.items()}
+    длина списка). Одно определение с очередью «Реализации» — lifecycle.queue_counts."""
+    c = lifecycle.queue_counts(queue)
+    return c["ordCounts"], c["dealCounts"]
 
 
 def bucket_counts(queue: list[dict]) -> dict | None:
-    """Счёт очереди по частям (§2.1, §4.3) в своих единицах: exec — разных заказов, сделок этих
+    """Счёт очереди по частям (§2.1, §4.3) в своих единицах — lifecycle.queue_counts (одно
+    определение у life, life_all, head.sep и закрытой части): exec — разных заказов, сделок этих
     заказов и людей-хозяев; deal — разных сделок и людей; hyg — разных заказов (у пунктов заказа)
-    и разных сделок (у пунктов сделки) двумя числами. Пункты без bucket — вне счёта; ни у одного
-    пункта его нет — None (очередь ещё без частей). «не назначен» человеком не считается."""
+    и разных сделок (у пунктов сделки). Ни у одного пункта нет bucket — None (очередь пуста или
+    ещё без частей). «не назначен» человеком не считается."""
     if not any(q.get("bucket") for q in queue):
         return None
-    acc = {b: {"orders": set(), "deals": set(), "people": set()} for b in BUCKETS}
-    for q in queue:
-        a = acc.get(q.get("bucket"))
-        if a is None:
-            continue
-        unit = q.get("unit") or ("order" if q.get("order") else "deal")
-        if unit == "order":
-            a["orders"].add(str(q["order"]))
-            if q.get("bucket") == "exec":
-                a["deals"].add(str(q["deal"]))
-        else:
-            a["deals"].add(str(q["deal"]))
-        w = _nm(q.get("whoId")) or (_nm(q.get("who")) if q.get("who") != NOT_SET else "")
-        if w:
-            a["people"].add(w)
-    return {"exec": {"orders": len(acc["exec"]["orders"]), "deals": len(acc["exec"]["deals"]),
-                     "people": len(acc["exec"]["people"])},
-            "deal": {"deals": len(acc["deal"]["deals"]), "people": len(acc["deal"]["people"])},
-            "hyg": {"orders": len(acc["hyg"]["orders"]), "deals": len(acc["hyg"]["deals"])}}
+    return lifecycle.queue_counts(queue)["bucketCounts"]
 
 
 def _chat_cell(a: dict, cur: dict | None, r: dict, now: dt.datetime) -> dict:

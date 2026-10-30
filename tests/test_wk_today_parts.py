@@ -29,7 +29,7 @@ const box = {document, window: {__ORKMONTH__: null, __DEALCTX__: null}, location
   Array, String, Number, Set, Map, RegExp, qmark: () => '', openContract() {}};
 vm.createContext(box);
 vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + inp.unpack + '\nfunction _dcData(){return null;}\n' + inp.code
-  + '\nthis.T={_orkWeekCtx,_orkWeekToday,_wkGroups,_wkgRow,_wkgDetail,_wkgAct,_wkNo,_odQueueR,_wkB,_wkU,_WK_STATE};'
+  + '\nthis.T={_orkWeekCtx,_orkWeekToday,_wkGroups,_wkgRow,_wkgDetail,_wkgAct,_wkNo,_odQueueR,_wkB,_wkIU,_WK_STATE};'
   + '\nthis.setKam=f=>{_rzKam=f;};', box);
 const T = box.T, out = {};
 for (const [name, X] of Object.entries(inp.cases)) {

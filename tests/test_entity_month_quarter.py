@@ -86,7 +86,8 @@ def _run(views: dict | None = None, ork_month=None, calls: list | None = None) -
 def _plain(html: str) -> str:
     """Текст страницы без разметки: кнопки чисел снимаются, число остаётся."""
     t = re.sub(r"<[^>]+>", " ", html)
-    return re.sub(r"\s+", " ", t)
+    t = re.sub(r"\s+", " ", t)
+    return re.sub(r"\(\s+", "(", re.sub(r"\s+\)", ")", t))      # «( 3 заказа )» от кнопки в скобках
 
 
 def _views(ct: dict) -> dict:
@@ -167,9 +168,12 @@ def test_месяц_главное_число_сделки_заказы_рядо
     t = _plain(html)
     assert "Сделки доставлены к сроку клиента" in t
     assert f"{k} из {n} {'сделки' if n % 10 == 1 and n % 100 != 11 else 'сделок'}" in t
-    # число сделок — кнопка списка сделок (реестр data-ctk), число заказов — список заказов (data-od)
+    # число сделок — кнопка списка сделок: список «Месяца» m:<i>.dueDeals (orkMonth, dk), а без него —
+    # реестр страницы (data-ctk); число заказов — список заказов (data-od)
     kpi = html[html.index('Сделки доставлены к сроку клиента'):]
-    assert 'data-ctk="main:dd.' + m0["m"] + '"' in html and "список сделок" in kpi[:4000]
+    dd_dk = (m0.get("otdDueDeals") or {}).get("dk")
+    assert (f'data-od="{dd_dk}"' in kpi[:4000] if dd_dk else 'data-ctk="main:dd.' + m0["m"] + '"' in html)
+    assert "список сделок" in kpi[:4000]
     assert f'data-od="{OD["dk"]}"' in html
     # таблица по месяцам — сделки и заказы отдельными столбцами, у столбцов — их совокупность (E53)
     for th in ("Сделки к сроку", "Заказы к сроку", "все сделки вида", "все заказы вида", "заказы с 24.08"):
@@ -222,6 +226,8 @@ def test_приёмка_и_файлы_в_своей_единице(built):
     M = om["main"]["month"]
     hi = M["head"]
     s1 = M["rows"][hi]["M1"]["S1"]
+    # сборка расчёта (PY-6) несёт S1.unit = deal; сборка старше — без единицы: «по заказам»
+    s1.pop("unit", None)
     t0 = _plain(_run({"main": _views(ct)["main"]}, om)["views"]["main"]["month"])
     assert "Приёмка за 1 рабочий день — по заказам" in t0 and f"{s1['k']} из {s1['n']} заказ" in t0
     s1.update(unit="deal", n=3, k=1, value=33)
@@ -307,7 +313,7 @@ def test_поставщики_по_воротам(built):
     assert "Не держат плановый срок производства: 1 поставщик · мало готовых заказов: 2 поставщика" in t
     # у фикстуры все поставщики ниже порога — прежний заголовок «7 поставщиков» был выводом из 1–3 заказов
     t0 = _plain(_run({"main": _views(copy.deepcopy(built["contracts"]))["main"]}, built["ork_month"])["views"]["main"]["quarter"])
-    assert "Держат ли поставщики плановый срок производства — судить рано" in t0 and "Не держат" not in t0
+    assert "Плановый срок производства у поставщиков: судить рано · мало заказов у" in t0 and "Не держат" not in t0
 
 
 def test_гарантия_заказы_и_сделки(built, drawn):
@@ -343,7 +349,8 @@ def test_чей_шаг_по_регламенту(drawn):
     assert len(own) == 13
     assert all(own[n] == "сделка" for n in (1, 2, 3)) and all(own[n] == "заказ" for n in range(4, 13))
     assert own[13] == "сделка и заказы"
-    assert "по заказу: «Заказ создан» до назначения менеджера ОРК" in body
+    # шаг 1 — приёмка сделки (решение владельца 30.10.2026, п. 1; how.steps[0].kind = deal из расчёта)
+    assert "от входа сделки в «Реализацию» до назначения менеджера ОРК первому заказу" in body
 
 
 def test_нарушения_два_итога(built, drawn):
@@ -371,8 +378,11 @@ def test_в_расчёте_с_единицей(built, drawn):
     W = built["contracts"]["ork"]["week"]
     n1, d1 = W["tiles"]["W1"]["n"], W["dealsNoOrder"]
     t = _plain(drawn["views"]["main"]["how"])
-    o1 = n1 - d1
-    assert f"{o1} заказ" in t and f"+ {d1} сделк" in t
+    if W["tiles"]["W1"].get("unit") == "deal":       # сборка расчёта: W1 — сделки (PY-5)
+        assert f"{n1} сделк" in t
+    else:
+        o1 = n1 - d1
+        assert f"{o1} заказ" in t and f"+ {d1} сделк" in t
     met = {m["code"]: m for m in built["contracts"]["ork"]["how"]["metrics"]}
     assert f"{met['W2']['n']} заказов" in t and f"{met['W3']['n']} заказ" in t
 
@@ -425,6 +435,9 @@ def test_залив_срок_сделки_по_недоставленным(buil
     d = [r for r in ct["rows"] if r.get("seg") and len(r["orders"]) > 1][0]
     first, second = sorted(d["orders"], key=lambda o: _d(o["dl"]))[:2]
     first["delivered"] = first["dl"]
+    # поля расчёта (PY-4) посчитаны до правки строки — запасной вывод шаблона проверяем без них
+    for f in ("dlNextOpen", "dlNextLbl", "dlNextOrder", "ordStat"):
+        d.pop(f, None)
     html = _run({"sep": _views(ct)["sep"]}, built["ork_month"])["views"]["sep"]["week"]
     t = _plain(html)
     assert f"ближайший срок заказа {second['dl'][:5]} · {second['lbl']} (из 2 заказов, доставлено 1, к сроку 1)" in t
