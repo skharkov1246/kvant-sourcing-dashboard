@@ -26,7 +26,8 @@ def _rules(css):
 
 def test_scale_variables_and_family():
     blk = _block()
-    for v, px in (("--rz-xs", 12), ("--rz-sm", 13), ("--rz-md", 14), ("--rz-lg", 16), ("--rz-xl", 20), ("--rz-2xl", 26)):
+    # --rz-xs — 13 px: минимальный кегль вкладки (спец. R4, 0.3 и 2.3: «шрифты плохо читаемы»)
+    for v, px in (("--rz-xs", 13), ("--rz-sm", 13), ("--rz-md", 14), ("--rz-lg", 16), ("--rz-xl", 20), ("--rz-2xl", 26)):
         assert f"{v}:{px}px" in blk, v
     assert "'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" in blk
     assert "tabular-nums lining-nums" in blk

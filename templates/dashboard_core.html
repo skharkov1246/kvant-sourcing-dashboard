@@ -1545,7 +1545,7 @@
      Вес селекторов — :where(): #tab-contracts (1,0,0) и .drw.rz (0,2,0) перебивают общие
      правила, но уступают любому правилу блока вкладки (#tab-contracts .класс, .drw .od…). */
   #tab-contracts,.drw.rz{
-    --rz-xs:12px;--rz-sm:13px;--rz-md:14px;--rz-lg:16px;--rz-xl:20px;--rz-2xl:26px;--rz-kpi:30px;
+    --rz-xs:13px;--rz-sm:13px;--rz-md:14px;--rz-lg:16px;--rz-xl:20px;--rz-2xl:26px;--rz-kpi:30px;
     --rz-lh:1.5;--rz-sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
     font-family:var(--rz-sans);font-size:var(--rz-md);line-height:var(--rz-lh);
     font-variant-numeric:tabular-nums lining-nums;
@@ -1640,8 +1640,7 @@
   .drw.rz :where(.req .rm .mono){font-size:var(--rz-xs)}
   @media(max-width:720px){
     #tab-contracts :where(.ctbar){flex-direction:column;align-items:stretch;gap:10px;border-bottom:0}
-    #tab-contracts :where(.ctbar .ctsub:not(.ctdir)){flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);margin:0;min-width:0;max-width:100%;padding-right:32px;
-      -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent)}  /* край гаснет — вкладки дальше, листаются */
+    #tab-contracts :where(.ctbar .ctsub:not(.ctdir)){flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);margin:0;min-width:0;max-width:100%;padding-right:32px}  /* R4: край без градиента — следующая вкладка видна обрезанной (спец. 2.2, П-8) */
     #tab-contracts :where(.ctbar .ctdir){margin:0;align-self:flex-start}
     #tab-contracts :where(.actile .v,.kpi .val){font-size:26px}
     #tab-contracts :where(.secttl){font-size:18px}
@@ -1881,6 +1880,186 @@
     #tab-contracts .orkw .orkled td .orkm,#tab-contracts .orkw .orkpulse td .orkm{display:block}
     #tab-contracts .orkw .orkpulse :is(th,td):is(:nth-child(4),:nth-child(5)){display:none}
   }
+  /* ==== R4:WP-A ==== каркас «Реализации» (спец. R4, 2.2–2.9): цвета-роли, шапка, подвкладки,
+     «Смотреть как», тревоги, состояния, словарь и подсказки, компоненты (число-кнопка, плитка,
+     строка-счётчик, спарклайн, буллет, столбцы, полоска в ячейке). Только под #tab-contracts,
+     .drw.rz и подсказкой .rztip; градиентов нет; текст не мельче 13 px.
+     Цвет (2.3, контраст проверен check_contrast.py): данные — серым; красный — только число и одно
+     слово тревоги; янтарный — «под угрозой», «не назначен», «данные устарели»; всегда со словом. */
+  #tab-contracts,.drw.rz,.rztip{
+    --rz-data:#6e7781;--rz-mut:#57606a;--rz-sel:#1f2328;--rz-alarm:#c01f2b;--rz-warn:#a65006;--rz-warnbg:#fff4e5;
+    --rz-link:#0b6b85;--rz-nav:#d97706;--rz-focus:#0b6b85;--rz-band1:#eef1f4;--rz-band2:#d0d7de;
+  }
+  :root[data-theme="dark"] #tab-contracts,:root[data-theme="dark"] .drw.rz,:root[data-theme="dark"] .rztip{
+    --rz-data:#8b97a6;--rz-mut:#8b97a6;--rz-sel:#e8edf2;--rz-alarm:#e5634d;--rz-warn:#f5a524;--rz-warnbg:#2b2416;
+    --rz-link:#3aa6b9;--rz-nav:#f5a524;--rz-focus:#3aa6b9;--rz-band1:#1c232d;--rz-band2:#33404f;
+  }
+  /* шапка: «Реализация» · данные на … · N заказов в работе · «?» */
+  #tab-contracts .rzhd{margin:0 0 2px}
+  #tab-contracts .rzhd-r1{display:flex;flex-wrap:nowrap;align-items:baseline;gap:4px 16px}
+  #tab-contracts .rzhd-r1 h1{flex:none}
+  #tab-contracts .rzhd-r1 h1{font-size:24px;font-weight:600;line-height:1.3;letter-spacing:-.005em;margin:0;color:var(--strong)}
+  #tab-contracts .rzhd-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 20px;margin:0;flex:1 1 360px;min-width:0;font-size:var(--rz-md);line-height:1.5;color:var(--rz-mut)}
+  #tab-contracts .rzhd-meta>span:empty{display:none}
+  #tab-contracts .rzhd-meta b{color:var(--ink);font-weight:600}
+  #tab-contracts .rzhd-meta .rzlive{color:var(--ink2)}
+  #tab-contracts .rzasof.rz-warn{font-weight:400}
+  #tab-contracts .rzasof.rz-warn .rzw,#tab-contracts .rzasof.rz-warn .rzw b{color:var(--rz-warn);font-weight:600}
+  #tab-contracts .rzasof a,#tab-contracts .rzalarm a,#tab-contracts .rzst a,.drw.rz .rzst a{color:var(--rz-link);font-weight:500;text-underline-offset:2px}
+  #tab-contracts .rzglb{flex:none;align-self:center;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;margin-left:auto;border:1px solid var(--line);border-radius:50%;background:var(--panel);color:var(--rz-link);font:600 15px/1 var(--rz-sans);cursor:pointer}
+  #tab-contracts .rzglb:hover{border-color:var(--rz-link)}
+  #tab-contracts .rzglb[aria-expanded="true"]{background:var(--rz-link);color:var(--bg);border-color:var(--rz-link)}
+  /* число-кнопка: пунктир снизу и рука — «открывается список»; область нажатия шире числа */
+  #tab-contracts button.rzn,.drw.rz button.rzn{position:relative;display:inline;font:inherit;font-weight:600;font-variant-numeric:tabular-nums lining-nums;color:inherit;background:none;border:0;border-bottom:1px dashed currentColor;border-radius:0;padding:0 1px;margin:0;line-height:inherit;cursor:pointer;text-align:inherit}
+  #tab-contracts button.rzn::after,.drw.rz button.rzn::after{content:"";position:absolute;inset:-8px -6px}
+  #tab-contracts button.rzn:hover,.drw.rz button.rzn:hover{color:var(--rz-link);border-bottom-style:solid}
+  #tab-contracts button.rzn:focus-visible,.drw.rz button.rzn:focus-visible,#tab-contracts .rzst-btn:focus-visible,.drw.rz .rzst-btn:focus-visible,
+  #tab-contracts .rzglb:focus-visible,#tab-contracts .rzview-s:focus-visible,#tab-contracts abbr.rzabbr:focus-visible,.drw.rz abbr.rzabbr:focus-visible,
+  #tab-contracts .rzgl-x:focus-visible,#tab-contracts .rzmoney>summary:focus-visible{outline:2px solid var(--rz-focus);outline-offset:2px;border-radius:3px}
+  #tab-contracts .rzn0,.drw.rz .rzn0{font-weight:600;color:var(--rz-mut)}
+  #tab-contracts .rzfinal,.drw.rz .rzfinal{font-weight:600}
+  #tab-contracts .rznd,.drw.rz .rznd{color:var(--rz-mut);font-weight:400;border-bottom:1px dotted var(--rz-mut);cursor:help}
+  #tab-contracts .rzcode,.drw.rz .rzcode{color:var(--rz-mut);font-size:13px;font-weight:400;white-space:nowrap}
+  #tab-contracts .rz-alarm-t,.drw.rz .rz-alarm-t{color:var(--rz-alarm);font-weight:600}
+  #tab-contracts .rz-warn-t,.drw.rz .rz-warn-t,#tab-contracts .rzalarm .rz-warn{color:var(--rz-warn);font-weight:600}
+  /* подвкладки — подчёркнутые вкладки слева; справа «Смотреть как» и направление */
+  #tab-contracts .rzbar{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 20px;margin:4px 0 10px;border-bottom:0}
+  #tab-contracts .rzbar #ctTabs{display:flex;flex:1 1 auto;flex-wrap:nowrap;gap:0 2px;min-width:0;max-width:100%;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line)}
+  #tab-contracts .rzbar #ctTabs::-webkit-scrollbar{display:none}
+  #tab-contracts .rzbar #ctTabs .snb{flex:none;font-size:15px;font-weight:500;color:var(--rz-mut);background:none;border:0;border-bottom:3px solid transparent;border-radius:0;padding:10px 12px 7px;min-height:44px;margin:0}
+  #tab-contracts .rzbar #ctTabs .snb:hover{color:var(--ink);border-bottom-color:var(--line)}
+  #tab-contracts .rzbar #ctTabs .snb.on{color:var(--ink);font-weight:600;border-bottom-color:var(--rz-nav)}
+  #tab-contracts .rzbar-r{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-left:auto;padding:0 0 4px}
+  #tab-contracts .rzbar .ctdirw{padding:0}
+  #tab-contracts .rzview{display:flex;align-items:center;gap:8px}
+  #tab-contracts .rzview-l{font-size:var(--rz-sm);color:var(--rz-mut);white-space:nowrap}
+  #tab-contracts .rzview-s{font:inherit;font-size:14px;min-height:34px;max-width:280px;padding:4px 8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer}
+  #tab-contracts .rzkamnote{margin:0 0 10px;font-size:14px;line-height:1.5;color:var(--ink2)}
+  #tab-contracts .rzkamnote[hidden]{display:none}
+  /* тревоги вида — одной-двумя строками под подвкладками, только если не ноль */
+  #tab-contracts .rzalarm{margin:0 0 10px;font-size:14px;line-height:1.5;color:var(--ink2)}
+  #tab-contracts .rzalarm[hidden],#tab-contracts .rzalarm:empty{display:none}
+  #tab-contracts .rzalarm-r{margin:2px 0}
+  /* словарь «?» и подсказки сокращений */
+  #tab-contracts .rzgl{margin:10px 0 8px;padding:12px 16px 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel);max-height:min(60vh,520px);overflow:auto}
+  #tab-contracts .rzgl[hidden]{display:none}
+  #tab-contracts .rzgl-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+  #tab-contracts .rzgl-h h2,#tab-contracts .rzhow0-h{font-size:16px;font-weight:600;margin:0;color:var(--ink)}
+  #tab-contracts .rzgl-n,#tab-contracts .rzhow0-l{font-size:13px;color:var(--rz-mut);margin:0}
+  #tab-contracts .rzgl-x{margin-left:auto;min-width:32px;min-height:32px;border:0;border-radius:8px;background:none;color:var(--rz-mut);font:400 20px/1 var(--rz-sans);cursor:pointer}
+  #tab-contracts .rzgl-x:hover{background:var(--hov);color:var(--ink)}
+  #tab-contracts .rzgl-l{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:0 32px;margin:4px 0 0}
+  #tab-contracts .rzgl-g{font-size:14px;font-weight:600;color:var(--rz-mut);margin:14px 0 0}
+  #tab-contracts .rzgl-r{display:grid;grid-template-columns:150px minmax(0,1fr);gap:2px 12px;padding:7px 0;border-top:1px solid var(--line2);font-size:14px;line-height:1.45}
+  #tab-contracts .rzgl-r dt{font-weight:600;color:var(--ink);min-width:80px}
+  #tab-contracts .rzgl-r dd{margin:0;color:var(--ink2)}
+  #tab-contracts .rzgl-r dd b{font-weight:500;color:var(--ink)}
+  #tab-contracts .rzhow0 .rzhow0-h+p,#tab-contracts .rzhow0 .rzhow0-l{margin-top:4px}
+  #tab-contracts .rzhow0 .rzhow0-h:not(:first-child){margin-top:20px}
+  #tab-contracts .rzhow0 p{font-size:14px;line-height:1.55;color:var(--ink2);margin:6px 0 0;max-width:96ch}
+  #tab-contracts abbr.rzabbr,.drw.rz abbr.rzabbr{text-decoration:underline dotted var(--rz-mut);text-underline-offset:3px;cursor:help;border:0}
+  .rztip{position:absolute;z-index:1200;max-width:320px;padding:8px 10px;border-radius:6px;background:var(--rz-sel);color:var(--bg);
+    font:400 13px/1.45 'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;box-shadow:0 4px 14px var(--shd);pointer-events:none}
+  .rztip[hidden]{display:none}
+  /* состояния (2.8): одна фраза; действия — кнопками; «устарели» — янтарным словом */
+  #tab-contracts .rzst,.drw.rz .rzst{margin:8px 0;padding:12px 14px;border:1px dashed var(--line);border-radius:8px;font-size:14px;line-height:1.5;color:var(--ink2)}
+  #tab-contracts .rzst-card .rzst{border:0;margin:0;padding:0}
+  #tab-contracts .rzst-t,.drw.rz .rzst-t{margin:0}
+  #tab-contracts .rzst-a,.drw.rz .rzst-a{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:10px 0 0}
+  #tab-contracts .rzst-stale .rzst-t,.drw.rz .rzst-stale .rzst-t{color:var(--rz-warn);font-weight:600}
+  #tab-contracts .rzst-btn,.drw.rz .rzst-btn{font:inherit;font-size:14px;font-weight:500;min-height:34px;padding:4px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--rz-link);cursor:pointer}
+  #tab-contracts .rzst-btn:hover,.drw.rz .rzst-btn:hover{border-color:var(--rz-link)}
+  #tab-contracts .rzskel,.drw.rz .rzskel{display:block;height:14px;width:60%;border-radius:4px;background:var(--panel2);margin:0 0 8px}
+  /* плитка-счётчик: число 40 px; вся плитка открывает список (растянутая кнопка числа) */
+  #tab-contracts .rztile{position:relative;display:flex;flex-direction:column;gap:4px;min-width:0;padding:14px 16px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+  #tab-contracts .rztile:hover{border-color:var(--rz-data)}
+  #tab-contracts .rztile:has(.rztile-n:focus-visible){outline:2px solid var(--rz-focus);outline-offset:2px}
+  #tab-contracts .rztile-t{font-size:14px;font-weight:600;line-height:1.35;color:var(--ink)}
+  #tab-contracts .rztile-vl{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+  #tab-contracts .rztile-n,#tab-contracts button.rzn.rztile-n{font-size:40px;line-height:1.1;font-weight:600;letter-spacing:-.01em;color:var(--ink);border-bottom:0;padding:0}
+  #tab-contracts button.rzn.rztile-n{position:static}
+  #tab-contracts button.rzn.rztile-n::after{inset:0;border-radius:8px}
+  #tab-contracts button.rzn.rztile-n:focus-visible{outline:none}
+  #tab-contracts .rztile.rz-alarm .rztile-n{color:var(--rz-alarm)}
+  #tab-contracts .rztile.rz-warn .rztile-n{color:var(--rz-warn)}
+  #tab-contracts .rztile-u{font-size:14px;color:var(--rz-mut)}
+  #tab-contracts .rztile-s{font-size:13px;line-height:1.45;color:var(--rz-mut)}
+  #tab-contracts .rztile-m{position:relative;z-index:1;font-size:13px;line-height:1.6;color:var(--rz-mut)}
+  #tab-contracts .rztile-a{font-size:14px;line-height:1.45;color:var(--ink2)}
+  #tab-contracts .rzspark{display:inline-flex;align-items:center;gap:8px}
+  #tab-contracts .rzspark svg{display:block;overflow:visible}
+  #tab-contracts .rzspark-l{stroke:var(--rz-data);stroke-width:1.5;stroke-linejoin:round}
+  #tab-contracts .rzspark-p{fill:var(--rz-sel)}
+  #tab-contracts .rzspark-m{font-size:13px;color:var(--rz-mut);white-space:nowrap}
+  /* строка-счётчик: «подпись · число ›», вся строка — кнопка */
+  #tab-contracts .rzcount,#tab-contracts button.rzn.rzcount,.drw.rz button.rzn.rzcount{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:baseline;gap:0 10px;width:100%;min-height:36px;padding:6px 4px;margin:0;border:0;border-bottom:1px solid var(--line2);border-radius:0;background:none;font:inherit;font-size:14px;font-weight:400;line-height:1.4;color:var(--ink);text-align:left}
+  #tab-contracts button.rzn.rzcount::after{content:none}
+  #tab-contracts button.rzn.rzcount:hover{background:var(--hov);color:var(--ink)}
+  #tab-contracts button.rzn.rzcount:focus-visible{outline:2px solid var(--rz-focus);outline-offset:-2px}
+  #tab-contracts .rzcount-v{font-size:16px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+  #tab-contracts button.rzcount .rzcount-v{border-bottom:1px dashed currentColor}
+  #tab-contracts .rzcount-c{color:var(--rz-mut)}
+  #tab-contracts .rzcount-s{grid-column:1/-1;font-size:13px;color:var(--rz-mut)}
+  #tab-contracts .rzcount.rz-alarm .rzcount-v{color:var(--rz-alarm)}
+  #tab-contracts .rzcount.rz-warn .rzcount-v{color:var(--rz-warn)}
+  /* буллет: полоса 240×16, до 80 % светлее, до цели темнее, значение — тёмное, цель — черта */
+  #tab-contracts .rzbul,.drw.rz .rzbul{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+  #tab-contracts .rzbul-b,.drw.rz .rzbul-b{position:relative;display:inline-block;width:240px;max-width:100%;height:16px;background:var(--rz-band1)}
+  #tab-contracts .rzbul-b i,.drw.rz .rzbul-b i{position:absolute;top:0;bottom:0;display:block}
+  #tab-contracts .rzbul-r1,.drw.rz .rzbul-r1{left:0;background:var(--rz-band1)}
+  #tab-contracts .rzbul-r2,.drw.rz .rzbul-r2{background:var(--rz-band2)}
+  #tab-contracts .rzbul-b .rzbul-v,.drw.rz .rzbul-b .rzbul-v{left:0;top:5px;bottom:5px;background:var(--rz-sel)}
+  #tab-contracts .rzbul-few .rzbul-b .rzbul-v,.drw.rz .rzbul-few .rzbul-b .rzbul-v{background:none;border:1.5px solid var(--rz-sel);top:4px;bottom:4px}
+  #tab-contracts .rzbul-b .rzbul-t,.drw.rz .rzbul-b .rzbul-t{width:2px;margin-left:-1px;top:-3px;bottom:-3px;background:var(--rz-sel)}
+  #tab-contracts .rzbul-l,.drw.rz .rzbul-l{font-size:14px;color:var(--ink)}
+  #tab-contracts .rzbul.rz-alarm .rzbul-l>.rzn,#tab-contracts .rzbul.rz-alarm .rzbul-l{color:var(--ink)}
+  #tab-contracts .rzbul-fn,.drw.rz .rzbul-fn{font-size:13px;color:var(--rz-mut)}
+  /* сортированные столбцы и полоска в ячейке */
+  #tab-contracts .rzbars,.drw.rz .rzbars{display:grid;gap:4px;margin:0;padding:0}
+  #tab-contracts .rzbars-r,.drw.rz .rzbars-r{display:grid;grid-template-columns:minmax(90px,200px) minmax(60px,1fr) minmax(36px,auto);align-items:center;gap:10px;font-size:14px;line-height:1.4}
+  #tab-contracts .rzbars-b,.drw.rz .rzbars-b{height:12px}
+  #tab-contracts .rzbars-b i,.drw.rz .rzbars-b i{display:block;height:100%;min-width:2px;background:var(--rz-data)}
+  #tab-contracts .rzbars-r.on .rzbars-b i,.drw.rz .rzbars-r.on .rzbars-b i{background:var(--rz-sel)}
+  #tab-contracts .rzbars-r.few .rzbars-b i,.drw.rz .rzbars-r.few .rzbars-b i{background:none;border:1.5px solid var(--rz-data)}
+  #tab-contracts .rzbars-v,.drw.rz .rzbars-v{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+  #tab-contracts .rzcb,.drw.rz .rzcb{display:inline-block;width:80px;margin-right:8px;vertical-align:middle}
+  #tab-contracts .rzcb-t,.drw.rz .rzcb-t{position:relative;display:block;height:8px;background:var(--rz-data)}
+  #tab-contracts .rzcb-t i,.drw.rz .rzcb-t i{position:absolute;left:0;top:0;bottom:0;background:var(--rz-alarm)}
+  /* «Как считаются деньги» — в конце «Сделок и денег» */
+  #tab-contracts .rzmoney{margin:24px 0 8px;font-size:14px;line-height:1.55;color:var(--ink2)}
+  #tab-contracts .rzmoney>summary{display:inline-flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;color:var(--rz-link);font-weight:600;list-style:none}
+  #tab-contracts .rzmoney>summary::-webkit-details-marker{display:none}
+  #tab-contracts .rzmoney>summary::before{content:"›";display:inline-block;width:10px;font-size:18px;line-height:1;transition:transform .15s}
+  #tab-contracts .rzmoney[open]>summary::before{transform:rotate(90deg)}
+  #tab-contracts .rzmoney-b p{margin:4px 0;max-width:96ch}
+  #tab-contracts .rzmoney-b ul{margin:4px 0 0 18px;max-width:96ch}
+  #tab-contracts .rzmoney-b li{margin:3px 0}
+  /* общий значок выгрузки «↓» во вкладке — не мельче 13 px (П-6); вне вкладки не меняется */
+  #tab-contracts .xlbtn .xli,.drw.rz .xlbtn .xli{font-size:13px}
+  /* пометка направления — строкой без рамки */
+  #tab-contracts .ctsepnote.is-sep{border:0;border-radius:0;background:none;padding:0;margin:0 0 10px;font-size:14px;color:var(--ink2)}
+  @media(max-width:560px){
+    #tab-contracts .rzhd-r1{flex-wrap:wrap;gap:2px 10px}
+    #tab-contracts .rzhd-r1 h1{font-size:22px}
+    #tab-contracts .rzhd-meta{flex-basis:100%;order:3;flex-direction:column}
+    #tab-contracts .rzgl-r{grid-template-columns:minmax(0,1fr)}
+    #tab-contracts .rzgl-l{grid-template-columns:minmax(0,1fr)}
+    #tab-contracts .rzglb{width:44px;height:44px}
+    #tab-contracts .rzbar{display:block;border-bottom:0;margin:4px 0 8px}
+    #tab-contracts .rzbar #ctTabs{border-bottom:1px solid var(--line);margin:0 -12px 0 0;padding-right:12px}
+    #tab-contracts .rzbar-r{justify-content:space-between;gap:8px;margin:0;padding:8px 0 0}
+    #tab-contracts .rzview-s{min-height:44px;max-width:190px}
+    #tab-contracts .rzbar-r{flex-wrap:nowrap}
+    #tab-contracts .rzbar #ctDirs .snb{padding:4px 10px}
+    #tab-contracts .rzbar #ctDirs .snb{min-height:44px}
+    #tab-contracts .rztile-n,#tab-contracts button.rzn.rztile-n{font-size:32px}
+    #tab-contracts .rzcount,#tab-contracts button.rzn.rzcount{min-height:44px}
+    #tab-contracts .rzgl-l{grid-template-columns:minmax(0,1fr)}
+    #tab-contracts .rzst-btn,.drw.rz .rzst-btn{min-height:44px}
+    /* число-кнопка в строке: область нажатия не меньше 44×44 (П-6), строка текста не раздвигается */
+    #tab-contracts button.rzn::after,.drw.rz button.rzn::after{inset:-12px -13px}
+  }
+  /* ==== /R4:WP-A ==== */
 </style>
 <script>
 /* Оформление: светлое для всех по умолчанию; «Тёмная тема» — выбор человека, помнится
@@ -4100,18 +4279,17 @@ const _CT_MODE_LBL={paid:'Оплата получена, сделка не за�
   salefx:'Продажа в валюте без курса',nosale:'Нет суммы сделки',nobuy:'Нет закупки',buyfx:'Закупка в валюте без курса',
   buysusp:'Закупка несоизмерима с продажей',margin:'В итоге валовой маржи',plan:'С планом по бюджету',noplan:'Без плана по бюджету',
   budget:'Бюджет сделки заведён',neg:'В минусе'};
-function _ctHeader(X,paid){
-  // Шапка (просьба владельца 29.10.2026: «чтобы логика читалась внятно»): заголовок, одна строка
-  // назначения, источник и свежесть одной строкой; сбои курсов — плашкой (решение 25.10.2026: не
-  // молча), правила денег и закрытой стадии — под «Как считаются деньги», а не стеной абзацев
+// «Как считаются деньги» (R4, спец. 2.2): правила денег, НДС, курса и закрытой стадии — из шапки
+// вкладки в «Сделки и деньги»; сбои курсов — тревогой над разделом денег (решение 25.10.2026: не молча)
+function _ctMoneyParts(X,paid){
   const fx=X.fx||{};
   const VAT='продажа без файла экономики — без НДС по правилу (÷1,20 при ТКП до 2026, ÷1,22 с 2026, иностранный покупатель — как есть), закупка — заказы как внесены';
   // реквизиты не прочитаны: основной вид — как РФ (НДС снят), отдельное направление — как
-  // иностранные (решение владельца 26.10.2026), об этом и говорит плашка
+  // иностранные (решение владельца 26.10.2026), об этом и говорит предупреждение
   const REQ=fx.reqErr?('страна покупателя не прочитана: НДС снят у всех'+(fx.nVatNoreqSep?', кроме отдельного направления — там «Сумма» как есть ('+fx.nVatNoreqSep+')':'')):'';
   const PT=fx.partial, warn=[], rules=[];
-  // число сделок в плашке — ссылка на «Сделки и деньги» с отбором этих сделок (data-ctgo + data-ctmode);
-  // ссылка — только когда отбор основного вида даёт ровно это число (иначе число без ссылки)
+  // число сделок в предупреждении — ссылка на «Сделки и деньги» с отбором этих сделок (data-ctgo +
+  // data-ctmode); ссылка — только когда отбор основного вида даёт ровно это число
   const R0=(X.rows||[]).filter(r=>!r.seg);
   const fxGo=(n,m,w)=>{if(!n) return ''; const t=_ctN(n,'сделка','сделки','сделок');
     const ok=_CT_MODE[m]&&R0.filter(_CT_MODE[m]).length===n;
@@ -4124,24 +4302,52 @@ function _ctHeader(X,paid){
   else if(fx.src==='bitrix') rules.push(`Деньги — в € по курсам Битрикса; ${VAT}.`);
   else rules.push(`Деньги — в € по курсу <b>${_esc(fx.lbl||'ЦБ РФ')}</b> на дату КП (заказ — на дату заказа)${fx.cbrUsdRub!=null?` · сегодня 1 USD = ${fx.cbrUsdRub} ₽`:''}.`,
     'Продажа'+VAT.slice(7)+'.'+(fx.noRate?` Без курса на свою дату — ${fxGo(fx.noRate,'nofx')}: в итоги не вошли.`:''));
-  rules.push('УПД — универсальный передаточный документ: клиент подписывает его при приёмке товара; без него сделку не закрыть.');
-  rules.push('Гарантию отдел реализации не ведёт: заказы на гарантии — на «<a href="#contracts/quarter" data-ctgo="quarter">Квартале</a>».');
-  // «Оплата получена», сделка открыта — видно сразу, а не в раскрытии: это пункт ОСС, число — список
+  rules.push('УПД (передаточный документ) клиент подписывает при приёмке товара; без него сделку не закрыть.');
+  rules.push('Гарантию отдел реализации контрактов не ведёт: заказы на гарантии — на «<a href="#contracts/quarter" data-ctgo="quarter">Квартале</a>».');
+  // «Оплата получена», сделка открыта — дело сопровождения сделки (ОСС), число — список
   const P0=(paid&&paid.main)||0, P1=(paid&&paid.sep)||0, R1=(X.rows||[]).filter(r=>r.seg);
   const pSep=P1?` и ${R1.filter(_CT_MODE.paid).length===P1?`<a href="#contracts/main/sep" class="cthd-go" data-ctgo="main" data-ctdir="sep" data-ctmode="paid">${P1} в направлении ${_esc(paid.name||'')}</a>`:`${P1} в направлении ${_esc(paid.name||'')}`}`:'';
-  const PD=(P0||P1)?`<p>«Оплата получена», а сделка в Битриксе не закрыта — её закрывает сопровождение сделки (ОСС). В доставке в срок и деньгах такие сделки уже считаются успешными.</p>`:'';
-  // первый экран (dataink, правило 2, ревью 30.10.2026): шапка вкладки — одной строкой (имя, источник,
-  // дата, «оплата получена — закрыть» числом-ссылкой), остальное — под «Подробнее»
-  const lbl=String(X.label||''), asOf=/^на\s/.test(lbl)?lbl.replace(/^на\s+/,''):lbl;
-  const PS=P0||P1?`<span>оплата получена, сделка не закрыта: ${P0?fxGo(P0,'paid'):'0 сделок'}${pSep} — закрыть (ОСС)</span>`:'';
-  return `<header class="cthd"><div class="cthd-row"><h1>Реализация</h1>`
-    +`<p class="cthd-meta"><span>Битрикс24, выгрузка на <b>${_esc(asOf)}</b></span>${PS}</p>`
-    +`<details class="cthd-more"><summary>Подробнее: что здесь, деньги и УПД</summary><div class="cthd-mb">`
-    +`<p class="cthd-lead"><b>От выигрыша до оплаты.</b> Заказы поставщикам по 13 шагам регламента отдела реализации контрактов (ОРК) — от приёмки сделки до подписанного клиентом УПД и оплаты. Подчёркнутое число открывает заказы за ним: что сделать и кто.</p>`
+  const paidLine=P0||P1?`Оплата получена, сделка в Битриксе не закрыта: ${P0?fxGo(P0,'paid'):'0 сделок'}${pSep} — закрывает сопровождение сделки (ОСС). В доставке в срок и деньгах такие сделки уже успешны.`:'';
+  return {warn,rules,paidLine};
+}
+function _ctMoneyHtml(X,paid){
+  const M=_ctMoneyParts(X,paid);
+  return `<details class="rzmoney" id="ctMoney"><summary>Как считаются деньги</summary><div class="rzmoney-b">`
     +`<p>Откуда: Битрикс24 — сделки воронки «Реализация» и карточки «Заказ поставщику»; внесённое после выгрузки здесь ещё не видно.</p>`
-    +PD+`<ul>${rules.map(r=>`<li>${r}</li>`).join('')}</ul></div></details></div>`
-    +warn.map(w=>`<div class="cthd-warn" role="status"><span aria-hidden="true">⚠</span> ${w}</div>`).join('')
+    +(M.paidLine?`<p>${M.paidLine}</p>`:'')+`<ul>${M.rules.map(r=>`<li>${r}</li>`).join('')}</ul></div></details>`;
+}
+// Шапка вкладки (R4, спец. 2.2): строка 1 — «Реализация» · «Данные на …» (устарели — янтарным со
+// словом и ссылкой на прогоны) · «N заказов в работе у отдела реализации контрактов (ОРК)» числом-
+// списком · «?» — словарь. Число заказов — у текущего вида (_ctHeadLive, его ставит renderContracts).
+// Правила денег — «Сделки и деньги» (_ctMoneyHtml); строка доверия — «Как считается» (_orkTrust).
+function _ctHeader(X,paid){
+  const O=X.ork||{}, lbl=String(X.label||''), asOf=O.asOf||(/^на\s/.test(lbl)?lbl.replace(/^на\s+/,''):lbl);
+  const S=_rzStale(asOf), dt=S.date||_esc(asOf);
+  const fresh=S.stale
+    ?`<span class="rzasof rz-warn" role="status"><span class="rzw rzfinal">Данные на <b>${dt}</b> — ${S.days} дн. назад, сборка не обновлялась</span> · <a href="${_RZ_RUNS}" target="_blank" rel="noopener">Прогоны ↗</a></span>`
+    :`<span class="rzasof">Данные на <b>${dt}</b></span>`;
+  return `<header class="cthd rzhd"><div class="cthd-row rzhd-r1"><h1>Реализация</h1>`
+    +`<p class="rzhd-meta">${fresh}<span class="rzlive" id="ctLive"></span></p>`
+    +`<button type="button" class="rzglb" id="rzGlossB" aria-expanded="false" aria-controls="rzGloss" title="Словарь: сокращения и термины вкладки"><span aria-hidden="true">?</span><span class="ctvh">Словарь</span></button></div>`
+    +`<section class="rzgl" id="rzGloss" aria-label="Словарь вкладки" hidden><div class="rzgl-h"><h2>Словарь</h2><span class="rzgl-n">сокращения и термины вкладки; то же — в «Как считается»</span><button type="button" class="rzgl-x" data-rzglx="1" aria-label="Закрыть словарь">×</button></div>${_rzGlossHtml()}</section>`
     +`</header>`;
+}
+// число заказов в работе текущего вида — у шапки (спец. 2.2: «51 заказ в работе»), открывает их список
+function _ctHeadLive(V,dir,SH){
+  const W=((V&&V.ork)||{}).week||{}, n=W.live;
+  if(n==null) return '';
+  const w=_ctN(+n,'заказ','заказа','заказов').replace(/^\d+\s/,'');
+  return `${_rzNum(n,{of:'w:live',title:'Заказы в работе',rank:'0'})} ${w} в работе${dir==='sep'&&SH?` направления ${_esc(SH.name)}`:''} у ${_rzGloss('ОРК',{first:true,gen:true})}`;
+}
+// тревоги вида под строкой подвкладок — только если не ноль (спец. 2.2): стадия неизвестна
+// регламенту, нет производственного календаря; на «Сделках и деньгах» — сбои курсов
+function _ctAlarms(V,sub,paid,X0){
+  const O=(V&&V.ork)||{}, T=O.trust||{}, A=[];
+  if(T.unknown) A.push(`<span class="rz-warn">Стадия неизвестна регламенту</span>: ${_rzNum(T.unknown,{of:'w:unk',title:'Стадия неизвестна регламенту: сверить в Битриксе'})} ${_ctN(+T.unknown,'заказ','заказа','заказов').replace(/^\d+\s/,'')} — шаг и срок не определить; сверить стадию в Битриксе`);
+  if((T.yearsNoCal||[]).length) A.push(`<span class="rz-warn">Нет производственного календаря на ${_esc((T.yearsNoCal||[]).join(', '))}</span> — сроки в рабочих днях этих лет не считаем; разработчику — внести календарь РФ`);
+  if(T.nextYearCal===false) A.push(`<span class="rz-warn">Нет календаря на следующий год</span> — с 1 января сроки в рабочих днях не посчитаются; разработчику — внести календарь РФ`);
+  if(sub==='main'&&X0){const M=_ctMoneyParts(X0,paid); M.warn.forEach(w=>A.push(`<span class="rz-warn" aria-hidden="true">⚠</span> ${w}`));}
+  return A.length?A.map(a=>`<p class="rzalarm-r">${a}</p>`).join(''):'';
 }
 // Вкладка направления без его сделок: «Нет данных» + чего нет и откуда придёт (portal-ui §2)
 function _ctSepEmpty(SH,X){
@@ -4155,30 +4361,23 @@ function _ctSepEmpty(SH,X){
 // руководителя ОРК — у каждого числа что сделать и кто. Подвкладки (адрес #contracts/<раздел>):
 // week — «Неделя руководителя ОРК» (по умолчанию), month — «Месяц», quarter — «Квартал»,
 // main — «Сделки и деньги» (таблица сделок, карточка, деньги, чаты и договоры), how — «Как
-// считается». Переключатель «Основное · <направление>» (решение 25.10.2026) — второй ряд,
-// работает во всех подвкладках: адрес направления — #contracts/<раздел>/sep. Прежние адреса
-// живут: #contracts/main — «Сделки и деньги» основного вида, #contracts/sep — «Сделки и
-// деньги» направления. Отдельное направление: его воронка и сделки реализации тех же
-// компаний; основной вид его сделок не показывает ни в очереди, ни в плитках, ни в итогах.
+// считается». Переключатель «Основное · <направление>» (решение 25.10.2026) — справа в строке
+// подвкладок, работает во всех подвкладках: адрес направления — #contracts/<раздел>/sep. Прежние
+// адреса живут: #contracts/main — «Сделки и деньги» основного вида, #contracts/sep — «Сделки и
+// деньги» направления. Полная грамматика адреса — _rzRoute (R4, спец. 2.6).
 const CT_SUBS=[['week','Неделя руководителя ОРК'],['month','Месяц'],['quarter','Квартал'],['main','Сделки и деньги'],['how','Как считается']];
 // подпись вкладки на экране — короткая (просьба владельца 29.10.2026); полное имя остаётся в тексте
 // кнопки (скрытой частью): им называют вкладку чтец экрана и файл «Excel» (_xlSub)
 const _CT_SHORT={week:['Неделя',' руководителя ОРК']};
 const _ctSubLbl=(k,nm)=>_CT_SHORT[k]?`${_CT_SHORT[k][0]}<span class="ctvh">${_CT_SHORT[k][1]}</span>`:nm;
-// что в подвкладке — одной строкой под переключателями (владелец 29.10.2026: «читай как человек,
-// которому смысл заголовков не понятен — расшифровывай»): что в ней и кому
-const _CT_SUBD={week:'',
-  month:'<b>Месяц</b> — дисциплина сроков отдела за последний полный месяц: доля шагов в норме, заполненность карточек заказов, нагрузка менеджеров ОРК. Видят руководители ОРК и владелец.',
-  quarter:'<b>Квартал</b> — поставщики и реальные сроки: держат ли обещанный срок готовности, сколько на деле идут производство и доставка, сколько платим вперёд.',
-  main:'<b>Сделки и деньги</b> — все сделки реализации: продажа, закупка, маржа, срок клиента, чаты и договоры. Строка открывает карточку сделки.',
-  how:'<b>Как считается</b> — нормы 13 шагов, словарь терминов, формулы показателей и когда числу можно верить.'};
-function _ctAddr(h){
-  const m=/^#contracts\/(\w+)(?:\/(\w+))?/.exec(h||'');
-  if(!m) return {sub:'week',dir:'main'};
-  if(m[1]==='sep'&&!m[2]) return {sub:'main',dir:'sep'};        // прежний адрес вкладки направления
-  const sub=CT_SUBS.some(s=>s[0]===m[1])?m[1]:'week';
-  return {sub,dir:m[2]==='sep'?'sep':'main'};
-}
+// что в подвкладке — подсказкой у вкладки (R4: на подвкладке — только тревоги, спец. 2.2)
+const _CT_SUBD={week:'Что сегодня срывает срок клиента и где заказы стоят дольше нормы, кто их двигает',
+  month:'Дисциплина сроков отдела за последний полный месяц: шаги в норме, полнота карточек, загрузка менеджеров',
+  quarter:'Поставщики и реальные сроки: держат ли срок готовности, сколько идут производство и доставка',
+  main:'Все сделки реализации: продажа, закупка, маржа, срок клиента, оплата клиента',
+  how:'Словарь, нормы 13 шагов, формулы показателей и когда числу можно верить'};
+// прежний разбор адреса — поверх _rzRoute: {sub, dir}
+function _ctAddr(h){const s=_rzRoute.parse(h==null?'':h); return {sub:s.sub,dir:s.sep?'sep':'main'};}
 // узкий экран (ревью 30.10.2026): таблицы без своей раскладки для телефона — карточками (подпись
 // столбца у каждой ячейки, data-l → ::before; в Excel не идёт); обёртка, которая всё равно шире
 // экрана, — фокусируемая область с именем таблицы (WCAG 2.1.1, axe scrollable-region-focusable)
@@ -4203,7 +4402,7 @@ function _rzFlow(root){
 }
 function renderContracts(){
   const X0=window.__CONTRACTS__, el=document.getElementById('tab-contracts'); if(!el) return;
-  if(!X0||!Array.isArray(X0.rows)){ el.innerHTML='<section class="card"><div class="secttl">Нет данных</div><div class="note">Нет данных «Реализации»: сделок воронки реализации и заказов поставщикам (СП-172) в сборке нет. Источник — Bitrix24, сборка main.py → contracts.compute.</div></section>'; return; }
+  if(!X0||!Array.isArray(X0.rows)){ el.innerHTML=`<header class="cthd rzhd"><div class="cthd-row rzhd-r1"><h1>Реализация</h1></div></header>`+_rzState('nodata',{what:'сделок воронки «Реализация» и карточек «Заказ поставщику» в этой сборке',why:'сборка не прочитала их из Битрикс24 (main.py → contracts.compute)',who:'разработчик — перезапустить сборку'}); return; }
   const H0=X0.head||{}, SH=H0.sep&&typeof H0.sep.name==='string'?H0.sep:null;
   const SV=SH&&X0.sep&&X0.sep.head&&X0.sep.life?X0.sep:null;
   const views={main:Object.assign({},X0,{rows:X0.rows.filter(r=>!r.seg),seg:null,sepHead:SH,dir:'main'})};
@@ -4217,49 +4416,65 @@ function renderContracts(){
   const draw=(dir,sub,panel,opt)=>{
     const V=views[dir];
     if(V.empty){ panel.innerHTML=_ctSepEmpty(SH,X0); return; }
-    try{ if(sub==='main') _ctPanel(V,panel,opt); else _orkPanel(V,sub,panel); }
+    try{ if(sub==='main') _ctPanel(V,panel,opt); else _orkPanel(V,sub,panel);
+      // «Как считаются деньги» — в конце «Сделок и денег», если вид не поставил свой (WP-E)
+      if(sub==='main'&&!panel.querySelector('#ctMoney')) panel.insertAdjacentHTML('beforeend',_ctMoneyHtml(X0,paid)); }
     catch(err){                             // сломанный вид не гасит переключатели и соседние виды
       console.error('Реализация, '+sub+' · '+dir+':',err);
       panel.innerHTML='<section class="card"><div class="secttl">Вкладка не отрисовалась</div>'
-        +'<div class="note">Не удалось загрузить раздел: данные неполные или повреждены. Техническая причина: '+_esc(String(err&&err.message||err))+'</div></section>';
+        +'<div class="note">Не удалось показать раздел: данные неполные или повреждены. Остальные разделы работают. Техническая причина: '+_esc(String(err&&err.message||err))+'</div></section>';
     }
   };
+  // «Смотреть как»: люди из очередей (имена — уже в странице за доступом; в адрес — только id)
+  const PP=_rzPeople();
+  const RG={orkHead:'Отдел реализации контрактов (ОРК)',orkMgr:'Отдел реализации контрактов (ОРК)',kam:'Менеджеры клиента (КАМ)',oss:'Сопровождение сделки (ОСС)'};
+  const grp={}; PP.forEach(p=>{const g=RG[p.role]||'Другие'; (grp[g]=grp[g]||[]).push(p);});
+  // подпись выбора — в самом поле («Смотреть как: все ▾»): одна строка с направлением и на телефоне
+  const kamSel=PP.length?`<div class="rzview"><label for="rzKam" class="ctvh">Смотреть как</label><select id="rzKam" class="rzview-s"><option value="" data-n="все">все</option>`
+    +Object.keys(grp).map(g=>`<optgroup label="${_esc(g)}">${grp[g].map(p=>`<option value="${_esc(p.id)}" data-n="${_esc(p.name+(p.gone?' (уволен)':''))}">${_esc(p.name)}${p.gone?' (уволен)':''}</option>`).join('')}</optgroup>`).join('')+`</select></div>`:'';
   el.innerHTML=_ctHeader(X0,paid)
-    +`<div class="ctbar"><div class="subnav ctsub" role="tablist" aria-label="Разделы реализации" id="ctTabs">`
-    +CT_SUBS.map(([k,nm])=>`<button type="button" class="snb" role="tab" id="ctTab-${k}" data-sub="${k}" aria-selected="false" aria-controls="ctPanel-main" tabindex="-1">${_ctSubLbl(k,nm)}</button>`).join('')+`</div>`
-    +(SH?`<div class="ctdirw"><span class="ctdirl" id="ctDirL">Направление<span class="ctdirn">: ${_esc(SH.name)} считается отдельно, в основной вид не входит</span></span><div class="subnav ctsub ctdir" role="tablist" aria-labelledby="ctDirL" id="ctDirs">`
-      +`<button type="button" class="snb" role="tab" id="ctDir-main" data-dir="main" aria-selected="true" aria-controls="ctPanel-main" tabindex="0">Основное</button>`
-      +`<button type="button" class="snb" role="tab" id="ctDir-sep" data-dir="sep" aria-selected="false" aria-controls="ctPanel-sep" tabindex="-1">${_esc(SH.name)} <span class="ctsubn" title="${_esc(_ctN(SH.live||0,'сделка','сделки','сделок')+' в работе')}">(${SH.live})</span></button></div></div>`:'')
-    +`</div><p class="ctsubd" id="ctSubD" aria-live="polite"></p>`
+    +`<div class="ctbar rzbar"><div class="subnav ctsub" role="tablist" aria-label="Разделы реализации" id="ctTabs">`
+    +CT_SUBS.map(([k,nm])=>`<button type="button" class="snb" role="tab" id="ctTab-${k}" data-sub="${k}" aria-selected="false" aria-controls="ctPanel-main" tabindex="-1" title="${_esc(_CT_SUBD[k]||'')}">${_ctSubLbl(k,nm)}</button>`).join('')+`</div>`
+    +`<div class="rzbar-r">${kamSel}`
+    +(SH?`<div class="ctdirw"><span class="ctvh" id="ctDirL">Направление: ${_esc(SH.name)} считается отдельно, в основной вид не входит</span><div class="subnav ctsub ctdir" role="tablist" aria-labelledby="ctDirL" id="ctDirs">`
+      +`<button type="button" class="snb" role="tab" id="ctDir-main" data-dir="main" aria-selected="true" aria-controls="ctPanel-main" tabindex="0" title="Все сделки, кроме направления ${_esc(SH.name)}">Основное</button>`
+      +`<button type="button" class="snb" role="tab" id="ctDir-sep" data-dir="sep" aria-selected="false" aria-controls="ctPanel-sep" tabindex="-1" title="${_esc(SH.name)} считается отдельно: ${_esc(_ctN(SH.live||0,'сделка','сделки','сделок'))} в работе">${_esc(SH.name)} <span class="ctsubn">(${SH.live})</span></button></div></div>`:'')
+    +`</div></div><p class="rzkamnote" id="rzKamNote" hidden></p><div class="rzalarm" id="rzAlarm" role="status"></div><p class="ctsubd" id="ctSubD" aria-live="polite"></p>`
     +`<div role="tabpanel" id="ctPanel-main" aria-labelledby="ctTab-week${SH?' ctDir-main':''}" tabindex="0"></div>`
     +(SH?`<div role="tabpanel" id="ctPanel-sep" aria-labelledby="ctTab-week ctDir-sep" tabindex="0" hidden></div>`:'');
   const subTabs=[...el.querySelectorAll('#ctTabs [role=tab]')], dirTabs=[...el.querySelectorAll('#ctDirs [role=tab]')];
+  const head=el.querySelector('header.rzhd'), gB=document.getElementById('rzGlossB'), gP=document.getElementById('rzGloss');
   // виды рисуются по одному: id элементов (очередь, таблица, плитки) одни на все — невидимая
   // панель пустеет
   const pick=(dir,sub,opt)=>{
     opt=opt||{};
     if(!views[dir]) dir='main';
     if(!CT_SUBS.some(s=>s[0]===sub)) sub='week';
-    if(dir===cur.dir&&sub===cur.sub&&!opt.mode) return;
+    if(dir===cur.dir&&sub===cur.sub&&!opt.mode&&!opt.force) return;
     cur.dir=dir; cur.sub=sub;
     const addr=sub+(dir==='sep'?'/sep':'');
     el.dataset.ctsub=addr;                  // базовый слой вернёт адрес при возврате в «Реализацию»
     const pid='ctPanel-'+dir;
     subTabs.forEach(b=>{const on=b.dataset.sub===sub; b.classList.toggle('on',on); b.setAttribute('aria-selected',on?'true':'false'); b.tabIndex=on?0:-1; b.setAttribute('aria-controls',pid);});
     dirTabs.forEach(b=>{const on=b.dataset.dir===dir; b.classList.toggle('on',on); b.setAttribute('aria-selected',on?'true':'false'); b.tabIndex=on?0:-1;});
-    // направление — подписью переключателя, а не плашкой над плитками (первый экран, ревью 30.10.2026);
-    // в «Квартале» — оговорка: поставщиков меряем по всем заказам
-    const nm=SH?_esc(SH.name):'';
-    const sepL=SH&&dir==='main'&&sub==='quarter'?` <span class="ctsubsep">Поставщиков меряем по всем заказам, вместе с направлением ${nm}.</span>`:'';
-    const dn=el.querySelector('#ctDirL .ctdirn'); if(dn) dn.hidden=dir==='sep';
-    const sd=document.getElementById('ctSubD'); if(sd) sd.innerHTML=(_CT_SUBD[sub]||'')+sepL;
+    // лента подвкладок на телефоне: выбранная — в видимой части ленты (страница вбок не едет)
+    {const R=document.getElementById('ctTabs'), t=subTabs.find(x=>x.dataset.sub===sub);
+     const fit=()=>{if(R&&t&&R.scrollWidth>R.clientWidth){const a=t.getBoundingClientRect(), r=R.getBoundingClientRect();
+       if(a.right>r.right||a.left<r.left) R.scrollLeft+=a.left-r.left-16;}};
+     fit(); setTimeout(fit,0);}   // вкладка могла быть ещё скрыта (ленивый рендер) — повтор после показа
+    _rzGloss.reset();
+    const V=views[dir];
+    const lv=document.getElementById('ctLive'); if(lv) lv.innerHTML=V&&!V.empty?_ctHeadLive(V,dir,SH):'';
+    const al=document.getElementById('rzAlarm'); if(al){const a=V&&!V.empty?_ctAlarms(V,sub,paid,X0):''; al.innerHTML=a; al.hidden=!a;}
+    // в «Квартале» основного вида — оговорка: поставщиков меряем по всем заказам
+    const sd=document.getElementById('ctSubD'); if(sd) sd.innerHTML=SH&&dir==='main'&&sub==='quarter'?`<span class="ctsubsep">Поставщиков меряем по всем заказам, вместе с направлением ${_esc(SH.name)}.</span>`:'';
     Object.keys(views).forEach(n=>{const p=document.getElementById('ctPanel-'+n); p.hidden=n!==dir; p.innerHTML='';});
     const panel=document.getElementById(pid);
     panel.setAttribute('aria-labelledby','ctTab-'+sub+(SH?' ctDir-'+dir:''));
     draw(dir,sub,panel,opt);
     if(typeof _xlMark==='function') _xlMark(panel);   // кнопки «Excel» таблиц подвкладки — сразу после рендера
     _rzFlow(panel);
-    if(opt.addr){ try{ history.replaceState(null,'','#contracts/'+addr); }catch(e){} }
+    if(opt.addr) _rzRoute.set({sub,sep:dir==='sep'},{push:false});
     if(opt.focus){ const b=(opt.focus==='dir'?dirTabs.find(x=>x.dataset.dir===dir):subTabs.find(x=>x.dataset.sub===sub)); if(b) b.focus(); }
   };
   const keys=(list,attr,go)=>e=>{
@@ -4277,17 +4492,430 @@ function renderContracts(){
   }
   // ссылки внутри вида: data-ctgo — подвкладка, data-ctdir — направление, data-ctmode —
   // отбор таблицы сделок («Сделки и деньги»)
-  el.addEventListener('click',e=>{const a=e.target.closest('[data-ctgo],[data-ctdir]'); if(!a||!el.contains(a)) return; e.preventDefault();
+  el.addEventListener('click',e=>{const a=e.target.closest('[data-ctgo],[data-ctdir]'); if(!a||!el.contains(a)||a.getAttribute('role')==='tab') return; e.preventDefault();
     pick(a.dataset.ctdir||cur.dir,a.dataset.ctgo||cur.sub,{addr:1,focus:a.dataset.ctdir?'dir':'sub',mode:a.dataset.ctmode||''}); window.scrollTo(0,0);});
-  window.addEventListener('hashchange',()=>{ if(/^#contracts\//.test(location.hash||'')){ const a=_ctAddr(location.hash); pick(a.dir,a.sub); } });
-  const a0=_ctAddr(location.hash);
-  pick(a0.dir,a0.sub);
+  // словарь «?»: раскрытие под шапкой; Esc и «×» закрывают, фокус — на «?»
+  const gloss=on=>{if(!gB||!gP) return; gP.hidden=!on; gB.setAttribute('aria-expanded',on?'true':'false'); if(on){const x=gP.querySelector('[data-rzglx]'); if(x) x.focus();}};
+  if(gB) gB.addEventListener('click',()=>gloss(gP.hidden));
+  if(gP){ gP.addEventListener('click',e=>{if(e.target.closest('[data-rzglx]')){gloss(false); gB.focus();}});
+    gP.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation(); gloss(false); gB.focus();}}); }
+  // число в шапке и в строке тревог — список заказов текущего вида (панель вида их не видит)
+  const openOf=(b,e)=>{const V=views[cur.dir]; if(!V||V.empty||typeof _odOpen!=='function') return;
+    e.preventDefault(); e.stopPropagation();
+    _odOpen(V,V.ork,{id:b.dataset.of,n:b.dataset.of,f:b.dataset.f||'',title:b.dataset.odt||''},b);};
+  [head,document.getElementById('rzAlarm')].forEach(z=>{if(z) z.addEventListener('click',e=>{const b=e.target.closest('button.rzn[data-of]'); if(b&&z.contains(b)) openOf(b,e);});});
+  // «Смотреть как»: выбор → адрес k=, память зрителя, событие rz:kam, перерисовка вида
+  const kamS=document.getElementById('rzKam'), kamN=document.getElementById('rzKamNote');
+  const setKam=(k,o)=>{o=o||{}; k=k&&PP.some(p=>p.id===String(k))?String(k):'';
+    _rzKam.v=k; if(kamS){ if(kamS.value!==k) kamS.value=k; [...kamS.options].forEach(x=>{x.textContent=(x.value===k?'Смотреть как: ':'')+(x.dataset.n||'');}); }
+    if(kamN){const nm=k?_rzKamName(k):''; kamN.hidden=!k;
+      kamN.innerHTML=k?`Показаны дела, где <b>${_esc(nm)}</b> делает или в курсе. <button type="button" class="rzst-btn" data-rzkam0="1">Показать всех</button>`:'';}
+    if(!o.noStore){try{ if(k) localStorage.setItem(_RZ_KAM_KEY,k); else localStorage.removeItem(_RZ_KAM_KEY); }catch(e){}}
+    if(!o.noAddr) _rzRoute.set({k},{push:false});
+    if(!o.silent){ try{document.dispatchEvent(new CustomEvent('rz:kam',{detail:{k}}));}catch(e){} pick(cur.dir,cur.sub,{force:1}); }};
+  if(kamS) kamS.addEventListener('change',()=>setKam(kamS.value));
+  if(kamN) kamN.addEventListener('click',e=>{if(e.target.closest('[data-rzkam0]')){setKam(''); if(kamS) kamS.focus();}});
+  // ---- уровни из адреса (спец. 2.6, 2.8): список → сделка → заказ → шаг; не нашёлся — «Не найдено»
+  const drwEl=()=>document.getElementById('drw');
+  const closeLv=()=>{const d=drwEl(); if(!d||!d.classList.contains('on')) return;
+    if(d.dataset.od==='1'&&typeof _odClose==='function') _odClose(false); else if(typeof closeDrw==='function') closeDrw();};
+  const notFound=(what,bx,back)=>{const d=drwEl(), b=document.getElementById('drwBody'), o=document.getElementById('ovl'); if(!d||!b) return;
+    if(typeof _rzDrw==='function') _rzDrw(true);
+    document.getElementById('drwName').textContent='Не найдено'; const s=document.getElementById('drwSub'); if(s) s.textContent=what;
+    b.innerHTML=_rzState('notfound',{what,date:_rzStale((X0.ork||{}).asOf||'').date||String(X0.label||'').replace(/^на\s+/,''),bx,back});
+    if(o) o.classList.add('on'); d.classList.add('on'); d.setAttribute('aria-hidden','false');
+    const nb=b.querySelector('[data-rzclose]'); if(nb) nb.addEventListener('click',()=>{closeLv(); _rzRoute.set({n:'',d:'',o:'',s:''},{push:false});});
+    const kb=b.querySelector('[data-rzback]'); if(kb) kb.addEventListener('click',()=>{const st=_rzRoute.set({d:'',o:'',s:''},{push:false}); apply(st);});
+    const h=document.getElementById('drwName'); if(h){h.setAttribute('tabindex','-1'); try{h.focus({preventScroll:true});}catch(e){}}};
+  const BX=typeof _OP_BX==='string'?_OP_BX:'https://kvantpro.bitrix24.ru/crm/';
+  const apply=st=>{
+    _rzRoute.busy++;
+    try{
+      if(st.k!==_rzKam()) setKam(st.k,{silent:true,noAddr:true});
+      pick(st.sep&&views.sep?'sep':'main',st.sub);
+      if(!st.n&&!st.d&&!st.o){closeLv(); return;}
+      const V=views[cur.dir]; if(!V||V.empty){notFound('Направления '+(SH?SH.name:''),'',false); return;}
+      let listOk=false;
+      if(st.n){
+        const F={}; String(st.f||'').split(',').forEach(p=>{const i=p.indexOf('.'); if(i>0) F[p.slice(0,i)]=p.slice(i+1);});
+        const spec={id:st.n,n:st.n,f:st.f,title:''}; if(F.step) spec.F={step:F.step}; else if(F.tag) spec.F={tag:F.tag}; else if(F.code) spec.F={act:F.code};
+        listOk=typeof _odOpen==='function'&&_odOpen(V,V.ork,spec,null)!==false;
+        if(!listOk){notFound('Списка за этим числом',''); return;}
+      }
+      if(st.d){
+        const row=(V.rows||[]).find(r=>String(r.deal)===String(st.d));
+        if(!row){notFound('Сделки id '+st.d,BX+'deal/details/'+st.d+'/',listOk); return;}
+        if(typeof openContract==='function') openContract(row,{order:st.o||''});
+      }
+      if(st.o){
+        const f=typeof _opFind==='function'?_opFind(st.o):null;
+        if(!f){notFound('Заказа id '+st.o,BX+'type/172/details/'+st.o+'/',listOk); return;}
+        const L=listOk&&typeof _OD==='object'&&_OD.M?(_OD.M.items||[]).map(i=>i.k).filter(k=>!/^d:/.test(k)):[];
+        const ok=typeof _opOpen==='function'&&_opOpen(st.o,{back:st.d?'deal':listOk?'list':'',list:L.length?L:undefined,idx:L.length?Math.max(0,L.indexOf(String(st.o))):undefined,step:st.s?+st.s:undefined,from:st.d?'deal':listOk?'list':undefined});
+        if(!ok){notFound('Заказа id '+st.o,BX+'type/172/details/'+st.o+'/',listOk); return;}
+      }
+      const h=document.getElementById('drwName'); if(h){h.setAttribute('tabindex','-1'); try{h.focus({preventScroll:true});}catch(e){}}
+    }finally{_rzRoute.busy--;}
+  };
+  _rzRoute.apply=st=>apply(st||_rzRoute.get());
+  // Мост к пакетам, которые адрес ещё не пишут: открытие списка, сделки и заказа — уровень в
+  // адресе (pushState). Пакет, который зовёт _rzRoute сам, помечает функцию .rzRoutes = true
+  if(!_rzRoute.bridged){ _rzRoute.bridged=1;
+    const wrap=(name,after)=>{const f=window[name]; if(typeof f!=='function'||f.rzRoutes||f.rzWrapped) return;
+      const g=function(){const r=f.apply(this,arguments); try{ if(!_rzRoute.busy&&/^#contracts/.test(location.hash||'')) after(r,arguments); }catch(e){} return r;};
+      g.rzWrapped=1; g.rzOrig=f; window[name]=g;};
+    wrap('_odOpen',(r,a)=>{const sp=a[2]||{}; const n=sp.n||sp.id; if(r&&n){const F=sp.F||{}; const f=sp.f!=null?sp.f:(F.step!=null?'step.'+F.step:F.tag?'tag.'+F.tag:'');
+      _rzRoute.set({n:String(n),f,d:'',o:'',s:''},{push:!_rzRoute.levels()||_rzRoute.get().n!==String(n)});}});
+    wrap('_opOpen',(r,a)=>{const o=a[1]||{}; if(r&&!o.keep) _rzRoute.set({o:String(a[0]),s:o.step?String(o.step):''},{push:true});});
+    wrap('openContract',(r,a)=>{const x=a[0]; const id=x&&typeof x==='object'?x.deal:x; if(id!=null&&_rzRoute.get().d!==String(id)) _rzRoute.set({d:String(id),o:'',s:''},{push:true});});
+  }
+  // панель закрыли (×, затемнение, Esc) — уровни из адреса уходят: «Назад» не откроет её снова
+  if(!_rzRoute.watch&&typeof MutationObserver==='function'&&drwEl()){ _rzRoute.watch=1;
+    let was=drwEl().classList.contains('on');
+    new MutationObserver(()=>{const on=drwEl().classList.contains('on'); if(on===was) return; was=on;
+      if(on||_rzRoute.busy||!/^#contracts/.test(location.hash||'')||!_rzRoute.levels()) return;
+      const dep=(history.state&&history.state.rzDepth)||0;
+      if(dep>0){_rzRoute.leaving=1; try{history.go(-dep);}catch(e){_rzRoute.set({n:'',f:'',d:'',o:'',s:''},{push:false});}}
+      else _rzRoute.set({n:'',f:'',d:'',o:'',s:''},{push:false});
+    }).observe(drwEl(),{attributes:true,attributeFilter:['class']});
+  }
+  // «Назад», «Вперёд», вставленная ссылка: адрес → уровни (один раз на смену адреса)
+  const onNav=()=>{const h=location.hash||''; if(!/^#contracts(\/|$|\?)/.test(h)) return;
+    if(_rzRoute.applied===h&&!_rzRoute.leaving) return; _rzRoute.applied=h; _rzRoute.leaving=0; apply(_rzRoute.parse(h));};
+  window.addEventListener('popstate',onNav); window.addEventListener('hashchange',onNav);
+  _rzTipWire();
+  // первый вход: «Смотреть как» — из адреса, иначе из памяти зрителя
+  const a0=_rzRoute.get();
+  if(!a0.k){let k=''; try{k=localStorage.getItem(_RZ_KAM_KEY)||'';}catch(e){} if(k&&PP.some(p=>p.id===k)){a0.k=k; if(/^#contracts/.test(location.hash||'')) _rzRoute.set({k},{push:false});}}
+  _rzRoute.applied=location.hash||'';
+  if(_rzRoute.levels(a0)) setTimeout(()=>apply(_rzRoute.get()),0);   // уровни — после первой отрисовки вкладки
+  setKam(a0.k,{silent:true,noAddr:true,noStore:true});
+  pick(a0.sep?'sep':'main',a0.sub);
 }
 // ---- «Реализация» по регламенту ОРК: подвкладки «Неделя», «Месяц», «Квартал», «Как считается»
 // Данные — раздел «ork» вида (orkview.py). Каждая плитка и ячейка — контракт показателя
 // {state: show | prelim | nodata | hidden, value, n, cover, why, need}: показываем значение;
 // «предварительно · n · покрытие» серым; «Нет данных: чего нет · откуда придёт»; «не
 // показываем: …». Ноль за неизвестное не рисуется.
+// ==== R4:WP-A — каркас «Реализации»: словарь, адрес, «Смотреть как», состояния, компоненты ====
+// Спецификация R4 (раунд 2), разделы 2.2–2.9 и 5.3. Помощники зовут все пакеты вкладки; подписи
+// неизменны (контракт 5.3). Владелец — WP-A; прочие пакеты зовут их через typeof-проверку.
+//
+// CT_GLOSS — один словарь: подсказки <abbr>, «?» в шапке, «Как считается → Словарь» (ia_copy 8.2).
+// full — словами; first — как писать при первом появлении на подвкладке; tip — 1–2 строки подсказки.
+// Ключи с точкой (cause.*) — подписи значений, в словарь на экране не идут.
+const CT_GLOSS={
+  'ОРК':{full:'отдел реализации контрактов',gen:'отдела реализации контрактов',tip:'ведёт заказ поставщику по 13 шагам регламента — от приёмки сделки до УПД и закрытия'},
+  'рук. ОРК':{full:'руководитель отдела реализации контрактов',first:'руководитель отдела реализации контрактов (рук. ОРК)',tip:'принимает сделку в работу и назначает менеджера ОРК — шаг 1, норма 1 раб. день'},
+  'КАМ':{full:'менеджер клиента',first:'КАМ (менеджер клиента)',tip:'договор и срок с заказчиком, доставка, оплата клиента; поле сделки «КАМ»'},
+  'ОСС':{full:'сопровождение сделки',tip:'даты, документы и закрытие сделки; поле заказа «Deal support specialist»'},
+  'УПД':{full:'универсальный передаточный документ',first:'УПД (передаточный документ)',tip:'клиент подписывает его при приёмке товара; без него сделку не закрыть'},
+  'PO':{full:'заказ поставщику',first:'заказ поставщику (PO)',tip:'Purchase order — наш заказ поставщику, документ шага 5'},
+  'OC':{full:'подтверждение заказа',first:'подтверждение заказа (OC)',tip:'Order confirmation — поставщик подтверждает наш заказ, срок и цену'},
+  'СП-172':{full:'карточки «Заказ поставщику» в Битриксе',tip:'смарт-процесс 172: одна карточка — один заказ поставщику (номер 900/1)'},
+  'раб. дн.':{full:'рабочие дни',first:'рабочие дни (раб. дн.)',tip:'по производственному календарю РФ; паузы не вычтены — полей «пауза» в Битриксе нет'},
+  'дн.':{full:'календарные дни',first:'календарные дни (дн.)',tip:'производство, доставка, просрочка срока клиента — в календарных днях'},
+  'P80':{full:'обычно не дольше',first:'обычно не дольше (P80)',tip:'срок, в который уложились 8 из 10 заказов за год'},
+  'W1':{full:'Сделку не приняли в работу за 1 раб. день',tip:'код показателя «Недели» в «Системе аналитики ОРК»'},
+  'W2':{full:'Шаги ОРК дольше нормы',tip:'код показателя «Недели»: шаги 1, 4, 5, 8 дольше нормы регламента'},
+  'W3':{full:'Срок клиента сорван или под угрозой',tip:'код показателя «Недели»: срок прошёл; до срока ≤ 14 дн. без отгрузки; прогноз позже срока'},
+  'W4':{full:'Эскалации и паузы',tip:'код показателя «Недели»: в Битриксе нет полей «Эскалация» и «Пауза» — не мерится'},
+  'W5':{full:'Звонки поставщикам на неделе',tip:'код показателя «Недели»: середина производства и за 14 дн. до плановой отгрузки'},
+  'M1':{full:'Шаги ОРК в норме',tip:'код показателя «Месяца»: доля сроков шагов 4, 5, 8 в норме регламента'},
+  'M2':{full:'Полнота карточки заказа',tip:'код показателя «Месяца»: обязательные файлы есть у прошедших шаг'},
+  'M3':{full:'Загрузка менеджеров ОРК',tip:'код показателя «Месяца»: заказы в работе на менеджера против среднего'},
+  'Q1':{full:'Готовы к плановому концу производства',tip:'код показателя «Квартала»: поставщик готов к сроку, который обещал'},
+  'Q2':{full:'Реальные сроки звеньев',tip:'код показателя «Квартала»: середина и «обычно не дольше» (P80) по звеньям'},
+  'Q3':{full:'Заказы со 100 % предоплатой',tip:'код показателя «Квартала»: сколько платим поставщику вперёд'},
+  'дольше нормы':{full:'дольше нормы',tip:'шаг идёт дольше срока регламента ОРК в рабочих днях'},
+  'ждём УПД от клиента':{full:'ждём УПД от клиента',tip:'доставлено больше 10 раб. дн. назад, подписанного УПД нет; подпись — за заказчиком, не «дольше нормы»'},
+  'срок клиента':{full:'срок клиента',tip:'поле заказа «Date of deadline to customer» — дата, обещанная заказчику'},
+  'под угрозой':{full:'срок под угрозой',tip:'до срока клиента ≤ 14 дн., а поставщик не отгрузил; или прогноз доставки позже срока'},
+  'кто делает':{full:'кто делает',tip:'исполнитель шага по регламенту ОРК'},
+  'в курсе':{full:'в курсе',tip:'не делает сам, но должен знать: обычно КАМ — он согласует с клиентом новый срок'},
+  'заказ в работе':{full:'заказ в работе',tip:'заказ поставщику не закрыт ни успехом, ни провалом'},
+  'плановые даты производства и доставки':{full:'плановые даты производства и доставки',tip:'начало и конец производства и доставка по бюджету — вносит ОСС при размещении'},
+  'стадия неизвестна регламенту':{full:'стадия неизвестна регламенту',tip:'стадии карточки нет в таблице «стадия → шаг»: шаг и срок не определить'},
+  'стадию не передвинули':{full:'стадию не передвинули',tip:'факт уже есть (оплата, отгрузка, доставка), а стадия в Битриксе раньше'},
+  'карточку забросили':{full:'карточку забросили',tip:'больше 60 раб. дн. на шаге с нормой до 2 раб. дн. — срок не считаем'},
+  'стадии прокликали разом':{full:'стадии прокликали разом',tip:'3 и больше смены стадии за 5 минут — даты задним числом, срок шага не мерится'},
+  'обязательный файл':{full:'обязательный файл',tip:'PO, OC, Packing list, УПД, платёжка — поле карточки заказа, которое шаг обязан заполнить'},
+  'ошибки в карточках Битрикса':{full:'ошибки в карточках Битрикса',tip:'стадия отстала, карточка заброшена, стадия неизвестна, менеджер не назначен'},
+  'проверка другим способом':{full:'проверка другим способом',tip:'то же число по другим датам: если не сходится — числу не верим'},
+  'пороги доверия':{full:'пороги доверия',tip:'когда число показываем, когда серым «мало данных», когда прячем'},
+  'предварительно':{full:'предварительно',tip:'мало данных: число может сильно измениться с новыми заказами'},
+  'срок шага':{full:'срок шага',tip:'время заказа между входом в шаг и выходом из него, в раб. дн.'},
+  'направление':{full:'отдельное направление',tip:'сделки направления, чьи сложности известны и ведутся, считаются отдельно и в основной вид не входят'},
+  'cause.our':{full:'наш шаг дольше нормы',tip:'шаг ОРК идёт дольше нормы: приёмка, договор с поставщиком, PO и предоплата, подготовка отгрузки'},
+  'cause.sup':{full:'у поставщика',tip:'производство дольше плана или ждём поставщика'},
+  'cause.log':{full:'у логистики',tip:'груз у логистики: передача, транзит, транспортная накладная'},
+  'cause.kam':{full:'у клиента и КАМа',tip:'ждём заказчика: договор, приёмка, оплата — ведёт КАМ'},
+  'cause.oss':{full:'у сопровождения сделки (ОСС)',tip:'ждём ОСС: даты, документы, запуск производства'},
+  'cause.nodata':{full:'не определить: нет дат',tip:'нет срока клиента, плановых дат или шаг неизвестен'},
+};
+// прежняя строка сокращений (список заказов, путь заказа) — из того же словаря
+const _RZ_GLOSS=['ОРК','КАМ','ОСС','УПД','PO','OC','раб. дн.'].map(t=>`${t} — ${CT_GLOSS[t].full}${t==='УПД'?', его подписывает клиент':''}`).join(' · ');
+try{ window.CT_GLOSS=CT_GLOSS; }catch(e){}
+const _rzE=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// _rzAbbr('ОСС') → <abbr> с подсказкой из словаря (наведение, фокус, нажатие — _rzTipWire)
+function _rzAbbr(term,opt){
+  const g=CT_GLOSS[term]; opt=opt||{};
+  if(!g) return _rzE(opt.text||term);
+  const tip=(g.full&&g.full!==term?g.full+' — ':'')+g.tip;
+  return `<abbr class="rzabbr" data-tip="${_rzE(tip)}" tabindex="0">${_rzE(opt.text||term)}</abbr>`;
+}
+// _rzGloss(term,{first:true}) — первое появление на подвкладке словами («отдел реализации контрактов
+// (ОРК)»), {first:false} — коротко в <abbr>; без first — само: первый вызов после смены подвкладки
+// (_rzGloss.reset, зовёт renderContracts) — словами, дальше — <abbr>
+function _rzGloss(term,opt){
+  const g=CT_GLOSS[term]; if(!g) return _rzE(term);
+  opt=opt||{}; const seen=_rzGloss.seen||(_rzGloss.seen=new Set());
+  const first=opt.first!=null?!!opt.first:!seen.has(term);
+  seen.add(term);
+  if(!first) return _rzAbbr(term);
+  if(opt.gen&&g.gen) return `${_rzE(g.gen)} (${_rzAbbr(term)})`;
+  if(g.first) return _rzE(g.first).replace(_rzE(term),_rzAbbr(term));
+  return g.full===term?_rzAbbr(term):`${_rzE(g.full)} (${_rzAbbr(term)})`;
+}
+_rzGloss.reset=()=>{_rzGloss.seen=new Set();};
+// код показателя — серым хвостом после слов: «Срок клиента сорван · W3»
+const _rzCode=c=>c?`<span class="rzcode"> · ${_rzAbbr(c)}</span>`:'';
+// число по-русски: тысячи узким пробелом, дробь запятой
+const _rzFmt=v=>{if(v==null||v==='') return ''; if(typeof v!=='number') return _rzE(v);
+  const s=(Math.round(v*10)/10).toString().split('.'); return s[0].replace(/\B(?=(\d{3})+(?!\d))/g,' ')+(s[1]?','+s[1]:'');};
+// ---- дни: одна подпись рода дней на всю вкладку (спец. 2.7) ----
+const _RZ_NORM={s1Over:1,s2Over:2,s3Over:9,s6Over:2,noUtd:10};
+const _RZ_DW={late:'после срока',risk:'до срока',forecast:'прогноз позже срока',planAfterDl:'план позже срока',
+  prodDev:'после плана производства',unpaid:'после срока оплаты',noPayPlan:'после доставки',noOrder:'без заказа'};
+// _rzDays(code, n, {norm, html}) → «просрочен на 35 дн.»; третий аргумент true/false — прежний вызов
+// (число жирным и род дней мелко, inWd — рабочие дни)
+function _rzDays(code,n,o){
+  if(n==null||n==='') return '';
+  if(typeof o!=='object'||o===null){                 // прежний вызов: _rzDays(code, n, inWd)
+    const inWd=!!o;
+    if(code==='risk'&&+n===0) return '<b>0</b> <span class="orku">дн. — срок сегодня</span>';
+    return `<b>${n}</b> <span class="orku">${inWd?'раб. дн.':'дн.'} ${_RZ_DW[code]||(inWd?'на шаге':'')}</span>`;
+  }
+  const N=o.html?`<b>${_rzFmt(+n)}</b>`:_rzFmt(+n), d=' дн.', w=' раб. дн.';
+  const norm=o.norm!=null?o.norm:_RZ_NORM[code];
+  switch(code){
+    case 'late': return `просрочен на ${N}${d}`;
+    case 'risk': return +n===0?`до срока ${N}${d} — сегодня`:`до срока ${N}${d}`;
+    case 'forecast': case 'planAfterDl': return `прогноз позже срока на ${N}${d}`;
+    case 'prodDev': return `${N}${d} после плана производства`;
+    case 's1Over': case 's2Over': case 's3Over': case 's6Over': return norm!=null?`${N}${w} при норме ${norm}`:`${N}${w} на шаге`;
+    case 'noUtd': return `${N}${w} от доставки`;
+    case 'unpaid': return `не оплачено ${N}${d} после срока`;
+    case 'noOrder': return `${N}${w} без заказа`;
+    case 'noPayPlan': return `${N}${d} после доставки`;
+    default: return o.inWd?`${N}${w}`:`${N}${d}${_RZ_DW[code]?' '+_RZ_DW[code]:''}`;
+  }
+}
+// ---- адрес: #contracts/<sub>[/sep][?n=&f=&k=&d=&o=&s=] (спец. 2.6, ia_copy 1.4) ----
+// Разбор и запись адреса — только здесь; пакеты зовут _rzRoute.get() и _rzRoute.set(patch,{push}).
+// Уровни сверху вниз: подвкладка › n (список) › d (сделка) › o (заказ) › s (шаг). Смена уровня —
+// pushState (Назад шагает по уровням), отбор и «Смотреть как» — replaceState. Имён в адресе нет:
+// d, o, k — id Битрикса, s — номер шага 1–13.
+const _RZ_Q=['n','f','k','d','o','s'], _RZ_LV=['n','d','o','s'];
+const _rzRoute={
+  busy:0,
+  parse(h){
+    h=String(h==null?location.hash:h);
+    const st={sub:'week',sep:false,n:'',f:'',k:'',d:'',o:'',s:''};
+    const m=/^#contracts(?:\/([A-Za-z]+))?(?:\/([A-Za-z]+))?\/?(?:\?(.*))?$/.exec(h);
+    if(!m) return st;
+    const a=m[1]||'', b=m[2]||'';
+    if(a==='sep'&&!b){st.sub='main'; st.sep=true;}        // прежний адрес вкладки направления
+    else {st.sub=CT_SUBS.some(x=>x[0]===a)?a:'week'; st.sep=b==='sep';}
+    (m[3]||'').split('&').forEach(p=>{if(!p) return; const i=p.indexOf('='), key=i<0?p:p.slice(0,i);
+      if(!_RZ_Q.includes(key)) return; let v=i<0?'':p.slice(i+1); try{v=decodeURIComponent(v.replace(/\+/g,' '));}catch(e){} st[key]=v.slice(0,200);});
+    ['d','o','k'].forEach(x=>{if(!/^\d{1,12}$/.test(st[x])) st[x]='';});
+    if(!/^(?:[1-9]|1[0-3])$/.test(st.s)) st.s='';
+    if(!/^[\w:./~\-]{1,120}$/.test(st.n)) st.n='';
+    if(!/^[\w.,|:\-]{1,200}$/.test(st.f)) st.f='';
+    return st;
+  },
+  get(){return this.parse(location.hash);},
+  href(st){
+    st=Object.assign({sub:'week',sep:false},st||{});
+    const q=_RZ_Q.filter(k=>st[k]!=null&&st[k]!=='').map(k=>k+'='+encodeURIComponent(String(st[k])).replace(/%2C/g,',').replace(/%7C/g,'|'));
+    return '#contracts/'+(st.sub||'week')+(st.sep?'/sep':'')+(q.length?'?'+q.join('&'):'');
+  },
+  // patch меняет ключи; уровни ниже самого верхнего изменённого снимаются, если их нет в patch
+  set(patch,opt){
+    opt=opt||{}; patch=patch||{};
+    const cur=this.get(), st=Object.assign({},cur,patch); st.sep=!!st.sep;
+    const subCh=st.sub!==cur.sub||st.sep!==!!cur.sep, top=_RZ_LV.findIndex(k=>k in patch&&String(patch[k]||'')!==cur[k]);
+    if(subCh||top>=0) _RZ_LV.forEach((k,i)=>{if((subCh||i>top)&&!(k in patch)) st[k]='';});
+    if(subCh&&!('f' in patch)) st.f='';
+    if('n' in patch&&patch.n!==cur.n&&!('f' in patch)) st.f='';
+    ['n','f','k','d','o','s'].forEach(k=>{st[k]=st[k]==null?'':String(st[k]);});
+    const h=this.href(st);
+    if(h===location.hash) return this.parse(h);
+    const dep=(history.state&&history.state.rzDepth)||0;
+    try{ if(opt.push) history.pushState({rzDepth:dep+1},'',h); else history.replaceState(Object.assign({},history.state||{},{rzDepth:dep}),'',h); }catch(e){}
+    this.last=h;
+    return this.parse(h);
+  },
+  levels(st){st=st||this.get(); return !!(st.n||st.d||st.o);},
+};
+// «Смотреть как» (спец. 2.9): id человека (Битрикс) или ''. Выбор помнится у зрителя (localStorage,
+// без него — «все») и пишется в адрес k=; смена — событие rz:kam на document
+const _RZ_KAM_KEY='kvant-rz-kam';
+function _rzKam(){return _rzKam.v||'';}
+function _rzKamOk(x){
+  const k=_rzKam(); if(!k) return true; if(!x) return false;
+  const eq=v=>v!=null&&v!==''&&String(v)===k;
+  if(eq(x.whoId)||eq(x.kamId)||eq(x.escalateToId)) return true;
+  if(Array.isArray(x.orders)&&x.deal!=null){          // строка сделки: КАМ сделки или виден её пункт
+    const C=window.__CONTRACTS__||{}, Q=[].concat(((C.life||{}).queue)||[],(((C.sep||{}).life||{}).queue)||[]);
+    return Q.some(q=>String(q.deal)===String(x.deal)&&(eq(q.whoId)||eq(q.kamId)||eq(q.escalateToId)));
+  }
+  return false;
+}
+// люди для «Смотреть как»: исполнители пунктов, КАМы и «в курсе» обеих очередей — с id
+function _rzPeople(){
+  const C=window.__CONTRACTS__||{}, Q=[].concat(((C.life||{}).queue)||[],(((C.sep||{}).life||{}).queue)||[]);
+  const P=new Map(), RK={orkHead:0,orkMgr:1,kam:2,oss:3};
+  const add=(id,nm,role)=>{if(!id||!nm||nm==='не назначен') return; id=String(id);
+    const p=P.get(id)||{id,name:String(nm).replace(/ \(уволен\)$/,''),gone:/\(уволен\)$/.test(nm),role,n:0};
+    if((RK[role]!=null?RK[role]:9)<(RK[p.role]!=null?RK[p.role]:9)) p.role=role; p.n++; P.set(id,p);};
+  Q.forEach(q=>{add(q.whoId,q.who,q.role); add(q.kamId,q.kam,'kam'); add(q.escalateToId,q.escalateTo,q.copyRole);});
+  return [...P.values()].sort((a,b)=>((RK[a.role]!=null?RK[a.role]:9)-(RK[b.role]!=null?RK[b.role]:9))||a.name.localeCompare(b.name,'ru'));
+}
+function _rzKamName(k){const p=_rzPeople().find(x=>x.id===String(k)); return p?p.name:'';}
+// ---- свежесть данных: дата сборки старше 1 рабочего дня — «устарели» (спец. 2.2, 2.8) ----
+// Рабочие дни здесь — Пн–Пт (производственного календаря в странице нет); «дн. назад» — календарные
+function _rzStale(asOf,now){
+  const t0=String(asOf||''), a1=/^(\d{4})-(\d\d)-(\d\d)/.exec(t0), a2=/^(\d\d)\.(\d\d)\.(\d{4})/.exec(t0);
+  if(!a1&&!a2) return {stale:false,days:null,wd:null,date:''};
+  const y=a1?a1[1]:a2[3], mo=a1?a1[2]:a2[2], d=a1?a1[3]:a2[1];
+  const a=new Date(+y,+mo-1,+d), t=now?new Date(now):new Date(); t.setHours(0,0,0,0);
+  const days=Math.round((t-a)/864e5); let wd=0;
+  for(let x=new Date(+y,+mo-1,+d+1);x<=t;x=new Date(x.getFullYear(),x.getMonth(),x.getDate()+1)){const g=x.getDay(); if(g&&g<6) wd++;}
+  return {stale:wd>1,days,wd,date:`${d}.${mo}.${y}`};
+}
+const _RZ_RUNS='https://github.com/skharkov1246/kvant-sourcing-dashboard/actions';
+// ---- состояния (спец. 2.8): одна фраза по шаблону; действия — кнопками с data-rz* ----
+function _rzState(kind,o){
+  o=o||{}; const E=_rzE, q=s=>`«${E(s)}»`;
+  const wrap=(t,act,role)=>`<div class="rzst rzst-${kind}"${role?` role="${role}"`:''}><p class="rzst-t">${t}</p>${act?`<p class="rzst-a">${act}</p>`:''}</div>`;
+  switch(kind){
+    case 'empty-filter': return wrap(`Под отбор ${q(o.filters||'')} заказов нет.`,`<button type="button" class="rzst-btn" data-rzreset="1">Снять отбор</button>`,'status');
+    case 'empty-ok': return wrap(`Сейчас ${E(o.what||'дел')} нет.`+(o.hist?` ${o.hist}`:''),'');
+    case 'nodata': {
+      const why=o.field?` Почему: ${q(o.field)} пустое${o.k!=null&&o.n!=null?` у ${o.k} из ${o.n}`:''}.`:(o.why?` Почему: ${E(o.why)}.`:'');
+      return wrap(`Нет данных: ${E(o.what||'')}.${why}${o.who?` Вносит: ${E(o.who)}.`:''}`,o.list||'');
+    }
+    case 'prelim': return wrap(`Мало данных: ${_ctN(+o.n||0,'заказ','заказа','заказов')} в расчёте, уверенный вывод — от ${E(o.min!=null?o.min:30)}.`,'');
+    case 'hidden': return wrap(`Скрыто: ${E(o.why||'')}.`+(o.instead?` ${o.instead}`:''),'');
+    case 'stale': return wrap(`Данные на ${E(o.date||'')} — ${_ctN(+o.days||0,'день','дня','дней').replace(/ (день|дня|дней)$/,' дн.')} назад. Сборка не обновлялась.`,`<a href="${_RZ_RUNS}" target="_blank" rel="noopener">Прогоны ↗</a>`,'status');
+    case 'noright': return wrap(`${E(o.block||'Этот блок')} видят руководители ОРК и владелец.`,'');
+    case 'notfound': return wrap(`${E(o.what||'Этого')} нет в данных на ${E(o.date||'')}: закрыт, удалён или в другом направлении.`,
+      [o.bx?`<a href="${E(o.bx)}" target="_blank" rel="noopener">Найти в Битриксе ↗</a>`:'',o.back?`<button type="button" class="rzst-btn" data-rzback="1">К списку</button>`:'',`<button type="button" class="rzst-btn" data-rzclose="1">Закрыть</button>`].filter(Boolean).join(' '),'status');
+    case 'error': return wrap(`Не загрузили ${E(o.what||'')}${o.why?`: ${E(o.why)}`:''}. Остальное — по открытой сборке.`,`<button type="button" class="rzst-btn" data-rzretry="1">Повторить</button>`,'alert');
+    case 'loading': return `<div class="rzst rzst-loading" aria-busy="true"><span class="rzskel" aria-hidden="true"></span><p class="rzst-t">Загружаем ${E(o.what||'')}…</p></div>`;
+  }
+  return wrap(E(o.text||''),'');
+}
+// ---- компоненты (спец. 2.4) ----
+// число-кнопка: <button class="rzn" data-of data-f data-kpi-rank>; data-od/odt — то же для прежнего
+// _odBind (пока он слушает data-od). Ноль и «нет данных» — не кнопка: за ними списка нет
+function _rzNum(v,o){
+  o=o||{}; const txt=o.text!=null?o.text:(o.fmt?o.fmt(v):_rzFmt(v));
+  if(v==null||v==='') return `<span class="rznd" title="${_rzE(o.why||'нет данных')}">нет данных</span>`;
+  if(o.final) return `<span class="rzfinal${o.cls?' '+o.cls:''}">${txt}</span>`;
+  if(!o.of||(+v===0&&!o.zero)) return `<span class="rzn0${o.cls?' '+o.cls:''}">${txt}</span>`;
+  const t=o.title||'';
+  return `<button type="button" class="rzn${o.cls?' '+o.cls:''}" data-of="${_rzE(o.of)}" data-od="${_rzE(o.of)}"${o.f?` data-f="${_rzE(o.f)}"`:''}${t?` data-odt="${_rzE(t)}"`:''}${o.sub?` data-ods="${_rzE(o.sub)}"`:''}${o.rank?` data-kpi-rank="${_rzE(o.rank)}"`:''} aria-label="${_rzE((t?t+': ':'')+String(txt).replace(/<[^>]+>/g,'')+' — открыть заказы')}">${txt}</button>`;
+}
+// строка-счётчик: «подпись · число ›», вся строка — кнопка списка (44 px на телефоне)
+function _rzCount(o){
+  o=o||{}; const v=o.v, tone=o.tone?' rz-'+o.tone:'';
+  const lab=`<span class="rzcount-l">${o.label||''}${o.code?_rzCode(o.code):''}</span>`;
+  const sub=o.sub?`<span class="rzcount-s">${o.sub}</span>`:'';
+  if(!o.of||!v) return `<div class="rzcount rzcount-st${tone}">${lab}<span class="rzcount-v">${v==null?'<span class="rznd">нет данных</span>':_rzFmt(v)}</span>${sub}</div>`;
+  return `<button type="button" class="rzn rzcount${tone}" data-of="${_rzE(o.of)}" data-od="${_rzE(o.of)}"${o.f?` data-f="${_rzE(o.f)}"`:''} data-odt="${_rzE(o.title||String(o.label||'').replace(/<[^>]+>/g,''))}"${o.rank?` data-kpi-rank="${_rzE(o.rank)}"`:''}>${lab}<span class="rzcount-v">${_rzFmt(v)}</span><span class="rzcount-c" aria-hidden="true">›</span>${sub}</button>`;
+}
+// спарклайн 120×28 серым, последняя точка тёмная; мин. и макс. подписаны (спец. 2.4а)
+function _rzSpark(vals,o){
+  o=o||{}; const V=(vals||[]).map(Number).filter(x=>isFinite(x)); if(V.length<2) return '';
+  const W=120,H=28,mn=Math.min(...V),mx=Math.max(...V),sp=mx-mn||1;
+  const pt=V.map((v,i)=>[Math.round(i*(W-4)/(V.length-1))+2,Math.round(H-3-(v-mn)*(H-6)/sp)]);
+  const L=pt[pt.length-1], d=V[V.length-1]-V[V.length-2];
+  return `<span class="rzspark"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${_rzE(`за ${V.length} недель: от ${mn} до ${mx}, сейчас ${V[V.length-1]}`)}"><polyline points="${pt.map(p=>p.join(',')).join(' ')}" fill="none" class="rzspark-l"/><circle cx="${L[0]}" cy="${L[1]}" r="2.5" class="rzspark-p"/></svg>`
+    +`<span class="rzspark-m">мин. ${mn} · макс. ${mx}${o.week!==false?` · ${d>0?'+':d<0?'−':'±'}${Math.abs(d)} за неделю`:''}</span></span>`;
+}
+// плитка-счётчик (цель 0): число 40 px, подпись-вывод одной строкой, одно действие «роль → что»;
+// число — кнопка списка, растянутая на плитку; части (mini) — свои кнопки поверх
+function _rzTile(o){
+  o=o||{}; const tone=o.tone?' rz-'+o.tone:'';
+  const num=o.of&&o.v?`<button type="button" class="rzn rztile-n" data-of="${_rzE(o.of)}" data-od="${_rzE(o.of)}"${o.f?` data-f="${_rzE(o.f)}"`:''} data-odt="${_rzE(o.titleText||String(o.title||'').replace(/<[^>]+>/g,''))}"${o.rank?` data-kpi-rank="${_rzE(o.rank)}"`:''} aria-haspopup="dialog" aria-label="${_rzE(`${String(o.title||'').replace(/<[^>]+>/g,'')}: ${o.v} — открыть заказы`)}">${_rzFmt(o.v)}</button>`
+    :`<span class="rztile-n${o.rank?'" data-kpi-rank="'+_rzE(o.rank):''}">${o.v==null?'—':_rzFmt(o.v)}</span>`;
+  return `<div class="rztile${tone}">`
+    +`<div class="rztile-t">${o.title||''}${o.code?_rzCode(o.code):''}</div>`
+    +`<div class="rztile-vl">${num}${o.unit?`<span class="rztile-u">${o.unit}</span>`:''}${o.spark||''}</div>`
+    +(o.sub?`<div class="rztile-s">${o.sub}</div>`:'')
+    +(o.mini?`<div class="rztile-m">${o.mini}</div>`:'')
+    +(o.act?`<div class="rztile-a">${o.act}</div>`:'')+`</div>`;
+}
+// буллет доли с целью: фон до 80 % светлее, до цели темнее, значение — тёмная полоса, цель — черта;
+// справа «k из n»; n меньше порога — полая полоса и «мало данных»
+function _rzBullet(o){
+  o=o||{}; const n=+o.n||0, k=+o.k||0, v=o.v!=null?+o.v:(n?k/n:null), T=o.target!=null?+o.target:0.95;
+  const pc=x=>Math.max(0,Math.min(100,Math.round(x*1000)/10));
+  const few=o.nMin!=null&&n<o.nMin;
+  const lab=v==null?'<span class="rznd">нет данных</span>':`${Math.round(v*100)} % · ${o.of&&k?_rzNum(k,{of:o.of,f:o.f,title:o.title}):k} из ${n}`;
+  return `<span class="rzbul${few?' rzbul-few':''}${v!=null&&v<0.8?' rz-alarm':''}"><span class="rzbul-b" role="img" aria-label="${_rzE(v==null?'нет данных':`${Math.round(v*100)} % при цели ${Math.round(T*100)} %: ${k} из ${n}`)}">`
+    +`<i class="rzbul-r1" style="width:80%"></i><i class="rzbul-r2" style="left:80%;width:${pc(Math.max(0,T-0.8))}%"></i>`
+    +(v!=null?`<i class="rzbul-v" style="width:${pc(v)}%"></i>`:'')+`<i class="rzbul-t" style="left:${pc(T)}%"></i></span>`
+    +`<span class="rzbul-l">${lab}${few?` <span class="rzbul-fn">мало данных: ${_ctN(n,'заказ','заказа','заказов')} в расчёте</span>`:''}</span></span>`;
+}
+// сортированные столбцы (люди, поставщики): серые, худший сверху, значение в конце; выбранный —
+// тёмный; полый при малом n
+function _rzBars(rows,o){
+  o=o||{}; const R=(rows||[]).slice(); if(o.sort!==false) R.sort((a,b)=>(b.v||0)-(a.v||0));
+  const mx=o.max||Math.max(1,...R.map(r=>+r.v||0));
+  return `<div class="rzbars" role="list">`+R.map(r=>`<div class="rzbars-r${r.sel?' on':''}${r.hollow?' few':''}" role="listitem"><span class="rzbars-l">${r.label}</span>`
+    +`<span class="rzbars-b"><i style="width:${Math.round((+r.v||0)/mx*100)}%"></i></span>`
+    +`<span class="rzbars-v">${r.of?_rzNum(r.v,{of:r.of,f:r.f,title:r.title,text:r.text}):(r.text!=null?r.text:_rzFmt(r.v))}</span></div>`).join('')+`</div>`;
+}
+// полоска в ячейке: серая до 80 px, красный сегмент — доля «дольше нормы»
+function _rzCellBar(v,o){
+  o=o||{}; const mx=Math.max(1,+o.max||+v||1), W=o.w||80, w=Math.round((+v||0)/mx*W), red=Math.min(+v||0,+o.red||0);
+  return `<span class="rzcb" aria-hidden="true"><span class="rzcb-t" style="width:${w}px">${red?`<i style="width:${Math.round(red/Math.max(1,+v)*100)}%"></i>`:''}</span></span>`;
+}
+// подсказка <abbr class="rzabbr">: наведение, фокус и нажатие; Esc закрывает (ia_copy 8.1)
+function _rzTipWire(){
+  if(_rzTipWire.on) return; _rzTipWire.on=1;
+  const tip=document.createElement('div'); tip.id='rzTip'; tip.className='rztip'; tip.setAttribute('role','tooltip'); tip.hidden=true; document.body.appendChild(tip);
+  let cur=null;
+  const show=a=>{cur=a; tip.textContent=a.dataset.tip||''; tip.hidden=false; a.setAttribute('aria-describedby','rzTip');
+    const r=a.getBoundingClientRect(), w=Math.min(320,window.innerWidth-16);
+    tip.style.maxWidth=w+'px'; const tw=tip.offsetWidth, th=tip.offsetHeight;
+    let x=Math.min(Math.max(8,r.left+window.scrollX),window.scrollX+window.innerWidth-tw-8), y=r.bottom+window.scrollY+6;
+    if(r.bottom+th+10>window.innerHeight) y=r.top+window.scrollY-th-6;
+    tip.style.left=x+'px'; tip.style.top=y+'px';};
+  const hide=()=>{if(cur) cur.removeAttribute('aria-describedby'); cur=null; tip.hidden=true;};
+  const on=e=>{const a=e.target&&e.target.closest&&e.target.closest('abbr.rzabbr'); if(a) show(a);};
+  document.addEventListener('mouseover',on); document.addEventListener('focusin',on);
+  document.addEventListener('mouseout',e=>{const a=e.target&&e.target.closest&&e.target.closest('abbr.rzabbr'); if(a&&a===cur&&document.activeElement!==a) hide();});
+  document.addEventListener('focusout',e=>{if(e.target===cur) hide();});
+  document.addEventListener('click',e=>{const a=e.target&&e.target.closest&&e.target.closest('abbr.rzabbr'); if(a){show(a);} else if(cur&&!tip.contains(e.target)) hide();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&cur){hide(); e.stopPropagation();}},true);
+}
+// словарь одним списком: «?» в шапке и «Как считается → Словарь» — один текст
+// три группы: сокращения, коды показателей (серый хвост «· W3»), термины регламента — по алфавиту
+const _RZ_ABBR=['ОРК','рук. ОРК','КАМ','ОСС','УПД','PO','OC','СП-172','раб. дн.','дн.','P80'];
+function _rzGlossHtml(o){
+  o=o||{};
+  const K=Object.keys(CT_GLOSS).filter(k=>k.indexOf('.')<0), cmp=(a,b)=>a.localeCompare(b,'ru');
+  const G=[['Сокращения',K.filter(k=>_RZ_ABBR.includes(k)).sort(cmp)],['Коды показателей',K.filter(k=>/^[WMQ]\d$/.test(k))],
+    ['Термины',K.filter(k=>!_RZ_ABBR.includes(k)&&!/^[WMQ]\d$/.test(k)).sort(cmp)]];
+  const row=k=>{const g=CT_GLOSS[k]; return `<div class="rzgl-r"><dt>${_rzE(k)}</dt><dd>${g.full&&g.full!==k?`<b>${_rzE(g.full)}</b> — `:''}${_rzE(g.tip)}</dd></div>`;};
+  return G.map(([t,L])=>`<h3 class="rzgl-g">${t}</h3><dl class="rzgl-l">${L.map(row).join('')}</dl>`).join('');
+}
+// ==== /R4:WP-A (помощники) ====
 const _ORK_KIND={P50:'середина срока производства — запросить у поставщика статус',P14:'за 14 дней до плановой отгрузки — подтвердить готовность и документы'};
 const _ORK_HYG={old:'доставлено больше года назад, УПД нет — внести УПД или закрыть заказ',behind:'стадию не передвинули: факт уже есть, а стадия отстала — обновить стадию',abandoned:'карточку забросили: больше 60 р.д. на шаге с нормой до 2 р.д. — закрыть заказ или обновить стадию',unknown:'стадия неизвестна регламенту: её нет в таблице «стадия → шаг» — сверить стадию',noMgr:'менеджер ОРК не назначен — назначить сотрудника ОРК'};
 // «Реализация», расшифровка (владелец 29.10.2026: «читай как человек… лучше расшифровывать»): подписи
@@ -4300,17 +4928,6 @@ const _RZ_PLAIN={noPlanDates:'нет плановых дат производс�
 // «Рег. 9.2.5», «Ан. §2.1» — пункт регламента ОРК и раздел «Системы аналитики ОРК» словами
 const _rzRef=t=>String(t==null?'':t).replace(/Рег\. ([\d.]*\d)/g,'п. $1 регламента ОРК').replace(/Ан\. §([\d.]*\d)/g,'разд. $1 аналитики ОРК').replace(/стадия не из таблицы( шагов)?/g,'стадия неизвестна регламенту');
 const _rzLB=L=>{const o=Object.assign({},L||{}); for(const k in _RZ_PLAIN) if(o[k]!=null) o[k]=_RZ_PLAIN[k]; return o;};
-// что значит число дней у пункта: у сроков регламента — рабочие дни на шаге, у прочих — календарные
-// дни своего смысла (после срока клиента, до срока, на сколько прогноз позже) — lifecycle.exceptions
-const _RZ_DW={late:'после срока',risk:'до срока',forecast:'прогноз позже срока',planAfterDl:'план позже срока',
-  prodDev:'после плана производства',unpaid:'после срока оплаты',noPayPlan:'после доставки',noOrder:'без заказа'};
-function _rzDays(code,n,inWd){
-  if(n==null) return '';
-  if(code==='risk'&&+n===0) return '<b>0</b> <span class="orku">дн. — срок сегодня</span>';
-  return `<b>${n}</b> <span class="orku">${inWd?'р.д.':'дн.'} ${_RZ_DW[code]||(inWd?'на шаге':'')}</span>`;
-}
-// сокращения — один раз на экран, строкой над первым числом («Неделя», список заказов, путь заказа)
-const _RZ_GLOSS='ОРК — отдел реализации контрактов · КАМ — менеджер клиента · ОСС — сопровождение сделки · УПД — передаточный документ, его подписывает клиент · PO/OC — наш заказ поставщику и его подтверждение · р.д. — рабочие дни по календарю РФ, паузы не вычитаем';
 // норма шага по регламенту (ork.NORM_DOC): мерится — «2 р.д.»; задана, а данных нет (шаг 6) —
 // «1–2 р.д. — нет данных»; не задана — «—» (не нормируется)
 function _orkNormTxt(st,doc,need,short){
@@ -4403,29 +5020,29 @@ function _orkTile2(o){
        +(o.act?`<div class="orka"><b>${_esc(_orkCap(o.who||''))}</b> → ${_esc(o.act)}</div>`:''))
     +`</div>`+parts+aside+`</div>`;
 }
-function _orkNoData(what,from){return `<section class="card"><div class="secttl">Нет данных</div><div class="note">Нет данных: ${what}. Откуда придёт — ${from}.</div></section>`;}
-// пометка отдельного направления — в каждой подвкладке: в основном виде ссылка, у направления — что в нём
+// «Нет данных» раздела вкладки — шаблон состояния (спец. 2.8): что не посчитать, почему, кто вносит
+function _orkNoData(what,from){return `<section class="card rzst-card">${_rzState('nodata',{what,why:from})}</section>`;}
+// пометка отдельного направления — одной строкой, только в его виде (в основном виде направление
+// видно переключателем в строке подвкладок)
 function _ctSepNote(X,sub){
-  // одна пометка (просьба владельца 29.10.2026): что это за вид и куда перейти — одной строкой
-  const SP=X.sepHead||null; if(!SP||!X.seg) return '';   // основной вид — строкой подвкладки (ctSubD)
-  const href=`#contracts/${sub}/sep`, nm=_esc(SP.name);
-  if(X.seg) return `<div class="note ctsepnote is-sep" role="note"><b>Только направление ${nm}</b>: его воронка и сделки реализации тех же компаний (${_ctN(SP.companies||0,'компания','компании','компаний')}). Очередь, плитки и итоги — только по ним.${sub==='quarter'?' «Квартал» общий: поставщиков меряем по всем заказам, вместе с основными.':''} <a href="#contracts/${sub}" data-ctdir="main">К основному виду →</a></div>`;
-  return `<div class="note ctsepnote" role="note"><b>${nm} считается отдельно</b>${SP.deals?`: ${_ctN(SP.live||0,'сделка','сделки','сделок')} в работе — их сложности известны и ими занимаются. В очередь, плитки и итоги ниже они не входят${sub==='quarter'?' (кроме «Квартала»: поставщиков меряем по всем заказам)':''}`:' — сделок в нём сейчас нет'}. <a href="${href}" data-ctdir="sep">Открыть ${nm} →</a></div>`;
+  const SP=X.sepHead||null; if(!SP||!X.seg) return '';
+  const nm=_esc(SP.name);
+  return `<p class="note ctsepnote is-sep" role="note">${nm} — отдельное направление: его воронка и сделки реализации тех же компаний (${_ctN(SP.companies||0,'компания','компании','компаний')}). Дела и числа здесь — только по нему.${sub==='quarter'?' «Квартал» общий: поставщиков меряем по всем заказам.':''} <a href="#contracts/${sub}" data-ctdir="main">К основному виду →</a></p>`;
 }
-// строка доверия (блок 1 «Недели»; во всех подвкладках): календарь, история стадий, паузы
+// строка доверия (R4, спец. 2.2): на подвкладках — ничего (тревоги — строкой под подвкладками,
+// _ctAlarms); на «Как считается» — первым блоком: словарь и как считаем сроки
 function _orkTrust(O){
-  const T=O.trust||{}, W=O.week||{}, ys=(T.calYears||[]).slice().sort();
+  const el=document.getElementById('tab-contracts'), sub=String((el&&el.dataset.ctsub)||'').split('/')[0];
+  if(sub!=='how') return '';
+  const T=O.trust||{}, ys=(T.calYears||[]).slice().sort();
   const cal=ys.length?(ys.length>1?`${ys[0]}–${ys[ys.length-1]}`:String(ys[0])):'нет';
-  const noCal=(T.yearsNoCal||[]).length?`<span class="nrc">нет производственного календаря на ${(T.yearsNoCal||[]).join(', ')} — сроки этих лет не считаем</span>`:'';
-  // одна строка: на какую дату данные и сколько заказов в работе (числа — списки); как считаем сроки и
-  // сокращения — раскрытием (владелец 29.10.2026: «лучше расшифровывать»)
-  return `<div class="note orktrust"><div class="orktr1">Данные на <b>${_orkD(O.asOf)}</b> · заказов в работе <b>${_odN(W.live,'w:live','Заказы в работе')}</b>: на шагах регламента ${_odN(T.mapped,'w:mapped','Заказы на шагах регламента')}${T.unknown?`, <span class="nrc">стадия неизвестна регламенту — ${_odN(T.unknown,'w:unk','Стадия неизвестна регламенту: сверить в Битриксе')} (сверить в Битриксе)</span>`:''}`
-    +(noCal?' · '+noCal:'')
-    +(T.nextYearCal===false?` · <span class="nrc">календаря на следующий год нет — с 1 января сроки в рабочих днях не посчитаются; разработчику — внести календарь РФ</span>`:'')
-    +(T.orkHead===false?' · руководителя ОРК нет в справочнике отделов Битрикса — в очереди вместо имени роль':'')+`</div>`
-    +`<details class="orktrd"><summary>Сокращения и как считаем сроки</summary><div class="orktrb"><p>${_RZ_GLOSS}.</p>`
-    +`<p>Сроки — в рабочих днях по производственному календарю РФ (есть на <b>${cal}</b>). Когда заказ вошёл в стадию, берём из истории стадий Битрикса — она есть с <b>${_orkD(T.histSince)}</b>. <b>Паузы не вычитаем</b>: полей «пауза» и «эскалация» в Битриксе нет — срок менеджера может быть завышен, если работа стояла не по его вине.</p>`
-    +`<p>За каждый пункт отвечает исполнитель шага по регламенту ОРК; «в копии» — кто должен знать и сам не делает (обычно КАМ: он согласует с клиентом новый срок).</p></div></details></div>`;
+  return `<section class="card rzhow0" id="rzHowGloss"><h2 class="rzhow0-h">Словарь</h2><p class="rzhow0-l">Сокращения и термины вкладки — тот же текст, что в подсказках и в «?» у заголовка.</p>${_rzGlossHtml()}`
+    +`<h2 class="rzhow0-h">Как считаем сроки</h2>`
+    +`<p>Сроки шагов — в рабочих днях по производственному календарю РФ (есть на <b>${cal}</b>). Когда заказ вошёл в стадию, берём из истории стадий Битрикса — она есть с <b>${_orkD(T.histSince)}</b>.</p>`
+    +`<p><b>Паузы не вычитаем</b>: полей «Пауза» и «Эскалация» в Битриксе нет — срок менеджера может быть завышен, если работа стояла не по его вине.</p>`
+    +`<p>За каждое дело отвечает исполнитель шага по регламенту — «кто делает»; «в курсе» — кто должен знать и сам не делает (обычно менеджер клиента: он согласует с клиентом новый срок).</p>`
+    +(T.orkHead===false?`<p>Руководителя отдела нет в справочнике отделов Битрикса — в делах вместо имени роль.</p>`:'')
+    +`</section>`;
 }
 function _orkPanel(X,sub,el){
   const O=X.ork;

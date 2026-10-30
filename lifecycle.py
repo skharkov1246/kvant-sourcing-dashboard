@@ -433,7 +433,7 @@ def _deal_item(code: str, sev: int, what: str, act: str, days, d: dict, own: dic
 
 def build(orders: list[dict], deals: list[dict], today: dt.date,
           warranty_months: int = WARRANTY_MONTHS, *, measure: list[dict] | None = None,
-          ork_head: str = "", cust_contract: set | None = None) -> dict:
+          ork_head: str = "", cust_contract: set | None = None, ork_head_id: str = "") -> dict:
     """orders — заказы, приведённые к фактам; deals — строки сделок contracts.py
     (deal, seq, customer, closed, done, norders, cat0At, managerGone, ossGone,
     respGone, manager, oss, ossDeal, orkResp, kam, dealStepMax, paidStage). → раздел
@@ -468,12 +468,26 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         return {"orkMgr": _nm(o.get("orkMgr")), "dealOrk": _nm(d.get("orkResp")), "orkHead": _nm(ork_head),
                 "kam": _nm(d.get("kam")), "ossOrder": _nm(o.get("oss")), "ossDeal": _nm(d.get("ossDeal"))}
 
+    def pid(o: dict | None, d: dict | None) -> dict:
+        """id Битрикса людей заказа и сделки — те же ключи, что у ppl (R4, Д-11а)."""
+        o, d = o or {}, d or {}
+        oi, di = o.get("_pid") or {}, d.get("_pid") or {}
+        return {"orkMgr": oi.get("orkMgr"), "dealOrk": di.get("dealOrk"), "orkHead": ork_head_id,
+                "kam": d.get("kamId") or di.get("kam"), "ossOrder": oi.get("ossOrder"),
+                "ossDeal": di.get("ossDeal")}
+
     def item(code: str, o: dict | None, d: dict | None) -> dict:
-        """Шаг, роль, исполнитель и копия пункта (ork.ITEM): who — хозяин пункта."""
-        ow = ork.item_owner(code, _step_now(o) if o else None, ppl(o, d))
+        """Шаг, роль, исполнитель и копия пункта (ork.ITEM): who — хозяин пункта. whoId и
+        escalateToId — id Битрикса тех же людей (отбор «Смотреть как», R4 Д-11а): '' — у
+        «не назначен» и у подписей ролей (логистика, руководитель ОРК не из справочника)."""
+        pp = ppl(o, d)
+        ow = ork.item_owner(code, _step_now(o) if o else None, pp)
+        ids = pid(o, d)
         return {"step": ow["step"], "role": ow["role"], "roleName": ork.ROLES.get(ow["role"], ""),
                 "who": ow["who"], "whoGone": gone(ow["who"]),
-                "escalateTo": ow["copy"], "copyRole": ow["copyRole"]}
+                "whoId": ork.role_id(ow["role"], pp, ids),
+                "escalateTo": ow["copy"], "copyRole": ow["copyRole"],
+                "escalateToId": ork.role_id(ow["copyRole"], pp, ids) if ow["copyRole"] else ""}
 
     def gone(name: str) -> bool:
         return name.endswith("(уволен)")      # contracts.who подписывает ушедших так

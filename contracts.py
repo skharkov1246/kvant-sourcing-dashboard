@@ -822,6 +822,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             # Responsible person заказа; менеджер ОРК — он, если он из отдела ОРК (решение 26.10.2026)
             "resp": _resp[0], "respOrk": is_ork(uid_of(o.get("assignedById"))),
             "orkMgr": _ork_mgr,
+            # id Битрикса тех же людей — отбор «Смотреть как» (R4, Д-11а); в страницу не идёт
+            # (life_orders — внутренний список)
+            "_pid": {"orkMgr": uid_of(o.get("assignedById")) if _ork_mgr else "",
+                     "ossOrder": uid_of(o.get(OSS_F))},
             "live": sm == "P", "success": sm == "S", "closedRecent": bool(sm == "S" and moved and moved >= recent_from),
             "created": _pdate(o.get("createdTime")), "dl": _pdate(o.get(DL_CUSTOMER)),
             "shipPlan": _pdate(o.get(SHIP_PLAN)), "shipFact": _pdate(o.get(SHIP_FACT)),
@@ -1344,6 +1348,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             # регламент ОРК: вход в реализацию, менеджер ОРК на сделке, шаг сделки по стадии и
             # наибольший по всем переходам, ячейка шага для таблицы сделок
             "cat0At": str(entered_real or ""), "orkResp": d_people["dealOrk"],
+            # id людей сделки для whoId / escalateToId пунктов очереди (R4, Д-11а); снимается
+            # до выдачи в страницу (ниже, вместе с _stuckOld)
+            "_pid": {"dealOrk": uid_of(d.get(ORK_RESP)), "kam": uid_of(d.get(KAM_F) or d.get(KAM_OLD)),
+                     "ossDeal": uid_of(d.get(OSS_DEAL))},
             "dealStep": d_step, "dealStepMax": max(_dmax) if _dmax else None,
             "stepCell": step_cell, "_stuckOld": stuck_old, "_stuckNew": stuck,
         })
@@ -1411,9 +1419,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     # разбор договоров не загружен — None: «договор не найден» не проверялся (пункт так и пишет)
     cust_contract = dealctx.customer_contract_deals(ctx_contracts) if ctx_contracts is not None else None
     life = lifecycle.build(main_orders, main_rows, today, measure=life_orders, ork_head=ork_head,
-                           cust_contract=cust_contract)
+                           cust_contract=cust_contract, ork_head_id=ork_head_uid or "")
     life_sep = (lifecycle.build(sep_orders, sep_rows, today, measure=life_orders, ork_head=ork_head,
-                                cust_contract=cust_contract)
+                                cust_contract=cust_contract, ork_head_id=ork_head_uid or "")
                 if sep_rows else None)
 
     # 7. скорость: сводные метрики
@@ -1753,6 +1761,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     sep_view = _view(sep_rows, life_sep, sep_orders, "sep") if sep_rows else None
     for r in rows:                         # кандидаты «Замедлено» — только для сравнения выше
         r.pop("_stuckOld", None)
+        r.pop("_pid", None)
         r.pop("_stuckNew", None)
     if sep_cats:
         # сводка направления для шапки основного вида и подписи его вкладки: имя — имя

@@ -934,6 +934,21 @@ def metric_state(value, n: int | None, cover: float | None, gates: dict = GATES,
 
 # --- хозяин пункта по шагу (решение 26.10.2026, п. 1) ---------------------------------------
 _ESC_STEP = object()
+# роль → поля people, из которых берётся человек роли, по порядку (первое непустое). Одна таблица у
+# подписи (owner) и у id человека (role_id): «Смотреть как» (R4, Д-11а) отбирает пункты по id, и id
+# обязан быть id того же человека, чьё имя показано. Логистика и поставщик — подписи ролей, без id
+ROLE_KEYS = {"orkMgr": ("orkMgr", "dealOrk"), "orkHead": ("orkHead",), "kam": ("kam",),
+             "oss": ("ossOrder", "ossDeal"), "log": (), "sup": ()}
+
+
+def role_id(role: str | None, people: dict, ids: dict) -> str:
+    """id Битрикса человека роли: id того поля people, чьё имя выбрал owner (ROLE_KEYS), иначе ''.
+    ids — те же ключи, что у people (orkMgr, dealOrk, orkHead, kam, ossOrder, ossDeal)."""
+    for k in ROLE_KEYS.get(role or "", ()):
+        if people.get(k) not in (None, "", "—"):
+            v = ids.get(k)
+            return str(v) if v not in (None, "", "0", "—") else ""
+    return ""
 
 
 def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP,
@@ -952,10 +967,10 @@ def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP,
                 return v
         return ""
 
-    find = {"orkMgr": lambda: nm("orkMgr", "dealOrk"),
-            "orkHead": lambda: nm("orkHead") or ROLES["orkHead"],
-            "kam": lambda: nm("kam"),
-            "oss": lambda: nm("ossOrder", "ossDeal"),
+    find = {"orkMgr": lambda: nm(*ROLE_KEYS["orkMgr"]),
+            "orkHead": lambda: nm(*ROLE_KEYS["orkHead"]) or ROLES["orkHead"],
+            "kam": lambda: nm(*ROLE_KEYS["kam"]),
+            "oss": lambda: nm(*ROLE_KEYS["oss"]),
             "log": lambda: ROLES["log"],
             "sup": lambda: ROLES["sup"]}
     if debt:
