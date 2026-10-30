@@ -570,11 +570,13 @@ def run(args) -> int:
             # подписи «Категории оборудования» — справочник поля (линии продукт-оунеров);
             # не прочитан — только оформление: «значение #id», блок пресейла остаётся
             try:
-                _cat_labels = {str(k): str(v) for k, v in
-                               ((client.userfields().get(presale_mod.CAT_F) or {}).get("enum") or {}).items()}
+                _uf = client.userfields()
+                _cat_labels = {str(k): str(v) for k, v in ((_uf.get(presale_mod.CAT_F) or {}).get("enum") or {}).items()}
+                # «Deal type (Presale)»: подписи вариантов — «Расценка», «Тендер», «Запрос от заказчика»
+                _type_labels = {str(k): str(v) for k, v in ((_uf.get(presale_mod.DTYPE_F) or {}).get("enum") or {}).items()}
             except Exception as e:                       # noqa: BLE001
-                print(f"  ⚠ подписи «Категории оборудования» не прочитаны: {type(e).__name__}")
-                _cat_labels = {}
+                print(f"  ⚠ подписи «Категории оборудования» и «Deal type» не прочитаны: {type(e).__name__}")
+                _cat_labels, _type_labels = {}, {}
             _psm = client.deal_stage_meta()
             # КП → ТКП по истории стадий (зонд v62): первые входы сделок пресейла в «Экономика готова»
             # и «ТКП отправлено» и дальше — фильтр STAGE_ID, с даты первой сделки воронки (≈ 25 запросов).
@@ -591,7 +593,7 @@ def run(args) -> int:
                 _phist = None
             _presale_in = dict(cid=_ps[0], cat_name=_ps[1], deals=_pdeals, stage_meta=_psm,
                                rfqs=rfqs, people=roster, names=names, today=p.end, service_ids=service_ids,
-                               cat_labels=_cat_labels, history=_phist)
+                               cat_labels=_cat_labels, history=_phist, type_labels=_type_labels)
         else:
             print("• Воронка пресейла: воронки с таким именем в портале нет")
     except Exception as e:                                   # noqa: BLE001

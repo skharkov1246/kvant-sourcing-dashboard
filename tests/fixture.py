@@ -1169,8 +1169,10 @@ class PresaleChats:
 #: файлом под сделкой и первые входы в «Экономика готова» (READY) и «ТКП отправлено» (WAIT).
 #: 8001 — сейчас на READY (входа в выдаче нет — «сейчас»); 8004 — READY → WAIT; 8005 — сразу WAIT;
 #: 8009 — READY и отказ; 8003 — КП есть, дальше «Тендерного» не ушла. Итог: КП 5, до экономики 4, ТКП 2
-PS_TKP_SRC = {"8001": "76", "8003": "76", "8004": "77", "8005": "77", "8009": "78"}
-PS_TKP_QUOTES = {"8001": 2, "8003": 1, "8004": 3, "8005": 1, "8009": 1}
+PS_TKP_SRC = {"8001": "76", "8003": "76", "8004": "77", "8005": "77", "8009": "78", "8007": "77", "8010": "76"}
+PS_TKP_QUOTES = {"8001": 2, "8003": 1, "8004": 3, "8005": 1, "8009": 1, "8010": 1}
+#: норматив КП и срок заказчика (регламент v1.4): 8010 — «Анализ КП», ЗИП, 1 КП из 3, срок прошёл
+#: 4 дня назад; 8007 — «Поиск поставщиков», срок через 2 дня (норматив на шаге 4 ещё не проверяется)
 
 
 def ps_tkp_history() -> dict:
@@ -1188,18 +1190,27 @@ def build_presale(*, chat: bool = True, tkp: bool = False) -> dict:
     import kamqueue
     import presale
     reader = chat_activity.Reader(PresaleChats(), set()) if chat else None
-    deals, rfqs = ps_deals(), []
+    deals, rfqs, meta = ps_deals(), [], ps_stage_meta()
     if tkp:
+        meta["C32:ANALYSIS"] = {"name": "Анализ КП и фиксация поставщиков", "sem": "P", "sort": 50, "cat": "32"}
+        deals.append({"ID": "8010", "TITLE": "Запрос на узел 8010", "STAGE_ID": "C32:ANALYSIS", "STAGE_SEMANTIC_ID": "P",
+                      "DATE_CREATE": (CT_TODAY - dt.timedelta(days=12)).isoformat() + "T10:00:00+03:00",
+                      "MOVED_TIME": (CT_TODAY - dt.timedelta(days=6)).isoformat() + "T10:00:00+03:00",
+                      "ASSIGNED_BY_ID": "10", presale.KAM_F: "11", presale.ZIP_F: "1", presale.DTYPE_F: "201",
+                      presale.DUE_F: (CT_TODAY - dt.timedelta(days=4)).isoformat() + "T18:00:00+03:00"})
         for x in deals:
             if x["ID"] in PS_TKP_SRC:
                 x[presale.SOURCER_F] = PS_TKP_SRC[x["ID"]]
+            if x["ID"] == "8007":
+                x[presale.DUE_F] = (CT_TODAY + dt.timedelta(days=2)).isoformat() + "T18:00:00+03:00"
         rfqs = [{"id": f"{did}{i}", "parentId2": did, "_hasQuote": True, "createdTime": x["DATE_CREATE"]}
                 for x in deals for did in [x["ID"]] for i in range(PS_TKP_QUOTES.get(did, 0))]
     names = {"76": "Иванов И.", "77": "Петрова А.", "78": "Сидоров С."} if tkp else {}
-    return presale.compute(cid="32", cat_name="Пресейл", deals=deals, stage_meta=ps_stage_meta(),
+    return presale.compute(cid="32", cat_name="Пресейл", deals=deals, stage_meta=meta,
                            rfqs=rfqs, people=CT_PEOPLE, names=names, today=CT_TODAY, chat_reader=reader,
                            cat_labels=PS_CAT_LABELS,
-                           chat_also=kamqueue.chat_wanted, history=ps_tkp_history() if tkp else None)
+                           chat_also=kamqueue.chat_wanted, history=ps_tkp_history() if tkp else None,
+                           type_labels={"201": "Запрос от заказчика", "202": "Расценка", "203": "Тендер"})
 
 
 def build_kam_queue() -> dict:

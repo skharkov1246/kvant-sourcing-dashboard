@@ -77,5 +77,6 @@ def test_today_and_order_split():
     today = re.search(r"const SO_TODAY=\[([^\]]*)\]", js).group(1).split(",")
     cards = re.search(r"const SO_CARDS=\[([^\]]*)\]", js).group(1).split(",")
     # видимых дел «Сегодня» — не больше 6 (остальные — «Ещё N дел»), отметка в карточках — отдельно
-    assert len(today) <= 8 and "_soRowsHtml(T," in js and "запроса нет.',6);" in js
+    # видов дел — до 10 (регламент v1.4: срок заказчика и норматив КП), видно всегда не больше 6
+    assert len(today) <= 10 and "_soRowsHtml(T," in js and "запроса нет.',6);" in js
     assert not set(today) & set(cards)

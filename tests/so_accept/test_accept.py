@@ -149,6 +149,8 @@ def test_p08_градиентов_нет(open_page, cfg):
 
 
 # ---------------------------------------------------------------- П-9 адрес
+# первая видимая кнопка «Сегодня» со списком запросов (в списке есть имя сорсера)
+TODAY_CARDS = '#soToday tr:not([hidden]) button:is([data-so$="gone"],[data-so$="chase"],[data-so$="pawStale"]) >> nth=0'
 STATE = """(()=>{const d=document.getElementById('drw'),on=d.classList.contains('on');
   const kind=!on?'none':document.querySelector('#drwBody #soDrwF')?'sourcer':/^Списка по ссылке нет/.test(document.getElementById('drwName').textContent)?'missing':document.querySelector('#drwBody .sowhyd')?'list':'other';
   const t=document.querySelector('#soTabs [aria-selected=true]'); return {kind,sub:t&&t.dataset.sub,hash:location.hash}})()"""
@@ -177,7 +179,7 @@ def test_p09_адрес_открывает_уровни(open_page, cfg, browser,
 
 def test_p09_назад_шагает_по_уровням(open_page, cfg):
     pg = open_page("#sourcing/today")
-    pg.click('#soToday button[data-so$="pawStale"]')
+    pg.click(TODAY_CARDS)
     pg.wait_for_timeout(200)
     s1 = pg.evaluate(STATE)
     pg.click("#drwBody .solnk")
@@ -192,7 +194,7 @@ def test_p09_назад_шагает_по_уровням(open_page, cfg):
     ok = (s1["kind"] == "list" and s2["kind"] == "sourcer" and "?p=" in s2["hash"] and s3["kind"] == "list"
           and s4["kind"] == "none" and s4["hash"] == "#sourcing/today")
     mark(cfg["P9"]["enforce"], ok, f"«Назад»: {s1} → {s2} → {s3} → {s4}")
-    pg.click('#soToday button[data-so$="pawStale"]')
+    pg.click(TODAY_CARDS)
     pg.wait_for_timeout(200)
     pg.click("#drwX")
     pg.wait_for_timeout(200)
@@ -271,5 +273,8 @@ def test_аудит_сегодня_дело_один_раз(open_page):
       SOQ.items.concat(SOQ.cards).forEach(it=>{const b=it.base||it.key; if(b==='ps-src'||b==='gone') return;
         it.rows.forEach(x=>{const k=x.kind+':'+x.id; if(blk.has(k)||(x.kind==='card'&&gone.has(k))) dup.push(b+' '+k);});});
       const who=SOQ.items.filter(it=>/сорсер/.test(it.who)&&it.rows.some(x=>x.who==='руководитель сорсинга')).map(it=>it.key);
-      return {dup:dup.slice(0,5),n:dup.length,who};}""")
-    assert r["n"] == 0 and not r["who"], r
+      // сделка — в одном пункте «Сегодня» (срок, стадия, первые запросы, норматив КП — одной строкой)
+      const seen={}, twice=[]; SOQ.items.forEach(it=>it.rows.forEach(x=>{if(x.kind!=='deal') return;
+        if(seen[x.id]&&seen[x.id]!==it.key) twice.push(x.id+': '+seen[x.id]+' и '+it.key); seen[x.id]=seen[x.id]||it.key;}));
+      return {dup:dup.slice(0,5),n:dup.length,who,twice};}""")
+    assert r["n"] == 0 and not r["who"] and not r["twice"], r
