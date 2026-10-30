@@ -113,7 +113,7 @@ def page(tmp_path_factory):
     import dashboard
     from tests import fixture
     m = fixture.build_metrics()
-    m["presale"] = fixture.build_presale()
+    m["presale"] = fixture.build_presale(tkp=True)   # КП → ТКП по истории стадий (зонд v62)
     m["coverage"]["uncovered"] = UNCOVERED
     m["coverage"]["withoutReq"] = len(UNCOVERED)
     d = tmp_path_factory.mktemp("so_tab")

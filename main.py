@@ -575,9 +575,23 @@ def run(args) -> int:
             except Exception as e:                       # noqa: BLE001
                 print(f"  ⚠ подписи «Категории оборудования» не прочитаны: {type(e).__name__}")
                 _cat_labels = {}
-            _presale_in = dict(cid=_ps[0], cat_name=_ps[1], deals=_pdeals, stage_meta=client.deal_stage_meta(),
+            _psm = client.deal_stage_meta()
+            # КП → ТКП по истории стадий (зонд v62): первые входы сделок пресейла в «Экономика готова»
+            # и «ТКП отправлено» и дальше — фильтр STAGE_ID, с даты первой сделки воронки (≈ 25 запросов).
+            # Не прочитана — None: КП → ТКП на странице «—», а не ноль
+            _phist = None
+            try:
+                _econ_ids, _tkp_ids = presale_mod.tkp_stage_ids(_psm, _ps[0])
+                _since = min((str(d.get("DATE_CREATE") or "")[:10] for d in _pdeals if d.get("DATE_CREATE")), default="")
+                if (_econ_ids or _tkp_ids) and _since:
+                    _phist = client.stage_history(2, since=_since, stage_ids=sorted(_econ_ids | _tkp_ids))
+                    print(f"  история стадий пресейла (КП → ТКП): сделок {len(_phist)}")
+            except Exception as e:                       # noqa: BLE001
+                print(f"  ⚠ история стадий пресейла не прочитана — КП → ТКП не считается: {type(e).__name__}: {без_вебхука(e)}")
+                _phist = None
+            _presale_in = dict(cid=_ps[0], cat_name=_ps[1], deals=_pdeals, stage_meta=_psm,
                                rfqs=rfqs, people=roster, names=names, today=p.end, service_ids=service_ids,
-                               cat_labels=_cat_labels)
+                               cat_labels=_cat_labels, history=_phist)
         else:
             print("• Воронка пресейла: воронки с таким именем в портале нет")
     except Exception as e:                                   # noqa: BLE001

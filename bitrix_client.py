@@ -624,7 +624,8 @@ class BitrixClient:
     def stage_history(self, entity_type_id: int, *, category_id: int | None = None,
                       since: str | None = None,
                       last: dict | None = None,
-                      transitions: dict | None = None) -> dict[str, list[tuple[str, str]]]:
+                      transitions: dict | None = None,
+                      stage_ids: list[str] | None = None) -> dict[str, list[tuple[str, str]]]:
         """Полная история стадий: {OWNER_ID: [(STAGE_ID, CREATED_TIME), …]} — ПЕРВЫЙ вход
         в каждую стадию, с полным временем (ISO), в хронологическом порядке.
         Для замера скорости переходов (сделки кат.0, заказы СП-172 и т.п.).
@@ -637,7 +638,11 @@ class BitrixClient:
         `transitions`, если передан, заполняется ВСЕМИ переходами каждой записи
         {OWNER_ID: [(STAGE_ID, CREATED_TIME), …]} в порядке истории, с повторными входами:
         сегменты регламента ОРК (ork.segments) считают возвраты и «пачки». Запросы и
-        листание те же — это тот же ответ, просто без отбрасывания повторов."""
+        листание те же — это тот же ответ, просто без отбрасывания повторов.
+
+        `stage_ids` — только входы в эти стадии (фильтр STAGE_ID массивом): воронку сделок так
+        отбирать надёжнее, чем CATEGORY_ID (зонд v60 по CATEGORY_ID получил записи чужой воронки);
+        ответ дополнительно сверяется с набором — запись другой стадии отбрасывается."""
         params: dict = {
             "entityTypeId": entity_type_id,
             "select": ["OWNER_ID", "CREATED_TIME", "STAGE_ID"],
@@ -648,6 +653,9 @@ class BitrixClient:
             params["filter"]["CATEGORY_ID"] = category_id
         if since:
             params["filter"][">=CREATED_TIME"] = since
+        want = set(stage_ids or ())
+        if want:
+            params["filter"]["STAGE_ID"] = sorted(want)
         hist: dict[str, list[tuple[str, str]]] = {}
         seen: dict[str, set] = {}
         start = 0
@@ -661,7 +669,7 @@ class BitrixClient:
             for x in items:
                 oid = str(x.get("OWNER_ID"))
                 st = str(x.get("STAGE_ID") or "")
-                if not oid or not st:
+                if not oid or not st or (want and st not in want):
                     continue
                 if last is not None:                         # ASC → последний переход побеждает
                     last[oid] = (st, str(x.get("CREATED_TIME") or ""))

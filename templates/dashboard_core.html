@@ -2545,10 +2545,10 @@
   #tab-sourcing :where(.soled,.sopulse) :where(th[scope=row]){font-weight:500;font-size:var(--so-md);text-align:left;color:var(--ink);border-bottom:1px solid var(--line2);padding:8px 7px;vertical-align:middle}
   /* «Сорсеры»: столбцы фиксированной ширины — числа не съезжают (владелец 30.10.2026) */
   #tab-sourcing :where(table.sopl){table-layout:fixed;min-width:1000px}
-  #tab-sourcing :where(.sopl col.c-n){width:19%}
-  #tab-sourcing :where(.sopl col.c-q){width:7%}
-  #tab-sourcing :where(.sopl col.c-sp){width:12%}
-  #tab-sourcing :where(.sopl col.c-do){width:13%}
+  #tab-sourcing :where(.sopl col.c-n){width:17%}
+  #tab-sourcing :where(.sopl col.c-q){width:6.5%}
+  #tab-sourcing :where(.sopl col.c-sp){width:11%}
+  #tab-sourcing :where(.sopl col.c-do){width:13.5%}
   #tab-sourcing :where(.sopl th){white-space:normal;overflow-wrap:normal;hyphens:manual}
   #tab-sourcing :where(.sopl td.num){white-space:nowrap}
   #tab-sourcing :where(.sopl .sodo .sotodo){display:flex;justify-content:space-between;align-items:center;margin:0 0 4px;white-space:normal}
@@ -3493,12 +3493,13 @@
   <h2 class="secttl" id="soPeopleH">Сорсеры: темп и что исправить</h2>
   <p class="sowhy">Сверху — у кого больше всего дел по очереди. Строка открывает запросы сорсера: стадии, поставщики, письма.</p>
   <section class="card soc">
-    <div class="twrap"><table class="sopl" data-xl-name="Сорсеры — темп и что исправить"><colgroup><col class="c-n"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-sp"><col class="c-do"></colgroup>
-      <thead><tr><th scope="col">Сорсер</th><th scope="col" class="r">Запросов</th><th scope="col" class="r" title="Карточки с исходящим письмом из Битрикса">С письмом</th><th scope="col" class="r" title="Файл КП в «Offer from supplier»">КП, шт.</th><th scope="col" class="r" title="КП засчитано ÷ запросов">КП, % запросов</th><th scope="col" class="r" title="Price at Work: КП есть, поставщик не выбран">Ждут итога</th><th scope="col" class="r" title="Запросы с нарушением правил отметки КП после 19.10.2026">Нару&shy;шения</th><th scope="col" class="r" title="Запросов в рабочий день за последние 4 недели">Темп, в день</th><th scope="col" class="r" title="Темп последних 4 недель против среднего за окно работы">К среднему</th><th scope="col">По неделям</th><th scope="col">Что сделать</th></tr></thead><tbody id="soPeople"></tbody><tfoot id="soPeopleF"></tfoot></table></div>
+    <div class="twrap"><table class="sopl" data-xl-name="Сорсеры — темп и что исправить"><colgroup><col class="c-n"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-sp"><col class="c-do"></colgroup>
+      <thead><tr><th scope="col">Сорсер</th><th scope="col" class="r">Запросов</th><th scope="col" class="r" title="Карточки с исходящим письмом из Битрикса">С письмом</th><th scope="col" class="r" title="Файл КП в «Offer from supplier»">КП, шт.</th><th scope="col" class="r" title="КП засчитано ÷ запросов">КП, % запросов</th><th scope="col" class="r" title="Price at Work: КП есть, поставщик не выбран">Ждут итога</th><th scope="col" class="r" title="Сделки пресейла сорсера с КП файлом: сколько из них дошли до «ТКП отправлено» — по истории стадий">КП → ТКП, сделок</th><th scope="col" class="r" title="Запросы с нарушением правил отметки КП после 19.10.2026">Нару&shy;шения</th><th scope="col" class="r" title="Запросов в рабочий день за последние 4 недели">Темп, в день</th><th scope="col" class="r" title="Темп последних 4 недель против среднего за окно работы">К среднему</th><th scope="col">По неделям</th><th scope="col">Что сделать</th></tr></thead><tbody id="soPeople"></tbody><tfoot id="soPeopleF"></tfoot></table></div>
     <details class="sohow"><summary>Как читать</summary><div class="sohowb">
       <p>Темп — запросов в рабочий день за последние 4 недели по вчерашний день: одно окно для всех, кто работал весь этот срок. ▲ и ▼ — последние 4 недели против среднего за окно работы человека. Итог за период растёт со стажем, поэтому людей сравниваем по темпу.</p>
       <p>В темп входят карточки робота пресейла, отнесённые сорсеру по полю «Сорсер» сделки, — сколько их, сказано в строке («роботом N»): темп с роботом и без него — разный труд.</p>
       <p>По неделям — столбик на неделю периода; бледный — неполная неделя, пунктир — человек ещё не работал или уже ушёл, красный — карточки, легшие на ушедшего после ухода.</p>
+      <p>«КП → ТКП, сделок» — сделки пресейла, где человек записан «Сорсером» и есть хотя бы одно КП файлом: сколько из них дошли до «Сорсинг завершен / Ожидаем решение заказчика» (КАМ отправил ТКП). Считается по истории стадий сделки — сделка, ушедшая потом в отказ, тоже засчитана. «—» — сделок с КП нет или история не прочитана.</p>
       <p>«Что сделать» — пункты «Сегодня» и «Порядка в карточках» этого человека: первые запросы, стадия дольше нормы, дожим поставщика, итог КП, «Ответ не получен», отметка КП. Сделка без сорсера и запросы ушедшего сюда не входят — их сначала назначает руководитель сорсинга. У ушедшего — открытые карточки на переназначение.</p>
     </div></details>
     <div class="insight soins" hidden><h3>Нагрузка</h3><div id="insLoad"></div></div>
@@ -4206,6 +4207,8 @@ if (M.send && M.send.rows){
    +kp('Открыто',_sk(H.open,'ps:open','','Открытые сделки пресейла'),`за 4 недели заведено ${H.new28}`,'')
    // цвет — по порогу, а не постоянный (аудит 30.10.2026: «0%» был зелёным); подпись — «k из n» и чего
    +kp('С запросом поставщику',H.withRfqPct+'%',`${H.withRfq} из ${H.total} сделок воронки, закрытые тоже · ${H.rfq} запросов · медиана ${H.rfqMed??'—'} на сделку`,H.total?(H.withRfqPct>=80?'ok':(H.withRfqPct<50?'warn':'')):'')
+   +(H.kp!=null?kp('КП → ТКП',`${H.kpTkp?_sk(H.kpTkp,'ps:tkp','','КП → ТКП отправлено'):0}<small> из ${H.kp?_sk(H.kp,'ps:kp','','Сделки с КП'):0}</small>`,
+      `сделок с КП файлом дошли до «ТКП отправлено» (по истории стадий) · до экономики ${H.kpEcon} · ждут ТКП на «Экономика готова» ${H.wait7}`,''):'')
    +kp('До первого запроса',H.lagMed!=null?H.lagMed+' дн':'—',H.rfq?`робот завёл ${H.robotRfqPct}% запросов`:'запросов нет','')
    +kp('Без сорсера',_sk(H.noSrc,'ps:nosrc','','Сделки пресейла без сорсера'),`открытые, мяч у сорсинга, «Сорсер» пуст · по всей воронке поле заполнено у ${H.srcPct}% из ${H.total}`,H.noSrc?'warn':'')
    +kp('Без запросов',_sk(H.noRfq,'ps:norfq','','Сделки пресейла без запросов'),`открытые, мяч у сорсинга, заведены ${H.noRfqDays}+ дн назад, ни одного запроса`,H.noRfq?'warn':'')
@@ -4569,6 +4572,11 @@ function _soQueue(){
   ((P&&P.openDeals)||[]).forEach(r=>Object.entries(PSF).forEach(([k,[a,def,f]])=>{if(!f(r.flags||[])) return;
     add('ps:'+k,{act:a,who:'',def,fact:1}).rows.push({kind:'deal',id:r.id,t:r.t,uid:r.srcId?String(r.srcId):'-',
       who:(SO_BALL[r.ball]||'—')+(r.who?`: ${r.who}`:''),why:r.stageName?`стадия «${r.stageName}»`:'',days:r.days});}));
+  // КП → ТКП (presale.kpDeals, история стадий): сделки с КП файлом и из них — с «ТКП отправлено»
+  ((P&&P.kpDeals)||[]).forEach(r=>{const row={kind:'deal',id:r.id,t:r.t,uid:r.srcId?String(r.srcId):'-',who:r.src||'сорсер не назначен',
+      why:[r.stageName?`стадия «${r.stageName}»${r.sem==='F'?', отказ':''}`:'',r.econ?`экономика ${_dm(r.econ)}`:'',r.tkp?`ТКП ${_dm(r.tkp)}`:'ТКП нет',_soN(r.quotes,'КП','КП','КП')].filter(Boolean).join(' · '),days:null};
+    add('ps:kp',{act:'Сделки пресейла с КП файлом',who:'',fact:1,def:'Сделки воронки «Пресейл», под которыми хотя бы одно КП поставщика приложено файлом к запросу. Дошла ли сделка до экономики и ТКП — по истории стадий.'}).rows.push(row);
+    if(r.tkp) add('ps:tkp',{act:'КП → ТКП отправлено',who:'',fact:1,def:'Сделки с КП файлом, вошедшие в «Сорсинг завершен / Ожидаем решение заказчика» или дальше: КАМ отправил ТКП (инструкция сорсера v1.4). По истории стадий, а не по текущей стадии.'}).rows.push(row);});
   // стадия сорсера дольше нормы регламента (presale.reg_of: рабочие дни на стадии против нормы)
   ((P&&P.openDeals)||[]).filter(r=>r.over).forEach(r=>{
     const it=add('over',{act:'Довести стадию до конца: сделка дольше нормы',who:'сорсер сделки',
@@ -4827,6 +4835,12 @@ _soTiles('');
     const d=Math.round((r.perDay4-r.perDay)*10)/10; if(!d) return '0';
     return `<span class="${d>0?'soup':'sodn'}" title="${d>0?'выше':'ниже'} среднего за окно работы">${d>0?'+':'−'}${fx(Math.abs(d))}</span>`;};
   const num=(v,l,cls)=>`<td class="num r${cls?' '+cls:''}" data-l="${l}">${v}</td>`;
+  // КП → ТКП по истории стадий пресейла (presale.bySourcer, зонд v62): «ТКП из КП», каждое — свои сделки;
+  // истории нет — «—» (не ноль); у сорсера нет сделок с КП — «—»
+  const PS=M.presale||{}, PSH=PS.head||{}, PSB=Object.fromEntries((PS.bySourcer||[]).map(a=>[String(a.id),a]));
+  const kpt=(uid,nm)=>{if(PSH.kp==null) return '<span class="dimv" title="история стадий пресейла не прочитана">—</span>';
+    const a=PSB[uid]; if(!a||!a.kp) return '<span class="dimv">—</span>';
+    return `${a.kpTkp?_sk(a.kpTkp,'ps:tkp',uid,'КП → ТКП отправлено — '+nm):'0'} <span class="dimv">из</span> ${_sk(a.kp,'ps:kp',uid,'Сделки с КП — '+nm)}`;};
   const row=({r})=>{const p=pace(r), q=r.quotes||0, sd=SEND[String(r.id)], b=r.buckets||{};
     return `<tr class="clickrow" data-uid="${r.id}" tabindex="0" aria-haspopup="dialog" aria-label="${_esc(r.n)} — открыть запросы">`
      +`<td data-l="Сорсер"><div class="who">${_esc(r.n)}${_tag(r)}${r.short&&!_gone(r)?'<span class="newb" title="В окне меньше четырёх рабочих недель — темп ещё неустойчив">новичок</span>':''}</div>`
@@ -4836,20 +4850,21 @@ _soTiles('');
      +num(q,'КП, шт.')
      +num(pct(q,r.c),'КП, % запросов')
      +num(b.paw||0,'Ждут итога')
+     +`<td class="num r" data-l="КП → ТКП, сделок">${kpt(String(r.id),r.n)}</td>`
      +num(r.violN||0,'Нарушения')
      +`<td class="num r" data-l="Темп, в день" data-xlv="${p??''}">${fx(p)}</td>`
      +`<td class="num r" data-l="К среднему">${dlt(r)}</td>`
      +`<td data-l="По неделям" data-xlv="${(r.wk||[]).join(' · ')}">${spark(r)}</td>`
      +`<td data-l="Что сделать" class="sodo">${todo(r)}</td></tr>`;};
   tb.innerHTML=ACTV.map(row).join('')
-    +(GONE.length?`<tr class="sogone"><td colspan="11">Ушли из отдела. Открытые запросы ${_soBtn('gone',(SOQ.by.gone||{}).n||0,'Открытые запросы ушедших сорсеров','','solink')} руководитель сорсинга переназначает действующим${k.goneAfter?`; легло после ухода — ${k.goneAfter}, сменить «Сорсера» в сделках`:''}.</td></tr>`+GONE.map(row).join(''):'')
+    +(GONE.length?`<tr class="sogone"><td colspan="12">Ушли из отдела. Открытые запросы ${_soBtn('gone',(SOQ.by.gone||{}).n||0,'Открытые запросы ушедших сорсеров','','solink')} руководитель сорсинга переназначает действующим${k.goneAfter?`; легло после ухода — ${k.goneAfter}, сменить «Сорсера» в сделках`:''}.</td></tr>`+GONE.map(row).join(''):'')
     || '<tr><td colspan="11" class="dimv">Нет данных: в периоде нет запросов отдела.</td></tr>';
   const tf=document.getElementById('soPeopleF'), c=A.reduce((s,r)=>s+r.c,0), q=A.reduce((s,r)=>s+(r.quotes||0),0);
   const sent=A.reduce((s,r)=>s+((SEND[String(r.id)]||{}).sent||0),0), hasSend=A.some(r=>SEND[String(r.id)]);
   const paw=A.reduce((s,r)=>s+((r.buckets||{}).paw||0),0), vio=A.reduce((s,r)=>s+(r.violN||0),0);
   const pd=A.filter(r=>!_gone(r)&&r.perDay4!=null).reduce((s,r)=>s+r.perDay4,0);
   // итог отдела — те же списки, что у чисел таблиц (заготовка _sk; кнопка — если строк столько же)
-  if(tf&&A.length) tf.innerHTML=`<tr><td><b>Отдел, итого</b></td>${num(c?_sk(c,'stg:all','','Запросы отдела'):0,'Запросов')}${num(hasSend?(sent?_sk(sent,'mail:yes','','С письмом, отдел'):0):'—','С письмом')}${num(q?_sk(q,'stg:q','','КП засчитано, отдел'):0,'КП, шт.')}${num(pct(q,c),'КП, % запросов')}${num(paw?_sk(paw,'paw','','Ждут итога КП, отдел'):0,'Ждут итога')}${num(vio?_sk(vio,'viol','','Нарушения, отдел'):0,'Нарушения')}<td class="num r" data-l="Темп, в день" title="Сумма темпа действующих сорсеров">${fx(Math.round(pd*10)/10)}</td><td></td><td></td><td></td></tr>`;
+  if(tf&&A.length) tf.innerHTML=`<tr><td><b>Отдел, итого</b></td>${num(c?_sk(c,'stg:all','','Запросы отдела'):0,'Запросов')}${num(hasSend?(sent?_sk(sent,'mail:yes','','С письмом, отдел'):0):'—','С письмом')}${num(q?_sk(q,'stg:q','','КП засчитано, отдел'):0,'КП, шт.')}${num(pct(q,c),'КП, % запросов')}${num(paw?_sk(paw,'paw','','Ждут итога КП, отдел'):0,'Ждут итога')}<td class="num r" data-l="КП → ТКП, сделок">${PSH.kp==null?'<span class="dimv">—</span>':`${PSH.kpTkp?_sk(PSH.kpTkp,'ps:tkp','','КП → ТКП отправлено, воронка'):0} <span class="dimv">из</span> ${PSH.kp?_sk(PSH.kp,'ps:kp','','Сделки с КП, воронка'):0}`}</td>${num(vio?_sk(vio,'viol','','Нарушения, отдел'):0,'Нарушения')}<td class="num r" data-l="Темп, в день" title="Сумма темпа действующих сорсеров">${fx(Math.round(pd*10)/10)}</td><td></td><td></td><td></td></tr>`;
   try{ _soLive(); }catch(e){ console.error('Сорсинг, итог сорсеров:',e); }
 })();
 
