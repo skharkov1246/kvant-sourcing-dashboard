@@ -747,6 +747,31 @@ def _item(code: str, r: dict, own: dict, act: str = "", days: int | None = None,
             "seg": r.get("seg")}
 
 
+def person_ids(queue: list[dict], life_queue: list[dict], rows: list[dict]) -> None:
+    """id Битрикса хозяина и копии у пунктов закрытой части (whoId, escalateToId), как у пунктов
+    life.queue (R4, Д-11а): по ним «Смотреть как» отбирает дела человека. Справочник «имя → id» —
+    из тех же имён очереди «Реализации» (who/whoId, escalateTo/escalateToId, kam/kamId) и КАМов
+    строк сделок; имени нет в справочнике — id не ставим (подпись роли, «не назначен», сводка
+    «менеджеры заказов: …»)."""
+    ids: dict[str, str] = {}
+
+    def put(name, pid) -> None:
+        name, pid = _nm(name), _nm(pid)
+        if name and pid and name != NOT_SET:
+            ids.setdefault(name, str(pid))
+    for q in life_queue:
+        put(q.get("who"), q.get("whoId"))
+        put(q.get("escalateTo"), q.get("escalateToId"))
+        put(q.get("kam"), q.get("kamId"))
+    for r in rows:
+        put(r.get("kam"), r.get("kamId"))
+    for q in queue:
+        if not _nm(q.get("whoId")) and ids.get(_nm(q.get("who"))):
+            q["whoId"] = ids[_nm(q.get("who"))]
+        if q.get("escalateTo") and not _nm(q.get("escalateToId")) and ids.get(_nm(q.get("escalateTo"))):
+            q["escalateToId"] = ids[_nm(q.get("escalateTo"))]
+
+
 def _unit_payload(queue: list[dict], prefix: str) -> dict:
     """{ordCounts, dealCounts, bucketCounts} очереди; prefix «sep» — sepOrdCounts и т. д."""
     oc, dc = unit_counts(queue)
@@ -1167,6 +1192,7 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
         if rec:
             deals[did] = rec
     queue.sort(key=lambda q: (q["sev"], -(q["days"] or 0), -q["seq"]))
+    person_ids(queue, (life or {}).get("queue") or [], rows)
     # что делать первым по сделке — общий порядок пунктов lifecycle и этих
     first: dict[str, dict] = {}
     for q in sorted(list((life or {}).get("queue") or []) + queue,

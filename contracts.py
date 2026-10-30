@@ -1338,6 +1338,14 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         # сделку (решение 26.10.2026, п. 4; dealClose / dealOpen очереди)
         d_step = _dstep(cur_stage) if in_cat0 else None
         _live_st = [x for x in ords_det if x["live"] and x["step"]]
+        # приёмка — одна на сделку (решение владельца 30.10.2026, п. 1): пока сделку не приняли
+        # (lifecycle._deal_accept), заказы на шаге 1 ждут приёмки СДЕЛКИ — у них не свой срок
+        # «дольше нормы», а один шаг сделки на всех (stepAcc); у принятой сделки новый заказ на
+        # шаге 1 — назначение менеджера ОРК на заказ (ordAssign), он остаётся заказным
+        if not closed and not lifecycle._deal_accept([lo_by_id[str(o.get("id"))] for o in ords]):
+            for x in _live_st:
+                if x["step"] == 1:
+                    x["stepAcc"] = True
         _cand = ([x for x in _live_st if x["step"] == 12] if (closed and sem != "F")
                  else [] if closed else _live_st)
         _all_done = bool(not closed and ords and all(_osem(o.get("stageId")) == "S" for o in ords))
@@ -1356,6 +1364,14 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                          "label": ork.NO_PAUSE, "close": "paid" if paid else "", "closeNote": _close_note,
                          # шаг взят у этого заказа: номер — рядом с шагом (E32)
                          "unit": "order", "order": c["id"], "lbl": c["lbl"], "orders": _cell_orders}
+            if c.get("stepAcc"):
+                # шаг сделки 1 «Приёмка сделки»: один на сделку, её заказы на шаге 1 ждут менеджера
+                # ОРК — счётом рядом (accept), срок — худший из них (E3)
+                _acc = [x for x in _live_st if x.get("stepAcc")]
+                _wds = [x["stepWd"] for x in _acc if x["stepWd"] is not None]
+                step_cell.update(unit="deal", order="", lbl="", accept=len(_acc),
+                                 wd=max(_wds) if _wds else None,
+                                 over=any(x["stepOver"] for x in _acc) if _wds else c["stepOver"])
         elif paid or _all_done:
             _o = ork.owner(13, d_people)
             step_cell = {"step": 13, "role": _o["role"], "who": _o["who"], "wd": None, "norm": None,

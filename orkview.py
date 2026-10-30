@@ -1696,8 +1696,13 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
         q_by[q["code"]].append(q)
         if q.get("order"):
             codes_of[str(q["order"])].append(q["code"])
-        else:
-            dcodes[str(q.get("deal") or "")].append(q["code"])
+    # коды сделки — по свёрнутой очереди: пункт сделки (unpaid, s1Over, payNoContract, noPayPlan…)
+    # остаётся у строки d: сам, а не только у копий по заказам (иначе «Дел по сделке нет»)
+    for q in queue:
+        if q.get("unit", "order" if q.get("order") else "deal") == "deal":
+            did = str(q.get("deal") or "")
+            if q["code"] not in dcodes[did]:
+                dcodes[did].append(q["code"])
     # прогноз доставки — как у очереди (lifecycle.build): звенья по всем заказам, обычное
     # опоздание поставщика — от SUP_MIN отгрузок
     lead, sup_rel = lifecycle.speeds(measure, today)
@@ -2211,8 +2216,16 @@ def _month_drill(month: dict, people: list[dict], orders: list[dict], U: list[di
         mw = _mon_word(m0)
         for c in ("S1", "S2", "S3", "S6"):
             _dk(M1.get(c) or {}, drill, f"{mi}.{c}", *seg_keys(segs[c]), prefix="m",
-                head=f"{SEG_TXT[c]} · {mw}: шаги в счёте", unit="segment")
+                head=(f"Приёмка сделки (шаг 1) · {mw}: сделки в счёте" if c == "S1"
+                      else f"{SEG_TXT[c]} · {mw}: шаги в счёте"), unit="segment")
             _excl_keys(M1.get(c) or {}, segs[c], drill, f"{mi}.{c}", f"{SEG_TXT[c]} · {mw}", used)
+        # приёмка — одна на сделку (решение 30.10.2026): плитка S1 считает сделки — и список за ней
+        # в сделках (ключ «d:», строка сделки с её заказами), а не отрезки заказов
+        for part in (f"{mi}.S1", f"{mi}.S1.excl", f"{mi}.S1.skip"):
+            e = drill.get(part)
+            if e:
+                e["unit"] = "deal"
+                e["k"] = [f"d:{(by_id.get(k) or {}).get('deal') or ''}" for k in e["k"]]
         allm = segs["S2"] + segs["S3"] + segs["S6"]
         _dk(M1.get("mgr") or {}, drill, f"{mi}.mgr", *seg_keys(allm), prefix="m",
             head=f"Шаги ОРК (шаги 4, 5, 8) · {mw}: шаги в счёте", unit="segment")

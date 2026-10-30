@@ -244,10 +244,16 @@ def test_что_исправить_счёт_разных_объектов(built,
     om = built["ork_month"]["main"]
     m0 = om["month"]["rows"][om["month"]["head"]]["m"]
     rows = [r for r in om["journal"]["rows"] if r["seg"] == "S1" and r["m"] == m0 and r["measurable"] and (r["over"] or 0) > 0]
-    nd, no = len({r["deal"] for r in rows}), len({r["order"] for r in rows})
-    assert nd < no      # фикстура: у сделки 933 несколько заказов — прежний счёт «раз» завышал приёмку
+    # приёмка — одна на сделку (решение 30.10.2026): в «приёмку» — только строки в счёте (counted);
+    # назначение менеджера ОРК на новый заказ уже принятой сделки — своей строкой, в заказах (ревью сведения)
+    acc = [r for r in rows if r.get("counted") is not False]
+    asg = [r for r in rows if r.get("counted") is False and "новый заказ" in str(r.get("note") or "")]
+    nd, na = len({r["deal"] for r in acc}), len({r["order"] for r in asg})
+    assert nd >= 1 and na >= 1      # фикстура: сделка 933 принята, её новые заказы — назначение
     t = _plain(drawn["views"]["main"]["month"])
-    assert f"приёмка дольше нормы у {nd} сделок ({no} заказа)" in t or f"приёмка дольше нормы у {nd} сделки ({no} заказа)" in t
+    assert re.search(rf"приёмка дольше нормы у {nd} сдел(ки|ок) ?,", t), t[t.find("Что исправить"):][:600]
+    assert not re.search(r"приёмка дольше нормы у \d+ сдел\w+ \(\d+ заказ", t)     # заказы назначения в приёмку не идут
+    assert f"Назначение менеджера ОРК на новый заказ — в " in t and f"дольше нормы у {na} заказ" in t
     assert "раза дольше нормы" not in t and "раз дольше нормы" not in t
 
 

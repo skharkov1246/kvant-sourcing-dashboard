@@ -201,8 +201,10 @@ def test_W1_сделки_n_сделки_на_шаге_1(run):
     assert L["title"].startswith("2 сделки (1 заказ):"), L["title"]
     # поля расчёта пришли — W1 и W1′ берутся как есть, у каждого своя единица
     d = run["data"]
-    assert d["U"]["w1"] == {"v": 1, "n": 2} and "Сделок: приёмка дольше 1 раб. дн. W1 1" in d["head"]
-    assert "Заказов без менеджера ОРК дольше 1 раб. дн. W1′ 1" in d["head"]
+    assert d["U"]["w1"] == {"v": 1, "n": 2} and "Сделок: приёмка дольше 1 раб. дн. W1" in d["head"]
+    # W1′ (заказы) — подстрокой W1 (сделки): у каждого своё число и единица (ревью сведения, П-2)
+    assert re.search(r"новые заказы ждут менеджера ОРК ?: 1", d["head"]), d["head"][d["head"].find("Ещё"):][:300]
+    assert 'data-od="w:W1o"' in d["headRaw"]
 
 
 def test_клиент_не_оплатил_сделки_заказы_в_скобках(run):
@@ -210,13 +212,13 @@ def test_клиент_не_оплатил_сделки_заказы_в_скоб�
     заказами — одна сделка. То же значение — в ведомости (шаг 13) и в списке за числом."""
     o = run["base"]
     assert o["U"]["unp"]["deals"] == 2 and o["U"]["unp"]["orders"] == 3
-    assert re.search(r"Сделок: клиент не оплатил в срок в них 3 заказа · с 01\.09 · делает КАМ 2", o["head"]), o["head"]
+    assert re.search(r"Сделок: клиент не оплатил в срок 3 заказа · с 01\.09 · КАМ 2", o["head"]), o["head"]
     assert o["lists"]["w:_fb/unpaidO"]["rows"] == 3 and o["lists"]["w:_fb/unpaidO"]["unit"] == "order"
     assert "клиент не оплатил 2 сделки 3 заказа в них" in o["led"]
     L = o["lists"]["w:unpaid"]
     assert L["unit"] == "deal" and L["rows"] == 2 and L["title"].startswith("2 сделки (3 заказа):"), L["title"]
     # без tiles.unpaid.deals — тот же счёт из ключей списка (разные сделки)
-    assert run["data"]["U"]["unp"]["deals"] == 2 and "доля заказов €27 тыс. — оценка" in run["data"]["head"]
+    assert run["data"]["U"]["unp"]["deals"] == 2 and "≈€27 тыс." in run["data"]["head"] and "доля этих заказов в сумме сделок — оценка" in run["data"]["headRaw"]
 
 
 def test_W5_звонки_по_заказам(run):

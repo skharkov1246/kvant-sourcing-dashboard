@@ -631,7 +631,7 @@ def _deal_accept(os_: list[dict]) -> bool:
 # пункты заказов (очередь КАМа, W2, «Сверх нормы по менеджерам», «Клиент не оплатил» — по заказам)
 ORD_FIELDS = ("ordNo", "sup", "dl", "due", "days", "who", "ref", "since", "inWd", "step", "role",
               "roleName", "whoGone", "whoId", "escalateTo", "copyRole", "escalateToId", "title", "fc",
-              "fcWhy", "byUtd", "phase")
+              "fcWhy", "byUtd", "phase", "whoOut")
 
 
 def _n_ord(n: int) -> str:
@@ -843,11 +843,17 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         pp = ppl(o, d)
         ow = ork.item_owner(code, _step_now(o) if o else None, pp)
         ids = pid(o, d)
-        return {"step": ow["step"], "role": ow["role"], "roleName": ork.ROLES.get(ow["role"], ""),
-                "who": ow["who"], "whoGone": gone(ow["who"]),
-                "whoId": ork.role_id(ow["role"], pp, ids),
-                "escalateTo": ow["copy"], "copyRole": ow["copyRole"],
-                "escalateToId": ork.role_id(ow["copyRole"], pp, ids) if ow["copyRole"] else ""}
+        r = {"step": ow["step"], "role": ow["role"], "roleName": ork.ROLES.get(ow["role"], ""),
+             "who": ow["who"], "whoGone": gone(ow["who"]),
+             "whoId": ork.role_id(ow["role"], pp, ids),
+             "escalateTo": ow["copy"], "copyRole": ow["copyRole"],
+             "escalateToId": ork.role_id(ow["copyRole"], pp, ids) if ow["copyRole"] else ""}
+        # «не назначен» — одно определение на экране (E25): менеджера ОРК нет И ответственного
+        # заказа нет (orkview.pulse_who, вид none). Менеджера ОРК нет, а ответственный заказа есть,
+        # но не из ОРК, — whoOut: «ответственный не из ОРК — назначить менеджера ОРК», своим счётом
+        if ow["role"] == "orkMgr" and ow["who"] == "не назначен" and o and _nm(o.get("resp")):
+            r["whoOut"] = True
+        return r
 
     def gone(name: str) -> bool:
         return name.endswith("(уволен)")      # contracts.who подписывает ушедших так
