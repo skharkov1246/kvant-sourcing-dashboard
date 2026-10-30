@@ -428,8 +428,13 @@ def _with_tabs_opened(path: Path) -> Path:
               "if(!SH()||RW()!==n)kvFail('Реализация: «Кого ждём» '+tr.dataset.adj+' — строк '+RW()+' вместо '+n);XX()});"
               # «Что сделать сегодня»: группы есть при непустой очереди; число группы — ровно её пункты,
               # из списка — переход обратно к группе
-              "if(((CX3.life||{}).queue||[]).length&&!document.querySelector('#ctPanel-main #orkToday [data-tq]'))"
+              # пункты «Порядка в карточках» (часть hyg, решение владельца 30.10.2026) — вне дневного счёта, своим
+              # блоком #orkTodayC: очередь из одних них не требует групп «Что сделать сегодня»
+              "var LQ=(CX3.life||{}).queue||[],BQ=function(q){return q.bucket||(typeof _wkB==='function'?_wkB(q):'exec')};"
+              "if(LQ.some(function(q){return BQ(q)!=='hyg'})&&!document.querySelector('#ctPanel-main #orkToday [data-tq]'))"
               "kvFail('Реализация: блок «Что сделать сегодня» пуст при непустой очереди');"
+              "if(LQ.some(function(q){return BQ(q)==='hyg'})&&!document.querySelector('#ctPanel-main #orkTodayC [data-tq]'))"
+              "kvFail('Реализация: блок «Порядок в карточках» пуст при пунктах порядка в очереди');"
               "EA('#orkToday button[data-tq]',function(b){var n=parseInt(b.textContent,10);b.click();"
               "if(!SH()||RW()!==n)kvFail('Реализация: «Что сделать сегодня» '+b.dataset.tq+' = '+n+', а в списке строк '+RW());"
               "else if(!document.querySelector('#drwBody [data-odq]'))kvFail('Реализация: «Что сделать сегодня» '+b.dataset.tq+' — нет перехода к группе');XX()});"
