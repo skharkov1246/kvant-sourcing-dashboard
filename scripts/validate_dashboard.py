@@ -306,7 +306,7 @@ def _with_tabs_opened(path: Path) -> Path:
               # сорсера) открывает ровно столько строк списка; непустая очередь — непустое «Сегодня»
               "try{var SOD=document.getElementById('drw'),SOR=function(){return [].slice.call(document.querySelectorAll("
               "'#drwBody table.solst tbody tr')).filter(function(t){return !t.querySelector('td[colspan]')}).length};"
-              "if(document.querySelectorAll('#soToday tr[data-sq]').length>6)kvFail('Сорсинг: в «Сегодня» больше 6 дел');"
+              "if(document.querySelectorAll('#soToday tr[data-sq]:not([hidden])').length>6)kvFail('Сорсинг: в «Сегодня» видно больше 6 дел');"
               "if(typeof SOQ!=='undefined'&&SOQ.items.length&&!document.querySelector('#soToday tr[data-sq]'))"
               "kvFail('Сорсинг: «Сегодня» пусто при непустой очереди');"
               "[].slice.call(document.querySelectorAll('#tab-sourcing [data-so]')).forEach(function(b){"
