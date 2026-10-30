@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""Деньги сорсинга: последние N сделок, перешедших в реализацию, — PDF владельцу в Telegram.
+"""Вклад отдела поиска поставщиков в выигрыш последних сделок, в деньгах, — PDF владельцу в Telegram.
 
-ВОПРОС ВЛАДЕЛЬЦА (30.10.2026). «Посчитай, сколько денег принёс компании отдел сорсинга —
-на последних 50 сделках, перешедших в реализацию. Новые поставщики: на сколько они
-отторгованы с помощью новых поставщиков».
+ВОПРОС ВЛАДЕЛЬЦА (30.10.2026, с уточнениями того же дня). «Сколько денег принёс компании
+отдел сорсинга — на последних 50 сделках, перешедших в реализацию. Меня интересуют только те
+сделки, где поставщиков нашли сорсеры. Премии не интересуют. Какое преимущество получила
+компания от работы отдела сорсинга, сколько они принесли дополнительного бизнеса». Затем:
+«из последних 50 сделок, переведённых в реализацию, какой вклад и пользу принёс отдел в то,
+что мы их выиграли; в деньги пересчитай все уровни — сколько пользы от существования отдела».
 
 ГДЕ СЧИТАЕТСЯ. Только внутри прогона sourcing-value.yml: суммы — закрытые сведения, журнал
 Actions публичный (CLAUDE.md, правило 5 и распоряжение 30.09.2026). Файл ведомости остаётся
@@ -15,47 +18,43 @@ Actions публичный (CLAUDE.md, правило 5 и распоряжен�
     без НДС тем же каскадом, что на вкладке: сверенный файл экономики первым, иначе «Сумма»
     по правилу НДС; закупка — файл экономики или заказы СП-172 по курсу ЦБ. Свои формулы денег
     сделки скрипт не заводит (правило 14: одна вставка формулы).
-  • Битрикс: история стадий сделок (вход в реализацию), карточки СП-166 сделок (поставщик,
-    стадия, файл КП), заказы СП-172 сделок (поставщик и сумма — для доли поставщика в закупке),
-    история заказов и выбранных запросов тех же поставщиков (новый ли поставщик), поле «Сорсер».
-  • Закрытая база: цены разобранных КП поставщиков (lib_prices_live, поток «разбор КП») по
-    номерам карточек СП-166 этих сделок.
-  • Курсы ЦБ РФ на дату цены (base.fx.load_cbr).
+  • Битрикс: история стадий сделок (вход в реализацию), карточки СП-166 и заказы СП-172 сделок,
+    история заказов и выбранных запросов поставщиков выборки (новый ли поставщик), состав отдела
+    поиска поставщиков (config.DEPT_SOURCING_ID с дочерними, вместе с ушедшими), поле «Сорсер».
+  • Закрытая база: цены разобранных КП поставщиков (lib_prices_live, поток «разбор КП»).
+  • Курсы ЦБ РФ на дату цены и заказа (base.fx.load_cbr).
 
-ОПРЕДЕЛЕНИЯ (все пороги — таблицей ПОРОГИ, правило 4).
+ОПРЕДЕЛЕНИЯ (пороги — таблицей ПОРОГИ, правило 4).
   • СДЕЛКА, ПЕРЕШЕДШАЯ В РЕАЛИЗАЦИЮ — первый вход в воронку реализации (кат. 0) ПОСЛЕ входа в
-    предпродажную воронку (не техническую, people.TECH_CATS). Кат. 0 — и воронка по умолчанию:
-    сделка, заведённая в ней и перенесённая в предпродажу, по первому входу выглядела бы старой
-    (probe_conversion). Заведённые сразу в реализацию и проигранные — отдельными счётчиками.
+    предпродажную воронку (не техническую, people.TECH_CATS), не проигранная. Кат. 0 — и
+    воронка по умолчанию: сделка, заведённая в ней и перенесённая в предпродажу, по первому
+    входу выглядела бы старой (probe_conversion).
   • ПОБЕДИТЕЛЬ — поставщик непроваленного заказа СП-172 сделки; заказов нет — поставщик
     карточки СП-166 в стадии Selected.
+  • ВЕДУЩИЙ ЗАПРОС — ответственный карточки СП-166; карточка робота (config.service_accounts) —
+    сорсер из поля сделки, как main.py; нет и его — создатель карточки, если он не робот.
+  • ПОСТАВЩИКА НАШЁЛ ОТДЕЛ — у победителя есть карточка СП-166 этой сделки, которую ведёт
+    сотрудник отдела поиска поставщиков. ВЫБОРКА — N последних по входу в реализацию сделок.
+  • УРОВЕНЬ ВКЛАДА (УРОВНИ, один на сделку, по старшинству): поставщика заказа нашёл отдел до
+    выигрыша; КП от отдела до выигрыша (файл или стадия КП), заказ у другого; запрашивал до
+    выигрыша без КП; поставщика заказа нашёл после выигрыша; подключился только после; без отдела.
+    «До выигрыша» — карточка заведена раньше входа сделки в реализацию.
+  • ДЕНЬГИ УРОВНЕЙ. Влияние — отдел дал цену до выигрыша или нашёл поставщика заказа; контроль —
+    на поставщика и цену сделки отдел не повлиял. Польза уровня влияния = (маржа уровня − маржа
+    контроля) × продажа уровня; верхняя граница — вся продажа − закупка уровней влияния. Маржа —
+    продажа − закупка к продаже по сделкам с обеими суммами. Контроля меньше КОНТРОЛЬ_МИН — оценки
+    нет. В месяц — делением на длину окна входа выборки; рубли — по курсу сборки «Реализации».
   • НОВЫЙ ПОСТАВЩИК — до первой карточки запроса ему по этой сделке (нет карточки — до входа
     сделки в реализацию) у него не было ни одного непроваленного заказа СП-172 и ни одного
     выбранного запроса по другим сделкам. Глубина — с первого заказа СП-172 в портале (печатается).
-  • ПОЗИЦИЯ — код из строки КП (буквы и цифры, верхний регистр). Цена — за единицу в € без НДС:
-    «с НДС» в примечании у рублёвой цены снимается по ставке РФ на дату (price_norm), у прочих —
-    позиция не сравнивается. Деньги позиции — сумма строки КП победителя (если цена × количество
-    сходится с ней), иначе цена × количество; цена лота на количество не умножается.
-  • СРАВНИМЫ — базис совпадает или не указан хотя бы у одного (разные известные коды
-    Инкотермс — не сравниваются) и цены отличаются не больше чем в ПОРОГИ["раз"] раз.
-  • Э1 ЭКОНОМИЯ НА ВЫБОРЕ — (лучшая итоговая цена прочих поставщиков − цена победителя) ×
-    деньги позиции / цена победителя, если больше нуля. Меньше нуля — «выбрано дороже».
-  • Э2 ТОРГ — (первая цена победителя − его итоговая цена) в долях итоговой × деньги позиции.
-  • Э1 и Э2 не складываются: по позиции берётся большее (ЭС — нижняя граница общего эффекта).
-  • Э3 ОТТОРГОВАНО С ПОМОЩЬЮ НОВЫХ — позиции, где КП дали и новый, и прежний поставщик:
-    (лучшая ПЕРВАЯ цена прежних − заплаченная итоговая) × деньги / заплаченная, если больше нуля,
-    и только когда выбран новый поставщик или прежний снизил цену после КП нового.
-
-ЛЮДИ И ПРЕМИЯ (уточнение владельца 30.10.2026: «оценить работу тех, кто создавал процесс, и
-на сколько они зарабатывают премию»).
-  • ВЕДУЩИЙ ЗАПРОСЫ — ответственный карточки СП-166; карточка робота (config.service_accounts) —
-    сорсер из поля сделки, как main.py. Ему засчитываются его карточки, КП файлом, новые
-    победители по его карточкам и ЭС, Э3, «выбрано дороже» позиций, выигранных поставщиком его
-    карточки.
-  • ПРЕМИЯ — строки «Премий» той же сборки (premia.compute, положение ред. 2): пул сделки при
-    К = 1 × К по умолчанию × доля роли; оплаченная сделка — «заработано», остальные —
-    «ожидается»; выброс (big) — без премии, как во вкладке. Своей формулы премии здесь нет
-    (правило 14). Сорсеру положение премии не назначает — это видно в таблице числом.
+  • ЗАКУПКА У ПОСТАВЩИКА — закупка сделки × его доля в суммах непроваленных заказов (курс ЦБ на
+    дату заказа); сумм нет — поровну между поставщиками заказов.
+  • ЭКОНОМИЯ ПО ЦЕНАМ КП — по позициям одного кода, где у победителя и конкурента есть цена:
+    Э1 — выбор против следующего по цене КП, Э2 — торг (первая цена победителя против итоговой),
+    ЭС — большее из двух по позиции (не сумма); Э3 — отторговано с помощью новых: лучшая первая
+    цена прежних поставщиков против заплаченной, когда выбран новый или прежний снизил цену после
+    КП нового. Цена — за единицу в € без НДС, сравнимы — один базис (или не указан) и разница не
+    больше ПОРОГИ["раз"] раз; деньги позиции — сумма строки КП победителя, лот не умножается.
 
     python scripts/sourcing_value.py --data modules.json --out DIR [--n 50] [--parts 10]
 
@@ -86,15 +85,12 @@ N_DEALS = 50
     "раз": 5.0,                 # цены одной позиции у разных поставщиков дальше — не та позиция/единица
     "сумма_строки": 0.02,       # цена × количество сходится с суммой строки КП в пределах доли
     "код_мин": 4,               # код позиции короче — не код (номер строки, «шт»)
-    "покрытие_цель": 0.70,      # доля закупки под сравнением КП, к которой вести (предложение)
-    "кп_мин": 3,                # КП с ценой на позицию — минимум конкурентной закупки (предложение)
+    "покрытие_цель": 0.70,      # доля закупки под сравнением цен КП, к которой вести (предложение)
+    "кп_мин": 3,                # КП файлом на сделку — минимум конкурентной закупки (предложение)
 }
-# Пример ставки премии сорсеру от доказанной экономии — только иллюстрация для решения
-# владельца (положение ред. 2 сорсинг не оплачивает), не норма.
-СТАВКА_ПРИМЕР = 0.10
 FEED = "разбор КП"
 SELECTED = "selected"
-TOP_ROWS = 15                   # строк в таблицах «выбрано дороже» и «новые поставщики»
+ROBOT = "~"                     # ведущий запроса не определён: карточка робота без сорсера в сделке
 
 
 # ───────────────────────────── время и разбор ─────────────────────────────
@@ -151,26 +147,43 @@ def candidates(rows: list[dict], today: dt.date, days: int) -> list[dict]:
     return out
 
 
-def pick(rows: list[dict], entries: dict[str, tuple[dt.datetime | None, str]], n: int) -> tuple[list[dict], dict]:
-    """N последних по входу в реализацию после предпродажи, не проигранных. → (строки, счётчики
-    пропущенных в том же окне: заведены сразу в реализацию, проиграны после входа)."""
-    moved = [(entries[r["deal"]][0], r) for r in rows
-             if entries.get(r["deal"], (None, ""))[1] == "moved" and entries[r["deal"]][0]]
-    moved.sort(key=lambda x: (x[0], int(r_seq(x[1]))), reverse=True)
-    live = [(t, r) for t, r in moved if not r.get("lost")]
-    chosen = live[:n]
-    lo = chosen[-1][0] if chosen else None
-    skipped = {
-        "lost": sum(1 for t, r in moved if r.get("lost") and lo and t >= lo),
-        "direct": sum(1 for r in rows if entries.get(r["deal"], (None, ""))[1] == "direct"
-                      and entries[r["deal"]][0] and lo and entries[r["deal"]][0] >= lo),
-    }
+def moved_live(rows: list[dict], entries: dict[str, tuple[dt.datetime | None, str]]) -> list[dict]:
+    """Непроигранные строки, вошедшие в реализацию после предпродажи, — новые первыми."""
     out = []
-    for t, r in chosen:
-        x = dict(r)
-        x["_entry"] = t
-        out.append(x)
-    return out, skipped
+    for r in rows:
+        t, k = entries.get(r["deal"], (None, ""))
+        if k == "moved" and t and not r.get("lost"):
+            x = dict(r)
+            x["_entry"] = t
+            out.append(x)
+    out.sort(key=lambda x: (x["_entry"], r_seq(x)), reverse=True)
+    return out
+
+
+def deal_winners(cards: list[dict], orders: list[dict], osem: dict[str, str]) -> set[str]:
+    """Поставщики непроваленных заказов сделки; заказов нет — поставщики Selected-карточек."""
+    w = {str(o.get("companyId")) for o in orders
+         if osem.get(str(o.get("stageId") or "")) != "F" and str(o.get("companyId") or "0") != "0"}
+    return w or {str(c.get("companyId")) for c in cards
+                 if c.get("_bucket") == SELECTED and str(c.get("companyId") or "0") != "0"}
+
+
+def found_by_dept(cards: list[dict], winners: set[str], who: dict[str, str], dept: set[str]) -> dict[str, set[str]]:
+    """Победитель → сотрудники отдела, чей запрос СП-166 ему по этой сделке был. Пусто — поставщиков
+    сделки отдел не находил."""
+    out: dict[str, set[str]] = defaultdict(set)
+    for c in cards:
+        s, u = str(c.get("companyId") or ""), who.get(str(c.get("id")), "")
+        if s in winners and u in dept:
+            out[s].add(u)
+    return dict(out)
+
+
+def money(r: dict) -> tuple[float, float]:
+    """(продажа, закупка) строки «Реализации» в €; без курса или подозрительная закупка — 0."""
+    buy = _f(r.get("buyEur")) if r.get("buySrc") not in ("none", "fx") and not r.get("buySusp") else 0.0
+    sale = _f(r.get("saleEur")) if r.get("saleKnown", True) else 0.0
+    return sale, buy
 
 
 def r_seq(r: dict) -> int:
@@ -426,211 +439,248 @@ def card_person(card: dict, deal_sourcer: str, service: set[str]) -> str:
     return ""
 
 
-def build(deals: list[dict], cards_by_deal: dict[str, list[dict]], orders: list[dict],
-          osem: dict[str, str], new_by_deal: dict[str, set[str]], offers: list[dict],
-          sourcer: dict[str, str], fx, service: set[str] | None = None,
-          pnames: dict[str, str] | None = None) -> dict:
-    """Итог по сделкам, сводам и людям. Все суммы — € без НДС. sourcer — сделка → uid поля
-    «Сорсер»; service — служебные записи (роботы); pnames — uid → имя."""
-    service, pnames = service or set(), pnames or {}
-    people: dict[str, dict] = defaultdict(lambda: {"deals": set(), "cards": 0, "kpFiles": 0, "newFound": 0,
-                                                   "es": 0.0, "e3": 0.0, "over": 0.0, "base": 0.0})
+#: Вклад отдела в выигрыш сделки — один уровень на сделку, по старшинству (код, подпись).
+УРОВНИ = (
+    ("found_pre", "поставщика заказа нашёл отдел до выигрыша"),
+    ("kp_pre", "КП от отдела до выигрыша, заказ у другого поставщика или заказа ещё нет"),
+    ("ask_pre", "отдел запрашивал до выигрыша, КП не получено"),
+    ("found_post", "поставщика заказа нашёл отдел после выигрыша"),
+    ("post", "отдел подключился только после выигрыша"),
+    ("none", "без отдела"),
+)
+ВКЛАД_В_ВЫИГРЫШ = ("found_pre", "kp_pre")   # КП от отдела было до выигрыша
+# Пересчёт уровней в деньги (просьба владельца 30.10.2026: «сколько пользы от существования отдела»).
+# ВЛИЯНИЕ — отдел дал цену до выигрыша или нашёл поставщика заказа; КОНТРОЛЬ — на поставщика и цену
+# сделки отдел не повлиял. Польза уровня влияния = (маржа уровня − маржа контроля) × продажа уровня;
+# верхняя граница — вся продажа − закупка уровней влияния (если без отдела их не выиграли бы).
+ВЛИЯНИЕ = ("found_pre", "kp_pre", "found_post")
+КОНТРОЛЬ = ("ask_pre", "post", "none")
+КОНТРОЛЬ_МИН = 3                # сделок контроля с обеими суммами — меньше: оценку не считаем
+
+
+def has_kp(card: dict, kp_buckets: set[str]) -> bool:
+    """КП получено: файл в «Offer from supplier» или стадия КП (Price at Work, Selected, Not Selected)."""
+    return bool(card.get("_offer")) or card.get("_bucket") in kp_buckets
+
+
+def level(dept_cards: list[dict], found: dict[str, set[str]], entry: dt.datetime, kp_buckets: set[str]) -> str:
+    """Уровень вклада отдела в выигрыш сделки (УРОВНИ). dept_cards — карточки сделки, которые вёл
+    отдел; found — победитель → нашедшие его сотрудники отдела; entry — вход в реализацию."""
+    pre = [c for c in dept_cards if (t := ts(c.get("createdTime"))) and t < entry]
+    pre_found = {str(c.get("companyId")) for c in pre} & set(found)
+    if pre_found:
+        return "found_pre"
+    if any(has_kp(c, kp_buckets) for c in pre):
+        return "kp_pre"
+    if pre:
+        return "ask_pre"
+    if found:
+        return "found_post"
+    return "post" if dept_cards else "none"
+
+
+def build(sample: list[dict], cards_by_deal: dict[str, list[dict]], orders: list[dict], osem: dict[str, str],
+          who: dict[str, str], dept: set[str], new_by_deal: dict[str, set[str]], offers: list[dict], fx,
+          kp_buckets: set[str]) -> dict:
+    """Сделки выборки, вклад отдела, люди отдела и новые поставщики. Все суммы — € без НДС."""
     shares = order_shares(orders, osem, fx)
+    ord_by_deal: dict[str, list[dict]] = defaultdict(list)
+    for o in orders:
+        ord_by_deal[str(o.get("parentId2") or "")].append(o)
     off_by_deal: dict[str, list[dict]] = defaultdict(list)
     for o in offers:
         off_by_deal[o["deal"]].append(o)
-    rows, over_all, e3_all = [], [], []
-    for r in deals:
+    people: dict[str, dict] = defaultdict(lambda: {"kpDeals": set(), "foundDeals": set(), "cards": 0, "kpFiles": 0,
+                                                   "newFound": 0, "sale": 0.0, "margin": 0.0})
+    rows, news, e3_all = [], [], []
+    for r in sample:
         did = r["deal"]
         cards = cards_by_deal.get(did, [])
-        sh = shares.get(did, {})
-        winners = set(sh) or {str(c.get("companyId")) for c in cards
-                              if c.get("_bucket") == SELECTED and str(c.get("companyId") or "0") != "0"}
+        winners = deal_winners(cards, ord_by_deal.get(did, []), osem)
+        found = found_by_dept(cards, winners, who, dept)
         new = new_by_deal.get(did, set())
-        card_sups = {str(c.get("companyId")) for c in cards if str(c.get("companyId") or "0") != "0"}
+        sh = shares.get(did) or ({s: 1 / len(winners) for s in winners} if winners else {})
+        sale, buy = money(r)
+        margin = (sale - buy) if (sale and buy) else None
         pos = deal_positions(off_by_deal.get(did, []), winners, new)
-        over_all += pos.pop("overList")
+        pos.pop("byCard")
+        pos.pop("overList")
         e3_all += pos.pop("e3List")
-        by_card = pos.pop("byCard")
-        who = {str(c.get("id")): card_person(c, sourcer.get(did, ""), service) or ROBOT for c in cards}
-        for c in cards:
-            x = people[who[str(c.get("id"))]]
-            x["deals"].add(did)
+        dept_cards = [c for c in cards if who.get(str(c.get("id"))) in dept]
+        lvl = level(dept_cards, found, r["_entry"], kp_buckets)
+        contrib: set[str] = set()              # сотрудники с вкладом в выигрыш этой сделки
+        for c in dept_cards:
+            u = who[str(c.get("id"))]
+            x = people[u]
             x["cards"] += 1
             x["kpFiles"] += 1 if c.get("_offer") else 0
-        for s_new in winners & new:            # новый победитель — тому, кто вёл запрос ему
-            for u in {who[str(c.get("id"))] for c in cards if str(c.get("companyId")) == s_new}:
-                people[u]["newFound"] += 1
-        for cid, m in by_card.items():
-            x = people[who.get(cid, "")]
-            for k, v in m.items():
-                x[k] += v
-        lead = Counter(who.values()).most_common(1)
-        lead_uid = lead[0][0] if lead else sourcer.get(did, "")
-        lead_uid = "" if lead_uid == ROBOT else lead_uid
-        buy = _f(r.get("buyEur")) if r.get("buySrc") not in ("none", "fx") and not r.get("buySusp") else 0.0
-        sale = _f(r.get("saleEur")) if r.get("saleKnown", True) else 0.0
-        new_share = sum(v for s, v in sh.items() if s in new) if sh else (1.0 if winners and winners <= new else 0.0)
-        via_share = sum(v for s, v in sh.items() if s in card_sups) if sh else (1.0 if winners & card_sups else 0.0)
+            t = ts(c.get("createdTime"))
+            if t and t < r["_entry"] and has_kp(c, kp_buckets):
+                x["kpDeals"].add(did)
+                contrib.add(u)
+        for s, us in found.items():
+            for u in us:
+                people[u]["foundDeals"].add(did)
+                contrib.add(u)
+                if s in new:
+                    people[u]["newFound"] += 1
+            if s in new:
+                news.append({"deal": did, "sup": s, "finders": sorted(us), "buy": buy * sh.get(s, 0.0)})
+        for u in contrib:
+            people[u]["sale"] += sale
+            people[u]["margin"] += margin or 0.0
+        src_new = set(found) & new
         rows.append({
             "deal": did, "seq": r_seq(r), "title": r.get("title") or f"Сделка #{did}",
-            "customer": r.get("customer") or "—", "entry": r["_entry"].astimezone(MSK).date(),
-            "sale": sale, "buy": buy, "saleSrc": r.get("saleSrc") or "", "buySrc": r.get("buySrc") or "",
-            "margin": (sale - buy) if (sale and buy) else None,
-            "planMd": r.get("planMdEur"), "planProfit": r.get("planProfitEur"),
-            "cards": len(cards), "kpFiles": sum(1 for c in cards if c.get("_offer")),
-            "sups": len(card_sups), "winners": len(winners), "newWinners": len(winners & new),
-            "newShare": new_share, "viaShare": via_share,
-            "sourcer": (pnames.get(lead_uid) or (f"сотрудник #{lead_uid}" if lead_uid else "")
-                        or ("запросы робота без сорсера" if cards else "запросов нет")),
+            "entry": r["_entry"].astimezone(MSK).date(), "sale": sale, "buy": buy, "margin": margin,
+            "saleSrc": r.get("saleSrc") or "", "level": lvl, "cards": len(cards), "cardsDept": len(dept_cards),
+            "kpFiles": sum(1 for c in cards if c.get("_offer")),
+            "winners": len(winners), "srcWinners": len(found), "srcNew": len(src_new),
+            "buySrc": buy * sum(sh.get(s, 0.0) for s in found), "buySrcNew": buy * sum(sh.get(s, 0.0) for s in src_new),
+            "finders": sorted({u for us in found.values() for u in us}),
             **pos,
         })
-    return {"rows": rows, "over": sorted(over_all, key=lambda x: -x["over"]),
-            "e3": sorted(e3_all, key=lambda x: -x["e3"]), "people": dict(people)}
-
-
-def premium(premia: dict | None, deal_ids: set[str], k: float) -> tuple[dict[str, dict], dict]:
-    """Премия по положению ред. 2 (premia.py) по сделкам выборки: uid → {earned (оплаченные
-    сделки), expected (в реализации), roles, deals} в ₽ при К = k. Строку «Премий» имеют
-    открытые и оплаченные сделки; выбросы (big) — как во вкладке, без премии. → (люди, охват)."""
-    out: dict[str, dict] = defaultdict(lambda: {"earned": 0.0, "expected": 0.0, "roles": set(), "deals": set()})
-    cov = {"rows": 0, "big": 0, "eurRub": None}
-    if not premia:
-        return {}, cov
-    cov["eurRub"] = (premia.get("params") or {}).get("eurRub")
-    for d in premia.get("deals") or []:
-        if str(d.get("id")) not in deal_ids:
-            continue
-        cov["rows"] += 1
-        if "big" in (d.get("fl") or []):
-            cov["big"] += 1
-            continue
-        for uid, role, share in d.get("parts") or []:
-            x = out[str(uid or "")]
-            x["roles"].add(role)
-            x["deals"].add(str(d.get("id")))
-            x["earned" if d.get("st") == "d" else "expected"] += float(d.get("p1") or 0) * k * float(share)
-    return dict(out), cov
-
-
-ROLE = {"ex": "исполнитель", "kam": "КАМ", "po": "продукт-оунер"}
-ROBOT = "~"                     # ключ людей: запрос робота, сорсер в сделке не указан
-
-
-def people_rows(ppl: dict[str, dict], prem: dict[str, dict], pnames: dict[str, str],
-                eur_rub: float | None) -> list[dict]:
-    """Один человек — одна строка: запросы и деньги, которые он принёс, и его премия."""
-    rows = []
-    for uid in set(ppl) | set(prem):
-        a, b = ppl.get(uid) or {}, prem.get(uid) or {}
-        roles = (["вёл запросы"] if a.get("cards") else []) + [ROLE.get(r, r) for r in sorted(b.get("roles", ()))]
-        prize = (b.get("earned") or 0.0) + (b.get("expected") or 0.0)
-        rows.append({
-            "uid": uid, "name": ("запросы робота, сорсер в сделке не указан" if uid == ROBOT else pnames.get(uid)
-                                 or (f"сотрудник #{uid}" if uid else "роль не закреплена")),
-            "roles": ", ".join(roles), "deals": len((a.get("deals") or set()) | (b.get("deals") or set())),
-            "cards": a.get("cards", 0), "kpFiles": a.get("kpFiles", 0), "newFound": a.get("newFound", 0),
-            "es": a.get("es", 0.0), "e3": a.get("e3", 0.0), "over": a.get("over", 0.0),
-            "earned": b.get("earned", 0.0), "expected": b.get("expected", 0.0), "prize": prize,
-            # премия к доказанной экономии его запросов — в одной валюте (₽)
-            "prizePerEs": (prize / (a.get("es", 0.0) * eur_rub)) if (eur_rub and a.get("es")) else None,
-        })
-    return sorted(rows, key=lambda r: (-r["es"], -r["prize"]))
+    return {"rows": rows, "people": dict(people), "news": sorted(news, key=lambda x: -x["buy"]),
+            "e3": sorted(e3_all, key=lambda x: -x["e3"])}
 
 
 def totals(rows: list[dict]) -> dict:
     t: dict = defaultdict(float)
+    lv: dict[str, dict] = {k: {"n": 0, "sale": 0.0, "margin": 0.0, "nMargin": 0, "saleM": 0.0} for k, _ in УРОВНИ}
     for r in rows:
-        for k in ("sale", "buy", "e1", "e2", "es", "e3", "e3NewWin", "e3OldDrop", "over", "missNew",
-                  "baseWin", "baseComp", "baseSolo"):
+        for k in ("sale", "buy", "buySrc", "buySrcNew", "es", "e3", "baseComp", "baseWin"):
             t[k] += r[k] or 0.0
-        for k in ("cards", "kpFiles", "pos", "posWin", "posComp", "posSolo", "e3n", "overN",
-                  "basisSkip", "ratioSkip"):
+        for k in ("cards", "cardsDept", "kpFiles", "winners", "srcWinners", "srcNew", "posComp", "posWin", "e3n"):
             t[k] += r[k] or 0
+        x = lv[r["level"]]
+        x["n"] += 1
+        x["sale"] += r["sale"]
         if r["margin"] is not None:
             t["margin"] += r["margin"]
-            t["marginSale"] += r["sale"]
-            t["marginBuy"] += r["buy"]
             t["nMargin"] += 1
-        if r["planMd"] is not None:
-            t["planMd"] += r["planMd"]
-            t["nPlan"] += 1
+            t["saleM"] += r["sale"]
+            x["margin"] += r["margin"]
+            x["nMargin"] += 1
+            x["saleM"] += r["sale"]
         if r["saleSrc"] == "file":
             t["nFile"] += 1
-        if r["cards"]:
-            t["nCards"] += 1
-        if r["posComp"]:
-            t["nComp"] += 1
-        if r["newWinners"]:
+        if r["srcNew"]:
             t["nNew"] += 1
-            t["buyNew"] += r["buy"] * r["newShare"]
-            if r["margin"] is not None:
-                t["marginNewDeals"] += r["margin"]
-        t["buyVia"] += r["buy"] * r["viaShare"]
-        t["newWinners"] += r["newWinners"]
-        t["winners"] += r["winners"]
+            t["saleNew"] += r["sale"]
+            t["marginNew"] += r["margin"] or 0.0
+        if r["kpFiles"] >= 2:
+            t["nKp2"] += 1
     t["n"] = len(rows)
+    t["levels"] = lv
+    w = [lv[k] for k in ВКЛАД_В_ВЫИГРЫШ]
+    t["winN"] = sum(x["n"] for x in w)
+    t["winSale"] = sum(x["sale"] for x in w)
+    t["winMargin"] = sum(x["margin"] for x in w)
+    for x in lv.values():
+        x["rate"] = x["margin"] / x["saleM"] if x["saleM"] else None
+    # деньги уровней: польза против контроля и верхняя граница
+    c = [lv[k] for k in КОНТРОЛЬ]
+    t["ctrlN"] = sum(x["nMargin"] for x in c)
+    c_sale = sum(x["saleM"] for x in c)
+    t["ctrlRate"] = (sum(x["margin"] for x in c) / c_sale) if (c_sale and t["ctrlN"] >= КОНТРОЛЬ_МИН) else None
+    for k in ВЛИЯНИЕ:
+        x = lv[k]
+        x["upper"] = x["margin"]
+        x["benefit"] = ((x["rate"] - t["ctrlRate"]) * x["saleM"]
+                        if (x["rate"] is not None and t["ctrlRate"] is not None) else None)
+    for k in КОНТРОЛЬ:
+        lv[k]["upper"] = 0.0
+        lv[k]["benefit"] = None
+    t["benefit"] = (sum(lv[k]["benefit"] for k in ВЛИЯНИЕ if lv[k]["benefit"] is not None)
+                    if t["ctrlRate"] is not None else None)
+    t["upper"] = sum(lv[k]["upper"] for k in ВЛИЯНИЕ)
+    t["inflN"] = sum(lv[k]["n"] for k in ВЛИЯНИЕ)
+    t["inflSale"] = sum(lv[k]["sale"] for k in ВЛИЯНИЕ)
+    t["inflSaleM"] = sum(lv[k]["saleM"] for k in ВЛИЯНИЕ)
+    t["inflRate"] = (t["upper"] / t["inflSaleM"]) if t["inflSaleM"] else None
     return dict(t)
+
+
+def dept_rows(ppl: dict[str, dict], members: dict[str, dict]) -> list[dict]:
+    """Строка на сотрудника отдела: действующие — все, даже без запросов в выборке; ушедшие —
+    только если у них есть запросы в выборке. members — uid → {name, active}."""
+    out = []
+    for uid, m in members.items():
+        a = ppl.get(uid)
+        if not a and not m.get("active"):
+            continue
+        a = a or {}
+        out.append({"uid": uid, "name": m["name"] + ("" if m.get("active") else " (уволен)"),
+                    "kpDeals": len(a.get("kpDeals") or ()), "foundDeals": len(a.get("foundDeals") or ()),
+                    "newFound": a.get("newFound", 0), "cards": a.get("cards", 0), "kpFiles": a.get("kpFiles", 0),
+                    "sale": a.get("sale", 0.0), "margin": a.get("margin", 0.0)})
+    return sorted(out, key=lambda x: (-x["margin"], -x["kpDeals"], -x["cards"], x["name"]))
 
 
 # ───────────────────────────── выводы и предложения ─────────────────────────────
 
-def proposals(t: dict, meta: dict | None = None) -> list[str]:
+def _share(a: float, b: float) -> str:
+    return _pct(a / b) if b else "—"
+
+
+def proposals(t: dict, dr: list[dict]) -> list[str]:
     """Прикладные предложения — из чисел итога, без общих слов. Оценки подстановкой помечены."""
     out = []
-    meta = meta or {}
-    eur_rub = meta.get("eurRub")
-    src = [r for r in meta.get("people") or [] if r["cards"]]
-    if src and eur_rub:
-        es = sum(r["es"] for r in src)
-        prize = sum(r["prize"] for r in src)
-        unpaid = [r for r in src if r["es"] > 0 and r["prize"] <= 0]
+    lv = t["levels"]
+    if t.get("benefit") is not None and t.get("months") and t["benefit"] <= 0:
         out.append(
-            f"Ведущие запросы ({len(src)} чел.) доказали экономию {_eur(es)} ({_rub(es * eur_rub)}), а их премия "
-            f"по положению ред. 2 на этих сделках — {_rub(prize)}, и только за роли исполнителя, КАМа или "
-            f"продукт-оунера: сорсинг положение не оплачивает; с экономией и без премии — {len(unpaid)} чел. "
-            f"Предложение: премия ведущему запросы — доля доказанной экономии ЭС его запросов; при ставке "
-            f"{_pct(СТАВКА_ПРИМЕР)} это {_rub(es * eur_rub * СТАВКА_ПРИМЕР)} на эти {int(t.get('n') or 0)} сделок "
-            f"(ставку решает владелец; пример, не норма). Начислять только по позициям с КП файлом и ценой "
-            f"конкурента — это сразу поднимет долю закупки под сравнением.")
-    buy = t.get("buy") or 0.0
-    comp_share = (t.get("baseComp") or 0.0) / buy if buy else 0.0
-    rate = (t.get("es") or 0.0) / t["baseComp"] if t.get("baseComp") else 0.0
-    if comp_share < ПОРОГИ["покрытие_цель"]:
-        rest = max(buy - (t.get("baseComp") or 0.0), 0.0)
+            f"Прибавки к марже от отдела на этих сделках нет: маржа сделок с его влиянием "
+            f"{_pct(t['inflRate'] or 0)} против {_pct(t['ctrlRate'])} у сделок без влияния. Польза отдела — в "
+            f"самих выигрышах: до {_eur(t['upper'] / t['months'])} продажи − закупки в месяц (верхняя граница). "
+            f"Чтобы получить точное число, замерить конверсию пресейла: доля выигранных сделок с КП отдела до "
+            f"ТКП и без него; польза = прирост выигрышей × средняя продажа − закупка.")
+    elif t.get("benefit") is not None and t.get("months"):
+        per_m = t["benefit"] / t["months"]
         out.append(
-            f"Под сравнением КП — {_pct(comp_share)} закупки ({_eur(t.get('baseComp') or 0)} из {_eur(buy)}). "
-            f"Цель — {_pct(ПОРОГИ['покрытие_цель'])}: каждое КП — файлом в «Offer from supplier» "
-            f"(правило 19.10.2026) и в разбор цен; без этого экономию не доказать. "
-            + (f"Если на закупке без сравнения ({_eur(rest)}) сохранится та же доля экономии "
-               f"({_pct(rate)}), это ещё около {_eur(rest * rate)} — оценка подстановкой, не факт."
-               if rate > 0 else ""))
-    if t.get("posSolo"):
+            f"Окупаемость отдела: польза по оценке — {_eur(per_m)} в месяц"
+            + (f" ({_rub(per_m * t['eurRub'])})" if t.get("eurRub") else "")
+            + ". Если месячный фонд оплаты отдела с налогами меньше этой суммы — отдел окупается уже на "
+              "сделках реализации; верхняя граница в месяц — "
+            + _eur(t["upper"] / t["months"]) + ".")
+    late = lv["found_post"]["n"] + lv["post"]["n"]
+    if late:
         out.append(
-            f"Позиций у победителя без сравнимого конкурента — {int(t['posSolo'])} на {_eur(t.get('baseSolo') or 0)}. "
-            f"Минимум {ПОРОГИ['кп_мин']} КП с ценой на позицию до выбора: на позициях с конкурентом "
-            f"экономия составила {_pct(rate)} закупки.")
-    if t.get("overN"):
+            f"В {late} сделках из {t['n']} отдел подключился только после выигрыша: продажа "
+            f"{_eur(lv['found_post']['sale'] + lv['post']['sale'])}. ТКП по ним выпускали на ценах, полученных "
+            f"без отдела. Правило: запрос СП-166 от отдела — до выпуска ТКП по каждой сделке пресейла.")
+    if lv["none"]["n"]:
         out.append(
-            f"Выбрано дороже лучшего сравнимого КП — {int(t['overN'])} позиций, разница {_eur(t.get('over') or 0)}. "
-            f"По каждой из раздела 6 записать причину в карточке СП-166 (срок, техника, базис, надёжность); "
-            f"без причины — переторжка с победителем по цене лучшего КП.")
-    if t.get("missNew"):
+            f"Без отдела выиграно {lv['none']['n']} сделок: продажа {_eur(lv['none']['sale'])}, продажа − закупка "
+            f"{_eur(lv['none']['margin'])}. По крупнейшим — повторный запрос отдела по тем же кодам до заказа "
+            f"поставщику, чтобы проверить цену действующего поставщика.")
+    if lv["ask_pre"]["n"]:
         out.append(
-            f"КП новых поставщиков дешевле выбранного на {_eur(t['missNew'])}: проверить новых "
-            f"(образец, документы, срок) и вернуть их в следующую закупку тех же кодов.")
-    if t.get("n"):
-        nn = int(t.get("nNew") or 0)
-        e3 = t.get("e3") or 0.0
+            f"В {lv['ask_pre']['n']} сделках отдел запрашивал до выигрыша, но КП не получено (нет файла в «Offer "
+            f"from supplier» и стадии КП): либо КП не положили файлом, либо поставщики не ответили. Разобрать по "
+            f"карточкам и класть каждое КП файлом в день получения (правило 19.10.2026).")
+    if t.get("srcNew"):
         out.append(
-            f"Новый поставщик выиграл в {nn} сделках из {int(t['n'])}; отторговано с их помощью {_eur(e3)}. "
-            f"Держать долю новых в запросах каждой сделки: не меньше одного нового поставщика на "
-            f"позицию, если прежних меньше {ПОРОГИ['кп_мин']}.")
-    nc = int(t.get("n", 0) - t.get("nCards", 0))
-    if nc > 0:
+            f"Новые поставщики от отдела — {int(t['srcNew'])} в {int(t.get('nNew') or 0)} сделках: продажа этих "
+            f"сделок {_eur(t.get('saleNew') or 0)}, продажа − закупка {_eur(t.get('marginNew') or 0)}. В каждой "
+            f"сделке запрашивать хотя бы одного нового поставщика рядом с прежними; нового проверять до заказа "
+            f"(документы, образец, срок).")
+    n_low = t["n"] - int(t.get("nKp2") or 0)
+    if n_low:
         out.append(
-            f"Сделок без единого запроса СП-166 — {nc} из {int(t['n'])}: поставщика в них выбирали без "
-            f"сорсинга, сравнения нет. Включить запрос через СП-166 обязательным шагом до ТКП.")
+            f"Сделок, где КП файлом меньше двух, — {n_low} из {t['n']}: цене поставщика не с чем сравниться. "
+            f"Минимум {ПОРОГИ['кп_мин']} КП файлом до выбора поставщика.")
+    comp = (t.get("baseComp") or 0.0) / t["buy"] if t.get("buy") else 0.0
+    if comp < ПОРОГИ["покрытие_цель"]:
+        out.append(
+            f"Экономию отдела в евро по ценам КП сейчас доказать нечем: под сравнением цен двух поставщиков на "
+            f"один код — {_pct(comp)} закупки ({int(t.get('posComp') or 0)} позиций): цены из КП этих сделок "
+            f"почти не разобраны. Включить разбор цен КП (поток «разбор КП») по сделкам пресейла и реализации, "
+            f"цель — {_pct(ПОРОГИ['покрытие_цель'])} закупки под сравнением.")
+    idle = [x for x in dr if not x["cards"]]
+    if idle:
+        out.append(
+            f"Действующих сотрудников отдела без единого запроса в этих {t['n']} сделках — {len(idle)} из "
+            f"{len(dr)}: проверить, чем они заняты (пресейл без выигрыша, торги), или перераспределить запросы.")
     return out
 
 
@@ -644,6 +694,10 @@ def _eur(v: float) -> str:
 def _rub(v: float) -> str:
     s = f"{abs(round(v)):,}".replace(",", "\u00a0")
     return ("−" if round(v) < 0 else "") + s + "\u00a0₽"
+
+
+def _num1(v: float) -> str:
+    return f"{v:.1f}".replace(".", ",")
 
 
 def _num(v: float) -> str:
@@ -681,178 +735,177 @@ table.t { width: 100%; border-collapse: collapse; table-layout: fixed; font-size
 """
 
 
-def render(rep: dict, t: dict, meta: dict, names: dict[str, str]) -> str:
+def render(rep: dict, t: dict, meta: dict, names: dict[str, str], pnames: dict[str, str]) -> str:
     rows = rep["rows"]
     lo = min((r["entry"] for r in rows), default=None)
     hi = max((r["entry"] for r in rows), default=None)
     span = f"{lo:%d.%m.%Y} — {hi:%d.%m.%Y}" if lo else "—"
-    buy = t.get("buy") or 0.0
-    marg = t.get("margin") or 0.0
-    rate = (t.get("es") or 0.0) / t["baseComp"] if t.get("baseComp") else 0.0
-    nm = lambda s: names.get(s) or f"компания #{s}"   # noqa: E731
-    title_of = {r["deal"]: r for r in rows}
+    sup = lambda s: names.get(s) or f"компания #{s}"                         # noqa: E731
+    who = lambda u: pnames.get(u) or f"сотрудник #{u}"                       # noqa: E731
+    lvl_name = dict(УРОВНИ)
+    seq_of = {r["deal"]: r for r in rows}
+    dr = meta.get("dept") or []
+    lv = t["levels"]
     p: list[str] = []
     a = p.append
-    a(f"<!doctype html><html lang='ru'><head><meta charset='utf-8'><title>Деньги сорсинга</title>"
+    a(f"<!doctype html><html lang='ru'><head><meta charset='utf-8'><title>Вклад сорсинга в выигрыш сделок</title>"
       f"<style>{CSS}</style></head><body>")
-    a(f"<h1>Деньги сорсинга: {t['n']} последних сделок, перешедших в реализацию</h1>")
-    a(f"<div class='sub'>сборка {meta['today']:%d.%m.%Y}; вход в реализацию {span}; "
-      f"суммы — евро без НДС, по курсу ЦБ РФ</div>")
+    a(f"<h1>Вклад отдела поиска поставщиков в {t['n']} последних выигранных сделок</h1>")
+    a(f"<div class='sub'>сделки, перешедшие в реализацию {span}; отдел — руководитель "
+      f"{_e(meta.get('head') or 'не указан в портале')}, сотрудников {meta.get('deptN', 0)}; сборка "
+      f"{meta['today']:%d.%m.%Y}; суммы — евро без НДС, по курсу ЦБ РФ</div>")
 
-    a("<h2>1. Итог</h2>")
-    a("<table class='t'><thead><tr><th style='width:52%'>показатель</th><th style='width:16%'>€</th>"
-      "<th style='width:32%'>база и охват</th></tr></thead><tbody>")
+    a("<h2>1. Итог: польза отдела в деньгах</h2>")
+    er = t.get("eurRub")
+    rub = lambda v: f" ({_rub(v * er)})" if er else ""                     # noqa: E731
+    ben, up, mo = t.get("benefit"), t.get("upper") or 0.0, t.get("months") or 0.0
+    if ben is not None and ben <= 0:
+        a(f"<p>Прибавки к марже от отдела на {t['n']} сделках, вошедших в реализацию за {span} (≈ {_num1(mo)} "
+          f"мес.), нет: оценка {_eur(ben)}. Маржа {t['inflN']} сделок, где отдел дал цену поставщика до выигрыша "
+          f"или нашёл поставщика заказа, — {_pct(t['inflRate'] or 0)} продажи, у сделок без влияния отдела — "
+          f"{_pct(t['ctrlRate'])} ({t['ctrlN']} сделок). Польза отдела — в самих выигрышах: верхняя граница "
+          f"{_eur(up)}{rub(up)}, в месяц {_eur(up / mo if mo else 0)}{rub(up / mo if mo else 0)} — вся продажа − "
+          f"закупка этих {t['inflN']} сделок, если без отдела их не выиграли бы. Доказано ценами КП — "
+          f"{_eur(t.get('es') or 0)}: цены из КП этих сделок почти не разобраны (раздел 3).</p>")
+    elif ben is not None:
+        a(f"<p>Польза отдела на {t['n']} сделках, вошедших в реализацию за {span} (≈ {_num1(mo)} мес.), — "
+          f"{_eur(ben)}{rub(ben)} по оценке, в месяц {_eur(ben / mo if mo else 0)}{rub(ben / mo if mo else 0)}. "
+          f"Это на столько больше продажа − закупка {t['inflN']} сделок, где отдел дал цену поставщика до "
+          f"выигрыша или нашёл поставщика заказа (маржа {_pct(t['inflRate'] or 0)} продажи), чем если бы у них "
+          f"была маржа сделок, на которые отдел не повлиял ({_pct(t['ctrlRate'])}, {t['ctrlN']} сделок). "
+          f"Верхняя граница — {_eur(up)}{rub(up)}: вся продажа − закупка этих {t['inflN']} сделок, если без "
+          f"отдела их не выиграли бы. Доказано ценами КП — {_eur(t.get('es') or 0)}: цены из КП этих сделок "
+          f"почти не разобраны (раздел 3).</p>")
+    else:
+        a(f"<p>Оценку пользы против сделок без влияния отдела посчитать нельзя: таких сделок с обеими суммами "
+          f"{t.get('ctrlN', 0)}, меньше {КОНТРОЛЬ_МИН}. Верхняя граница — {_eur(up)}{rub(up)}: вся продажа − "
+          f"закупка {t['inflN']} сделок, где отдел дал цену поставщика до выигрыша или нашёл поставщика заказа. "
+          f"Доказано ценами КП — {_eur(t.get('es') or 0)}.</p>")
+    a("<table class='t'><thead><tr><th style='width:30%'>вклад отдела</th><th style='width:6%'>сделок</th>"
+      "<th style='width:12%'>продажа, €</th><th style='width:12%'>продажа − закупка, €</th>"
+      "<th style='width:8%'>маржа</th><th style='width:16%'>польза против сделок без влияния отдела, €</th>"
+      "<th style='width:16%'>верхняя граница, €</th></tr></thead><tbody>")
+    for k, label in УРОВНИ:
+        x = lv[k]
+        ctrl = k in КОНТРОЛЬ
+        a(f"<tr><td>{_e(label)}</td><td class='r'>{x['n']}</td><td class='r'>{_num(x['sale'])}</td>"
+          f"<td class='r'>{_num(x['margin'])}</td><td class='r'>{_pct(x['rate']) if x['rate'] is not None else '—'}</td>"
+          f"<td class='r'>{'контроль' if ctrl else (_num(x['benefit']) if x['benefit'] is not None else '—')}</td>"
+          f"<td class='r'>{_num(x['upper'])}</td></tr>")
+    a(f"<tr><td>Итого</td><td class='r'>{t['n']}</td><td class='r'>{_num(t.get('sale') or 0)}</td>"
+      f"<td class='r'>{_num(t.get('margin') or 0)}</td>"
+      f"<td class='r'>{_pct((t.get('margin') or 0) / t['saleM']) if t.get('saleM') else '—'}</td>"
+      f"<td class='r'>{_num(ben) if ben is not None else '—'}</td><td class='r'>{_num(up)}</td></tr>")
+    a("</tbody></table>")
+    a(f"<p>Маржа — продажа − закупка к продаже, по сделкам с обеими суммами ({int(t.get('nMargin') or 0)} из "
+      f"{t['n']}); логистика и таможня не вычтены. Оценка исходит из того, что без отдела эти сделки выиграли бы "
+      f"с маржой сделок, на которые отдел не повлиял; верхняя граница — что не выиграли бы вовсе. Истина между "
+      f"ними. На новых поставщиках от отдела, у которых компания раньше не покупала, — {int(t.get('nNew') or 0)} "
+      f"сделок: продажа {_eur(t.get('saleNew') or 0)}, продажа − закупка {_eur(t.get('marginNew') or 0)}.</p>")
+
+    a("<h2>2. Поставщики и цены</h2>")
+    a("<table class='t'><thead><tr><th style='width:50%'>показатель</th><th style='width:15%'>€</th>"
+      "<th style='width:35%'>доля и база</th></tr></thead><tbody>")
 
     def row(label, val, note):
         a(f"<tr><td>{_e(label)}</td><td class='r'>{val}</td><td>{_e(note)}</td></tr>")
-    row("Продажа сделок", _num(t.get("sale") or 0),
-        f"{t['n']} сделок; из сверенного файла экономики — {int(t.get('nFile') or 0)}")
-    row("Закупка у поставщиков", _num(buy), "по строкам «Реализации»: файл экономики или заказы СП-172")
-    row("Продажа − закупка (наценка над поставщиком; логистика и таможня не вычтены)", _num(marg),
-        f"{int(t.get('nMargin') or 0)} сделок с обеими суммами; "
-        + (_pct(marg / t['marginSale']) + " продажи" if t.get("marginSale") else "—"))
-    if t.get("nPlan"):
-        row("Маржинальный доход по книгам бюджета", _num(t.get("planMd") or 0),
-            f"{int(t['nPlan'])} сделок с книгой бюджета")
-    row("Экономия сорсинга ЭС: большее из Э1 и Э2 по каждой позиции", _num(t.get("es") or 0),
-        f"{_pct(rate)} закупки под сравнением ({_eur(t.get('baseComp') or 0)})" if t.get("baseComp")
-        else "сравнимых позиций нет")
-    row("в т. ч. Э1 — выбор против следующего по цене сравнимого КП", _num(t.get("e1") or 0),
-        f"{int(t.get('posComp') or 0)} позиций с конкурентом в {int(t.get('nComp') or 0)} сделках")
-    row("в т. ч. Э2 — торг: первая цена победителя против итоговой", _num(t.get("e2") or 0),
-        f"{int(t.get('posWin') or 0)} позиций победителя с ценой")
-    row("Э3 — отторговано с помощью новых поставщиков", _num(t.get("e3") or 0),
-        f"{int(t.get('e3n') or 0)} позиций: выбран новый — {_eur(t.get('e3NewWin') or 0)}; "
-        f"прежний снизил цену после КП нового — {_eur(t.get('e3OldDrop') or 0)}")
-    row("Закупка у новых поставщиков", _num(t.get("buyNew") or 0),
-        f"{_pct((t.get('buyNew') or 0) / buy) if buy else '—'} закупки; новых победителей "
-        f"{int(t.get('newWinners') or 0)} из {int(t.get('winners') or 0)}; сделок с новым — {int(t.get('nNew') or 0)}")
-    row("Продажа − закупка сделок с новым поставщиком", _num(t.get("marginNewDeals") or 0),
-        "сделки, где хотя бы один победитель — новый")
-    row("Закупка у поставщиков, пришедших через запросы СП-166 этой сделки", _num(t.get("buyVia") or 0),
-        f"{_pct((t.get('buyVia') or 0) / buy) if buy else '—'} закупки; сделок с запросами — "
-        f"{int(t.get('nCards') or 0)} из {t['n']}")
-    _pp, _er = meta.get("people") or [], meta.get("eurRub")
-    if _pp and _er:
-        _all = sum(x["prize"] for x in _pp)
-        _src = sum(x["prize"] for x in _pp if x["cards"])
-        row(f"Премия по положению ред. 2 на этих сделках (К = {str(meta.get('k')).replace('.', ',')})",
-            _num(_all / _er),
-            f"{_rub(_all)}: заработано {_rub(sum(x['earned'] for x in _pp))}, ожидается "
-            f"{_rub(sum(x['expected'] for x in _pp))}; из неё ведущим запросы — {_rub(_src)}")
-    row("Выбрано дороже лучшего сравнимого КП", _num(t.get("over") or 0),
-        f"{int(t.get('overN') or 0)} позиций; КП новых дешевле выбранного — {_eur(t.get('missNew') or 0)}")
-    a("</tbody></table>")
-    a(f"<p>Прямые деньги сорсинга на этих сделках — экономия ЭС {_eur(t.get('es') or 0)}: на столько "
-      f"закупка дешевле, чем у следующего поставщика или по первой цене победителя (по позиции берётся "
-      f"большее, суммы Э1 и Э2 не складываются). Из неё отторговано с помощью новых поставщиков "
-      f"{_eur(t.get('e3') or 0)}. Продажа − закупка {_eur(marg)} — деньги сделок, которые сорсинг "
-      f"обеспечил поставщиком: {_pct((t.get('buyVia') or 0) / buy) if buy else '—'} закупки пришло от "
-      f"поставщиков из запросов СП-166. Экономия доказана ценами разобранных КП и считается только по "
-      f"позициям, где у победителя и конкурента есть цена одного кода; закупка вне сравнения "
-      f"({_eur(max(buy - (t.get('baseComp') or 0), 0))}) в экономию не входит.</p>")
-
-    a("<h2>2. Люди: кто вёл запросы, что принёс, какая премия</h2>")
-    k, cov = meta.get("k"), meta.get("premCov") or {}
-    a(f"<p>Ведущий запросы — ответственный карточки СП-166; у карточки робота — сорсер из поля сделки. Ему "
-      f"засчитываются его запросы, КП файлом, новые поставщики, выигравшие по его запросу, и экономия ЭС и Э3 "
-      f"по позициям, которые выиграл поставщик его карточки. Премия — по положению о мотивации ред. 2, тем же "
-      f"расчётом, что вкладка «Премии» (premia.py): пул 20 % результата сделки × К, исполнителю (ответственному "
-      f"сделки) 7/20, КАМу и продукт-оунеру 13/20; К = {str(k).replace('.', ',') if k else '—'}. Заработано — "
-      f"по оплаченным сделкам, ожидается — по сделкам в реализации. Строк премии у сделок выборки — "
-      f"{cov.get('rows', 0)} из {t['n']} (закрытых сделок в расчёте премий нет), из них без премии как выброс — "
-      f"{cov.get('big', 0)}. Сорсеру положение премии не назначает: у ведущего запросы она есть, только если он "
-      f"же исполнитель, КАМ или продукт-оунер сделки.</p>")
-    a("<table class='t'><thead><tr><th style='width:18%'>сотрудник</th><th style='width:10%'>роль</th>"
-      "<th style='width:5%'>сде&shy;лок</th><th style='width:6%'>запро&shy;сов</th><th style='width:6%'>КП файлом</th>"
-      "<th style='width:7%'>новых победи&shy;телей</th><th style='width:7%'>ЭС, €</th><th style='width:7%'>Э3, €</th>"
-      "<th style='width:7%'>дороже лучшего КП, €</th><th style='width:9%'>премия заработана, ₽</th>"
-      "<th style='width:9%'>премия ожидается, ₽</th><th style='width:9%'>премия на 1 ₽ экономии</th>"
-      "</tr></thead><tbody>")
-    for x in meta.get("people") or []:
-        ratio = (f"{x['prizePerEs']:.2f}".replace(".", ",") if x["prizePerEs"] is not None else "—")
-        a(f"<tr><td>{_e(x['name'])}</td><td>{_e(x['roles'])}</td><td class='r'>{x['deals']}</td>"
-          f"<td class='r'>{x['cards']}</td><td class='r'>{x['kpFiles']}</td><td class='r'>{x['newFound']}</td>"
-          f"<td class='r'>{_num(x['es'])}</td><td class='r'>{_num(x['e3'])}</td><td class='r'>{_num(x['over'])}</td>"
-          f"<td class='r'>{_num(x['earned'])}</td><td class='r'>{_num(x['expected'])}</td>"
-          f"<td class='r'>{ratio}</td></tr>")
+    row("Закупка у поставщиков, найденных отделом", _num(t.get("buySrc") or 0),
+        f"{_share(t.get('buySrc') or 0, t.get('buy') or 0)} закупки {t['n']} сделок ({_eur(t.get('buy') or 0)}); "
+        f"победителей от отдела {int(t.get('srcWinners') or 0)} из {int(t.get('winners') or 0)}")
+    row("в т. ч. у новых поставщиков, найденных отделом (до этого закупок у компании не было)",
+        _num(t.get("buySrcNew") or 0),
+        f"{int(t.get('srcNew') or 0)} новых поставщиков в {int(t.get('nNew') or 0)} сделках; "
+        f"{_share(t.get('buySrcNew') or 0, t.get('buy') or 0)} закупки")
+    row("Продажа − закупка сделок с новым поставщиком от отдела", _num(t.get("marginNew") or 0),
+        f"продажа {_eur(t.get('saleNew') or 0)}; {_share(t.get('marginNew') or 0, t.get('margin') or 0)} продажи − закупки")
+    comp = _share(t.get("baseComp") or 0, t.get("buy") or 0)
+    row("Экономия по ценам КП (выбор или торг, большее по позиции)", _num(t.get("es") or 0),
+        f"под сравнением цен — {comp} закупки, {int(t.get('posComp') or 0)} позиций")
+    row("Отторговано с помощью новых поставщиков", _num(t.get("e3") or 0),
+        f"{int(t.get('e3n') or 0)} позиций с ценами нового и прежнего поставщика")
+    row("Конкуренция: сделок с двумя и более КП файлом", "—",
+        f"{int(t.get('nKp2') or 0)} из {t['n']}; КП файлом {int(t.get('kpFiles') or 0)}; запросов "
+        f"{int(t.get('cards') or 0)}, из них вёл отдел {int(t.get('cardsDept') or 0)}")
     a("</tbody></table>")
 
     a("<h2>3. Предложения</h2><ol>")
-    for s in proposals(t, meta):
+    for s in proposals(t, dr):
         a(f"<li>{_e(s)}</li>")
     a("</ol>")
 
-    a("<h2>4. Сделки</h2>")
-    a("<table class='t'><thead><tr>"
-      "<th style='width:5%'>№ реал.</th><th style='width:15%'>сделка</th><th style='width:6%'>вход</th>"
-      "<th style='width:8%'>продажа</th><th style='width:5%'>источ&shy;ник</th><th style='width:8%'>закупка</th><th style='width:8%'>продажа − закупка</th>"
-      "<th style='width:5%'>запро&shy;сов</th><th style='width:5%'>КП файлом</th><th style='width:6%'>победи&shy;телей / новых</th>"
-      "<th style='width:7%'>под срав&shy;нением</th><th style='width:7%'>ЭС</th><th style='width:7%'>Э3</th>"
-      "<th style='width:8%'>вёл запросы</th></tr></thead><tbody>")
-    for r in sorted(rows, key=lambda x: (x["entry"], x["seq"]), reverse=True):
-        src = "файл" if r["saleSrc"] == "file" else "Битрикс"
-        a(f"<tr><td class='c'>{r['seq'] or '—'}</td><td>{_e(r['title'])}</td>"
-          f"<td class='c'>{r['entry']:%d.%m.%y}</td>"
-          f"<td class='r'>{_num(r['sale'])}</td><td class='c'>{src}</td><td class='r'>{_num(r['buy'])}</td>"
-          f"<td class='r'>{_num(r['margin']) if r['margin'] is not None else '—'}</td>"
-          f"<td class='r'>{r['cards']}</td><td class='r'>{r['kpFiles']}</td>"
-          f"<td class='c'>{r['winners']} / {r['newWinners']}</td>"
-          f"<td class='r'>{_num(r['baseComp'])}</td><td class='r'>{_num(r['es'])}</td>"
-          f"<td class='r'>{_num(r['e3'])}</td><td>{_e(r['sourcer'])}</td></tr>")
-    a(f"<tr><td></td><td>Итого</td><td></td><td class='r'>{_num(t.get('sale') or 0)}</td><td></td>"
-      f"<td class='r'>{_num(buy)}</td><td class='r'>{_num(marg)}</td><td class='r'>{int(t.get('cards') or 0)}</td>"
-      f"<td class='r'>{int(t.get('kpFiles') or 0)}</td>"
-      f"<td class='c'>{int(t.get('winners') or 0)} / {int(t.get('newWinners') or 0)}</td>"
-      f"<td class='r'>{_num(t.get('baseComp') or 0)}</td><td class='r'>{_num(t.get('es') or 0)}</td>"
-      f"<td class='r'>{_num(t.get('e3') or 0)}</td><td></td></tr>")
+    a("<h2>4. Сотрудники отдела</h2>")
+    a("<p>Вклад в выигрыш — КП по запросу сотрудника получено до выигрыша или поставщик его запроса стал "
+      "победителем. Сделка засчитывается каждому, кто внёс вклад, поэтому строки не складываются в итог "
+      "(он — в разделе 1).</p>")
+    a("<table class='t'><thead><tr><th style='width:22%'>сотрудник отдела</th><th style='width:10%'>сделок с его КП "
+      "до выигрыша</th><th style='width:10%'>сделок, где нашёл поставщика заказа</th><th style='width:9%'>новых "
+      "постав&shy;щиков</th><th style='width:8%'>запросов</th><th style='width:9%'>КП файлом</th>"
+      "<th style='width:16%'>продажа сделок с его вкладом, €</th><th style='width:16%'>продажа − закупка, €</th>"
+      "</tr></thead><tbody>")
+    for x in dr:
+        a(f"<tr><td>{_e(x['name'])}</td><td class='r'>{x['kpDeals']}</td><td class='r'>{x['foundDeals']}</td>"
+          f"<td class='r'>{x['newFound']}</td><td class='r'>{x['cards']}</td><td class='r'>{x['kpFiles']}</td>"
+          f"<td class='r'>{_num(x['sale'])}</td><td class='r'>{_num(x['margin'])}</td></tr>")
     a("</tbody></table>")
 
-    a("<h2>5. Отторговано с помощью новых поставщиков</h2>")
-    if rep["e3"]:
-        a("<table class='t'><thead><tr><th style='width:6%'>№ реал.</th><th style='width:26%'>сделка</th>"
-          "<th style='width:16%'>код</th><th style='width:22%'>поставщик (победитель)</th>"
-          "<th style='width:14%'>как</th><th style='width:8%'>€</th><th style='width:8%'>ниже прежних</th>"
+    a("<h2>5. Новые поставщики, найденные отделом</h2>")
+    if rep["news"]:
+        a("<table class='t'><thead><tr><th style='width:7%'>№ реал.</th><th style='width:30%'>сделка</th>"
+          "<th style='width:28%'>поставщик</th><th style='width:20%'>нашёл</th><th style='width:15%'>закупка у него, €</th>"
           "</tr></thead><tbody>")
-        for x in rep["e3"][:TOP_ROWS]:
-            r = title_of.get(x["deal"], {})
+        for x in rep["news"]:
+            r = seq_of.get(x["deal"], {})
+            a(f"<tr><td class='c'>{r.get('seq') or '—'}</td><td>{_e(r.get('title', ''))}</td><td>{_e(sup(x['sup']))}</td>"
+              f"<td>{_e(', '.join(who(u) for u in x['finders']))}</td><td class='r'>{_num(x['buy'])}</td></tr>")
+        a("</tbody></table>")
+    else:
+        a("<p>Новых поставщиков-победителей от отдела в этих сделках нет.</p>")
+
+    sec = 6
+    if rep["e3"]:
+        a(f"<h2>{sec}. Отторговано с помощью новых поставщиков</h2>")
+        a("<table class='t'><thead><tr><th style='width:7%'>№ реал.</th><th style='width:27%'>сделка</th>"
+          "<th style='width:16%'>код</th><th style='width:22%'>поставщик (победитель)</th>"
+          "<th style='width:14%'>как</th><th style='width:7%'>€</th><th style='width:7%'>ниже прежних</th>"
+          "</tr></thead><tbody>")
+        for x in rep["e3"]:
+            r = seq_of.get(x["deal"], {})
             a(f"<tr><td class='c'>{r.get('seq') or '—'}</td><td>{_e(r.get('title', ''))}</td>"
-              f"<td class='pn'>{_e(x['key'])}</td><td>{_e(nm(x['sup']))}</td><td>{_e(x['how'])}</td>"
+              f"<td class='pn'>{_e(x['key'])}</td><td>{_e(sup(x['sup']))}</td><td>{_e(x['how'])}</td>"
               f"<td class='r'>{_num(x['e3'])}</td><td class='r'>{_pct(x['pct'])}</td></tr>")
         a("</tbody></table>")
-        if len(rep["e3"]) > TOP_ROWS:
-            a(f"<p>Показаны {TOP_ROWS} крупнейших из {len(rep['e3'])} позиций; итог раздела 1 — по всем.</p>")
-    else:
-        a("<p>Позиций, где КП дали и новый, и прежний поставщик одного кода, в выборке нет.</p>")
+        sec += 1
+    a(f"<h2>{sec}. Сделки</h2>")
+    a("<table class='t'><thead><tr>"
+      "<th style='width:5%'>№ реал.</th><th style='width:17%'>сделка</th><th style='width:6%'>вход</th>"
+      "<th style='width:8%'>продажа</th><th style='width:5%'>источ&shy;ник</th><th style='width:8%'>продажа − закупка</th>"
+      "<th style='width:17%'>вклад отдела</th><th style='width:6%'>запросов отдела / всего</th>"
+      "<th style='width:5%'>КП файлом</th><th style='width:7%'>победи&shy;телей от отдела / новых</th>"
+      "<th style='width:16%'>нашёл</th></tr></thead><tbody>")
+    for r in sorted(rows, key=lambda x: (x["entry"], x["seq"]), reverse=True):
+        a(f"<tr><td class='c'>{r['seq'] or '—'}</td><td>{_e(r['title'])}</td><td class='c'>{r['entry']:%d.%m.%y}</td>"
+          f"<td class='r'>{_num(r['sale'])}</td><td class='c'>{'файл' if r['saleSrc'] == 'file' else 'Битрикс'}</td>"
+          f"<td class='r'>{_num(r['margin']) if r['margin'] is not None else '—'}</td>"
+          f"<td>{_e(lvl_name[r['level']])}</td><td class='c'>{r['cardsDept']} / {r['cards']}</td>"
+          f"<td class='r'>{r['kpFiles']}</td><td class='c'>{r['srcWinners']} / {r['srcNew']}</td>"
+          f"<td>{_e(', '.join(who(u) for u in r['finders']))}</td></tr>")
+    a("</tbody></table>")
 
-    a("<h2>6. Выбрано дороже лучшего сравнимого КП</h2>")
-    if rep["over"]:
-        a("<table class='t'><thead><tr><th style='width:6%'>№ реал.</th><th style='width:28%'>сделка</th>"
-          "<th style='width:16%'>код</th><th style='width:26%'>победитель</th><th style='width:8%'>КП</th>"
-          "<th style='width:8%'>€ сверх</th><th style='width:8%'>дороже на</th></tr></thead><tbody>")
-        for x in rep["over"][:TOP_ROWS]:
-            r = title_of.get(x["deal"], {})
-            a(f"<tr><td class='c'>{r.get('seq') or '—'}</td><td>{_e(r.get('title', ''))}</td>"
-              f"<td class='pn'>{_e(x['key'])}</td><td>{_e(nm(x['sup']))}</td><td class='r'>{x['n']}</td>"
-              f"<td class='r'>{_num(x['over'])}</td><td class='r'>{_pct(x['pct'])}</td></tr>")
-        a("</tbody></table>")
-    else:
-        a("<p>Позиций, где победитель дороже сравнимого КП, нет.</p>")
-
-    a("<h2>7. Как посчитано</h2>")
+    a(f"<h2>{sec + 1}. Как посчитано</h2>")
     why = meta.get("why") or {}
-    a(f"<p>Сделки — {t['n']} последних по первому входу в воронку реализации после предпродажной воронки, "
-      f"кроме проигранных; в том же окне пропущено проигранных после входа — {meta['skipped'].get('lost', 0)}, "
-      f"заведённых сразу в реализацию — {meta['skipped'].get('direct', 0)}. Продажа и закупка — строки вкладки "
-      f"«Реализация» на день сборки (файл экономики первым). Новый поставщик — без заказа СП-172 и без "
-      f"выбранного запроса по другим сделкам до первого запроса ему по этой сделке; заказы СП-172 в портале — "
-      f"с {meta.get('ordersSince') or '—'}. Цены — разобранные КП поставщиков из карточек СП-166 сделок: строк "
+    a(f"<p>Сделки — {t['n']} последних по первому входу в воронку реализации после предпродажной воронки, не "
+      f"проигранные; в том же окне пропущено проигранных — {meta.get('lost', 0)}. Запрос отдела — карточка СП-166, "
+      f"которую ведёт сотрудник отдела поиска поставщиков с дочерними подразделениями (вместе с ушедшими): "
+      f"ответственный карточки, у карточки робота — сорсер из поля сделки. До выигрыша — карточка заведена раньше "
+      f"входа сделки в реализацию; КП — файл в «Offer from supplier» или стадия КП (Price at Work, Selected, Not "
+      f"Selected). Поставщика заказа нашёл отдел — у поставщика непроваленного заказа СП-172 (нет заказов — у "
+      f"выбранного в СП-166) есть запрос отдела этой сделки. Продажа и закупка — строки вкладки «Реализация» на день "
+      f"сборки (файл экономики первым, иначе «Сумма» без НДС по правилу); закупка у поставщика — по его доле в суммах "
+      f"заказов. Новый поставщик — без заказа СП-172 и без выбранного запроса по другим сделкам до первого запроса "
+      f"ему по этой сделке; заказы СП-172 в портале — с {meta.get('ordersSince') or '—'}. Цены КП: строк "
       f"{meta.get('priceRows', 0)}, взято {meta.get('offers', 0)}; не взято — "
-      + "; ".join(f"{k} {v}" for k, v in sorted(why.items(), key=lambda kv: -kv[1]))
-      + f". Позиция — код из строки КП; сравнимы цены одного базиса (или без базиса хотя бы у одной) и не "
-      f"дальше чем в {ПОРОГИ['раз']:g} раза: отброшено пар по базису {int(t.get('basisSkip') or 0)}, по "
-      f"разнице цен {int(t.get('ratioSkip') or 0)}. Деньги позиции — сумма строки КП победителя, цена лота на "
-      f"количество не умножается. Курсы ЦБ: {meta.get('fxSrc') or 'не получены'}.</p>")
+      + ("; ".join(f"{k} {v}" for k, v in sorted(why.items(), key=lambda kv: -kv[1])) or "нет")
+      + f". Курсы ЦБ: {meta.get('fxSrc') or 'не получены'}.</p>")
     a("</body></html>")
     return "".join(p)
 
@@ -905,7 +958,7 @@ def read_prices(card_ids: list[str]) -> list[dict]:
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description="Деньги сорсинга: PDF-ведомость по последним сделкам реализации")
+    ap = argparse.ArgumentParser(description="Вклад отдела поиска поставщиков в выигрыш сделок: PDF-ведомость")
     ap.add_argument("--data", required=True, help="main.py --data-json")
     ap.add_argument("--out", required=True)
     ap.add_argument("--n", type=int, default=N_DEALS)
@@ -917,6 +970,7 @@ def main(argv=None) -> int:
     import stages
     from base import fx as fx_mod
     from bitrix_client import BitrixClient
+    from probe_conversion import читать_историю
 
     today = dt.datetime.now(MSK).date()
     data = json.loads(Path(a.data).read_text(encoding="utf-8"))
@@ -929,47 +983,67 @@ def main(argv=None) -> int:
     print(f"кандидатов (вход или выигрыш за {ПОРОГИ['кандидаты_дней']} дн.): {len(cand)}")
 
     client = BitrixClient(config.Settings.load().bitrix_webhook_url)
-    from probe_conversion import читать_историю
     ids = sorted({r["deal"] for r in cand}, key=int)
     hist: dict[str, list] = {}
-    fails = 0
     for part in _parts(ids, a.parts):
         h, err = читать_историю(client, part)
         if err:
-            fails += 1
-            print(f"  часть истории не прочитана: {err}")
-            continue
+            print(f"::error::часть истории стадий не прочитана: {err}")
+            return 1
         hist.update(h)
-    if fails:
-        print(f"::error::частей истории стадий не прочитано: {fails} — выборка была бы неполной")
-        return 1
     entries = {d: realization_entry(hist.get(d, []), set(people.TECH_CATS)) for d in ids}
-    kinds = Counter(k for _, k in entries.values())
-    print("вход в реализацию: " + ", ".join(f"{k} {v}" for k, v in sorted(kinds.items())))
-    deals, skipped = pick(cand, entries, a.n)
-    print(f"выбрано сделок: {len(deals)} из {a.n}; в окне пропущено: проигранных {skipped['lost']}, "
-          f"заведённых сразу в реализацию {skipped['direct']}")
-    if len(deals) < a.n:
-        print(f"::warning::сделок меньше запрошенного: {len(deals)}")
-    did_list = [r["deal"] for r in deals]
+    print("вход в реализацию: " + ", ".join(f"{k} {v}" for k, v in sorted(Counter(k for _, k in entries.values()).items())))
+    moved = moved_live(cand, entries)
+    sample = moved[:a.n]
+    if not sample:
+        print("::error::нет сделок, перешедших в реализацию")
+        return 1
+    lo = sample[-1]["_entry"]
+    lost = sum(1 for r in cand if r.get("lost") and entries.get(r["deal"], (None, ""))[1] == "moved"
+               and entries[r["deal"]][0] and entries[r["deal"]][0] >= lo)
+    print(f"выборка: {len(sample)} из {a.n}; в том же окне проиграно после входа: {lost}")
+    sids = [r["deal"] for r in sample]
 
-    # карточки СП-166 и заказы СП-172 сделок — частями по сделкам
+    # отдел поиска поставщиков: с дочерними подразделениями и ушедшими (как main.py)
+    roster = people.roster(client)
+    tree = client.dept_tree_ids(config.DEPT_SOURCING_ID)
+    dept = client.dept_member_ids(config.DEPT_SOURCING_ID) | {u for u, x in roster.items() if set(x["depts"]) & tree}
+    members = {u: {"name": (roster.get(u) or {}).get("name") or f"сотрудник #{u}",
+                   "active": (roster.get(u) or {}).get("active", True)} for u in dept}
+    pnames = {u: x["name"] + ("" if x["active"] else " (уволен)") for u, x in roster.items()}
+    head_uid = next((str(d.get("UF_HEAD") or "") for d in client.departments()
+                     if str(d.get("ID")) == str(config.DEPT_SOURCING_ID)), "")
+    head = (roster.get(head_uid) or {}).get("name", "")
+    print(f"отдел: сотрудников {len(dept)} (действующих {sum(1 for x in members.values() if x['active'])}); "
+          f"руководитель в портале {'указан' if head else 'не указан'}")
+    service = config.service_accounts({u: x["name"] for u, x in roster.items() if x["active"]})
+    sourcer_f = config.DEAL_SOURCER_FIELDS[0][0]
+    dd = client.deals_by_ids(sids, select=["ID", sourcer_f])
+    sourcer = {d: str(x.get(sourcer_f)) for d, x in dd.items() if str(x.get(sourcer_f) or "0") != "0"}
+
+    # карточки СП-166 и заказы СП-172 сделок выборки — частями по сделкам
     card_sel = ["id", "companyId", "stageId", "createdTime", "parentId2", "assignedById", "createdBy",
                 config.RFQ_OFFER_FIELD]
     cards, orders = [], []
-    for part in _parts(did_list, a.parts):
+    for part in _parts(sids, a.parts):
         cards += read_items(client, config.SPA_ENTITY_TYPE_ID, "parentId2", part, card_sel)
         orders += read_items(client, 172, "parentId2", part,
                              ["id", "companyId", "parentId2", "opportunity", "currencyId", "stageId", "createdTime"])
     for c in cards:
         c["_bucket"] = stages.classify_stage(str(c.get("stageId") or ""))
         c["_offer"] = bool(c.get(config.RFQ_OFFER_FIELD))
-    print(f"карточек СП-166: {len(cards)}; заказов СП-172: {len(orders)}")
     cards_by_deal: dict[str, list[dict]] = defaultdict(list)
     for c in cards:
         cards_by_deal[str(c.get("parentId2") or "")].append(c)
+    ord_by_deal: dict[str, list[dict]] = defaultdict(list)
+    for o in orders:
+        ord_by_deal[str(o.get("parentId2") or "")].append(o)
+    who = {str(c["id"]): (card_person(c, sourcer.get(str(c.get("parentId2") or ""), ""), service) or ROBOT)
+           for c in cards}
+    print(f"карточек СП-166: {len(cards)}, из них вёл отдел {sum(1 for c in cards if who[str(c['id'])] in dept)}; "
+          f"заказов СП-172: {len(orders)}")
 
-    # история поставщиков: заказы и выбранные запросы по всем сделкам
+    # новый ли поставщик — история заказов и выбранных запросов поставщиков выборки
     sups = sorted({str(x.get("companyId")) for x in cards + orders if str(x.get("companyId") or "0") != "0"}, key=int)
     oh = read_items(client, 172, "companyId", sups, ["id", "companyId", "parentId2", "stageId", "createdTime"])
     # выбранные запросы — только стадия Selected воронки по умолчанию: всех карточек этих
@@ -983,8 +1057,7 @@ def main(argv=None) -> int:
         osem.setdefault(sid, "S" if sid.endswith(":SUCCESS") else "F" if sid.endswith(":FAIL") else "P")
     first = client.call_envelope("crm.item.list", {"entityTypeId": 172, "order": {"id": "ASC"},
                                                    "select": ["id", "createdTime"], "start": 0}) or {}
-    fi = ((first.get("result") or {}).get("items") or [{}])[0]
-    orders_since = day(fi.get("createdTime"))
+    orders_since = day((((first.get("result") or {}).get("items") or [{}])[0]).get("createdTime"))
     orders_hist: dict[str, list[dict]] = defaultdict(list)
     for o in oh:
         orders_hist[str(o.get("companyId"))].append(o)
@@ -992,24 +1065,16 @@ def main(argv=None) -> int:
     for c in sh:
         sel_hist[str(c.get("companyId"))].append(c)
     new_by_deal: dict[str, set[str]] = {}
-    for r in deals:
+    for r in sample:
         did = r["deal"]
         fc = first_contact(cards_by_deal.get(did, []), r["_entry"])
-        ds = {str(c.get("companyId")) for c in cards_by_deal.get(did, [])} | \
-             {str(o.get("companyId")) for o in orders if str(o.get("parentId2") or "") == did}
+        ds = {str(x.get("companyId")) for x in cards_by_deal.get(did, []) + ord_by_deal.get(did, [])}
         new_by_deal[did] = {s for s in ds if s not in ("", "0", "None")
                             and is_new(s, did, fc.get(s, r["_entry"]), orders_hist, sel_hist, osem)}
-    print(f"поставщиков в сделках: {len(sups)}; заказов этих поставщиков в истории: {len(oh)}; "
-          f"выбранных запросов: {len(sh)}; заказы СП-172 в портале с {orders_since or '—'}")
+    print(f"поставщиков выборки: {len(sups)}; их заказов в истории: {len(oh)}; выбранных запросов: {len(sh)}; "
+          f"заказы СП-172 в портале с {orders_since or '—'}")
 
-    sourcer_f = config.DEAL_SOURCER_FIELDS[0][0]
-    dd = client.deals_by_ids(did_list, select=["ID", sourcer_f])
-    users = client.users()
-    sourcer = {d: str(x.get(sourcer_f)) for d, x in dd.items() if str(x.get(sourcer_f) or "0") != "0"}
-    service = config.service_accounts(users)
-    print(f"сделок с полем «Сорсер»: {len(sourcer)} из {len(did_list)}")
-
-    # цены разобранных КП
+    # цены разобранных КП по карточкам выборки
     card_map = {str(c["id"]): c for c in cards}
     try:
         prices = read_prices(sorted(card_map, key=int))
@@ -1026,31 +1091,28 @@ def main(argv=None) -> int:
     print(f"строк цен КП: {len(prices)}; взято предложений: {len(offers)}; не взято: "
           + ", ".join(f"{k} {v}" for k, v in sorted(why.items())))
 
-    rep = build(deals, cards_by_deal, orders, osem, new_by_deal, offers, sourcer, fx,
-                service=service, pnames=users)
-    import premia as premia_mod
-    prem, cov = premium(data.get("premia"), set(did_list), premia_mod.K_DEFAULT)
-    ppl = people_rows(rep["people"], prem, users, cov.get("eurRub"))
-    print(f"люди: вели запросы {sum(1 for x in ppl if x['cards'])}, с премией по положению "
-          f"{sum(1 for x in ppl if x['prize'])}; строк премии у сделок выборки {cov['rows']} из {len(did_list)}; "
-          f"запросов робота без сорсера {(rep['people'].get(ROBOT) or {}).get('cards', 0)}")
+    rep = build(sample, cards_by_deal, orders, osem, who, dept, new_by_deal, offers, fx, set(stages.KP_STAGES))
     t = totals(rep["rows"])
-    names = client.companies_by_ids({x["sup"] for x in rep["over"][:TOP_ROWS] + rep["e3"][:TOP_ROWS]})
+    span_days = max((sample[0]["_entry"] - lo).days, 1)
+    t["months"] = span_days / 30.44
+    cfx = (data.get("contracts") or {}).get("fx") or {}
+    t["eurRub"] = (float(cfx["eurUsd"]) * float(cfx["usdRub"])) if (cfx.get("eurUsd") and cfx.get("usdRub")) else None
+    dr = dept_rows(rep["people"], members)
+    names = client.companies_by_ids({x["sup"] for x in rep["news"] + rep["e3"]})
     # журнал — только счётчики и доли (правило 17)
-    buy = t.get("buy") or 0.0
-    print(f"сделок с запросами: {int(t.get('nCards') or 0)}; с позициями под сравнением: {int(t.get('nComp') or 0)}; "
-          f"позиций: {int(t.get('pos') or 0)}, у победителя {int(t.get('posWin') or 0)}, с конкурентом "
-          f"{int(t.get('posComp') or 0)}; доля закупки под сравнением "
-          f"{(t.get('baseComp') or 0) / buy * 100 if buy else 0:.1f} %; новых победителей {int(t.get('newWinners') or 0)} "
-          f"из {int(t.get('winners') or 0)}; позиций Э3 {int(t.get('e3n') or 0)}; выбрано дороже {int(t.get('overN') or 0)}")
+    print("уровни вклада: " + ", ".join(f"{k} {t['levels'][k]['n']}" for k, _ in УРОВНИ)
+          + f"; контроль с обеими суммами {t.get('ctrlN', 0)}; оценка пользы "
+          + ("посчитана" if t.get("benefit") is not None else "не посчитана")
+          + f"; новых поставщиков от отдела {int(t.get('srcNew') or 0)}; позиций под сравнением цен "
+            f"{int(t.get('posComp') or 0)}; сотрудников в таблице отдела {len(dr)}")
 
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
-    meta = {"today": today, "skipped": skipped, "ordersSince": orders_since.strftime("%d.%m.%Y") if orders_since else "",
+    meta = {"today": today, "head": head, "deptN": len(dept), "dept": dr, "lost": lost,
+            "ordersSince": orders_since.strftime("%d.%m.%Y") if orders_since else "",
             "priceRows": len(prices), "offers": len(offers), "why": dict(why),
-            "fxSrc": {"cbr": "ряды cbr.ru", "mirror": "зеркало ЦБ"}.get(info.get("src") or "", ""),
-            "people": ppl, "k": premia_mod.K_DEFAULT, "premCov": cov, "eurRub": cov.get("eurRub")}
-    (out / "doc.html").write_text(render(rep, t, meta, names), encoding="utf-8")
+            "fxSrc": {"cbr": "ряды cbr.ru", "mirror": "зеркало ЦБ"}.get(info.get("src") or "", "")}
+    (out / "doc.html").write_text(render(rep, t, meta, names, pnames), encoding="utf-8")
     (out / "ids.txt").write_text("".join(f"{r['seq']}\n" for r in rep["rows"] if r["seq"]), encoding="utf-8")
     print(f"ведомость: сделок {len(rep['rows'])}")
     return 0
