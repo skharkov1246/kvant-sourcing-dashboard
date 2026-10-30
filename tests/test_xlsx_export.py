@@ -273,6 +273,7 @@ try{
   document.querySelector('#tab-contracts [role="tab"][data-sub="week"]').click();
   snap(document.getElementById('orkQb').closest('table'),'queue');
   snap(document.getElementById('orkLed').closest('table'),'ledger');
+  snap(document.getElementById('orkRisk').closest('table'),'risk');
   // список за числом (дровер): в имени файла — подвкладка и направление числа, как у таблиц вкладки
   var od=function(sel,key){var b=document.querySelector(sel+' button[data-od="w:live"]'); b.click();
     var t=document.getElementById('odTable'); snap(t,key); out[key].trs=t.tBodies[0].rows.length; out[key].n=+b.textContent;
@@ -380,8 +381,32 @@ def test_список_за_числом_имя_файла_с_подвкладк�
         assert len(rows) == 1 + x["rows"]
         # шапка — столбцы списка без значков сортировки; в ячейках — данные, без ссылок «в Битриксе»
         # и без подписей для телефона (поставщик под заказом — только столбцом)
-        assert rows[0][:4] == ["Заказ", "Где застрял", "Срок клиента", "Что сделать"], rows[0]
+        # ревью 30.10.2026: по столбцу на поле, числа — числами (как в выгрузке до R4: «Шаг», «Р.д.»)
+        H = ["№ заказа", "Сделка", "Заказчик", "Шаг №", "Шаг", "Стадия в Битриксе", "Р.д. на шаге",
+             "Норма, р.д.", "Дней после срока клиента (минус — до срока)", "Срок клиента", "Прогноз доставки",
+             "Что сделать", "Кто отвечает", "Менеджер ОРК", "Ещё пункты очереди"]
+        assert rows[0][:len(H)] == H, rows[0]
         assert not any("Битрикс" in str(c) or "поставщик:" in str(c) for row in rows[1:] for c in row)
+        col = {h: i for i, h in enumerate(rows[0])}
+        for h in ("Шаг №", "Р.д. на шаге", "Норма, р.д.", "Дней после срока клиента (минус — до срока)"):
+            vals = [row[col[h]] for row in rows[1:] if row[col[h]] not in (None, "")]
+            assert all(isinstance(v, int) for v in vals), (h, vals[:5])
+            assert vals or x is b, h                    # у второго направления заказов мало — типы, не наличие
+        for h in ("Срок клиента", "Прогноз доставки"):
+            assert all(re.fullmatch(r"\d\d\.\d\d\.\d{4}", row[col[h]]) for row in rows[1:] if row[col[h]]), h
+        assert all(isinstance(row[col["Что сделать"]], str) and row[col["Что сделать"]] for row in rows[1:])
+
+
+def test_зона_риска_дни_числом(page_run):
+    """«Срок клиента под угрозой»: «Дней» — числом (ревью 30.10.2026: стало «35 дн. после срока»
+    текстом); смысл дней — в столбце «Что случилось»."""
+    out, r, _m = page_run
+    k = out["risk"]
+    rows = _rows(k["b64"])
+    i = rows[0].index("Дней, кал.")
+    vals = [row[i] for row in rows[1:1 + k["rows"]]]
+    assert k["rows"] == len(r["contracts"]["ork"]["week"]["risk"]) > 0
+    assert all(isinstance(v, int) for v in vals if v not in (None, "")) and any(isinstance(v, int) for v in vals)
 
 
 def test_таблица_сделок_как_на_странице(page_run):

@@ -741,7 +741,9 @@ def path(order: dict, transitions: list, names: dict, today: dt.date, workdays_f
     говорят одно (шаг 12 — от доставки, шаг 1 — от начала приёмки, шаг 4 — от назначения);
     записи, начатые позже этого дня, поглощаются им. У шага без нормы — вход по истории (факт
     поднял шаг — с дня факта), истории шага нет — clock. Истории нет — одна запись: текущий шаг от clock, без него — от создания
-    заказа. Шага нет (стадия не из таблицы, фактов нет) — путь по истории как есть."""
+    заказа. Шага нет (step_now — None: стадия не из таблицы, доставки без УПД нет) — путь по истории
+    до дня входа в эту стадию, последний известный шаг кончается в этот день, а последняя запись —
+    [None, день входа, р.д.]: «стадия вне регламента», шаг и норма не выдумываются."""
     fn = workdays_fn or period_mod.workdays_ru
     msk = period_mod.MSK
     day = lambda d: dt.datetime(d.year, d.month, d.day, tzinfo=msk)   # noqa: E731
@@ -778,7 +780,20 @@ def path(order: dict, transitions: list, names: dict, today: dt.date, workdays_f
             continue
         out.append([st, t.astimezone(msk).date()])
     cur = step_now(order)
-    if cur is not None and not (cur not in NORM_WD and out and out[-1][0] == cur):
+    if cur is None:
+        # стадия не из таблицы шагов (и доставки без УПД нет): последний известный шаг кончается в
+        # день входа в эту стадию, дальше — запись [None, день, р.д.] «стадия вне регламента», без
+        # нормы и без выдуманного шага «→ сейчас» (ревью 30.10.2026)
+        u = None
+        for t, st in reversed(pts):
+            if st is not None:
+                break
+            u = t
+        u_day = (u.astimezone(msk).date() if u is not None
+                 else _d(order.get("stageSince")) or _d(order.get("created")) or (out[-1][1] if out else today))
+        out = [e for e in out if e[1] <= u_day]
+        out.append([None, u_day])
+    elif not (cur not in NORM_WD and out and out[-1][0] == cur):
         # шаг с нормой — день счёта срока (clock), как stepFrom; без нормы — вход по истории
         since = clock(order, cur)[0]
         if since is None:

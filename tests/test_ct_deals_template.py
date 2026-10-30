@@ -52,7 +52,7 @@ try{
   out.card={deal:tr0.dataset.ct, secs:[].slice.call(body.querySelectorAll('.rzc-h')).map(function(h){return txt(h).replace(/\s*\d+$/,'');}),
     dealLink:(body.querySelector('a.rzc-bx')||{}).href||'', ords:body.querySelectorAll('.rzc-ord').length,
     ordLinks:[].slice.call(body.querySelectorAll('.rzc-ord a.rzc-lnk')).map(function(a){return a.getAttribute('href');}),
-    paths:body.querySelectorAll('[data-ctop]').length, todo:txt(body.querySelector('.rzc-todo')), text:txt(body)};
+    paths:body.querySelectorAll('.rzc-ord [data-ctop]').length, strip:body.querySelectorAll('.rzc-strip [data-ctop]').length, todo:txt(body.querySelector('.rzc-todo')), text:txt(body)};
   document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
   out.closed=!drw.classList.contains('on');
   setTimeout(function(){
@@ -62,7 +62,7 @@ try{
       var calls=[]; window._opOpen=function(k,o){calls.push([k,o&&o.back,o&&o.deal&&String(o.deal.deal)]);};
       var tr1=trs.filter(function(t){return (by[t.dataset.ct].orders||[]).length>1;})[0]||tr0;
       tr1.querySelector('td.c-deal').click();
-      var bs=[].slice.call(body.querySelectorAll('[data-ctop]'));
+      var bs=[].slice.call(body.querySelectorAll('.rzc-ord [data-ctop]'));
       out.path={deal:tr1.dataset.ct, n:bs.length, ords:(by[tr1.dataset.ct].orders||[]).map(function(o){return String(o.id);}),
         ids:bs.map(function(b){return b.dataset.ctop;})};
       if(bs[0]) bs[0].click();
@@ -146,6 +146,8 @@ def test_карточка_сделки_по_порядку(page):
     assert c["ords"] == len(c["ordLinks"]) > 0
     assert all(re.fullmatch(r"https://kvantpro\.bitrix24\.ru/crm/type/172/details/\d+/", h) for h in c["ordLinks"])
     assert c["paths"] == c["ords"], "_opOpen есть — у каждого заказа «Путь заказа →»"
+    # ревью 30.10.2026: живые заказы — строкой под шапкой (первый экран карточки), кнопка — путь заказа
+    assert 0 < c["strip"] <= c["ords"]
     assert "кто:" in c["todo"] or "Пунктов в очереди нет" in c["text"]
     assert "Сделка в Битриксе ↗" in c["text"] and "Экономика сделки" in c["text"]
 

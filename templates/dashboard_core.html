@@ -600,7 +600,7 @@
   #tab-contracts .ctdhowl{margin:2px 0 8px 18px;padding:0;font-size:var(--rz-sm,13px);line-height:1.55;color:var(--ink2);max-width:110ch}
   #tab-contracts .ctdhowl li{margin:0 0 4px}
   #tab-contracts .ctdhowl b{color:var(--strong);font-weight:600}
-  #tab-contracts .ctm-cs{font-family:var(--mono);font-size:var(--rz-xs,12px);font-weight:500;color:var(--mut);margin-left:6px;white-space:nowrap}
+  #tab-contracts .ctm-cs{font-family:inherit;font-size:var(--rz-xs,12px);font-weight:500;color:var(--mut);margin-left:6px;white-space:nowrap}
   #tab-contracts .ctm-kpi-d{font-size:var(--rz-sm,13px);line-height:1.45;color:var(--ink2)}
   /* полоса «значение и цель» (bullet graph): серая дорожка 0–100 %, полоса — значение, метка — цель */
   #tab-contracts .ctm-bul{width:100%;display:flex;flex-direction:column;gap:4px}
@@ -1100,7 +1100,7 @@
   .drw.rz .odno{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
   .drw.rz .odno b{font-size:var(--rz-lg,16px);font-weight:600;color:var(--ink)}
   .drw.rz .odno b::after{content:" ›";font-family:var(--od-f);color:var(--mut);font-weight:500}
-  .drw.rz .oddeal{font-size:var(--rz-sm,13px);color:var(--ink2);margin-top:2px}
+  .drw.rz .oddeal{font-size:var(--rz-sm,13px);color:var(--ink2);margin-top:7px}
   .drw.rz .odbx{font-size:var(--rz-xs,12px);font-weight:500;color:var(--b2);white-space:nowrap;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--b2) 45%,transparent);text-underline-offset:2px;display:inline-block;padding:5px 2px;margin:-5px 0;line-height:1.2}
   .drw.rz .odbx:hover{text-decoration-color:currentColor}
   .drw.rz .odbx:focus-visible{outline:2px solid var(--a);outline-offset:1px;border-radius:2px}
@@ -1760,6 +1760,117 @@
   .drw.rz .op-cardbtn{min-height:44px;padding:10px 14px;text-align:left;font-weight:600}
   @media(max-width:520px){.drw.rz .op-card{padding:14px}.drw.rz .op-links{margin-left:0}.drw.rz .op-ttl{font-size:18px}.drw.rz .op-num{font-size:26px}
     .drw.rz .op-kv{grid-template-columns:minmax(0,1fr)}.drw.rz .op-kv dd{margin-bottom:4px}}
+  /* R4 · первый экран «Реализации» (ревью 30.10.2026, dataink правило 2): шапка вкладки — одной строкой,
+     направление — в строке подвкладки, «Неделя»: плитки и «Сегодня» — на первом экране 1280×800;
+     на телефоне «Сегодня» первым, плитки — сеткой в два столбца */
+  #tab-contracts .cthd{margin:0 0 10px}
+  #tab-contracts .cthd-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 16px}
+  #tab-contracts .cthd-row h1{font-size:22px;line-height:1.3}
+  #tab-contracts .cthd-row .cthd-meta{margin:0;flex:0 1 auto}
+  #tab-contracts .cthd-row .cthd-more{margin:0}
+  #tab-contracts .cthd-row .cthd-more>summary{min-height:24px}
+  #tab-contracts .cthd-row .cthd-more[open]{flex-basis:100%}
+  #tab-contracts .cthd-mb{padding:4px 0 2px;color:var(--ink2)}
+  #tab-contracts .cthd-mb p{margin:4px 0;max-width:96ch}
+  #tab-contracts .cthd-mb .cthd-lead{margin:4px 0}
+  #tab-contracts .cthd-mb ul{margin:4px 0 0 18px}
+  #tab-contracts .ctbar{margin-bottom:8px}
+  #tab-contracts .ctsubd{margin:0 0 10px}
+  #tab-contracts .ctsubsep{color:var(--mut)}
+  #tab-contracts .ctsubsep a{color:var(--b);font-weight:500;white-space:nowrap;text-underline-offset:2px}
+  #tab-contracts .ctsubsep a:focus-visible{outline:2px solid var(--a);outline-offset:2px;border-radius:3px}
+  #tab-contracts .ctsepnote.is-sep{border:0;border-radius:0;background:none;padding:0;margin:0 0 10px;color:var(--mut)}
+  #tab-contracts .orktop{display:flex;flex-direction:column}
+  #tab-contracts .orkweek .orkhd{margin:0 0 8px}
+  #tab-contracts .orkweek .orktw .actile{padding:10px 12px 4px 14px;gap:2px}
+  #tab-contracts .orkweek .orktw .actile .v{font-size:28px}
+  #tab-contracts .orkweek .orkparts{padding:0 12px 6px 14px;line-height:1.5}
+  #tab-contracts .orkaside{margin:0;padding:0 12px 6px 14px;font-size:var(--rz-xs,12px);line-height:1.45;color:var(--mut)}
+  #tab-contracts .orkaside .odn{font-weight:600;color:var(--ink2)}
+  #tab-contracts .orktoday .orkhd{margin:14px 0 6px}
+  #tab-contracts .orktoday .orkc{padding:2px 14px 8px;margin-bottom:12px}
+  #tab-contracts .orkw .orktd td{padding-top:6px;padding-bottom:6px}
+  #tab-contracts .orktdf{margin-top:6px;padding-top:6px}
+  #tab-contracts .orkw .orktd{line-height:1.35}
+  #tab-contracts .orkw .orktd th{padding-bottom:4px}
+  #tab-contracts .orkweek .orkh{font-size:19px}
+  #tab-contracts .orkw .kpis.orkt5.orkt4{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .drw.rz .odt [hidden]{display:none!important}
+  .drw.rz .rzc-strip{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:10px 0 4px}
+  .drw.rz .rzc-strl{font-size:var(--rz-sm,13px);color:var(--mut)}
+  .drw.rz .rzc-ochip{font:inherit;font-size:var(--rz-sm,13px);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px 10px;min-height:28px;cursor:pointer}
+  .drw.rz .rzc-ochip .mono{font-family:var(--mono);font-weight:600}
+  .drw.rz .rzc-ochip.bad{border-color:color-mix(in srgb,var(--nr) 55%,var(--line));color:var(--nr)}
+  .drw.rz .rzc-ochip:hover{background:var(--panel2)}
+  .drw.rz .rzc-ochip:focus-visible,.drw.rz .rzc-more>summary:focus-visible,.drw.rz .rzc-moreq>summary:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+  .drw.rz .rzc-more,.drw.rz .rzc-moreq{margin:8px 0 4px;font-size:var(--rz-sm,13px)}
+  .drw.rz .rzc-more>summary,.drw.rz .rzc-moreq>summary{display:inline-flex;align-items:center;gap:6px;min-height:28px;cursor:pointer;color:var(--b2);font-weight:500;list-style:none;border-radius:3px}
+  .drw.rz .rzc-more>summary::-webkit-details-marker,.drw.rz .rzc-moreq>summary::-webkit-details-marker{display:none}
+  .drw.rz .rzc-more>summary::before,.drw.rz .rzc-moreq>summary::before{content:"›";display:inline-block;width:10px;font-size:16px;line-height:1;transition:transform .15s}
+  .drw.rz .rzc-more[open]>summary::before,.drw.rz .rzc-moreq[open]>summary::before{transform:rotate(90deg)}
+  .drw.rz .rzc-more .rzc-facts{margin-top:6px}
+  .drw.rz .odgld{margin:4px 0 0;font-size:var(--rz-sm,13px);color:var(--mut)}
+  .drw.rz .odgld>summary{display:inline-flex;align-items:center;gap:6px;min-height:24px;cursor:pointer;color:var(--b2);font-weight:500;list-style:none}
+  .drw.rz .odgld>summary::-webkit-details-marker{display:none}
+  .drw.rz .odgld>summary::before{content:"›";display:inline-block;width:10px;font-size:16px;line-height:1;transition:transform .15s}
+  .drw.rz .odgld[open]>summary::before{transform:rotate(90deg)}
+  .drw.rz .odgld>summary:focus-visible{outline:2px solid var(--a);outline-offset:2px;border-radius:3px}
+  .drw.rz .odgld .odgl{margin:4px 0 0}
+  @media(max-width:560px){
+    .drw.rz .odlede{flex-direction:row;flex-wrap:wrap;gap:6px 10px;margin-bottom:12px}
+    .drw.rz .oddef{font-size:var(--rz-sm,13px);line-height:1.45}
+    .drw.rz .odq{min-height:32px;padding:4px 10px}
+    .drw.rz .odh2i,.drw.rz .odsorted{display:none}
+    .drw.rz .odact{min-height:44px;padding:8px 10px;align-items:center}
+    .drw.rz .odact-n{grid-row:1/2;font-size:var(--rz-lg,16px)}
+    .drw.rz .odact-r,.drw.rz .odact-d,.drw.rz .odact-s{display:none}
+    .drw.rz .odact-m:not(:has(.amb)){display:none}
+    .drw.rz .odact-m{grid-column:1/-1}
+    .drw.rz .odacts{gap:6px}
+  }
+  #tab-contracts .orkw th .dep{display:block;font-weight:400;font-size:var(--rz-xs,12px);color:var(--mut);line-height:1.35}
+  #tab-contracts .rzn,.drw.rz .rzn{font-family:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-weight:inherit}
+  #tab-contracts .orkweek .orkparts .orkpart{white-space:normal}
+  #tab-contracts .ctsubd:empty{display:none}
+  #tab-contracts .ctdirn{color:var(--mut)}
+  #tab-contracts .orkw4{margin:0 0 6px;font-size:var(--rz-sm,13px);line-height:1.5;color:var(--mut)}
+  #tab-contracts .orkw4 b{color:var(--ink2);font-weight:600}
+  @media(max-width:1180px){#tab-contracts .orkw .kpis.orkt5.orkt4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  #tab-contracts .orkw .orktd td{line-height:1.35}
+  #tab-contracts .orkw .orktd th:nth-child(1){width:52%}
+  #tab-contracts .orkw .orktd th:nth-child(2){width:24%}
+  #tab-contracts .orkw .orktd th:nth-child(4){width:13%}
+  #tab-contracts .orkw .orktd td.orktdo{white-space:normal}
+  @media(max-width:560px){
+    #tab-contracts .cthd-row h1{font-size:20px}
+    #tab-contracts .orktop>.orktoday{order:-1}
+    #tab-contracts .orktoday .orkhd{margin-top:0}
+    #tab-contracts .orkweek .orkhd{margin-top:8px}
+    #tab-contracts .orkw .kpis.orkt5{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}
+    #tab-contracts .orkweek .orktw .actile{padding:8px 10px 2px 12px}
+    #tab-contracts .orkweek .orktw .actile .v{font-size:24px}
+    #tab-contracts .orkweek .orkparts,#tab-contracts .orkaside{padding-left:12px;padding-right:10px}
+  }
+  /* узкий экран: таблицы без своей раскладки — карточками (_rzFlow) */
+  @media(max-width:560px){
+    #tab-contracts table.rzflow{min-width:0!important;width:100%;display:block}
+    #tab-contracts table.rzflow thead{position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+    #tab-contracts table.rzflow :is(tbody,tfoot){display:block}
+    #tab-contracts table.rzflow tr{display:block;padding:8px 0;border-top:1px solid var(--line2)}
+    #tab-contracts table.rzflow tbody tr:first-child{border-top:0}
+    #tab-contracts table.rzflow :is(td,th){display:block;position:relative!important;padding:2px 0 2px 42%;min-height:20px;border:0;text-align:left;white-space:normal;max-width:none!important;box-shadow:none!important;background:none!important;min-width:0;left:auto!important}
+    #tab-contracts table.rzflow :is(td,th)::before{content:attr(data-l);position:absolute;left:0;top:2px;width:40%;color:var(--mut);font-size:var(--rz-xs,12px);font-weight:500;line-height:1.45}
+    #tab-contracts table.rzflow :is(td,th):not([data-l]){padding-left:0;font-weight:600}
+    #tab-contracts table.rzflow :is(td,th):not([data-l])::before{content:none}
+    #tab-contracts table.rzflow td:empty{display:none}
+  }
+  @media(max-width:900px){
+    #tab-contracts .orkw :is(.orkled,.orkpulse) td.r{white-space:normal}
+    #tab-contracts .orkw .orkled :is(td,th){padding-left:5px;padding-right:5px}
+    #tab-contracts .orkw .orkled :is(th,td):nth-child(2){display:none}
+    #tab-contracts .orkw .orkled td .orkm,#tab-contracts .orkw .orkpulse td .orkm{display:block}
+    #tab-contracts .orkw .orkpulse :is(th,td):is(:nth-child(4),:nth-child(5)){display:none}
+  }
 </style>
 <script>
 /* Оформление: светлое для всех по умолчанию; «Тёмная тема» — выбор человека, помнится
@@ -3622,6 +3733,10 @@ function _rzDrw(on){const d=document.getElementById('drw'); if(!d) return;
   _rzDrw.mo.observe(d,{attributes:true,attributeFilter:['class']});}
 function openContract(x){
   if(typeof _rzDrw==='function') _rzDrw(true);
+  // откуда открыли карточку (строка таблицы, очереди): путь заказа из карточки и «← к сделке» её не
+  // затирают — Esc после «сделка → путь → назад» возвращает фокус сюда (ревью 30.10.2026, WCAG 2.4.3)
+  {const d0=document.getElementById('drw'), ae=document.activeElement;
+   if(!(d0&&ae&&d0.contains(ae))) openContract.from=ae&&ae!==document.body?ae:null;}
   document.getElementById('drwName').textContent=(x.seq?`№${x.seq} · `:'')+(x.customer!=='—'?x.customer:x.title.slice(0,40));
   document.getElementById('drwSub').textContent=`${x.title.slice(0,60)} · продажа ${x.saleLbl} · заказов ${x.norders}`;
   // Карточка сделки (R3, 29.10.2026: «как мне понимать, что дальше»): сверху вниз — шапка (стадия,
@@ -3636,10 +3751,18 @@ function openContract(x){
     :x.lateN?`<span class="rzc-badge bad">срок клиента сорван · ${x.lateDays} дн</span>`
     :x.dlNext?`<span class="rzc-badge ok">срок клиента ${x.dlNext} · в срок</span>`
     :x.noDl?'<span class="rzc-badge bad">срока клиента нет</span>':'';
-  h+=`<div class="rzc-top"><span class="rzc-badge${x.slow?' bad':''}">${_esc(_stShort(x.stageName||'—'))}${x.stageDays!=null?` · ${x.stageDays} дн. в стадии`:''}</span>${dlB}`
+  // дни в стадии сделки — справочно (сроки отдела — по шагам заказов): нейтрально, не цветом тревоги
+  h+=`<div class="rzc-top"><span class="rzc-badge">${_esc(_stShort(x.stageName||'—'))}${x.stageDays!=null?` · ${x.stageDays} дн. в стадии`:''}</span>${dlB}`
     +`<a class="rzc-lnk rzc-bx" href="${_ctBxDeal(x.deal)}" target="_blank" rel="noopener">Сделка в Битриксе ↗</a></div>`;
+  // заказы сделки — строкой сразу под шапкой: номер, шаг, срок; кнопка — путь заказа (первый экран
+  // карточки: шапка, «Что делать» и первый заказ, ревью 30.10.2026)
+  const OS=(x.orders||[]).filter(o=>o.live);
+  if(OS.length&&typeof _opOpen==='function') h+=`<div class="rzc-strip"><span class="rzc-strl">Заказы в работе:</span>`
+    +OS.map(o=>{const st=o.step!=null?`шаг ${o.step}`:'шаг не определён', bad=o.late||o.stepOver;
+      const tl=[st,o.late?'срок клиента сорван':o.stepOver?'дольше нормы':o.stepWaitUtd?'ждём УПД':''].filter(Boolean).join(' · ');
+      return `<button type="button" class="rzc-ochip${bad?' bad':''}" data-ctop="${_esc(String(o.id))}" aria-label="${_esc(`Заказ ${o.lbl||'id '+o.id}: ${tl} — путь заказа`)}"><span class="rzn">№</span><span class="mono">${_esc(o.lbl||'id '+o.id)}</span> · ${_esc(tl)}</button>`;}).join('')+`</div>`;
   const FL=[];
-  FL.push(['Стадия сделки',`<b>${_esc(x.stageName||'—')}</b>${x.stageDays!=null?` — <span class="stgd${x.slow?' bad':''}">${x.stageDays} дн. в ней</span><div class="rzc-note">справочно: «долго» — больше ${x.stageThr} дн.; сроки отдела — по шагам заказов ниже</div>`:''}`]);
+  FL.push(['Стадия сделки',`<b>${_esc(x.stageName||'—')}</b>${x.stageDays!=null?` — <span class="stgd">${x.stageDays} дн. в ней</span><div class="rzc-note">справочно: «долго» — больше ${x.stageThr} дн.; сроки отдела — по шагам заказов ниже</div>`:''}`]);
   const dlTxt=x.lateN?`<b class="nrc">просрочен на ${x.lateDays} дн.</b> <span class="dimv">· заказов ${x.lateN}, закупка ${x.lateBuyLbl}</span>`
     :(x.dlNext?`<b>${x.dlNext}</b> <span class="dimv">— ${x.closed?'сделка закрыта, срок не в счёте':'в срок'}</span>`:'');
   const ndTxt=x.noDl?`<span class="dimv">без срока клиента: ${_ctN(x.noDl,'заказ в работе','заказа в работе','заказов в работе')} — внести из договора</span>`:'';
@@ -3649,7 +3772,7 @@ function openContract(x){
   if(x.kam&&x.kam!=='—') FL.push(['КАМ — менеджер клиента',`<b>${_esc(String(x.kam).replace(/ \(уволен\)$/,''))}</b> <span class="dimv">· договор и срок с клиентом, оплата</span>`]);
   if(x.manager&&x.manager!=='—'&&x.oss&&x.oss!=='—') FL.push(['Сопровождение (ОСС)',`<b>${_esc(x.oss)}</b> <span class="dimv">· документы, УПД, закрытие</span>`]);
   FL.push(['В реализации',`с <b>${x.entered?_esc(_orkD(x.entered)):'—'}</b>${x.firstLag!=null?` · первый заказ поставщику — через <b>${x.firstLag} дн.</b>`:''}`]);
-  h+=`<dl class="rzc-facts">${FL.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`
+  h+=`<details class="rzc-more"><summary>Стадия сделки, ответственные и даты</summary><dl class="rzc-facts">${FL.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></details>`
     +(x.slow&&!(x.lateN&&/обещани/.test(x.why||''))?`<div class="rzc-why flag">⚠ ${_esc(x.why)}</div>`:'');
   // ---------- 2. что делать: пункты очереди сделки (кто, что, с какого дня) ----------
   const QL=_ctDealQ(x), QG=[];
@@ -3666,13 +3789,16 @@ function openContract(x){
     if(TD&&!tdG) h+=`<li class="first"><div class="act">${_esc(_orkCap(dcx.todo.act))}</div>`
       +`<div class="meta">кто: <b>${_esc(String(dcx.todo.who).replace(/ \(уволен\)$/,''))}</b> · ${_esc(dcx.todo.what)}</div>`
       +`<div class="meta dimv">первым — по очереди и чату сделки (оценка ИИ)</div></li>`;
-    h+=QG.map(G=>{const L=G.L, q=L[0], w=String(q.who||'').replace(/ \(уволен\)$/,''), dmax=Math.max(...L.map(z=>z.days||0));
-      const ords=L.filter(z=>z.ordLbl||z.order).map(z=>`<b class="mono">${_ordNo(z.ordLbl,z.seq)}</b>${L.length>1&&z.days!=null?` <span class="dimv">${z.days} ${z.inWd?'р.д.':'дн.'}</span>`:''}`);
-      return `<li class="${q.sev<=1?'bad':''}"><div class="act">${_esc(_orkCap(q.act))}${G===tdG?' <span class="rzc-first">первым</span>':''}</div>`
+    // первые три — сразу, остальные — раскрытием «Ещё N» (первый экран карточки)
+    const QV=TD&&!tdG?2:3;
+    h+=QG.map((G,gi)=>{const L=G.L, q=L[0], w=String(q.who||'').replace(/ \(уволен\)$/,''), dmax=Math.max(...L.map(z=>z.days||0));
+      const cut=gi===QV&&QG.length>QV?`</ol><details class="rzc-moreq"><summary>Ещё ${_ctN(QG.length-QV,'действие','действия','действий')}</summary><ol class="rzc-todo" start="${QV+1}">`:'';
+      const ords=L.filter(z=>z.ordLbl||z.order).map(z=>`<b class="mono">${_ordNo(z.ordLbl,z.seq).replace(/№/g,'<span class="rzn">№</span>')}</b>${L.length>1&&z.days!=null?` <span class="dimv">${z.days} ${z.inWd?'р.д.':'дн.'}</span>`:''}`);
+      return cut+`<li class="${q.sev<=1?'bad':''}"><div class="act">${_esc(_orkCap(q.act))}${G===tdG?' <span class="rzc-first">первым</span>':''}</div>`
         +`<div class="meta">кто: ${q.roleName?_esc(q.roleName)+' — ':''}${w==='не назначен'||!w?'<b class="nrc">не назначен</b>':`<b>${_esc(w)}</b>`}${q.whoGone?' <span class="gone">уволен</span>':''}`
         +`${q.escalateTo?` · если не решено — ${_esc(String(q.escalateTo).replace(/ \(уволен\)$/,''))}`:''}${q.days!=null?` · ${_ctDaysTxt(q,L.length>1?dmax:null)}`:''}${q.since?` · с ${_esc(q.since)}`:''}</div>`
         +`<div class="meta">${_esc(q.what||'')}${ords.length?` · ${ords.join(', ')}`:''}${q.signal?` <span class="dimv">· ${_esc(q.signal)}</span>`:''}</div></li>`;}).join('')
-      +`</ol>`;
+      +`</ol>`+(QG.length>QV?`</details>`:'');
   }
   // ---------- 3. заказы сделки: где стоит каждый, путь заказа, Битрикс ----------
   const ords=x.orders||[];
@@ -3834,12 +3960,20 @@ function openContract(x){
   // таймлайн стадий сделки
   if((x.timeline||[]).length){
     h+=`<div class="h rzc-h">Путь сделки по стадиям воронки</div><div class="rzc-note">Справочно: стадии самой сделки. Сроки отдела считаем по шагам заказов — «Путь заказа» у каждого заказа выше. Полная история — <a class="rzc-lnk" href="${_ctBxDeal(x.deal)}" target="_blank" rel="noopener">в Битриксе ↗</a></div>`;
-    h+=x.timeline.map((t,i)=>`<div class="tlrow${i===x.timeline.length-1?' cur':''}"><span class="tld">${t.at}</span><span class="tln">${_esc(_stShort(t.name))}</span><span class="tldur">${t.days} дн.${i===x.timeline.length-1?' · сейчас':''}</span></div>`).join('');
+    h+=x.timeline.map((t,i)=>`<div class="tlrow${i===x.timeline.length-1?' cur':''}"><span class="tld">${_esc(/^\d{4}-\d\d-\d\d/.test(String(t.at))?_orkD(String(t.at).slice(0,10)):String(t.at))}</span><span class="tln">${_esc(_stShort(t.name))}</span><span class="tldur">${t.days} дн.${i===x.timeline.length-1?' · сейчас':''}</span></div>`).join('');
   }
   h+='</div>';
   const bd=document.getElementById('drwBody'); bd.innerHTML=h; bd.scrollTop=0;
   _ctCardWire(x);
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
+  // карточка — модальный диалог, как список заказов и путь заказа (ревью 30.10.2026): Tab по кругу
+  // внутри, Esc и крестик — фокус туда, откуда открыли; прежние role/aria возвращает _odClose
+  if(typeof _odWire==='function'&&typeof _OD_ARIA!=='undefined'){
+    if(_drw.dataset.od!=='1'){_OD.aria=Object.fromEntries(_OD_ARIA.map(a=>[a,_drw.getAttribute(a)]));
+      _OD.trigger=openContract.from&&openContract.from.isConnected?openContract.from:null;}
+    _drw.setAttribute('role','dialog'); _drw.setAttribute('aria-modal','true'); _drw.setAttribute('aria-labelledby','drwName');
+    _drw.dataset.od='1'; _odWire();
+  }
 }
 // Ссылки в Битрикс: сделка и заказ поставщику (смарт-процесс 172) — в новой вкладке
 const _ctBxDeal=id=>`https://kvantpro.bitrix24.ru/crm/deal/details/${encodeURIComponent(id)}/`;
@@ -3909,7 +4043,8 @@ function _ctCardWire(x){
   const b=document.getElementById('drwBody'); if(!b) return; b._ctDeal=x;
   if(b._ctWired) return; b._ctWired=1;
   b.addEventListener('click',e=>{const t=e.target.closest('[data-ctop]'); if(!t||!b.contains(t)||typeof _opOpen!=='function') return;
-    e.preventDefault(); _opOpen(t.dataset.ctop,{back:'deal',deal:b._ctDeal});});
+    e.preventDefault(); b._ctRet={k:String(t.dataset.ctop),top:b.scrollTop};   // «← к сделке» вернёт сюда
+    _opOpen(t.dataset.ctop,{back:'deal',deal:b._ctDeal});});
 }
 // «2 сделки», «5 сделок»: число и слово в нужной форме
 const _ctN=(n,one,few,many)=>{const m=n%10,h=n%100;return n+' '+(m===1&&h!==11?one:(m>=2&&m<=4&&(h<12||h>14)?few:many));};
@@ -3984,13 +4119,19 @@ function _ctHeader(X,paid){
   // «Оплата получена», сделка открыта — видно сразу, а не в раскрытии: это пункт ОСС, число — список
   const P0=(paid&&paid.main)||0, P1=(paid&&paid.sep)||0, R1=(X.rows||[]).filter(r=>r.seg);
   const pSep=P1?` и ${R1.filter(_CT_MODE.paid).length===P1?`<a href="#contracts/main/sep" class="cthd-go" data-ctgo="main" data-ctdir="sep" data-ctmode="paid">${P1} в направлении ${_esc(paid.name||'')}</a>`:`${P1} в направлении ${_esc(paid.name||'')}`}`:'';
-  const PD=(P0||P1)?`<p class="cthd-paid">Оплата получена, а сделка в Битриксе не закрыта: ${P0?fxGo(P0,'paid'):'0 сделок'}${pSep} — закрывает сопровождение сделки (ОСС). В доставке в срок и деньгах такие сделки уже считаются успешными.</p>`:'';
-  return `<header class="cthd"><h1>Реализация: от выигрыша до оплаты</h1>`
-    +`<p class="cthd-lead">Заказы поставщикам по 13 шагам регламента отдела реализации контрактов (ОРК) — от приёмки сделки до подписанного клиентом УПД и оплаты. Подчёркнутое число открывает заказы за ним: что сделать и кто.</p>`
-    +`<p class="cthd-meta"><span>Откуда: Битрикс24 — сделки воронки «Реализация» и карточки «Заказ поставщику»</span><span>выгрузка на <b>${_esc(X.label||'')}</b> — внесённое позже здесь ещё не видно</span></p>`
-    +PD
+  const PD=(P0||P1)?`<p>«Оплата получена», а сделка в Битриксе не закрыта — её закрывает сопровождение сделки (ОСС). В доставке в срок и деньгах такие сделки уже считаются успешными.</p>`:'';
+  // первый экран (dataink, правило 2, ревью 30.10.2026): шапка вкладки — одной строкой (имя, источник,
+  // дата, «оплата получена — закрыть» числом-ссылкой), остальное — под «Подробнее»
+  const lbl=String(X.label||''), asOf=/^на\s/.test(lbl)?lbl.replace(/^на\s+/,''):lbl;
+  const PS=P0||P1?`<span>оплата получена, сделка не закрыта: ${P0?fxGo(P0,'paid'):'0 сделок'}${pSep} — закрыть (ОСС)</span>`:'';
+  return `<header class="cthd"><div class="cthd-row"><h1>Реализация</h1>`
+    +`<p class="cthd-meta"><span>Битрикс24, выгрузка на <b>${_esc(asOf)}</b></span>${PS}</p>`
+    +`<details class="cthd-more"><summary>Подробнее: что здесь, деньги и УПД</summary><div class="cthd-mb">`
+    +`<p class="cthd-lead"><b>От выигрыша до оплаты.</b> Заказы поставщикам по 13 шагам регламента отдела реализации контрактов (ОРК) — от приёмки сделки до подписанного клиентом УПД и оплаты. Подчёркнутое число открывает заказы за ним: что сделать и кто.</p>`
+    +`<p>Откуда: Битрикс24 — сделки воронки «Реализация» и карточки «Заказ поставщику»; внесённое после выгрузки здесь ещё не видно.</p>`
+    +PD+`<ul>${rules.map(r=>`<li>${r}</li>`).join('')}</ul></div></details></div>`
     +warn.map(w=>`<div class="cthd-warn" role="status"><span aria-hidden="true">⚠</span> ${w}</div>`).join('')
-    +`<details class="cthd-more"><summary>Как пересчитаны деньги и что такое УПД</summary><ul>${rules.map(r=>`<li>${r}</li>`).join('')}</ul></details></header>`;
+    +`</header>`;
 }
 // Вкладка направления без его сделок: «Нет данных» + чего нет и откуда придёт (portal-ui §2)
 function _ctSepEmpty(SH,X){
@@ -4016,7 +4157,7 @@ const _CT_SHORT={week:['Неделя',' руководителя ОРК']};
 const _ctSubLbl=(k,nm)=>_CT_SHORT[k]?`${_CT_SHORT[k][0]}<span class="ctvh">${_CT_SHORT[k][1]}</span>`:nm;
 // что в подвкладке — одной строкой под переключателями (владелец 29.10.2026: «читай как человек,
 // которому смысл заголовков не понятен — расшифровывай»): что в ней и кому
-const _CT_SUBD={week:'<b>Неделя</b> — что горит сейчас: срок клиента под угрозой, шаги дольше нормы и очередь дел по исполнителям шагов.',
+const _CT_SUBD={week:'',
   month:'<b>Месяц</b> — дисциплина сроков отдела за последний полный месяц: доля шагов в норме, заполненность карточек заказов, нагрузка менеджеров ОРК. Видят руководители ОРК и владелец.',
   quarter:'<b>Квартал</b> — поставщики и реальные сроки: держат ли обещанный срок готовности, сколько на деле идут производство и доставка, сколько платим вперёд.',
   main:'<b>Сделки и деньги</b> — все сделки реализации: продажа, закупка, маржа, срок клиента, чаты и договоры. Строка открывает карточку сделки.',
@@ -4027,6 +4168,28 @@ function _ctAddr(h){
   if(m[1]==='sep'&&!m[2]) return {sub:'main',dir:'sep'};        // прежний адрес вкладки направления
   const sub=CT_SUBS.some(s=>s[0]===m[1])?m[1]:'week';
   return {sub,dir:m[2]==='sep'?'sep':'main'};
+}
+// узкий экран (ревью 30.10.2026): таблицы без своей раскладки для телефона — карточками (подпись
+// столбца у каждой ячейки, data-l → ::before; в Excel не идёт); обёртка, которая всё равно шире
+// экрана, — фокусируемая область с именем таблицы (WCAG 2.1.1, axe scrollable-region-focusable)
+const _RZ_OWNFLOW=/\b(orkq|orkrk|orktd|orkled|orkcp|orkmine|orkp80|orkpulse|orkover|orkj|odt)\b/;
+function _rzFlow(root){
+  if(!root) return;
+  root.querySelectorAll('.twrap > table.lft').forEach(t=>{
+    if(_RZ_OWNFLOW.test(t.className)||t.querySelector('#ctBody')) return;
+    t.classList.add('rzflow');
+    const hr=t.tHead&&t.tHead.rows[t.tHead.rows.length-1]; if(!hr) return;
+    const L=[]; [...hr.cells].forEach(c=>{const k=c.cloneNode(true); k.querySelectorAll('.ctm-th2,.ctm-cs,.dep,.odarr,.qq').forEach(z=>z.remove());
+      const l=k.textContent.replace(/\s+/g,' ').trim(); for(let i=0;i<(c.colSpan||1);i++) L.push(l);});
+    [...t.tBodies].forEach(tb=>[...tb.rows].forEach(tr=>{let i=0; [...tr.cells].forEach(c=>{if(i>0&&L[i]&&!c.hasAttribute('data-l')) c.setAttribute('data-l',L[i]); i+=c.colSpan||1;});}));
+  });
+  const reg=()=>root.querySelectorAll('.twrap').forEach(w=>{const t=w.querySelector('table'); if(!t) return;
+    const over=w.scrollWidth>w.clientWidth+1;
+    if(over&&w.getAttribute('role')!=='region'){w.setAttribute('role','region'); w.tabIndex=0;
+      w.setAttribute('aria-label',((t.caption&&t.caption.textContent)||t.dataset.xlName||'Таблица').trim()+' — прокрутка вбок');}
+    else if(!over&&w.getAttribute('role')==='region'){w.removeAttribute('role'); w.removeAttribute('tabindex'); w.removeAttribute('aria-label');}});
+  reg();
+  if(!_rzFlow.rs){_rzFlow.rs=1; let tm=0; window.addEventListener('resize',()=>{clearTimeout(tm); tm=setTimeout(()=>{const p=document.querySelector('#tab-contracts [role=tabpanel]:not([hidden])'); if(p) _rzFlow(p);},200);});}
 }
 function renderContracts(){
   const X0=window.__CONTRACTS__, el=document.getElementById('tab-contracts'); if(!el) return;
@@ -4054,7 +4217,7 @@ function renderContracts(){
   el.innerHTML=_ctHeader(X0,paid)
     +`<div class="ctbar"><div class="subnav ctsub" role="tablist" aria-label="Разделы реализации" id="ctTabs">`
     +CT_SUBS.map(([k,nm])=>`<button type="button" class="snb" role="tab" id="ctTab-${k}" data-sub="${k}" aria-selected="false" aria-controls="ctPanel-main" tabindex="-1">${_ctSubLbl(k,nm)}</button>`).join('')+`</div>`
-    +(SH?`<div class="ctdirw"><span class="ctdirl" id="ctDirL">Направление</span><div class="subnav ctsub ctdir" role="tablist" aria-labelledby="ctDirL" id="ctDirs">`
+    +(SH?`<div class="ctdirw"><span class="ctdirl" id="ctDirL">Направление<span class="ctdirn">: ${_esc(SH.name)} считается отдельно, в основной вид не входит</span></span><div class="subnav ctsub ctdir" role="tablist" aria-labelledby="ctDirL" id="ctDirs">`
       +`<button type="button" class="snb" role="tab" id="ctDir-main" data-dir="main" aria-selected="true" aria-controls="ctPanel-main" tabindex="0">Основное</button>`
       +`<button type="button" class="snb" role="tab" id="ctDir-sep" data-dir="sep" aria-selected="false" aria-controls="ctPanel-sep" tabindex="-1">${_esc(SH.name)} <span class="ctsubn" title="${_esc(_ctN(SH.live||0,'сделка','сделки','сделок')+' в работе')}">(${SH.live})</span></button></div></div>`:'')
     +`</div><p class="ctsubd" id="ctSubD" aria-live="polite"></p>`
@@ -4074,12 +4237,18 @@ function renderContracts(){
     const pid='ctPanel-'+dir;
     subTabs.forEach(b=>{const on=b.dataset.sub===sub; b.classList.toggle('on',on); b.setAttribute('aria-selected',on?'true':'false'); b.tabIndex=on?0:-1; b.setAttribute('aria-controls',pid);});
     dirTabs.forEach(b=>{const on=b.dataset.dir===dir; b.classList.toggle('on',on); b.setAttribute('aria-selected',on?'true':'false'); b.tabIndex=on?0:-1;});
-    const sd=document.getElementById('ctSubD'); if(sd) sd.innerHTML=(_CT_SUBD[sub]||'')+(SH&&dir==='sep'?` Сейчас — только направление ${_esc(SH.name)}.`:'');
+    // направление — подписью переключателя, а не плашкой над плитками (первый экран, ревью 30.10.2026);
+    // в «Квартале» — оговорка: поставщиков меряем по всем заказам
+    const nm=SH?_esc(SH.name):'';
+    const sepL=SH&&dir==='main'&&sub==='quarter'?` <span class="ctsubsep">Поставщиков меряем по всем заказам, вместе с направлением ${nm}.</span>`:'';
+    const dn=el.querySelector('#ctDirL .ctdirn'); if(dn) dn.hidden=dir==='sep';
+    const sd=document.getElementById('ctSubD'); if(sd) sd.innerHTML=(_CT_SUBD[sub]||'')+sepL;
     Object.keys(views).forEach(n=>{const p=document.getElementById('ctPanel-'+n); p.hidden=n!==dir; p.innerHTML='';});
     const panel=document.getElementById(pid);
     panel.setAttribute('aria-labelledby','ctTab-'+sub+(SH?' ctDir-'+dir:''));
     draw(dir,sub,panel,opt);
     if(typeof _xlMark==='function') _xlMark(panel);   // кнопки «Excel» таблиц подвкладки — сразу после рендера
+    _rzFlow(panel);
     if(opt.addr){ try{ history.replaceState(null,'','#contracts/'+addr); }catch(e){} }
     if(opt.focus){ const b=(opt.focus==='dir'?dirTabs.find(x=>x.dataset.dir===dir):subTabs.find(x=>x.dataset.sub===sub)); if(b) b.focus(); }
   };
@@ -4149,7 +4318,8 @@ const _orkWho=w=>_esc(String(w==null?'':w).replace(/ \(уволен\)$/,''));
 // поставщик (только если он есть в данных страницы: то же поле, что у столбца «Заказ · поставщик») и
 // срок, по которому считана строка («срок 01.09.2026», «с 14.10 (назначение)»)
 const _ordNo=(l,seq)=>{l=String(l||''); const m=/^(\d+)\//.exec(l); return m&&(!seq||+m[1]===+seq)?`№${_esc(l)}`:`№${seq||'—'}${l?' · '+_esc(l):''}`;};
-const _orkNo=x=>_ordNo(x.ordLbl,x.seq);
+// «№» — обычным шрифтом, цифры — моноширинным: в IBM Plex Mono «№» похож на «₩» (ревью 30.10.2026)
+const _orkNo=x=>_ordNo(x.ordLbl,x.seq).replace(/№/g,'<span class="rzn">№</span>');
 const _orkFx=x=>[x.sup&&x.sup!=='—'?'поставщик '+_esc(x.sup):'',x.ref?_esc(x.ref):''].filter(Boolean).join(' · ');
 // «дд.мм», а не текущего года — «дд.мм.гггг» (начало счёта срока шага в карточке заказа)
 const _orkDy=s=>{const m=/^(\d{4})/.exec(String(s||'')); return m&&+m[1]!==new Date().getFullYear()?_orkD(s):_orkDm(s);};
@@ -4210,22 +4380,24 @@ function _orkTile2(o){
   // «Как посчитано» — в одной строке с частями числа (раскрытие — во всю ширину плитки)
   const hw=how?`<details class="orkexp orkexpi"><summary>как посчитано</summary><div class="orkhowb">${how}</div></details>`:'';
   const parts=pl.length||hw?`<div class="orkparts">${pl.join('<span class="orksep" aria-hidden="true"> · </span>')}${pl.length&&hw?'<span class="orksep" aria-hidden="true"> · </span>':''}${hw}</div>`:'';
+  // вне числа (не в счёте) — отдельной приглушённой строкой, не среди частей: части складываются в число
+  const aside=ok&&o.aside?`<p class="orkaside">${o.aside}</p>`:'';
   return `<div class="orktw${cls}">`
     +`<div class="actile orkt${cls}${click?'':' static'}"${click?` data-of="${o.filt}" data-odt="${_esc(name)}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="${_esc(`${name}: ${s.v} — список заказов`)}"`:''}>`
     +`<div class="t">${_esc(o.title)}</div>`
     +`<div class="orkvl"><div class="v">${s.v}</div>${s.cls==='pre'?'<span class="orkbadge" title="мало данных — см. «как посчитано»">предварительно</span>':''}${o.code?`<span class="orkcode" title="код показателя в регламенте ОРК">${o.code}</span>`:''}</div>`
-    +`<div class="orkd">${_esc(o.desc)}</div>`
+    +(o.desc?`<div class="orkd">${_esc(o.desc)}</div>`:'')
     +(s.cls==='nod'||s.cls==='hid'?`<div class="orkstate">${_esc(o.nodNote||_rzRef(s.note))}</div>${o.nodLink||''}`
       :(s.note&&!s.cls?`<div class="orkstate">${_esc(_rzRef(s.note))}</div>`:'')
        +(o.norm?`<div class="orkn">${o.norm}</div>`:'')
        +(o.act?`<div class="orka"><b>${_esc(_orkCap(o.who||''))}</b> → ${_esc(o.act)}</div>`:''))
-    +`</div>`+parts+`</div>`;
+    +`</div>`+parts+aside+`</div>`;
 }
 function _orkNoData(what,from){return `<section class="card"><div class="secttl">Нет данных</div><div class="note">Нет данных: ${what}. Откуда придёт — ${from}.</div></section>`;}
 // пометка отдельного направления — в каждой подвкладке: в основном виде ссылка, у направления — что в нём
 function _ctSepNote(X,sub){
   // одна пометка (просьба владельца 29.10.2026): что это за вид и куда перейти — одной строкой
-  const SP=X.sepHead||null; if(!SP) return '';
+  const SP=X.sepHead||null; if(!SP||!X.seg) return '';   // основной вид — строкой подвкладки (ctSubD)
   const href=`#contracts/${sub}/sep`, nm=_esc(SP.name);
   if(X.seg) return `<div class="note ctsepnote is-sep" role="note"><b>Только направление ${nm}</b>: его воронка и сделки реализации тех же компаний (${_ctN(SP.companies||0,'компания','компании','компаний')}). Очередь, плитки и итоги — только по ним.${sub==='quarter'?' «Квартал» общий: поставщиков меряем по всем заказам, вместе с основными.':''} <a href="#contracts/${sub}" data-ctdir="main">К основному виду →</a></div>`;
   return `<div class="note ctsepnote" role="note"><b>${nm} считается отдельно</b>${SP.deals?`: ${_ctN(SP.live||0,'сделка','сделки','сделок')} в работе — их сложности известны и ими занимаются. В очередь, плитки и итоги ниже они не входят${sub==='quarter'?' (кроме «Квартала»: поставщиков меряем по всем заказам)':''}`:' — сделок в нём сейчас нет'}. <a href="${href}" data-ctdir="sep">Открыть ${nm} →</a></div>`;
@@ -4255,7 +4427,8 @@ function _orkPanel(X,sub,el){
     return; }
   const h=_ctSepNote(X,sub)+_orkTrust(O);
   _odBind(el,X,O);                          // числа со списком заказов за ними ([data-od]) — во всех подвкладках
-  if(sub==='week') return _orkWeek(X,O,el,h);
+  // «Неделя»: строка доверия — под «Сегодня», а не над плитками (первый экран, ревью 30.10.2026)
+  if(sub==='week') return _orkWeek(X,O,el,_ctSepNote(X,sub),_orkTrust(O));
   if(sub==='month'){ el.innerHTML=h+_orkMonth(X,O); _orkJWire(X,el); return; }
   if(sub==='quarter'){ el.innerHTML=h+_orkQuarter(X,O); return; }
   el.innerHTML=h+_orkHow(X,O);
@@ -4273,7 +4446,7 @@ function _dcImpBlock(X){
     +`</section>`;
 }
 // ---------- «Неделя руководителя ОРК»: блоки 1–10 ----------
-function _orkWeek(X,O,el,h){
+function _orkWeek(X,O,el,h,trust){
   const W=O.week, T=W.tiles||{}, L=X.life||{}, R=X.rows||[], byDeal=Object.fromEntries(R.map(r=>[String(r.deal),r]));
   const DC=_dcData(), DQ=DC?(DC.queue||[]).filter(x=>!!x.seg===!!X.seg):[];
   // подписи пунктов — простыми словами (_RZ_PLAIN поверх подписей данных)
@@ -4325,7 +4498,8 @@ function _orkWeek(X,O,el,h){
     return [ws.slice(0,2).map(_orkWho).join(', ')+(ws.length>2?` и ещё ${ws.length-2}`:''),sub];};
   const tdOld=g=>{const o=g.items.reduce((a,x)=>x.days!=null&&(!a||x.days>a.days)?x:a,null); return o?_rzDays(o.code,o.days,o.inWd):'<span class="dimv">—</span>';};
   const tdUnit=g=>{const k=g.items.filter(x=>x.order).length; return k===g.items.length?['заказ','заказа','заказов']:!k?['сделка','сделки','сделок']:['пункт','пункта','пунктов'];};
-  const tdRow=g=>{const [wm,ws]=tdWho(g), u=tdUnit(g), n=g.items.length, a=_orkCap(_rzRef(top1(g.acts)||LB[g.code]||g.code));
+  // ссылка на пункт регламента — в очереди ниже; в «Сегодня» — только действие (первый экран)
+  const tdRow=g=>{const [wm,ws]=tdWho(g), u=tdUnit(g), n=g.items.length, a=_orkCap(_rzRef(top1(g.acts)||LB[g.code]||g.code).replace(/\s*\(п\. [\d.]+ регламента ОРК\)/g,''));
     return `<tr data-tq="${_esc(g.code)}" class="orksv${g.sev<=2?1:g.sev<=5?2:3}"><td class="orktda"><div class="orktdx"><span class="orkdot" aria-hidden="true"></span><div><b>${_esc(a)}</b> <span class="orkwhat">— ${_esc(LB[g.code]||g.items[0].what||'')}</span></div></div></td>`
       +`<td>${wm}${ws?` <span class="orkwhat">· ${ws}</span>`:''}</td>`
       +`<td class="r orktdc"><button type="button" class="odn orktdn" data-tq="${_esc(g.code)}" aria-label="${_esc(`${a}: ${_ctN(n,...u)} — список`)}">${n}</button> <span class="orku">${_ctN(n,...u).replace(/^\d+ /,'')}</span></td>`
@@ -4345,27 +4519,34 @@ function _orkWeek(X,O,el,h){
   if(shown(T2)&&T2.value) wk.push(`дольше нормы ${T2.value}`);
   if(shown(T3)&&T3.value) wk.push(`срок клиента под угрозой у ${T3.value}`);
   if(shown(T1)&&T1.value) wk.push(`не приняты в работу ${T1.value}`);
+  const w4nod=unk(T.W4);
   // плитки — первыми (что не так), «Сегодня» — сразу под ними (что делать): обе части — на первом экране
-  h+=`<section class="orksec orkweek" id="orkWeekS">`+sec('',`Неделя ${_orkDm(W.mon)}–${_orkD(W.sun)}${wk.length?': '+wk.join(', '):': отклонений нет'}`,'Пять счётчиков регламента ОРК, норма — ноль. Плитка и её части — списки заказов.',qmark('ork.week'))
-   +`<div class="kpis orkt5" id="orkTiles">`
-   +_orkTile({code:'W1',title:'Не приняты в работу',st:T1,filt:'w1',cls:T1.value?'warn':'',
-      desc:`Нет менеджера ОРК дольше ${nw(1)} р.д.`,
-      parts:[bit('сделок без заказа',T1.noOrder,'w:noOrderOver',`Сделки без заказа дольше ${nw(1)} р.д.`),bit('не считаем',T1.excluded,'w:step/1/nc','Приёмка: не считаем в сроке (карточка с ошибкой или сделка вне воронки «Реализация»)')],
+  h+=`<div class="orktop"><section class="orksec orkweek" id="orkWeekS">`+sec('',`Неделя ${_orkDm(W.mon)}–${_orkD(W.sun)}${wk.length?': '+wk.join(', '):': отклонений нет'}`,'',qmark('ork.week'))
+   +`<div class="kpis orkt5${w4nod?' orkt4':''}" id="orkTiles">`
+   +_orkTile({code:'W1',title:`Не приняты в работу за ${nw(1)} р.д.`,st:T1,filt:'w1',cls:T1.value?'warn':'',
+      desc:'',
+      // части складываются в число (ревью 30.10.2026): заказы на шаге 1 дольше нормы + сделки без заказа;
+      // «не считаем» — вне числа, отдельной приглушённой строкой
+      parts:[bit('заказов без менеджера ОРК',T1.orders,'w:W1/~ord',`Не приняты в работу: заказы без менеджера ОРК дольше ${nw(1)} р.д.`),bit('сделок без заказа',T1.noOrder,'w:noOrderOver',`Сделки без заказа дольше ${nw(1)} р.д.`)],
+      aside:T1.excluded?`ещё ${_odN(T1.excluded,'w:step/1/nc','Приёмка: не в счёте — карточка с ошибкой или сделка вне воронки «Реализация»')} не в счёте: ошибка в карточке`:'',
       meta:`Руководитель ОРК принимает сделку и назначает менеджера ОРК за ${nw(1)} р.д. от заказа или входа сделки в реализацию. Заказов ${T1.orders||0}, сделок без заказа ${T1.noOrder||0}.${T1.excluded?` Не считаем ${T1.excluded}: карточка с ошибкой или сделка не в воронке «Реализация».`:''} ${_orkCap(recTxt)}.${T1.byAssign&&rec.n?` Из ${rec.n} приёмку закрыло назначение менеджера ОРК: ${T1.byAssign}.`:''}${T1.assignStale||T1.assignNoMgr?` Назначение не засчитано («Заказ создан»):${T1.assignStale?` дата раньше начала приёмки — ${T1.assignStale}`:''}${T1.assignStale&&T1.assignNoMgr?',':''}${T1.assignNoMgr?` назначен не сотрудник ОРК — ${T1.assignNoMgr}`:''}.`:''} Паузы не вычитаем.`})
    +_orkTile({code:'W2',title:'Шаги ОРК дольше нормы',st:T2,filt:'w2',cls:T2.value?'bad':'',
-      desc:'Шаг отдела идёт дольше нормы',
+      desc:'',
       parts:[1,4,5,8].map(k=>bit(SNm[k],bs[k],'w:W2',`Шаги ОРК дольше нормы: шаг ${k} · ${SNm[k]}`,{step:k})),
       meta:`Норма, р.д.: приёмка (шаг 1) ${nw(1)}, договор с поставщиком (4) ${nw(4)}, заказ поставщику, его подтверждение и предоплата (5) ${nw(5)}, подготовка отгрузки (8) ${nw(8)}; закрывают менеджеры ОРК — по людям ниже. Сейчас: ${[1,4,5,8].map(k=>`${SNm[k]} — ${bs[k]||0}`).join(', ')}.${T2.waitUtd?` Ждём подписанный УПД от клиента: ${T2.waitUtd} — больше ${nw(12)} р.д. от доставки; подпись за клиентом, это не просрочка менеджера, в число не входит.`:''}${(W.waitUtd||{}).unknown?` Срок УПД не посчитать (нет даты доставки или календаря года): ${W.waitUtd.unknown}.`:''}${T2.excluded?` Не считаем ${T2.excluded}: карточка с ошибкой или приёмка сделки вне воронки «Реализация».`:''}${(O.trust||{}).noCalendar?` Год без производственного календаря: ${O.trust.noCalendar}.`:''} От входа заказа в стадию шага до сегодня, паузы не вычитаем.`})
    +_orkTile({code:'W3',title:'Срок клиента под угрозой',st:T3,filt:'w3',cls:T3.value?'bad':'',
-      desc:'Срок сорван или может сорваться',
+      desc:'',
       parts:[bit('сорван',b3.late,'w:W3','Срок клиента сорван',{tag:tagOf('late')}),bit(`до срока ≤ ${RD} дн.`,b3.risk,'w:W3',`До срока клиента ≤ ${RD} дн., не отгружено`,{tag:tagOf('risk')}),bit('прогноз позже',b3.forecast,'w:W3','Прогноз доставки позже срока клиента',{tag:tagOf('forecast')})],
       meta:`Сорван ${b3.late||0}, до срока ≤ ${RD} дн. без отгрузки ${b3.risk||0}, прогноз позже срока ${b3.forecast||0}. Это результат поставщика и логистики: менеджер ОРК двигает поставку, КАМ договаривается с клиентом о новом сроке. Сделки с сорванным сроком — и в таблице <a href="#contracts/main" data-ctgo="main" data-ctmode="late" class="orklink">«Сделки и деньги» → просрочен дедлайн</a>`})
-   +_orkTile({code:'W4',title:'Эскалации и паузы',st:T.W4,desc:'В Битриксе не ведутся — сроки считаем без пауз',nodNote:'Нет данных: полей «Эскалация» и «Пауза срока» в Битриксе нет — нужна заявка администратору',
-      nodLink:`<a href="#contracts/how" data-ctgo="how" class="orklink orknodl">Какие поля нужны →</a>`})
+   +(w4nod?'':_orkTile({code:'W4',title:'Эскалации и паузы',st:T.W4,desc:'В Битриксе не ведутся — сроки считаем без пауз',nodNote:'Нет данных: полей «Эскалация» и «Пауза срока» в Битриксе нет — нужна заявка администратору',
+      nodLink:`<a href="#contracts/how" data-ctgo="how" class="orklink orknodl">Какие поля нужны →</a>`}))
    +_orkTile({code:'W5',title:'Контрольные точки недели',st:T5,filt:'w5',cls:T5.value?'amb':'',
-      desc:'Когда запросить у поставщика статус производства',norm:`В производстве ${T5.prod!=null?T5.prod:'—'}${T5.noDates?`, без плановых дат ${T5.noDates}`:''}`,
+      desc:'Запросить статус у поставщика',norm:`В производстве ${T5.prod!=null?T5.prod:'—'}${T5.noDates?`, без плановых дат ${T5.noDates}`:''}`,
       meta:`Середина срока производства и 14 дн. до плановой отгрузки — дни, когда менеджер ОРК запрашивает у поставщика статус. Точек ${T5.value!=null?T5.value:'—'} у заказов в производстве (шаги 6–7): ${T5.prod!=null?T5.prod:'—'}${T5.noDates?`, без плановых дат — ${T5.noDates}`:''}${T5.unknown?`; стадия неизвестна регламенту — ${T5.unknown}`:''}. Плановые даты производства есть у ${_orkPct(T5.cover)}.`})
-   +`</div></section>`+todayH;
+   +`</div></section>`+todayH+`</div>`
+   // W4 без данных — строкой под «Сегодня», а не пустой плиткой на первом экране (ревью 30.10.2026, Ш3)
+   +(w4nod?`<p class="note orkw4"><b>Эскалации и паузы</b> <span class="orkcode" title="код показателя в регламенте ОРК">W4</span> — нет данных: полей «Эскалация» и «Пауза срока» в Битриксе нет, поэтому сроки считаем без пауз; нужна заявка администратору. <a href="#contracts/how" data-ctgo="how" class="orklink">Какие поля нужны →</a></p>`:'')
+   +(trust||'');
   // 3. очередь с отбором по роли, человеку и шагу
   const codes=Object.keys(LB).filter(k=>Q.some(x=>x.code===k));
   const roles=[...new Set(Q.map(x=>x.role).concat(Q.map(x=>x.copyRole)).filter(Boolean))];
@@ -4384,7 +4565,7 @@ function _orkWeek(X,O,el,h){
   // 4. зона риска
   const RK=W.risk||[];
   h+=`<section class="card orkc"><h3 class="orkct">Срок клиента под угрозой: ${_ctN(RK.length,'заказ','заказа','заказов')}${b3.late?`, сорван у ${b3.late}`:''}</h3><p class="orkwhy">Срок прошёл, до него ≤ ${RD} дн. без отгрузки или прогноз доставки позже срока. Менеджер ОРК двигает поставку, КАМ согласует с клиентом новый срок.</p>`
-   +`<div class="twrap"><table class="lft orkrk" data-xl-name="Срок клиента под угрозой"><caption class="orkvh">Срок клиента под угрозой</caption><thead><tr><th scope="col">Что случилось</th><th scope="col">Заказ · заказчик</th><th scope="col">Срок клиента · прогноз</th><th scope="col" class="r">Дней</th><th scope="col">Кто двигает · кто согласует</th></tr></thead><tbody id="orkRisk"></tbody></table></div><div id="orkRiskMore"></div></section>`;
+   +`<div class="twrap"><table class="lft orkrk" data-xl-name="Срок клиента под угрозой"><caption class="orkvh">Срок клиента под угрозой</caption><thead><tr><th scope="col">Что случилось</th><th scope="col">Заказ · заказчик</th><th scope="col">Срок клиента · прогноз</th><th scope="col" class="r">Дней, кал.</th><th scope="col">Кто двигает · кто согласует</th></tr></thead><tbody id="orkRisk"></tbody></table></div><div id="orkRiskMore"></div></section>`;
   // приёмка руководителя ОРК (шаг 1) — рядом с точками недели
   const s1=Q.filter(x=>x.step===1&&x.role==='orkHead'), head=(s1.find(x=>x.role==='orkHead')||{}).who||W.orkHead||'руководитель ОРК';
   const HY=W.hygiene||{}, HB=HY.by||{}, ab1=(HY.items||[]).filter(x=>x.step===1&&(x.kinds||[]).includes('abandoned')).length;
@@ -4402,23 +4583,25 @@ function _orkWeek(X,O,el,h){
   const ab1B=ab1?_odN(ab1,'w:hyg/xabandoned','Карточку забросили (шаг 1)',{step:1}):'';
   h+=`<section class="card orkc"><h3 class="orkct">Приёмка сделок · ${_orkWho(head)}${s1.length?` — ждут ${s1.length}`:''}</h3><p class="orkwhy">Шаг 1: руководитель ОРК принимает сделку и назначает менеджера ОРК за ${nw(1)} р.д. ${recN}.</p>`
    +`<div class="twrap"><table class="lft orkmine" data-xl-name="Приёмка сделок"><caption class="orkvh">Приёмка сделок</caption><thead><tr><th scope="col">Что сделать</th><th scope="col">Заказ · заказчик</th><th scope="col">Что случилось</th><th scope="col" class="r">Дней</th></tr></thead><tbody id="orkMine">`
-   +(s1.map(x=>`<tr class="drill" data-ct="${x.deal}" tabindex="0"><td class="orkqa">${_esc(_orkCap(x.act))}</td><td>${noB(x)}<div class="dep">${_esc(x.customer||'')}</div>${_orkFx(x)?`<div class="dep">${_orkFx(x)}</div>`:''}</td><td class="orkcap">${_esc(LB[x.code]||x.what)}</td><td class="r">${days(x)}</td></tr>`).join('')||`<tr><td colspan="4" class="dimv">${ab1?`сейчас приёмки никто не ждёт; карточек, заброшенных на шаге 1: ${ab1B} — они в «Карточках с ошибками» ниже`:emptyTxt(T1,'сейчас приёмки никто не ждёт')}</td></tr>`)
+   +(s1.map(x=>`<tr class="drill" data-ct="${x.deal}" tabindex="0"><td class="orkqa">${_esc(_orkCap(x.act))}</td><td>${noB(x)}<div class="dep">${_esc(x.customer||'')}</div>${_orkFx(x)?`<div class="dep">${_orkFx(x)}</div>`:''}</td><td class="orkcap">${_esc(LB[x.code]||x.what)}</td><td class="r" data-xlv="${x.days!=null?x.days:''}">${days(x)}</td></tr>`).join('')||`<tr><td colspan="4" class="dimv">${ab1?`сейчас приёмки никто не ждёт; карточек, заброшенных на шаге 1: ${ab1B} — они в «Карточках с ошибками» ниже`:emptyTxt(T1,'сейчас приёмки никто не ждёт')}</td></tr>`)
    +`</tbody></table></div>`
    +how(`Шаг 1 — у руководителя ОРК ${nw(1)} р.д. от создания заказа или входа сделки в реализацию. Приёмка закончена, когда назначен менеджер ОРК (поле «Дата записи нового ответственного») или заказ ушёл из стадии «Заказ создан» — что раньше. Дальше шаг 4: договор с поставщиком — ${nw(4)} р.д. от назначения.`)
    +`</section>`;
   h+=`</div>`;
   // 5. где стоят заказы: 13 шагов регламента
   const sumNow=LG.reduce((s,x)=>s+(x.now||0),0), sumOver=LG.reduce((s,x)=>s+(x.over||0),0);
+  // сколько заказов за парами «заказ × файл» шага (у заказа может не быть нескольких файлов)
+  const artO=no=>{const K=_odKeys((((W.drill||{}).step||{})[no]||{}).art); return K?new Set(K.k).size:0;};
   const normC=s=>s.normState==='norm'?_esc(String(s.normDoc||'').replace(/\s*р\.д\.?/g,'')):s.normState==='nodata'?`${_esc(String(s.normDoc||'').replace(/\s*р\.д\.?/g,''))} <span class="dimv" title="${_esc('норма есть, а дат в заказе нет: '+(s.normNeed||''))}">— не меряем: дат нет</span>`:'<span class="dimv" title="регламент нормы не задаёт">—</span>';
   h+=sec('',`Где сейчас ${_ctN(W.live||0,'заказ','заказа','заказов')} в работе: 13 шагов регламента${sumOver?`, дольше нормы — ${sumOver}`:''}`,'У кого мяч и сколько дольше нормы. Строка — пункты очереди этого шага, число — список заказов.',qmark('ork.ledger'))
    +`<section class="card orkc">`
-   +`<div class="twrap"><table class="lft orkled" data-xl-name="13 шагов регламента"><caption class="orkvh">Где сейчас заказы: 13 шагов регламента</caption><thead><tr><th scope="col">Шаг регламента</th><th scope="col">Кто делает</th><th scope="col" class="r">На шаге</th><th scope="col" class="r">Дольше нормы</th><th scope="col" class="r">Норма, р.д.</th><th scope="col" class="r" title="Обязательные файлы шага, которых нет в карточке, — у заказов, уже прошедших шаг: пары «заказ × файл»">Нет файлов шага</th><th scope="col">От кого зависит</th></tr></thead><tbody id="orkLed">`
+   +`<div class="twrap"><table class="lft orkled" data-xl-name="13 шагов регламента"><caption class="orkvh">Где сейчас заказы: 13 шагов регламента</caption><thead><tr><th scope="col">Шаг регламента</th><th scope="col">Кто делает</th><th scope="col" class="r">На шаге</th><th scope="col" class="r">Дольше нормы</th><th scope="col" class="r">Норма, р.д.</th><th scope="col" class="r" title="Обязательные файлы шага, которых нет в карточке, — у заказов, уже прошедших шаг: файлов из нужных и у скольких заказов">Нет файлов шага<span class="dep">у прошедших шаг: файлов из нужных</span></th><th scope="col">От кого зависит</th></tr></thead><tbody id="orkLed">`
    +LG.map(s=>`<tr class="drill${s.over?' orkov':''}" data-step="${s.no}" tabindex="0"><td><span class="orkstn">${s.no}</span> ${_esc(s.name)}${s.seg?` <span class="dimv orkseg" title="${_esc('отрезок '+s.seg+' — по нему считаются сроки в «Месяце» и «Квартале»')}">${s.seg}</span>`:''}<div class="dep orkm">${_esc(s.roleName)}</div></td>`
      +`<td>${_esc(s.roleName)}${s.no===1&&head&&head!=='руководитель ОРК'?`<div class="dep">${_orkWho(head)}</div>`:''}${(s.also||[]).length?`<div class="dep also">вместе с: ${_esc(s.also.join(', '))}</div>`:''}</td>`
      +`<td class="r mono">${_odN(s.now||0,`w:step/${s.no}/now`,`Шаг ${s.no} · ${s.name}: заказы на шаге`)}${s.no===12&&W.closed12?`<div class="dep" title="сделка закрыта или оплачена, а заказ доставлен без УПД — менеджер ОРК всё равно получает УПД">из них сделка уже закрыта: ${_odN(W.closed12,'w:step/12/closed','Шаг 12: сделка закрыта, УПД ещё нет')}</div>`:''}${s.no===13&&W.dealClose?`<div class="dep" title="оплата получена, сделка в Битриксе открыта — ОСС закрывает сделку; это сделки, а не заказы">закрыть сделку (ОСС): ${_odN(W.dealClose,'w:step/13/close','Шаг 13: оплата получена, закрыть сделку')}</div>`:''}</td>`
-     +`<td class="r mono${s.over?' hot':''}">${s.waitUtd!=null?(s.waitUtd===0&&s.overUnknown&&s.overUnknown>=s.now-(s.notCounted||0)?'<span class="dimv" title="срок не посчитать ни у одного заказа шага">—</span>':`<span class="${s.waitUtd?'amb':'dimv'}" title="больше ${nw(12)} р.д. от доставки без подписанного УПД: подпись за клиентом, это не просрочка менеджера; на 11-й р.д. менеджер ОРК эскалирует КАМу">ждём УПД от клиента ${_odN(s.waitUtd,'w:step/12/wait','Шаг 12: ждём УПД от клиента')}</span>`):s.over===0&&s.overUnknown&&s.overUnknown>=s.now-(s.notCounted||0)?'<span class="dimv" title="срок не посчитать ни у одного заказа шага">—</span>':s.over==null?(s.normState==='nodata'?'<span class="dimv" title="норма регламента есть, дат в заказе нет">не меряем</span>':'<span class="dimv" title="регламент нормы не задаёт">—</span>'):_odN(s.over,`w:step/${s.no}/over`,`Шаг ${s.no} · ${s.name}: дольше нормы`)}${s.overUnknown?`<div class="dep" title="нет даты входа в шаг или факта доставки, или года нет в календаре РФ">срок не посчитать: ${_odN(s.overUnknown,`w:step/${s.no}/unk`,`Шаг ${s.no}: срок не посчитать`)}</div>`:''}${s.notCounted?`<div class="dep" title="карточка с ошибкой (стадия отстала, заброшена, доставка старше года без УПД) или приёмка сделки вне воронки «Реализация»">не считаем: ${_odN(s.notCounted,`w:step/${s.no}/nc`,`Шаг ${s.no}: на шаге, но срок не считаем`)}</div>`:''}${s.no===7&&LP.state!=='nodata'&&s.longP80!=null?`<div class="dep${s.longP80?' amb':''}" title="${_esc(LP.label||'')}">дольше обычного: ${_odN(s.longP80,'w:step/7/p80','Шаг 7: производство дольше обычного')}<br>80 % заказов — до ${Math.round(LP.p80)} дн.; нормы нет</div>`:''}</td>`
+     +`<td class="r mono${s.over?' hot':''}">${s.waitUtd!=null?(s.waitUtd===0&&s.overUnknown&&s.overUnknown>=s.now-(s.notCounted||0)?'<span class="dimv" title="срок не посчитать ни у одного заказа шага">—</span>':`<span class="${s.waitUtd?'amb':'dimv'}" title="больше ${nw(12)} р.д. от доставки без подписанного УПД: подпись за клиентом, это не просрочка менеджера; на 11-й р.д. менеджер ОРК эскалирует КАМу">ждём УПД от клиента ${_odN(s.waitUtd,'w:step/12/wait','Шаг 12: ждём УПД от клиента')}</span>`):s.over===0&&s.overUnknown&&s.overUnknown>=s.now-(s.notCounted||0)?'<span class="dimv" title="срок не посчитать ни у одного заказа шага">—</span>':s.over==null?(s.normState==='nodata'?'<span class="dimv" title="норма регламента есть, дат в заказе нет">не меряем</span>':'<span class="dimv" title="регламент нормы не задаёт">—</span>'):_odN(s.over,`w:step/${s.no}/over`,`Шаг ${s.no} · ${s.name}: дольше нормы`)}${s.overUnknown?`<div class="dep" title="нет даты входа в шаг или факта доставки, или года нет в календаре РФ">срок не посчитать: ${_odN(s.overUnknown,`w:step/${s.no}/unk`,`Шаг ${s.no}: срок не посчитать`)}</div>`:''}${s.notCounted?`<div class="dep" title="карточка с ошибкой (стадия отстала, заброшена, доставка старше года без УПД) или приёмка сделки вне воронки «Реализация»">не считаем: ${_odN(s.notCounted,`w:step/${s.no}/nc`,`Шаг ${s.no}: на шаге, но срок не считаем`)}</div>`:''}${s.no===7&&LP.state!=='nodata'&&s.longP80!=null?`<div class="dep${s.longP80?' amb':''}" title="${_esc(LP.label||'')}">дольше обычного: ${_odN(s.longP80,'w:step/7/p80',`Шаг 7: производство дольше обычного — больше ${Math.round(LP.p80)} дн.`)}<br>80 % заказов — до ${Math.round(LP.p80)} дн.; нормы нет</div>`:''}</td>`
      +`<td class="r mono">${normC(s)}</td>`
-     +`<td class="r mono${s.artMiss?' hot':''}">${s.artReq?`${_odN(s.artMiss,`w:step/${s.no}/art`,`Шаг ${s.no} · ${s.name}: нет обязательного файла шага (пары «заказ × файл»)`)} из ${s.artReq}`:'—'}</td>`
+     +`<td class="r mono${s.artMiss?' hot':''}" data-xlv="${s.artReq?`${s.artMiss||0} из ${s.artReq}`:''}">${s.artReq?`${_odN(s.artMiss,`w:step/${s.no}/art`,`Шаг ${s.no} · ${s.name}: нет обязательных файлов шага`)} из ${s.artReq}${artO(s.no)?`<div class="dep">у ${_ctN(artO(s.no),'заказа','заказов','заказов')}</div>`:''}`:'—'}</td>`
      +`<td>${s.waitsName?_esc(s.waitsName):''}</td></tr>`).join('')
    +`</tbody><tfoot><tr><td colspan="2"><b>Итого на шагах</b></td><td class="r mono"><b>${_odN(sumNow,'w:mapped','Заказы на шагах регламента')}</b></td><td colspan="4" class="dimv">всего заказов в работе ${_odN(W.live||0,'w:live','Заказы в работе')}${W.closed12?` (из них ${_odN(W.closed12,'w:step/12/closed','Шаг 12: сделка закрыта, УПД ещё нет')} — у закрытых сделок, шаг 12)`:''}${W.unknown?` · стадия неизвестна регламенту — ${_odN(W.unknown,'w:unk','Стадия неизвестна регламенту: сверить в Битриксе')} (в «Карточках с ошибками»)`:''}${sumNow+(W.unknown||0)!==(W.live||0)?' · <span class="nrc">сумма не сходится с числом заказов в работе</span>':''}</td></tr></tfoot></table></div>`
    +`<p class="orkwhy orkled-n">Сделок в реализации без заказа поставщику: ${_odN(W.dealsNoOrder||0,'w:noOrder','Сделки в реализации без заказа')}${W.dealsNoOrderOver!=null?`, из них дольше ${nw(1)} р.д. — ${_odN(W.dealsNoOrderOver,'w:noOrderOver',`Сделки без заказа дольше ${nw(1)} р.д.`)} (в плитке «Не приняты в работу»)`:' — они в плитке «Не приняты в работу»'}.</p>`
@@ -4432,12 +4615,12 @@ function _orkWeek(X,O,el,h){
   h+=sec('','Ждём другие отделы и поставщика','Мяч не у ОРК: заказы на шагах КАМа, ОСС, логистики или поставщика — это не просрочка менеджера ОРК.')
    +`<div class="grid orkg2"><section class="card orkc">`
    +`<div class="twrap"><table class="lft orkadj" data-xl-name="Ждём другие отделы и поставщика"><caption class="orkvh">Ждём другие отделы и поставщика</caption><thead><tr><th scope="col">Кого ждём</th><th scope="col">Чего ждём — шаги</th><th scope="col" class="r">Заказов</th></tr></thead><tbody id="orkAdj">`
-   +Object.keys(_ORK_ADJ).map(r=>{const SS=LG.filter(s=>s.waits===r), st=SS.map(s=>s.no), t=`Ждём: ${_ORK_ADJ[r]} (шаги ${st.join(', ')||'—'})`; return `<tr class="drill" data-adj="${r}" data-steps="${st.join(',')}" data-odt="${_esc(t)}" tabindex="0"><td>${_esc(ADJN[r]||_orkCap(_ORK_ADJ[r]))}</td><td>${SS.map(s=>`<div>${s.no} · ${_esc(s.name)}</div>`).join('')||'—'}</td><td class="r mono">${AJ[r]!=null?_odN(AJ[r],'w:adj/'+r,t):'—'}${r==='sup'&&LP.state!=='nodata'&&LP.k?`<div class="dep amb">дольше обычного: ${_odN(LP.k,'w:p80','Производство дольше обычного (шаг 7)')}</div>`:''}</td></tr>`;}).join('')
+   +Object.keys(_ORK_ADJ).map(r=>{const SS=LG.filter(s=>s.waits===r), st=SS.map(s=>s.no), t=`Ждём: ${_ORK_ADJ[r]} (шаги ${st.join(', ')||'—'})`; return `<tr class="drill" data-adj="${r}" data-steps="${st.join(',')}" data-odt="${_esc(t)}" tabindex="0"><td>${_esc(ADJN[r]||_orkCap(_ORK_ADJ[r]))}</td><td>${SS.map(s=>`<div>${s.no} · ${_esc(s.name)}</div>`).join('')||'—'}</td><td class="r mono">${AJ[r]!=null?_odN(AJ[r],'w:adj/'+r,t):'—'}${r==='sup'&&LP.state!=='nodata'&&LP.k?`<div class="dep amb">дольше обычного: ${_odN(LP.k,'w:p80','Производство дольше обычного (шаг 7) — больше '+Math.round(LP.p80||0)+' дн.')}</div>`:''}</td></tr>`;}).join('')
    +`</tbody></table></div>`
    +how('Клик по строке — список этих заказов (поставщики, стадии, сроки; в списке — «Показать в очереди дел» по этим шагам); «дольше обычного» — свой список. Шаги 2–3 (договор с заказчиком) заказ не занимает: стадия «Заказ направлен» — уже шаг 4, поэтому ожидание договора заказчика здесь не видно — оно в очереди пунктами «договор стороны не найден» и «оплатили поставщику без договора клиента».')
    +`</section>`
    // шаг 7 не нормируется: дольше P80 производства по всем заказам — сигнал (мяч у поставщика)
-   +`<section class="card orkc"><h3 class="orkct">Производство дольше обычного · ${LP.state==='nodata'?'нет данных':_odN(LP.k,'w:p80','Производство дольше обычного (шаг 7)')}</h3><p class="orkwhy">Дольше, чем шли 80 % заказов за год${LP.p80!=null?` (до ${Math.round(LP.p80)} дн.)`:''}. Нормы у производства нет — это сигнал: менеджер ОРК запрашивает у поставщика статус и новую дату готовности.</p>`
+   +`<section class="card orkc"><h3 class="orkct">Производство дольше обычного · ${LP.state==='nodata'?'нет данных':_odN(LP.k,'w:p80','Производство дольше обычного (шаг 7) — больше '+Math.round(LP.p80||0)+' дн.')}</h3><p class="orkwhy">Дольше, чем шли 80 % заказов за год${LP.p80!=null?` (до ${Math.round(LP.p80)} дн.)`:''}. Нормы у производства нет — это сигнал: менеджер ОРК запрашивает у поставщика статус и новую дату готовности.</p>`
    +(LP.state==='nodata'?`<div class="note">Нет данных: ${_esc(LP.why||'срок, в который укладываются 80 % заказов, не посчитан')}. Откуда придёт — законченные производства (вход в «Заказ готов»).</div>`
      :`<div class="twrap"><table class="lft orkp80" data-xl-name="Производство дольше обычного"><caption class="orkvh">Производство дольше обычного</caption><thead><tr><th scope="col">Сделка · заказчик</th><th scope="col">Заказ · поставщик</th><th scope="col" class="r">Дней в производстве</th><th scope="col">Менеджер ОРК</th></tr></thead><tbody id="orkP80">`
       +((LP.items||[]).slice(0,12).map(p80row).join('')||'<tr><td colspan="4" class="dimv">пусто — все в производстве не дольше обычного</td></tr>')
@@ -4477,7 +4660,7 @@ function _orkWeek(X,O,el,h){
     B.innerHTML=r.map(riskRow).join('')||`<tr><td colspan="5" class="dimv">${emptyTxt(T3,'пусто — сроки клиентов не под угрозой')}</td></tr>`;
     document.getElementById('orkRiskMore').innerHTML=(!riskAll&&RK.length>12)?`<span class="stchip orkmore" id="orkRiskAll" tabindex="0" role="button">Показать все ${RK.length}</span>`:'';
   };
-  const riskRow=x=>`<tr class="drill" data-ct="${x.deal}" tabindex="0"><td class="orkcap${x.code==='late'?' hot':''}">${_esc(LB[x.code]||x.code)}</td><td>${noB(x)}<div class="dep">${cust(x.deal)}</div>${x.sup&&x.sup!=='—'?`<div class="dep">поставщик ${_esc(x.sup)}</div>`:''}</td><td class="mono">${x.dl?'срок '+_esc(x.dl):'срока нет'}${x.fc&&x.code==='forecast'?`<div class="dep">прогноз доставки ${_esc(x.fc)}</div>`:''}</td><td class="r">${x.days!=null?_rzDays(x.code,x.days,false):''}</td><td>менеджер ОРК: ${x.who&&x.who!=='не назначен'?_orkWho(x.who):'<span class="amb">не назначен</span>'}${x.copy?`<div class="dep">согласует срок — КАМ: ${_orkWho(x.copy)}</div>`:''}</td></tr>`;
+  const riskRow=x=>`<tr class="drill" data-ct="${x.deal}" tabindex="0"><td class="orkcap${x.code==='late'?' hot':''}">${_esc(LB[x.code]||x.code)}</td><td>${noB(x)}<div class="dep">${cust(x.deal)}</div>${x.sup&&x.sup!=='—'?`<div class="dep">поставщик ${_esc(x.sup)}</div>`:''}</td><td class="mono">${x.dl?'срок '+_esc(x.dl):'срока нет'}${x.fc&&x.code==='forecast'?`<div class="dep">прогноз доставки ${_esc(x.fc)}</div>`:''}</td><td class="r" data-xlv="${x.days!=null?x.days:''}">${x.days!=null?_rzDays(x.code,x.days,false):''}</td><td>менеджер ОРК: ${x.who&&x.who!=='не назначен'?_orkWho(x.who):'<span class="amb">не назначен</span>'}${x.copy?`<div class="dep">согласует срок — КАМ: ${_orkWho(x.copy)}</div>`:''}</td></tr>`;
   riskRows();
   const qrows=()=>{
     const r=Q.filter(x=>(!F.codes||F.codes.includes(x.code))&&(!F.w2||x.w2||(F.wu&&x.waitUtd))&&(!F.steps||F.steps.includes(x.step))
@@ -4500,7 +4683,7 @@ function _orkWeek(X,O,el,h){
       return `<tr class="drill" data-ct="${x.deal}" tabindex="0"><td class="orkqa${x.sev<=2&&!String(x.code).startsWith('chat')?' hot':''}${rep?' orkrep':''}">${_esc(_orkCap(_rzRef(x.act||'')))}</td>`
       +`<td>${noB(x)}${ttl?` <span class="dep orkttl">${_esc(ttl)}</span>`:''}<div class="dep">${_esc(x.customer||'')}${(x.customer&&(x.ordLbl?_orkFx(x):x.sup||x.dl))?' · ':''}${x.ordLbl?_orkFx(x):`${_esc(x.sup||'')}${x.dl?' · срок '+_esc(x.dl):''}${x.fc&&x.code==='forecast'?' · прогноз '+_esc(x.fc):''}`}</div></td>`
       +`<td class="orkcap">${_esc(LB[x.code]&&_RZ_PLAIN[x.code]?LB[x.code]:(x.what||''))}<div class="dep">${x.step!=null?`шаг ${x.step}${s?' · '+_esc(s.name):''}`:'вне шагов регламента'}</div>${x.byUtd?'<div class="dep">дата доставки взята из УПД: факта доставки в заказе нет</div>':''}${x.waitUtd?'<div class="dep">ждём подписанный УПД от клиента — это не просрочка менеджера</div>':''}${x.signal?`<div class="dep">${_esc(x.signal)}</div>`:''}</td>`
-      +`<td class="r">${days(x)}</td>`
+      +`<td class="r" data-xlv="${x.days!=null?x.days:''}">${days(x)}</td>`
       +`<td>${x.who&&x.who!=='не назначен'?_orkWho(x.who):'<span class="amb">не назначен</span>'}${x.whoGone?' <span class="gone">уволен — переназначить</span>':''}<div class="dep">${_esc(x.roleName||'')}${x.escalateTo&&x.escalateTo!==x.who?`${x.roleName?' · ':''}в копии: ${_orkWho(x.escalateTo)}`:(!x.role&&x.kam&&x.kam!==x.who?'в копии КАМ: '+_orkWho(x.kam):'')}</div></td></tr>`;};
   const qtail=r=>{
     document.getElementById('orkMore').innerHTML=(!F.all&&r.length>40)?`<span class="stchip orkmore" id="orkAll" tabindex="0" role="button">Показать все ${r.length}</span>`:'';
@@ -4638,9 +4821,10 @@ function _ctmPre(st){
 }
 // полоса «значение и цель» (dataink: bullet graph вместо плашки): дорожка 0–100 %, значение, метка цели
 function _ctmBullet(v,T){
-  const w=Math.max(0,Math.min(100,v)), bad=v<T, d=String(Math.round((T-v)*10)/10).replace('.',',');
-  return `<div class="ctm-bul${bad?' is-bad':''}" role="img" aria-label="${_esc(`${v} % при цели ${T} %${bad?` — ниже цели на ${d} пункта`:' — цель выполнена'}`)}"><div class="ctm-bul-t" aria-hidden="true"><i class="ctm-bul-v" style="width:${w}%"></i><i class="ctm-bul-m" style="left:${Math.min(100,T)}%"></i></div>`
-    +`<div class="ctm-bul-l">${bad?`ниже цели ${T} % на ${d} пункта`:`цель ${T} % выполнена`}</div></div>`;
+  const w=Math.max(0,Math.min(100,v)), bad=v<T, dv=Math.round((T-v)*10)/10, d=String(dv).replace('.',',');
+  const pp=Number.isInteger(dv)?_ctN(dv,'пункт','пункта','пунктов').replace(/^\S+ /,''):'пункта';
+  return `<div class="ctm-bul${bad?' is-bad':''}" role="img" aria-label="${_esc(`${v} % при цели ${T} %${bad?` — ниже цели на ${d} ${pp}`:' — цель выполнена'}`)}"><div class="ctm-bul-t" aria-hidden="true"><i class="ctm-bul-v" style="width:${w}%"></i><i class="ctm-bul-m" style="left:${Math.min(100,T)}%"></i></div>`
+    +`<div class="ctm-bul-l">${bad?`ниже цели ${T} % на ${d} ${pp}`:`цель ${T} % выполнена`}</div></div>`;
 }
 function _ctmNotes(){
   const L=[];
@@ -4711,23 +4895,26 @@ function _orkMonth(X,O){
   const part=st=>{if(!mc) return ''; const v=_orkSt(st,pc).v; return `${_esc(_orkCap(_ctmMon(mc.m)))} идёт${v==='—'?' — значения пока нет':`: <b>${v}</b>, месяц неполный — число в таблице ниже`}`;};
   const M1=(m0.M1||{}).mgr||{}, M3=M.M3||{}, M2=m0.M2||{}, OT=m0.otd||{};
   const SG0=(O.how||{}).segNorms||{}, nr=c=>SG0[c]!=null?SG0[c]:'—';
-  let h=`<div class="ctm"><p class="ctm-scope">Заказы, созданные с <b>${_orkD(M.since)}</b> — с этой даты в Битриксе работают роботы ОРК и у заказа есть менеджер ОРК. Цель — <b>${T} %</b>. Сроки — в рабочих днях (р.д.) по календарю РФ, паузы не вычитаем.${M.note?' '+_esc(_orkCap(M.note))+'.':''}</p>`;
+  let h=`<div class="ctm"><p class="ctm-scope">Заказы, созданные с <b>${_orkD(M.since)}</b> — с этой даты в Битриксе работают роботы ОРК и у заказа есть менеджер ОРК. Цель: шаги вовремя и карточки заполнены — <b>${T} %</b>, доставлено к сроку клиента — <b>80 %</b>. Сроки — в рабочих днях (р.д.) по календарю РФ, паузы не вычитаем.${M.note?' '+_esc(_orkCap(M.note))+'.':''}</p>`;
   // заголовок — вывод с числом (dataink: action title), тема — подписью
   const bad1=[]; const sv=st=>(st&&(st.state==='show'||st.state==='prelim')&&st.value!=null)?st.value:null;
   if(sv(M1)!=null&&sv(M1)<T) bad1.push(`шаги вовремя у ${sv(M1)} %`);
   if(sv(M2)!=null&&sv(M2)<T) bad1.push(`карточки заполнены на ${sv(M2)} %`);
+  // заголовок месяца — только выводы этого месяца (ревью 30.10.2026): M1, M2 и доставка к сроку ниже
+  // цели; «ещё не доставлено после срока» — срез на дату выгрузки, а не итог месяца: отдельной строкой
+  const OTT=80, otv=sv(OT), asOfT=_orkD(O.asOf||(O.week||{}).asOf||'');
   const mn=_orkCap(_ctmMon(m0.m||'Месяц')), lo0=(X.deadlines||{}).lateOrders||0;
-  const fnd=(bad1.length?`${bad1.join(', ')} — ниже цели ${T} %`:'')+(lo0?`${bad1.length?'; ':''}${_ctN(lo0,'заказ','заказа','заказов')} ещё не доставлено после срока клиента`:'');
+  const fnd=[bad1.length?`${bad1.join(', ')} — ниже цели ${T} %`:'',otv!=null&&otv<OTT?`доставлено к сроку клиента ${otv} % при цели ${OTT} %`:''].filter(Boolean).join('; ');
   h+=`<div class="secttl"><b>·</b> ${_esc(mn)}${fnd?`: ${_esc(fnd)}`:m0.partial?' — идёт, неполный':' — последний полный месяц'}${qmark('ork.month')}</div>`
    +(fnd?`<p class="ctm-lead">${m0.partial?'Месяц идёт, неполный':'Последний полный месяц'}${m0.eraPartial?`; считаем с ${_orkDm(M.since)} — месяц неполный`:''}. Карточка показателя открывает заказы за числом.</p>`:(m0.eraPartial?`<p class="ctm-lead">Считаем с ${_orkDm(M.since)} — месяц неполный.</p>`:''))
    +`<div class="ctm-kpis ctm-kpis-4">`
    +_ctmKpi({code:'M1',title:'Шаги отдела вовремя',desc:`доля законченных в месяце шагов в норме: договор с поставщиком — ${nr('S2')} р.д., заказ и подтверждение поставщика — ${nr('S3')}, подготовка к отгрузке — ${nr('S6')}`,st:M1,fmt:pc,target:T,meta:`в норме <b>${M1.k!=null?M1.k:'—'}</b> из ${M1.n||0} · не считаем: стадии прокликали разом или вернули назад — ${M1.excluded||0}, шаг перепрыгнули — ${M1.skipped||0}`,who:'менеджеры ОРК; разбор — руководитель ОРК',part:part(mc&&(mc.M1||{}).mgr)})
    +_ctmKpi({code:'M2',title:'Карточки заказов заполнены',desc:'обязательные файлы шага (заказ поставщику, подтверждение, упаковочный лист, УПД…) есть у заказов, прошедших шаг',st:M2,fmt:pc,target:T,meta:`есть <b>${M2.have!=null?M2.have:'—'}</b> из ${M2.n||0} нужных · ${_esc(M2.label||'')}`,who:'менеджер ОРК: приложить файлы шага',part:part(mc&&mc.M2)})
    +_ctmKpi({code:'M3',title:'Нагрузка менеджеров ОРК',desc:`заказов в работе на менеджера; норма — не дальше ±${Math.round((M3.band||0.25)*100)} % от среднего`,st:M3,fmt:v=>String(v),meta:`менеджеров ОРК ${M3.managers||0} · дальше ±${Math.round((M3.band||0.25)*100)} % от среднего — ${M3.outBand||0} · ответственный заказа не из ОРК — ${M3.notOrk||0}`,who:'руководитель ОРК: перераспределить заказы'})
-   +_ctmKpi({code:'',title:'Доставлено к сроку клиента',desc:'доля доставленных в месяце заказов не позже обещанной клиенту даты; результат поставщика и логистики',st:OT,fmt:pc,meta:`в срок <b>${OT.ontime!=null?OT.ontime:'—'}</b> из ${OT.n||0} доставленных${lo0?` · ещё ${_ctN(lo0,'заказ','заказа','заказов')} не доставлено после срока — в долю не входят`:''}`,who:'поставщик и логистика — не менеджер ОРК',part:part(mc&&mc.otd)})
+   +_ctmKpi({code:'',title:'Доставлено к сроку клиента',desc:'доля доставленных в месяце заказов не позже обещанной клиенту даты; результат поставщика и логистики',st:OT,fmt:pc,target:OTT,meta:`в срок <b>${OT.ontime!=null?OT.ontime:'—'}</b> из ${OT.n||0} доставленных в месяце`,who:'поставщик и логистика — не менеджер ОРК',part:part(mc&&mc.otd)})
    +`</div>`;
   // ссылки — вне карточек-кнопок показателей (вложенная кнопка в role=button недоступна с клавиатуры)
-  const mx=[lo0?`Ещё не доставлено после срока клиента: ${_ctmLateBtn(X,lo0)} — в долю «доставлено к сроку» не входят, пока не доставлены.`:'',
+  const mx=[lo0?`<b>Сейчас${asOfT?`, на ${asOfT}`:''}</b>, не за месяц: после срока клиента ещё не доставлено ${_ctmLateBtn(X,lo0)} — в долю «доставлено к сроку» они не входят, пока не доставлены.`:'',
     (M1.excluded&&_orkJData(V))?`Шаги, которые не считаем (стадии прокликали разом или вернули назад): ${M1.excluded} — <button type="button" class="ctlnk" data-jexcl="1">показать в журнале</button>.`:''].filter(Boolean);
   if(mx.length) h+=`<p class="ctm-lead ctm-more-l">${mx.join(' ')}</p>`;
   h+=_ctmFix(V,M,m0);
@@ -4809,7 +4996,7 @@ function _orkJPick(rows,F){
 }
 function _orkJRow(r,cust,has){
   return (!has||has(r.deal)?`<tr class="drill" data-ct="${_esc(r.deal)}" tabindex="0">`:`<tr title="карточки этой сделки в виде нет">`)
-    +`<td><b class="mono">№${r.seq||'—'}</b><div class="dep">${_esc(cust(r.deal))}</div><div class="dep orkm">${_esc(r.stepName||r.seg)} · ${_esc(r.end||'—')} · ${r.wd!=null?r.wd+' р.д.':'—'} при норме ${r.norm}</div></td>`
+    +`<td><b>№<span class="mono">${r.seq||'—'}</span></b><div class="dep">${_esc(cust(r.deal))}</div><div class="dep orkm">${_esc(r.stepName||r.seg)} · ${_esc(r.end||'—')} · ${r.wd!=null?r.wd+' р.д.':'—'} при норме ${r.norm}</div></td>`
     +`<td>${_esc(r.title||r.order)}<div class="dep">${_esc(r.sup||'')}</div>${r.order?`<a class="odbx" href="https://kvantpro.bitrix24.ru/crm/type/172/details/${encodeURIComponent(r.order)}/" target="_blank" rel="noopener" data-xlv="" aria-label="${_esc('Заказ '+(r.title||r.order)+' в Битриксе, новая вкладка')}">в Битриксе ↗</a>`:''}</td>`
     +`<td>${_esc(r.stepName||'')}<div class="dep">шаг ${r.step} · ${_esc(r.seg)}</div></td>`
     +`<td class="mono dt1">${_esc(r.start||'—')}</td><td class="mono dt1">${_esc(r.end||'—')}</td>`
@@ -5110,7 +5297,15 @@ function _odResolve(X,O,id){
     else if(p[0]==='who'){
       const w=(S.D.who||{})[p.slice(1,-1).join('/')], f=p[p.length-1];
       v=!w?null:f==='all'?{k:(w.over||[]).concat(w.wait||[]),t:(w.over||[]).map(()=>'сверх нормы').concat((w.wait||[]).map(()=>'ждём УПД от клиента'))}:w[f];
-    } else {v=S.D; for(const x of p) v=v&&typeof v==='object'?v[x]:undefined;}
+    } else {
+      // «…/~ord» и «…/~deal» — только заказы или только сделки того же списка (части плитки W1:
+      // заказы без менеджера ОРК и сделки без заказа — одно множество W1, ревью 30.10.2026)
+      const only=/^~(ord|deal)$/.test(p[p.length-1])?p.pop().slice(1):'';
+      v=S.D; for(const x of p) v=v&&typeof v==='object'?v[x]:undefined;
+      const K0=only?_odKeys(v):null;
+      if(K0){const keep=K0.k.map(k=>(k.slice(0,2)==='d:')===(only==='deal'));
+        v={k:K0.k.filter((_,i)=>keep[i]),t:K0.t?K0.t.filter((_,i)=>keep[i]):undefined,h:K0.h};}
+    }
   } else v=S.D[m[2]];
   const K=_odKeys(v); return K?Object.assign(K,{rows:S.rows}):null;
 }
@@ -5178,16 +5373,28 @@ function _odPrep(M){
     const po=!isD&&r.wd==null&&r.step!=null?PO.get(String(x.k)):null, pl=po&&Array.isArray(po.path)&&po.path.length?po.path[po.path.length-1]:null;
     x.pn=pl&&pl[0]===+r.step&&pl[2]!=null?{wd:pl[2],from:pl[1]}:null;
     // «почему» срока шага (ork.judged → contracts stepWhy): срок не посчитать, не считаем — у этого заказа
-    if(!isD){const o2=PO.get(String(x.k)); x.why=o2&&o2.live&&o2.stepWhy?String(o2.stepWhy):'';}
+    if(!isD){const o2=PO.get(String(x.k)); x.why=o2&&o2.live&&o2.stepWhy?String(o2.stepWhy):''; x.p80=o2&&o2.live?_rzP80(x.k):null;}
     if(isD&&r.kind==='dealClose'&&!codes.includes('dealClose')) codes.push('dealClose');
     if(isD&&r.kind==='noOrder'&&r.over&&!codes.includes('noOrder')) codes.push('noOrder');
-    const qs=codes.map(c=>{const q=QI.get(x.k+'|'+c)||QI.get('d:'+(r.deal||'')+'|'+c)||{}; return {c,q,sev:q.sev!=null?+q.sev:50};})
+    // строка из списка пунктов очереди («Сегодня», «Списком заказов»): код пункта — её подпись (x.tag);
+    // этот пункт и его действие, роль и хозяин — первыми, а не «Разобрать сделку» (ревью 30.10.2026)
+    const own=x.tag&&(QI.has(x.k+'|'+x.tag)||QI.has('d:'+(r.deal||'')+'|'+x.tag))?x.tag:'';
+    if(own&&!codes.includes(own)) codes.push(own);
+    const qs=codes.map(c=>{const q=QI.get(x.k+'|'+c)||QI.get('d:'+(r.deal||'')+'|'+c)||{}; return {c,q,sev:c===own?-1:q.sev!=null?+q.sev:50};})
       .sort((a,b)=>a.sev-b.sev);
+    if(own&&qs.length&&qs[0].c===own) qs[0].sev=qs[0].q.sev!=null?+qs[0].q.sev:50;
     let a;
-    if(qs.length){const t=qs[0], q=t.q;
+    // список «нет файлов шага» (w:step/N/art): строка — пара «заказ × файл», действие — приложить этот файл
+    // (ревью 30.10.2026: число доводится до действия и исполнителя)
+    const artM=/^w:step\/(\d+)\/art$/.exec(String(M.id||''));
+    if(artM&&x.tag){const f=String(x.tag).replace(/^нет:\s*/,''), s0=SN[+artM[1]];
+      a={key:'f:'+f,txt:`Приложить в карточку заказа: ${f}`,role:(s0&&s0.roleName)||'менеджер ОРК',who:r.mgr&&!_OD_GROUP(r.mgr)?r.mgr:'не назначен',sev:30,days:null,unit:'',code:'',why:[`нет файла шага ${artM[1]}: ${f}`],more:[]};}
+    else if(qs.length){const t=qs[0], q=t.q;
       a={key:'c:'+t.c,txt:_odCap(_rzRef(q.act||LB[t.c]||t.c)),role:q.roleName||_OD_ROLE[q.role]||'',who:q.who||'',sev:t.sev,
         days:q.days!=null?q.days:null,unit:q.inWd?'р.д.':'дн',code:t.c,inWd:!!q.inWd,why:qs.map(z=>LB[z.c]||z.c),
         more:qs.slice(1).map(z=>({t:LB[z.c]||z.c,act:z.q.act||'',who:z.q.who||''}))};}
+    else if(x.p80) a={key:'p80',txt:'Запросить у поставщика статус и новую дату готовности',role:'менеджер ОРК',who:r.mgr&&!_OD_GROUP(r.mgr)?r.mgr:(r.own||''),sev:55,
+      days:x.p80.days,unit:'дн',code:'',inWd:false,why:['производство дольше обычного'],more:[]};
     else if(r.closed) a={key:'closed',txt:'Заказ закрыт — действий нет',role:'',who:'',sev:99,days:null,unit:'',why:[],more:[]};
     else if(r.step!=null){const s=SN[r.step];
       a={key:'s:'+r.step,txt:`Держать срок шага ${r.step}${s?' «'+s.name+'»':''}`,code:'',inWd:r.wd!=null||!!x.pn,more:[],role:(s&&s.roleName)||_OD_ROLE[r.ownR]||'',who:r.own||'',sev:60,
@@ -5275,7 +5482,7 @@ function _odTr(x,P,withSup){
   const no=isD?(r.kind==='dealClose'?'сделка: закрыть':r.kind==='noOrder'?'сделка без заказа':'сделка'):(r.no||'id '+x.k);
   const hy=(r.hyg||[]).map(k=>(_ORK_HYG[k]||k).split(' — ')[0]);
   const c1=`<td class="odc1" data-l="Заказ"><div class="odno"><b${isD?'':' class="mono"'}>${_esc(no)}</b>${!isD&&!r.missing?' '+_odBx('order',x.k,'Заказ '+no):''}</div>`
-    +`<div class="oddeal">${seq?`сделка <span class="mono">№${_esc(seq)}</span>`:'сделка —'}${did?' '+_odBx('deal',did,'Сделка №'+(seq||did)):''}</div>`
+    +`<div class="oddeal">${seq?`сделка №<span class="mono">${_esc(seq)}</span>`:'сделка —'}${did?' '+_odBx('deal',did,'Сделка №'+(seq||did)):''}</div>`
     +(cust?`<div class="odcust">${_esc(cust)}</div>`:'')
     // подпись числа (код пункта, «в срок · 12 дн») — если она не повторяет «почему» действия
     +(x.tag&&!a.why.includes(LB[x.tag]||x.tag)?`<div class="odtag">${_esc(LB[x.tag]||x.tag)}</div>`:'')
@@ -5291,6 +5498,7 @@ function _odTr(x,P,withSup){
       +(r.over?'<div class="dep hot">дольше нормы</div>':r.wu?'<div class="dep amb">ждём УПД от клиента</div>':'');}
   else if(r.tu) dy=`<div class="oddays dimv">срок шага не посчитать</div>${x.why?`<div class="dep">почему: ${_esc(_rzRef(x.why))}</div>`:''}`;
   else if(x.pn) dy=`<div class="oddays"><b>${x.pn.wd} р.д.</b> на шаге · нормы у шага нет</div>${x.pn.from&&!r.since?`<div class="dep">с ${_esc(_orkD(x.pn.from))} · вход в шаг</div>`:''}`;
+  if(x.p80) dy+=`<div class="dep amb">${_esc(_rzP80T(x.p80))}</div>`;
   else if(r.cd!=null) dy=`<div class="oddays"><b>${r.cd} кал. дн.</b> на шаге${r.norm==null?' · нормы у шага нет':''}</div>`;
   const c2=`<td class="odc2" data-l="Где застрял">`
     +(r.step!=null?`<div class="odstep"><span class="odsn">Шаг ${r.step}</span>${s?' · '+_esc(s.name):''}</div>`
@@ -5312,7 +5520,17 @@ function _odTr(x,P,withSup){
     +(!r.mgr||r.mgr===a.who||r.mgr==='не назначен'?'':r.mgr==='ответственный вне ОРК'?'<div class="dep">ответственный заказа — не из ОРК</div>':`<div class="dep">менеджер ОРК: ${_orkWho(r.mgr)}${r.gone?' · уволен':''}</div>`)
     +(r.kam&&r.kam!==a.who?`<div class="dep">КАМ: ${_orkWho(r.kam)}</div>`:'')+`</td>`;
   const c5=withSup?`<td class="odsupc" data-l="Поставщик">${r.sup?_esc(r.sup):'<span class="dimv">—</span>'}</td>`:'';
-  return `<tr class="drill" data-odk="${_esc(x.k)}" data-odct="${_esc(did)}" tabindex="0">${c1}${c2}${c3}${c4}${c5}</tr>`;
+  // выгрузка в Excel — по столбцу на поле, числа числами (ревью 30.10.2026): видимая ячейка отдаёт своё
+  // главное значение (data-xlv), остальное — скрытыми ячейками рядом (_odXlCols — шапка тех же столбцов)
+  const xv=v=>_esc(v==null?'':String(v)), xh=v=>`<td hidden data-xlv="${xv(v)}"></td>`;
+  const wd=r.wd!=null?r.wd:x.pn?x.pn.wd:'', dd=x.late!=null?x.late:x.left!=null?-x.left:'';
+  const whoT=a.who?_orkWhoT(a.who)+(a.role?' · '+a.role:''):(a.role||'');
+  const c1x=c1.replace('<td class="odc1"',`<td class="odc1" data-xlv="${xv(no)}"`)+xh(seq?'№'+seq:'')+xh(cust);
+  const c2x=c2.replace('<td class="odc2"',`<td class="odc2" data-xlv="${xv(r.step!=null?r.step:'')}"`)+xh(s?s.name:(r.closed?'заказ закрыт':''))+xh(r.stage||'')+xh(wd)+xh(r.norm!=null?r.norm:'');
+  const c3x=c3.replace('<td class="odc3"',`<td class="odc3" data-xlv="${xv(dd)}"`)+xh(x.dl!=null?_odDM(x.dl):'')+xh(x.fc!=null?_odDM(x.fc):'');
+  const c4x=c4.replace('<td class="odc4"',`<td class="odc4" data-xlv="${xv(a.txt)}"`)+xh(whoT)+xh(r.mgr?_orkWhoT(r.mgr):'')
+    +xh((a.more||[]).map(z=>z.t).join('; '));
+  return `<tr class="drill" data-odk="${_esc(x.k)}" data-odct="${_esc(did)}" tabindex="0">${c1x}${c2x}${c3x}${c4x}${c5}</tr>`;
 }
 // порядок строк: по умолчанию сначала худшие — просрочка срока клиента, превышение нормы, дни на шаге
 const _OD_DIR={no:1,stay:-1,dl:1,act:1,sup:1};
@@ -5330,7 +5548,8 @@ function _odHtml(M,F){
   let h='';
   const q=M.queue?`<button type="button" class="odq" data-odq="1">${_esc(M.queueLbl||'Показать в очереди дел')} →</button>`:'';
   // что считает число и сокращения — один раз на экран списка (владелец 29.10.2026: «лучше расшифровывать»)
-  h+=`<div class="odlede"><div>${def?`<p class="oddef">${_esc(def)}</p>`:''}<p class="odgl">${_esc(_RZ_GLOSS)}.</p></div>${q}</div>`;
+  // сокращения — раскрытием (первый экран списка — «Что делать» и первые строки, ревью 30.10.2026)
+  h+=`<div class="odlede"><div>${def?`<p class="oddef">${_esc(def)}</p>`:''}<details class="odgld"><summary>Сокращения: ОРК, КАМ, ОСС, УПД, р.д.</summary><p class="odgl">${_esc(_RZ_GLOSS)}.</p></details></div>${q}</div>`;
   // за числом заказов нет (ноль у плитки или строки) — так и сказать, без «по этому отбору»: отбора нет
   if(!N) return h+'<div class="note odempty">За этим числом заказов нет.</div>';
   // закрытый заказ («Месяц», «Квартал») — своей корзиной, а не «стадия не из таблицы»
@@ -5346,7 +5565,7 @@ function _odHtml(M,F){
   const qq=String(F.q||'').trim().toLowerCase();
   const pass=x=>(F.step==null||stepOf(x)===F.step)&&(!F.sup||supOf(x)===F.sup)&&(!F.mgr||mgrOf(x)===F.mgr)
     &&(!F.tag||tagOf(x)===F.tag)&&(!F.act||x.a.key===F.act)&&(!qq||x.s.indexOf(qq)>=0);
-  const rows=_odSort(it.filter(pass),F);
+  const rows=_odSort(it.filter(pass),F); M._shown=rows;
   const ord=s=>s==='?'?2:s==='x'?1:0;
   const steps=[...bs.keys()].sort((a,b)=>ord(a)-ord(b)||(+a)-(+b));
   const stepLbl=s=>s==='?'?'стадия неизвестна регламенту':s==='x'?'заказ закрыт':`шаг ${s}${SN[s]?' · '+SN[s].name:''}`;
@@ -5355,15 +5574,22 @@ function _odHtml(M,F){
   // дни группы — со смыслом (как «Дольше всех» в «Сегодня»): «35 дн. после срока», «12 р.д. на шаге»
   const gDays=g=>g.worst>0?(g.code?`дольше всех: ${g.worst} ${g.inWd?'р.д.':'дн.'} ${_RZ_DW[g.code]||(g.inWd?'на шаге':'')}`.trim():`дольше всех: ${g.worst} ${g.inWd?'р.д.':'дн.'} на шаге`):'';
   // 1. что делать и кто: группы по следующему действию (клик — отбор таблицы, повторный — снять)
-  const GS=P.groups, fold=GS.length>6&&!F.more, show=fold?GS.slice(0,6).concat(GS.slice(6).filter(g=>g.key===F.act)):GS;
+  // под отбором (часть плитки, шаг, поставщик…) карточки считают только отобранные строки (без отбора
+  // по самому действию): число на карточке = строк после клика по ней (ревью 30.10.2026)
+  const pNA=x=>{const a=F.act; F.act=''; const v=pass(x); F.act=a; return v;};
+  const fN=F.step!=null||F.sup||F.mgr||F.tag||qq;
+  const GS=fN?P.groups.map(g=>{const xs=it.filter(x=>x.a.key===g.key&&pNA(x)); return Object.assign({},g,{n:xs.length,none:xs.filter(x=>x.a.who==='не назначен').length});}).filter(g=>g.n||g.key===F.act):P.groups;
+  const LIM=typeof matchMedia==='function'&&matchMedia('(max-width:560px)').matches?3:6;   // телефон — три карточки
+  const fold=GS.length>LIM&&!F.more, show=fold?GS.slice(0,LIM).concat(GS.slice(LIM).filter(g=>g.key===F.act)):GS;
   const lvl=g=>g.key.slice(0,2)==='c:'?(g.sev<=3?'hi':g.sev<=6?'md':'lo'):g.key.slice(0,2)==='s:'?'st':'lo';
   h+=`<section class="odsec" aria-labelledby="odActH"><h4 class="odh" id="odActH">Что делать <span class="odh2i">— кто отвечает, сколько заказов; клик — отобрать их в таблице</span></h4><div class="odacts">`
     +show.map(g=>{const on=F.act===g.key;
-      const meta=[g.role?_esc(g.role):'',g.none?`<span class="amb">у ${g.none} не назначен</span>`:'',_esc(gDays(g))].filter(Boolean).join(' · ');
+      // на телефоне карточка — одной строкой: действие · число · «не назначен»; роль и дни — с экрана шире
+      const meta=[g.role?`<span class="odact-r">${_esc(g.role)}</span>`:'',g.none?`<span class="amb">у ${g.none} не назначен</span>`:'',gDays(g)?`<span class="odact-d">${_esc(gDays(g))}</span>`:''].filter(Boolean).join('<span class="odact-s"> · </span>');
       return `<button type="button" class="odact ${lvl(g)}${on?' on':''}" data-odf="${_esc('act:'+g.key)}" aria-pressed="${on}" aria-label="${_esc(`${g.txt}: ${g.n}${g.role?', '+g.role:''}`)}">`
         +`<span class="odact-t">${_esc(g.txt)}</span><span class="odact-n">${g.n}</span>`
         +(meta?`<span class="odact-m">${meta}</span>`:'')+`</button>`;}).join('')
-    +`</div>${GS.length>6?`<button type="button" class="odmore" data-odf="more" aria-expanded="${!fold}">${fold?`Ещё ${_ctN(GS.length-6,'действие','действия','действий')}`:'Свернуть'}</button>`:''}</section>`;
+    +`</div>${GS.length>LIM?`<button type="button" class="odmore" data-odf="more" aria-expanded="${!fold}">${fold?`Ещё ${_ctN(GS.length-LIM,'действие','действия','действий')}`:'Свернуть'}</button>`:''}</section>`;
   // 2. отбор — одной строкой: шаг регламента, поставщик, менеджер ОРК, причина, поиск (разрезы с
   // числами — под таблицей, полосами по убыванию)
   const opt=(m,cur,all,fmt,sorter)=>`<option value="">${all}</option>`+[...m.entries()].sort(sorter||((a,b)=>b[1]-a[1]||String(a[0]).localeCompare(String(b[0]),'ru')))
@@ -5383,15 +5609,20 @@ function _odHtml(M,F){
   const actG=F.act?GS.find(g=>g.key===F.act):null;
   const act=[F.act?['act',actG?actG.txt:F.act]:null,F.step!=null?['step',stepLbl(F.step)]:null,F.tag?['tag','причина: '+F.tag]:null,
     F.sup?['sup','поставщик: '+F.sup]:null,F.mgr?['mgr','менеджер ОРК: '+_orkWhoT(F.mgr)]:null,qq?['q',`поиск: «${String(F.q).trim()}»`]:null].filter(Boolean);
-  h+=`<div class="odlisth"><h4 class="odh" id="odListH">${act.length?'Отобрано':'Заказы'} <span class="odcnt">${rows.length}${rows.length!==N?' из '+N:''}</span></h4>`
+  const nD=it.filter(x=>_odIsDeal(x)).length, lstW=!nD?'Заказы':nD===N?'Сделки':'Заказы и сделки';
+  h+=`<div class="odlisth"><h4 class="odh" id="odListH">${act.length?'Отобрано':lstW} <span class="odcnt">${rows.length}${rows.length!==N?' из '+N:''}</span></h4>`
     +(F.sort?`<button type="button" class="odlink" data-odf="sort:">Сначала худшие</button>`:'<span class="odsorted">сначала худшие: просрочка срока клиента, затем превышение нормы шага</span>')+`</div>`;
   if(act.length) h+=`<div class="statleg odactive">`+act.map(([k,l])=>`<button type="button" class="stchip on" data-odf="rm:${k}" aria-label="${_esc('Снять отбор: '+l)}">${_esc(l)} ×</button>`).join('')+chip('reset',false,'Сбросить')+`</div>`;
   if(!rows.length) return h+`<div class="note odempty">${act.length>1?'По этому сочетанию отборов пусто.':'По этому отбору пусто.'} ${chip('reset',false,'Сбросить')}</div>`;
   const withSup=it.some(x=>!_odIsDeal(x)&&x.r.sup);
-  const th=(k,l,cls)=>{const on=F.sort===k, d=F.dir||_OD_DIR[k];
-    return `<th scope="col"${cls?` class="${cls}"`:''} data-xlv="${_esc(l)}"${on?` aria-sort="${d>0?'ascending':'descending'}"`:''}><button type="button" class="odsort${on?' on':''}" data-odsort="${k}">${_esc(l)}<span class="odarr" aria-hidden="true">${on?(d>0?'↑':'↓'):'↕'}</span></button></th>`;};
+  // xs — скрытые столбцы выгрузки после видимого, xl — имя видимого столбца в файле (см. _odTr)
+  const th=(k,l,cls,xs,xl)=>{const on=F.sort===k, d=F.dir||_OD_DIR[k];
+    return `<th scope="col"${cls?` class="${cls}"`:''} data-xlv="${_esc(xl||l)}"${on?` aria-sort="${d>0?'ascending':'descending'}"`:''}><button type="button" class="odsort${on?' on':''}" data-odsort="${k}">${_esc(l)}<span class="odarr" aria-hidden="true">${on?(d>0?'↑':'↓'):'↕'}</span></button></th>`
+      +(xs||[]).map(t=>`<th hidden scope="col" data-xlv="${_esc(t)}"></th>`).join('');};
   h+=`<div class="twrap odwrap"><table class="lft odt" id="odTable" data-xl-name="${_esc(M.title)}"${M.xlSub?` data-xl-sub="${_esc(M.xlSub)}"`:''}><caption class="odvh">Заказы за числом, сначала худшие</caption><thead><tr>`
-    +th('no','Заказ','odc1')+th('stay','Где застрял','odc2')+th('dl','Срок клиента','odc3')+th('act','Что сделать','odc4')+(withSup?th('sup','Поставщик','odsupc'):'')
+    +th('no','Заказ','odc1',['Сделка','Заказчик'],'№ заказа')+th('stay','Где застрял','odc2',['Шаг','Стадия в Битриксе','Р.д. на шаге','Норма, р.д.'],'Шаг №')
+    +th('dl','Срок клиента','odc3',['Срок клиента','Прогноз доставки'],'Дней после срока клиента (минус — до срока)')
+    +th('act','Что сделать','odc4',['Кто отвечает','Менеджер ОРК','Ещё пункты очереди'],'Что сделать')+(withSup?th('sup','Поставщик','odsupc'):'')
     +`</tr></thead><tbody>`+rows.map(x=>_odTr(x,P,withSup)).join('')+`</tbody></table></div>`
     +`<p class="odfoot">${typeof _opOpen==='function'?'Строка — путь заказа по 13 шагам регламента, у сделки без заказа — карточка сделки.':'Строка — карточка сделки.'} «в Битриксе ↗» — карточка заказа или сделки в Битриксе, в новой вкладке.</p>`;
   // 4. разрезы — под таблицей, свёрнуты: полосы по убыванию, клик — отбор
@@ -5421,6 +5652,9 @@ function _odShow(){
   document.getElementById('drwName').textContent=M.title;
   document.getElementById('drwSub').textContent=M.sub||_odSub(M);
   body.innerHTML=_odHtml(M,_OD.F);
+  // отбор (часть плитки, шаг…) — счёт в шапке по отобранным строкам и «из N за числом» (ревью 30.10.2026)
+  if(!M.sub&&M._shown&&M._shown.length!==M.items.length&&M._shown.length)
+    document.getElementById('drwSub').textContent=_odSub({items:M._shown})+` · из ${_ctN(M.items.length,'строки','строк','строк')} за числом`;
   _odExcelHook(body);
 }
 // диалог списка — свои role/aria-modal/aria-labelledby на общем дровере; при закрытии — прежние
@@ -5590,6 +5824,15 @@ function _opWeek(k){
   for(const O of [D.C.ork,D.S.ork]){const W=O&&O.week; if(!W) continue; const r=_odRows(W).orders.find(x=>String(x.k)===String(k)); if(r) return r;}
   return null;
 }
+// «Производство дольше обычного» (week.longP80): заказ в счёте сигнала — дни в производстве
+// (календарные) и порог P80; путь и список говорят то же, что число (ревью 30.10.2026)
+function _rzP80(k){
+  const D=_opData();
+  for(const O of [D.C.ork,D.S.ork]){const LP=O&&O.week&&O.week.longP80; if(!LP||!Array.isArray(LP.items)) continue;
+    const it=LP.items.find(x=>String(x.order)===String(k)); if(it&&LP.p80!=null) return {days:it.days,p80:Math.round(LP.p80)};}
+  return null;
+}
+const _rzP80T=p=>`в производстве ${p.days} дн. (календарных) — дольше, чем у 8 из 10 заказов (до ${p.p80} дн.)`;
 // пункты очереди: заказа — по приоритету; уровня сделки — следом (закрытая часть — только с правом)
 function _opQueue(k,did){
   const D=_opData(), seen=new Set(), ord=[], deal=[];
@@ -5630,6 +5873,8 @@ function _opStuck(o,S,P,w,D){
   } else if(wd!=null){
     big=`<b class="op-num">${wd} р.д.</b> <span class="op-of">на шаге · ${o.stepNormState==='nodata'?`норма ${_esc(o.stepNormDoc||'')} — не меряем: нужных дат в заказе нет`:'нормы у шага нет'}</span>`;
   } else big=`<span class="op-of">Срок шага не посчитать: ${_esc(_rzRef(o.stepWhy||'нет даты входа в шаг'))}</span>`;
+  const p8=o.live?_rzP80(o.id):null;
+  if(p8) big+=`<span class="op-of op-p80"><br><span class="op-warn">Производство дольше обычного:</span> ${_esc(_rzP80T(p8))}. Нормы у шага нет — это сигнал, не нарушение.</span>`;
   const from=o.stepFrom||(last&&last[0]===o.step?last[1]:''), by=o.stepFromBy||(from?'вход в шаг':'');
   const why=(o.stepHyg||o.stepClosed)&&o.stepWhy?`<p class="op-line op-mut">Срок не считаем: ${_esc(_rzRef(o.stepWhy).replace(/^гигиена карточки:\s*/,'карточка с ошибкой — '))}</p>`:'';
   const waits=w&&w.waits&&_ORK_ADJ[w.waits]?_ORK_ADJ[w.waits]:(s&&s.waitsName&&s.waits&&s.waits!==s.role?s.waitsName:'');
@@ -5651,6 +5896,9 @@ function _opTodo(o,Q,S){
     +`<p class="op-who">${x.who&&x.who!=='не назначен'?`<b>${_orkWho(x.who)}</b>`:'<span class="op-warn">не назначен</span>'}${x.roleName?` · ${_esc(x.roleName)}`:''}${x.escalateTo?` <span class="op-mut">· в копии ${_orkWho(x.escalateTo)}${x.copyRole&&_OD_ROLE[x.copyRole]&&!String(x.escalateTo).includes('('+_OD_ROLE[x.copyRole]+')')&&!/\([^)]*\)\s*$/.test(String(x.escalateTo))?' ('+_esc(_OD_ROLE[x.copyRole])+')':''}</span>`:''}</p></li>`;
   let h='';
   if(Q.ord.length||Q.deal.length) h=`<ol class="op-todo">${Q.ord.map(x=>one(x,0)).join('')}${Q.deal.map(x=>one(x,1)).join('')}</ol>`;
+  else if(o.live&&_rzP80(o.id)){const p8=_rzP80(o.id);
+    h=`<ol class="op-todo"><li class="op-todo-i"><p class="op-what">Производство дольше обычного <span class="op-mut">· ${p8.days} дн. при обычных до ${p8.p80} дн.</span></p><p class="op-act">→ запросить у поставщика статус и новую дату готовности</p>`
+      +`<p class="op-who">${o.stepWho&&o.stepWho!=='не назначен'?`<b>${_orkWho(o.stepWho)}</b> · менеджер ОРК`:'<span class="op-warn">не назначен</span> · менеджер ОРК'}</p></li></ol>`;}
   else if(o.live&&o.step!=null) h=`<p class="op-line">Отклонений нет. По регламенту на шаге ${o.step}: <b>${_esc(_OP_DO[o.step]||'')}</b>${o.stepWho?` — ${_orkWho(o.stepWho)}`:''}.</p>`;
   else h=`<p class="op-line op-mut">Отклонений в очереди дел нет.</p>`;
   return `<section class="op-card" aria-labelledby="opTodoH"><h4 id="opTodoH">Что сделать${Q.ord.length+Q.deal.length?` <span class="op-cnt">${Q.ord.length+Q.deal.length}</span>`:''}</h4>${h}</section>`;
@@ -5658,7 +5906,11 @@ function _opTodo(o,Q,S){
 function _opPath(o,S,P,w,D){
   if(!o.live) return '';
   if(!P.length) return `<section class="op-card" aria-labelledby="opPathH"><h4 id="opPathH">Путь по шагам</h4><p class="op-line op-mut">Нет данных: истории стадий заказа в сборке нет.</p></section>`;
-  const V=_opVisits(P), cur=o.step, first=P[0][0], dd=_orkD;
+  // последняя запись [null, день, р.д.] — стадия вне регламента (ork.path): шаг не выдумываем
+  const U=P[P.length-1][0]==null?P[P.length-1]:null, PK=U?P.slice(0,-1):P;
+  const V=_opVisits(P.filter(e=>e[0]!=null)), cur=o.step, first=PK.length?PK[0][0]:14, dd=_orkD;
+  const known=PK.reduce((m,e)=>Math.max(m,e[0]),0);
+  if(U) PK.forEach((e,i)=>{const v=V[e[0]]; if(i===PK.length-1&&v&&v.length){v[v.length-1].to=U[1]; v[v.length-1].cur=false;}});
   const fc=w&&w.fc?w.fc:'', dl=_opIso(o.dl), asOf=D.asOf;
   // плановые даты впереди: конец производства, приход на склад, срок клиента и прогноз
   const plan={};
@@ -5675,6 +5927,7 @@ function _opPath(o,S,P,w,D){
     if(n===cur) st='is-cur';
     else if(v.length) st=cur!=null&&n>cur?'is-back':'is-done';
     else if(cur!=null&&n>cur) st='is-next';
+    else if(U&&n>known) st='is-next';
     else if(n===2||n===3) {st='is-deal'; note='по сделке целиком — договор с заказчиком ведёт КАМ';}
     else if(n<first) {st='is-nohist'; note='раньше начала истории стадий в Битриксе';}
     else {st='is-skip'; note='пропущен: стадия перепрыгнула шаг';}
@@ -5695,9 +5948,10 @@ function _opPath(o,S,P,w,D){
       +(v.length?`<ul class="op-sv">${v.map(visit).join('')}</ul>`:'')
       +(extra.length?`<p class="op-sx">${extra.join(' · ')}</p>`:'')+`</div></li>`);
   }
-  const back=P.some((e,i)=>i&&e[0]<P[i-1][0]);
+  const back=PK.some((e,i)=>i&&e[0]<PK[i-1][0]);
   return `<section class="op-card" aria-labelledby="opPathH"><h4 id="opPathH">Путь по шагам</h4>`
     +`<p class="op-sm op-lead">Каждый шаг: кто делает, норма, когда вошёл и вышел, сколько рабочих дней. Пунктир — шаг без захода (впереди, пропущен или по сделке).${back?' Заказ возвращался на прежние шаги — каждый заход отдельной строкой.':''}</p>`
+    +(U?`<p class="op-line op-unk">С ${dd(U[1])} заказ в стадии «${_esc(o.stageName||'—')}» — её нет в регламенте${U[2]!=null?` (<b>${U[2]} р.д.</b>)`:''}. Шаг и норму не определить: сверить стадию заказа в Битриксе. Шаги ниже последнего пройденного — без оценки.</p>`:'')
     +`<ol class="op-steps">${li.join('')}</ol></section>`;
 }
 function _opDates(o,w,D){
@@ -5757,9 +6011,12 @@ function _opWire(){
       _opFocus(body.querySelector(`tr[data-odk="${CSS&&CSS.escape?CSS.escape(String(k)):k}"]`)||body.querySelector('[data-odf]')); return;}
     // карточка сделки: из списка — _odCard (у карточки своё «← к списку»), иначе openContract
     const card=()=>{_OP.k=null; const sc=_OD.scroll;
-      if(_OP.back==='list'||_OP.dealList){_odCard(did); _OD.scroll=sc;}
-      else if(typeof openContract==='function'&&(_OP.deal||F)) openContract(_OP.deal||F.d);   // класс rz ставит сама openContract
-      body.scrollTop=0; _opFocus(body.querySelector('[data-odback]'));};
+      if(_OP.back==='list'||_OP.dealList){_odCard(did); _OD.scroll=sc; body.scrollTop=0; _opFocus(body.querySelector('[data-odback]')); return;}
+      if(typeof openContract==='function'&&(_OP.deal||F)) openContract(_OP.deal||F.d);   // класс rz ставит сама openContract
+      // назад в карточку — на то же место и на ту же кнопку «Путь заказа →» (ревью 30.10.2026)
+      const ret=body._ctRet, esc=v=>CSS&&CSS.escape?CSS.escape(v):v, ob=body.querySelector(`[data-ctop="${esc(String(k))}"]`);
+      if(ret&&ret.k===String(k)) body.scrollTop=ret.top; else if(ob&&ob.scrollIntoView) {body.scrollTop=0; ob.scrollIntoView({block:'center'});} else body.scrollTop=0;
+      _opFocus(ob||null);};
     if(g.dataset.opgo==='deal'||g.dataset.opgo==='card') card();
   });
 }
@@ -5782,7 +6039,9 @@ function _opOpen(k,opts){
   if(drw.dataset.od!=='1'){
     _OD.aria=Object.fromEntries(_OD_ARIA.map(a=>[a,drw.getAttribute(a)]));
     const a=opts.trigger&&opts.trigger.isConnected?opts.trigger:document.activeElement;   // номер заказа в очереди «Недели» (B4)
-    _OD.trigger=a&&!drw.contains(a)&&a!==document.body?a:(_OD.trigger&&_OD.trigger.isConnected?_OD.trigger:document.querySelector('#tab-contracts [role=tabpanel]:not([hidden])'));
+    // путь открыт из карточки сделки (кнопка внутри дровера) — фокус вернуть туда, откуда открыли карточку
+    const cf=typeof openContract==='function'&&openContract.from&&openContract.from.isConnected?openContract.from:null;
+    _OD.trigger=a&&!drw.contains(a)&&a!==document.body?a:cf&&a&&drw.contains(a)?cf:(_OD.trigger&&_OD.trigger.isConnected?_OD.trigger:document.querySelector('#tab-contracts [role=tabpanel]:not([hidden])'));
   }
   if(typeof _rzDrw==='function') _rzDrw(true);
   const F=_opFind(k), o=F.o, d=F.d;

@@ -149,3 +149,83 @@ def test_ширины_без_прокрутки_вбок(browser, page_url, w):
     assert pg.locator("#opRoot .op-stuck.is-over").count() == 1
     assert not errs, errs
     pg.close()
+
+
+def test_карточка_из_таблицы_путь_назад_esc(browser, page_url):
+    """Ревью 30.10.2026: карточка сделки из «Сделок и денег» — модальный диалог (Tab не уходит под
+    подложку); «Путь заказа →» → «← к сделке» возвращает ту же прокрутку и фокус на ту же кнопку;
+    Esc — фокус на строку сделки, а не на панель вкладки; атрибуты дровера после закрытия — прежние."""
+    pg = browser.new_page(viewport={"width": 1280, "height": 800})
+    errs = []
+    pg.on("pageerror", lambda e: errs.append(str(e)))
+    pg.goto(page_url + "#contracts/main")
+    pg.wait_for_selector("#ctBody tr[data-ct]")
+    tr = pg.locator("#ctBody tr[data-ct]").first
+    ct = tr.get_attribute("data-ct")
+    tr.focus()
+    pg.keyboard.press("Enter")
+    pg.wait_for_selector("#drw.on")
+    assert pg.evaluate("[document.getElementById('drw').getAttribute('role'),document.getElementById('drw').getAttribute('aria-modal')]") == ["dialog", "true"]
+    for _ in range(60):
+        pg.keyboard.press("Tab")
+        assert pg.evaluate("document.getElementById('drw').contains(document.activeElement)")
+    btn = pg.locator("#drwBody [data-ctop]").first
+    if btn.count():
+        k = btn.get_attribute("data-ctop")
+        pg.evaluate("document.getElementById('drwBody').scrollTop=200")
+        btn.focus()
+        top = pg.evaluate("document.getElementById('drwBody').scrollTop")
+        pg.keyboard.press("Enter")
+        pg.wait_for_selector("#opRoot")
+        pg.locator("[data-opgo=deal]").click()
+        pg.wait_for_function("!document.getElementById('opRoot')")
+        assert pg.evaluate("document.activeElement.dataset.ctop") == k
+        assert pg.evaluate("document.getElementById('drwBody').scrollTop") == top
+    pg.keyboard.press("Escape")
+    assert not pg.evaluate("document.getElementById('drw').classList.contains('on')")
+    assert pg.evaluate("document.activeElement.dataset.ct") == ct
+    assert pg.evaluate("document.getElementById('drw').getAttribute('role')") is None
+    assert not errs, errs
+    pg.close()
+
+
+def test_путь_заказа_стадия_вне_регламента(browser, page_url):
+    """Ревью 30.10.2026: заказ со стадией не из таблицы шагов — путь не тянет последний известный
+    шаг «→ сейчас» с вердиктом нормы и не пишет «пропущен» у шагов после него; есть строка
+    «вне регламента» с днём входа в стадию."""
+    pg, errs = _open(browser, page_url)
+    k = pg.evaluate("()=>{for(const d of window.__CONTRACTS__.rows) for(const o of d.orders||[]) if(o.live&&o.step==null) return String(o.id);}")
+    if not k:
+        pytest.skip("в синтетике нет живого заказа со стадией вне регламента")
+    pg.evaluate("k=>_opOpen(k,{})", k)
+    pg.wait_for_selector("#opRoot")
+    txt = pg.locator("#opRoot .op-steps").inner_text()
+    assert "→ сейчас" not in txt and "пропущен" not in txt
+    assert "нет в регламенте" in pg.locator("#opRoot .op-unk").inner_text()
+    assert not errs, errs
+    pg.close()
+
+
+def test_производство_дольше_обычного_не_отклонений_нет(browser, page_url):
+    """Ревью 30.10.2026: заказ из списка «Производство дольше обычного» — в строке списка дни в
+    производстве и порог, в пути заказа не «Отклонений нет», а «запросить у поставщика статус»."""
+    pg, errs = _open(browser, page_url)
+    b = pg.locator("#ctPanel-main button[data-od='w:p80']").first
+    if not b.count():
+        pytest.skip("в синтетике нет числа «Производство дольше обычного»")
+    b.click()
+    pg.wait_for_selector("#drw.on")
+    rows = pg.locator(ORDER_ROW)
+    n = rows.count()
+    assert n == int(b.inner_text())
+    for i in range(n):
+        r = pg.locator(ORDER_ROW).nth(i)
+        assert "дольше, чем у 8 из 10 заказов" in r.inner_text()
+        r.click()
+        pg.wait_for_selector("#opRoot")
+        t = pg.locator("#opRoot").inner_text()
+        assert "Отклонений нет" not in t and "статус и новую дату" in t
+        pg.locator("[data-opgo=list]").click()
+        pg.wait_for_selector("#odTable")
+    assert not errs, errs
+    pg.close()

@@ -237,7 +237,12 @@ def три():
 
 
 def _rows(html: str) -> list[str]:
-    return [r for r in html.split("</tr>") if "<tr" in r]
+    return [r for r in _nos(html).split("</tr>") if "<tr" in r]
+
+
+def _nos(html: str) -> str:
+    """«№» номера заказа — обычным шрифтом (span.rzn, ревью 30.10.2026): для сравнения строк — как текст."""
+    return html.replace('<span class="rzn">№</span>', "№")
 
 
 _KQ_JS = r"""
@@ -286,7 +291,7 @@ def test_неделя_строки_с_номером_заказа_поставщ
     r = [x for x in qb if "№991/1<" in x and "сделку не приняли в работу дольше 1 р.д." in x]
     assert len(r) == 1 and "с 15.10 (создан заказ)" in r[0]
     # «Моя приёмка» — та же строка с номером и началом счёта
-    mine = _render({"main": v}, om)["main"]["week"]
+    mine = _nos(_render({"main": v}, om)["main"]["week"])
     mine = mine[mine.index('id="orkMine"'):]
     assert "№991/1" in mine[:mine.index("</tbody>")] and "с 15.10 (создан заказ)" in mine[:mine.index("</tbody>")]
     # поставщика в данных нет — строка без него, номер и срок остаются
@@ -296,7 +301,7 @@ def test_неделя_строки_с_номером_заказа_поставщ
         x["sup"] = ""
     ids = _render({"main": v}, om)["main"]["ids"]
     assert "Компания 40" not in ids["orkQb"] and "Компания 40" not in ids["orkRisk"]
-    assert "№990/2" in ids["orkQb"] and "срок 29.09.2026" in ids["orkQb"]
+    assert "№990/2" in _nos(ids["orkQb"]) and "срок 29.09.2026" in ids["orkQb"]
 
 
 def test_карточка_заказа_номер_и_начало_счёта(три):
@@ -373,7 +378,7 @@ def test_номер_чужой_сделки_и_без_номера(три):
     q = [x for x in v["life"]["queue"] if x["seq"] == 990 and x["code"] == "late"]
     q[1]["ordLbl"], q[2]["ordLbl"] = "905/2", "id 99502"
     v["life"]["queue"] = q
-    qb = _render({"main": v}, om)["main"]["ids"]["orkQb"]
+    qb = _nos(_render({"main": v}, om)["main"]["ids"]["orkQb"])
     assert "№990/1<" in qb and "№990 · 905/2" in qb and "№990 · id 99502" in qb
     assert "№905/2" not in qb
 

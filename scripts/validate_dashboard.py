@@ -381,6 +381,14 @@ def _with_tabs_opened(path: Path) -> Path:
               "EA('#orkTiles .actile[data-of]',function(t){var v=parseInt((t.querySelector('.v')||{}).textContent,10);t.click();"
               "if(!SH())kvFail('Реализация: плитка '+t.dataset.of+' не открыла список заказов');"
               "else if(!isNaN(v)&&RW()!==v)kvFail('Реализация: плитка '+t.dataset.of+' = '+v+', а в списке строк '+RW());XX()});"
+              # части плитки — кнопками своих списков — складываются в число плитки, и каждая открывает
+              # ровно столько строк («не в счёте» — вне частей, отдельной строкой; ревью 30.10.2026)
+              "EA('.orktw',function(w){var t=w.querySelector('.actile[data-of]'),v=t?parseInt((t.querySelector('.v')||{}).textContent,10):NaN,"
+              "P=[].slice.call(w.querySelectorAll('.orkparts button.odn'));if(!P.length||isNaN(v))return;"
+              "var sm=P.reduce(function(a,b){return a+(parseInt(b.textContent,10)||0)},0);"
+              "if(sm!==v)kvFail('Реализация: части плитки '+t.dataset.of+' дают '+sm+', а число плитки '+v);"
+              "P.forEach(function(b){var n=parseInt(b.textContent,10);b.click();"
+              "if(!SH()||RW()!==n)kvFail('Реализация: часть плитки '+t.dataset.of+' «'+(b.dataset.odt||'')+'» = '+n+', а в списке строк '+RW());XX()})});"
               "var PR=(CX3.ork.week.pulse||{}).rows||[];"
               "EA('#orkPulseB tr[data-od]',function(tr,i){tr.click();var n=(PR[i]||{}).n;"
               "if(!SH()||RW()!==n)kvFail('Реализация: строка «Пульса» '+i+' — строк '+RW()+' вместо '+n);XX()});"

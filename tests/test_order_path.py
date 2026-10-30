@@ -52,6 +52,9 @@ def check_tail(o: dict, p: list, fn=cal) -> None:
     st = ork.step_now(o)
     assert p[-1][0] == st
     assert p[-1][2] == fn(dt.date.fromisoformat(p[-1][1]), TODAY)
+    if st is None:                                 # стадия вне регламента: ни нормы, ни выдуманного шага
+        assert all(e[0] is not None for e in p[:-1])
+        return
     if st in ork.NORM_WD:
         assert p[-1][1] == ork.clock(o, st)[0].isoformat()
     ov = ork.overrun(o, TODAY, fn)
@@ -134,6 +137,27 @@ def test_unknown_stage_keeps_step():
     assert [x[0] for x in p] == [1, 7]                           # стадия не из таблицы шаг не меняет
 
 
+def test_unknown_current_stage_closes_last_step():
+    """Стадия сейчас не из таблицы (ревью 30.10.2026): последний известный шаг кончается в день входа
+    в неё, последняя запись — [None, день, р.д.]; шаг 5 не тянется «→ сейчас» и не судится нормой."""
+    o, tr = order("S:OLD", "2026-09-01", [("S:NEW", "2026-09-01"), ("S:SPEC", "2026-09-03"),
+                                          ("S:OLD", "2026-09-20")])
+    assert ork.step_now(o) is None
+    p = ork.path(o, tr, NAMES, TODAY, cal)
+    assert p == [[1, "2026-09-01", 2], [5, "2026-09-03", 17], [None, "2026-09-20", 29]]
+    check_tail(o, p)
+    # только переход в неизвестную стадию — одна запись «вне регламента»
+    o2, tr2 = order("S:OLD", "2026-08-10", [("S:OLD", "2026-08-10")])
+    p2 = ork.path(o2, tr2, NAMES, TODAY, cal)
+    assert p2 == [[None, "2026-08-10", 70]]
+    check_tail(o2, p2)
+    # истории нет — с входа в стадию (stageSince), без шага
+    o3, tr3 = order("S:OLD", "2026-08-10", [])
+    p3 = ork.path(o3, tr3, NAMES, TODAY, cal)
+    assert [x[0] for x in p3] == [None]
+    check_tail(o3, p3)
+
+
 def test_contracts_rows_tail_invariant():
     """Каждый живой заказ синтетики: последняя запись пути = step, stepFrom, stepWd; закрытые —
     без пути; в пути ни имён, ни денег — только шаг, ISO-дата и число."""
@@ -148,13 +172,15 @@ def test_contracts_rows_tail_invariant():
             live += 1
             p = o["path"]
             assert p, o["id"]
-            for st, day, wd in p:
+            for i, (st, day, wd) in enumerate(p):
+                if st is None:                     # «стадия вне регламента» — только последней записью
+                    assert i == len(p) - 1 and o["step"] is None, o["id"]
+                    continue
                 assert isinstance(st, int) and 1 <= st <= 13
                 dt.date.fromisoformat(day)
                 assert wd is None or isinstance(wd, int)
             assert [x[1] for x in p] == sorted(x[1] for x in p)          # по времени
-            if o["step"] is not None:
-                assert p[-1][0] == o["step"], o["id"]
+            assert p[-1][0] == o["step"], o["id"]
             if o["stepFrom"]:
                 assert p[-1][1] == o["stepFrom"] and p[-1][2] == o["stepWd"], o["id"]
     assert live > 10

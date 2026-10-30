@@ -345,7 +345,8 @@ def test_разбор_числа_что_делать_худшие_сверху_�
         assert f'crm/deal/details/{x["deal"]}/"' in h, x["deal"]
     links = re.findall(r'<a class="odbx"[^>]*>', h)
     assert links and all('target="_blank"' in a and 'rel="noopener"' in a and 'data-xlv=""' in a for a in links)
-    for t in ("Заказ", "Где застрял", "Срок клиента", "Что сделать", "Поставщик"):
+    # шапка выгрузки — по столбцу на поле (ревью 30.10.2026): видимые столбцы и скрытые рядом
+    for t in ("№ заказа", "Сделка", "Шаг №", "Р.д. на шаге", "Норма, р.д.", "Срок клиента", "Что сделать", "Кто отвечает", "Поставщик"):
         assert f'data-xlv="{t}"' in h, t
     assert "клик — фильтр" not in h and "Что делать" in h
     assert h.index("<table") < h.index("По поставщикам") and '<details class="odcuts"' in h
