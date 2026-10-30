@@ -26,7 +26,8 @@ def _rules(css):
 
 def test_scale_variables_and_family():
     blk = _block()
-    for v, px in (("--rz-xs", 12), ("--rz-sm", 13), ("--rz-md", 14), ("--rz-lg", 16), ("--rz-xl", 20), ("--rz-2xl", 26)):
+    # --rz-xs — 13 px: минимальный кегль вкладки (спец. R4, 0.3 и 2.3: «шрифты плохо читаемы»)
+    for v, px in (("--rz-xs", 13), ("--rz-sm", 13), ("--rz-md", 14), ("--rz-lg", 16), ("--rz-xl", 20), ("--rz-2xl", 26)):
         assert f"{v}:{px}px" in blk, v
     assert "'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" in blk
     assert "tabular-nums lining-nums" in blk
@@ -78,7 +79,7 @@ def test_labels_reset_inside_scope():
 def test_rz_drawer_switch():
     assert "function _rzDrw(on){" in TPL
     # карточка сделки — первая строка openContract
-    oc = TPL[TPL.index("function openContract(x){"):]
+    oc = TPL[TPL.index("function openContract(x,opt){"):]
     assert oc.split("\n")[1].strip() == "if(typeof _rzDrw==='function') _rzDrw(true);"
     # панели других вкладок снимают класс
     for fn in ("function openDrw(", "function openDeals(", "function openUncovered(", "function openDir(", "function openPeopleDeals("):
@@ -86,4 +87,4 @@ def test_rz_drawer_switch():
         head = body[:body.index("\n", body.index("\n") + 1)]
         assert "_rzDrw(false)" in head, fn
     # _rzDrw объявлен до openContract (новый регион прямо перед ним)
-    assert TPL.index("function _rzDrw(on){") < TPL.index("function openContract(x){")
+    assert TPL.index("function _rzDrw(on){") < TPL.index("function openContract(x,opt){")

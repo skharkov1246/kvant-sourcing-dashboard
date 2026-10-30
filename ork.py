@@ -817,6 +817,16 @@ def checkpoints(order: dict, week) -> list[dict]:
     P50 — prodStart + ½(prodEnd − prodStart), для всех заказов; P14 — (shipPlan, иначе
     prodEnd) − 14 дн., если производство дольше 30 дн. Заказ уже готов или отгружен
     (шаг ≥ 8 по стадии и фактам) — точек нет: контроль производства пройден."""
+    w = _d(week)
+    mon = w - dt.timedelta(days=w.weekday())
+    sun = mon + dt.timedelta(days=6)
+    return [{"kind": k, "date": d.isoformat()} for k, d in checkpoint_dates(order) if mon <= d <= sun]
+
+
+def checkpoint_dates(order: dict) -> list[tuple[str, dt.date]]:
+    """Все контрольные точки производства заказа — [(P50 | P14, дата)], без окна недели: то же
+    правило, что у checkpoints (одна функция). Карточка заказа берёт из них ближайшую
+    («Следующая проверка»), неделя — попавшие в неделю. Готов или отгружен — точек нет."""
     ps, pe = _d(order.get("prodStart")), _d(order.get("prodEnd"))
     if not ps or not pe or pe < ps:
         return []
@@ -825,14 +835,11 @@ def checkpoints(order: dict, week) -> list[dict]:
     st = step_of(order.get("stage"), order) if order.get("stage") else None
     if st is not None and st >= 8:
         return []
-    w = _d(week)
-    mon = w - dt.timedelta(days=w.weekday())
-    sun = mon + dt.timedelta(days=6)
     pts = [("P50", ps + dt.timedelta(days=int((pe - ps).days * CHECKPOINT["half"])))]
     if (pe - ps).days > CHECKPOINT["long_days"]:
         base = _d(order.get("shipPlan")) or pe
         pts.append(("P14", base - dt.timedelta(days=CHECKPOINT["before_days"])))
-    return [{"kind": k, "date": d.isoformat()} for k, d in pts if mon <= d <= sun]
+    return pts
 
 
 # --- гигиена карточки ----------------------------------------------------------------------
@@ -934,6 +941,21 @@ def metric_state(value, n: int | None, cover: float | None, gates: dict = GATES,
 
 # --- хозяин пункта по шагу (решение 26.10.2026, п. 1) ---------------------------------------
 _ESC_STEP = object()
+# роль → поля people, из которых берётся человек роли, по порядку (первое непустое). Одна таблица у
+# подписи (owner) и у id человека (role_id): «Смотреть как» (R4, Д-11а) отбирает пункты по id, и id
+# обязан быть id того же человека, чьё имя показано. Логистика и поставщик — подписи ролей, без id
+ROLE_KEYS = {"orkMgr": ("orkMgr", "dealOrk"), "orkHead": ("orkHead",), "kam": ("kam",),
+             "oss": ("ossOrder", "ossDeal"), "log": (), "sup": ()}
+
+
+def role_id(role: str | None, people: dict, ids: dict) -> str:
+    """id Битрикса человека роли: id того поля people, чьё имя выбрал owner (ROLE_KEYS), иначе ''.
+    ids — те же ключи, что у people (orkMgr, dealOrk, orkHead, kam, ossOrder, ossDeal)."""
+    for k in ROLE_KEYS.get(role or "", ()):
+        if people.get(k) not in (None, "", "—"):
+            v = ids.get(k)
+            return str(v) if v not in (None, "", "0", "—") else ""
+    return ""
 
 
 def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP,
@@ -952,10 +974,10 @@ def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP,
                 return v
         return ""
 
-    find = {"orkMgr": lambda: nm("orkMgr", "dealOrk"),
-            "orkHead": lambda: nm("orkHead") or ROLES["orkHead"],
-            "kam": lambda: nm("kam"),
-            "oss": lambda: nm("ossOrder", "ossDeal"),
+    find = {"orkMgr": lambda: nm(*ROLE_KEYS["orkMgr"]),
+            "orkHead": lambda: nm(*ROLE_KEYS["orkHead"]) or ROLES["orkHead"],
+            "kam": lambda: nm(*ROLE_KEYS["kam"]),
+            "oss": lambda: nm(*ROLE_KEYS["oss"]),
             "log": lambda: ROLES["log"],
             "sup": lambda: ROLES["sup"]}
     if debt:
@@ -990,12 +1012,18 @@ ITEM = {
     "dealOpen": (13, "oss", None),
     "dealClose": (13, "oss", None),
     "noOrder": (1, "orkHead", "kam"),
+    # приёмка — одна на сделку (решение владельца 30.10.2026, п. 1): пункт сделки у руководителя
+    # ОРК, КАМ в копии; заказ, добавленный в уже принятую сделку, — пункт заказа ordAssign
+    # «назначить менеджера ОРК на новый заказ» у руководителя ОРК, без КАМа (не разговор с клиентом)
     "s1Over": (1, "orkHead", "kam"),
+    "ordAssign": (1, "orkHead", None),
     "s2Over": (4, "orkMgr", "orkHead"),
     "s3Over": (5, "orkMgr", "orkHead"),
     "s6Over": (8, "orkMgr", "orkHead"),
     "payNoContract": (5, "orkHead", "kam"),
     "gone": (1, "orkHead", None),
+    # уволен ответственный или ОСС заказа — пункт заказа (единица — заказ, номер в строке)
+    "goneOrd": (None, "orkHead", None),
     "noDl": (1, "orkHead", "kam"),
     "noPlanDates": (6, "oss", None),
     "noFact": (11, "log", None),
@@ -1041,8 +1069,17 @@ OVER_CODE = {1: "s1Over", 4: "s2Over", 5: "s3Over", 8: "s6Over"}
 # «сверх нормы» менеджера (W2, по менеджерам, ведомость, «Замедлено») он не идёт
 WAIT_CODE = {12: "noUtd"}
 WAIT_UTD = "ждём УПД от клиента"
-# все сроки шагов регламента в р.д. → код пункта очереди (inWd у пункта)
+# все сроки шагов регламента в р.д. → код пункта очереди (inWd у пункта). Шаг 1 — ПЕРВАЯ приёмка
+# сделки (s1Over, пункт сделки: решение владельца 30.10.2026, п. 1)
 TERM_CODE = {**OVER_CODE, **WAIT_CODE}
+# тот же срок шага 1 у заказа, добавленного в уже принятую сделку: назначить менеджера ОРК на
+# новый заказ (код → шаг). Дни — рабочие, как у TERM_CODE
+TERM_EXTRA = {"ordAssign": 1}
+# коды пунктов со сроком шага в р.д. (inWd, «с дд.мм (…)»)
+TERM_CODES = frozenset(TERM_CODE.values()) | frozenset(TERM_EXTRA)
+# шаг «сверх нормы» → все коды пунктов этого срока (W2, «Сверх нормы по менеджерам»): шаг 1 —
+# приёмка сделки (s1Over) и назначение менеджера ОРК на новый заказ (ordAssign)
+STEP_CODES = {st: (code, *(c for c, s in TERM_EXTRA.items() if s == st)) for st, code in OVER_CODE.items()}
 
 
 def item_owner(code: str, step_now: int | None, people: dict, *, key: str | None = None) -> dict:
