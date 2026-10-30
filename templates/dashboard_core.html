@@ -3304,6 +3304,14 @@
   .drw.rz .odtd[open]{padding-bottom:10px}
   .drw.rz .odsec{margin-bottom:16px}
   /* ==== /R4:INT ==== */
+  /* ==== Линии столбцов (владелец 30.10.2026: «нет деления на столбцы — глазу не за что зацепиться»):
+     тонкая линия между соседними ячейками строки — во вкладке «Реализация» и её панели, пока таблица —
+     таблица (шире 900 px; уже строки — карточками, без линий) ==== */
+  :root{--rz-col:var(--line2)}
+  :root[data-theme="dark"]{--rz-col:var(--line)}
+  @media (min-width:901px){
+    #tab-contracts table :is(th,td)+:is(th,td),.drw.rz table :is(th,td)+:is(th,td){border-left:1px solid var(--rz-col)}
+  }
 </style>
 <script>
 /* Оформление: светлое для всех по умолчанию; «Тёмная тема» — выбор человека, помнится
