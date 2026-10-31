@@ -1195,14 +1195,16 @@ def realctx_raw() -> dict:
     return {"version": 1, "at": t(0.2), "chats": chats, "contracts": contracts, "econ": econ, "facts": facts}
 
 
-def build_realization(hist: bool = True) -> dict:
+def build_realization(hist: bool = True, stub=None) -> dict:
     """«Реализация» со сводом чатов и договоров — как main.py: contracts.compute с чатами и
     финальной экономикой свода, затем dealctx.build. → {"contracts": …, "dealctx": …, "ork_month": …}
-    для dashboard.write."""
+    для dashboard.write. stub — другая заглушка портала (например, ПодтверждениеПередачи: её
+    справочник людей с уволенным — roster)."""
     import dealctx
     ctx = dealctx.clean(realctx_raw())
+    kw = {"stub": stub, "people": getattr(stub, "roster", CT_ROSTER)} if stub is not None else {}
     ct = build_contracts(ctx_chats=ctx["chats"], ctx_econ=ctx["econ"], ctx_contracts=ctx["contracts"],
-                         keep_head=True)
+                         keep_head=True, **kw)
     ork_month = ct.pop("orkMonth", None)  # как main.py: поимённое — не в данные вкладки, своим массивом
     ork_head = ct.pop("_orkHead", "")
     import contracts as contracts_mod
