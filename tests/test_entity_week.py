@@ -366,7 +366,10 @@ def test_как_считается_чей_шаг_и_нарушения(built):
     h = built[3]["how"]
     kinds = {s["no"]: s["kind"] for s in h["steps"]}
     assert {n for n, k in kinds.items() if k == "deal"} == {1, 2, 3}
-    assert {n for n, k in kinds.items() if k == "order"} == set(range(4, 13)) and kinds[13] == "both"
+    # шаг 0 «Подтверждение передачи в ОРК» — заказа (решение владельца 31.10.2026), меряет его задача
+    assert {n for n, k in kinds.items() if k == "order"} == {0} | set(range(4, 13)) and kinds[13] == "both"
+    st0 = next(s for s in h["steps"] if s["no"] == 0)
+    assert st0["measure"] == "task" and st0["stages"] == [] and st0["next"] == "" and st0["esc"] == "КАМ"
     st1 = next(s for s in h["steps"] if s["no"] == 1)
     assert st1["measure"] == "order" and st1["kindName"] == "сделка"
     V = h["viol"]

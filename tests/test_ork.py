@@ -33,9 +33,11 @@ def t(day: str, hm: str = "10:00") -> str:
 
 
 def test_таблица_шагов_полна():
-    assert [s["no"] for s in ork.STEPS] == list(range(1, 14))
+    # шаг 0 «Подтверждение передачи в ОРК» — первым (решение владельца 31.10.2026), за ним 13 шагов
+    assert [s["no"] for s in ork.STEPS] == list(range(0, 14))
     assert ork.OWNER_RULE == "step"
-    assert ork.NORM_WD == {1: 1, 4: 2, 5: 9, 8: 2, 12: 10}
+    assert ork.NORM_WD == {0: 5, 1: 1, 4: 2, 5: 9, 8: 2, 12: 10}
+    assert ork.EXECUTOR[0] == "confirmResp" and ork.STEP[0]["esc"] == "kam" and "confirmResp" not in ork.ADJACENT
     assert ork.EXECUTOR[1] == "orkHead" and ork.EXECUTOR[11] == "log" and ork.EXECUTOR[13] == "oss"
     assert {ork.EXECUTOR[n] for n in (4, 5, 6, 7, 8, 9, 12)} == {"orkMgr"}
     assert {ork.EXECUTOR[n] for n in (2, 3, 10)} == {"kam"}
@@ -392,7 +394,8 @@ def test_ждём_упд_одно_правило_не_сверх_нормы():
     assert шаг4["over"] is True and шаг4["waitUtd"] is False
     assert 12 not in ork.OVER_CODE and "noUtd" not in ork.OVER_CODE.values()
     assert ork.WAIT_CODE == {12: "noUtd"} and ork.TERM_CODE[12] == "noUtd"
-    assert set(ork.TERM_CODE) == set(ork.OVER_CODE) | set(ork.WAIT_CODE)
+    assert set(ork.TERM_CODE) == set(ork.OVER_CODE) | set(ork.WAIT_CODE) | set(ork.PRE_CODE)
+    assert ork.PRE_CODE == {0: "s0Over"} and 0 not in ork.OVER_CODE and 0 not in ork.STEP_CODES
 
 
 # ── приёмка кончается назначением менеджера ОРК (вопрос владельца 29.10.2026) ─────────────

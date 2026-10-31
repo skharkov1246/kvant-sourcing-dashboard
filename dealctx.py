@@ -676,7 +676,9 @@ def _reg(code: str, r: dict, ppl: dict, key: str | None = None, order: dict | No
     регламент даёт пункт менеджеру ОРК (чаты, договор поставщика), хозяин — руководитель ОРК, а
     менеджеры заказов сделки — в копии списком («менеджеры заказов: …»); шаг — шаг сделки."""
     if order is not None:
-        pp = {**ppl, "orkMgr": _nm(order.get("orkMgr")), "ossOrder": _nm(order.get("oss"))}
+        # исполнитель задачи подтверждения передачи — хозяин шага 0 (решение владельца 31.10.2026)
+        pp = {**ppl, "orkMgr": _nm(order.get("orkMgr")), "ossOrder": _nm(order.get("oss")),
+              "confirmResp": _nm(order.get("confirmWho"))}
         ow = ork.item_owner(code, order.get("step"), pp, key=key)
         return {"step": order.get("step"), "role": ow["role"], "roleName": ork.ROLES.get(ow["role"], ""),
                 "who": ow["who"], "escalateTo": ow["copy"], "copyRole": ow["copyRole"]}

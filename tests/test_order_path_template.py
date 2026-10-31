@@ -101,13 +101,19 @@ def test_каждый_живой_заказ_путь_из_13_шагов(run):
                 assert "Заказ закрыт" in h and 'class="op-steps"' not in h
                 continue
             live += 1
-            assert h.count('<li class="op-s ') == 13, o["id"]
+            # шаг 0 «Подтверждение передачи в ОРК» (решение владельца 31.10.2026) — в пути, только если
+            # заказ на нём сейчас или был (путь с записью шага 0): тогда 14 шагов, иначе прежние 13
+            has0 = o["step"] == 0 or any(st == 0 for st, _day, _wd in o["path"])
+            assert h.count('<li class="op-s ') == (14 if has0 else 13), o["id"]
             cur = re.findall(r'<li class="op-s ([^"]*)" aria-current="step" data-ops="\d+"><button [^>]*><span class="op-dot" aria-hidden="true">(\d+)</span>', h)
             if o["step"] is None:
                 assert not cur and "неизвестна регламенту" in h and "сверить стадию заказа в Битриксе" in h
                 continue
             assert len(cur) == 1 and int(cur[0][1]) == o["step"] and "is-cur" in cur[0][0], o["id"]
-            assert f"Шаг {o['step']} из 13" in h
+            if o["step"] == 0:
+                assert "Шаг 0 · до передачи в ОРК" in h and "Шаг 0 из 13" not in h, o["id"]
+            else:
+                assert f"Шаг {o['step']} из 13" in h
             if o["stepWd"] is not None:
                 seg = h[h.index('aria-current="step"'):]
                 seg = seg[:seg.index("</li>")]

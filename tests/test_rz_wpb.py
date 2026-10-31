@@ -169,8 +169,10 @@ def test_д7_в_сборке(built):
         assert sum(W["lateByWho"].values()) == W["tiles"]["W3"]["byOrders"]["late"], nm
         for w, n in W["lateByWho"].items():
             assert len(W["drill"]["who"][w]["late"]) == n, (nm, w)
-        # второй способ: пункты late очереди по исполнителю
-        want = Counter((q.get("who") or "не назначен") for q in v["life"]["queue"] if q["code"] == "late")
+        # второй способ: пункты late очереди по исполнителю; ответственный заказа не из ОРК (whoOut —
+        # заказ не передан в ОРК, решение владельца 31.10.2026) менеджером ОРК не числится — «не назначен»
+        want = Counter(("не назначен" if q.get("whoOut") else (q.get("who") or "не назначен"))
+                       for q in v["life"]["queue"] if q["code"] == "late")
         assert dict(want) == W["lateByWho"], nm
 
 
