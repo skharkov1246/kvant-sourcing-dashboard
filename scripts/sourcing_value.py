@@ -1018,12 +1018,12 @@ def main(argv=None) -> int:
           f"руководитель в портале {'указан' if head else 'не указан'}")
     service = config.service_accounts({u: x["name"] for u, x in roster.items() if x["active"]})
     sourcer_f = config.DEAL_SOURCER_FIELDS[0][0]
-    dd = client.deals_by_ids(sids, select=["ID", sourcer_f])
+    dd = client.deals_by_ids(sids, select=["ID", sourcer_f, "COMPANY_ID"])
     sourcer = {d: str(x.get(sourcer_f)) for d, x in dd.items() if str(x.get(sourcer_f) or "0") != "0"}
 
     # карточки СП-166 и заказы СП-172 сделок выборки — частями по сделкам
     card_sel = ["id", "companyId", "stageId", "createdTime", "parentId2", "assignedById", "createdBy",
-                config.RFQ_OFFER_FIELD]
+                "ufCrm18Supplier", "ufCrm18SupplContact", config.RFQ_OFFER_FIELD]
     cards, orders = [], []
     for part in _parts(sids, a.parts):
         cards += read_items(client, config.SPA_ENTITY_TYPE_ID, "parentId2", part, card_sel)
@@ -1032,6 +1032,23 @@ def main(argv=None) -> int:
     for c in cards:
         c["_bucket"] = stages.classify_stage(str(c.get("stageId") or ""))
         c["_offer"] = bool(c.get(config.RFQ_OFFER_FIELD))
+    # поставщик карточки: companyId бывает унаследован от сделки — это заказчик (зонд v61); берём
+    # поля «Supplier» и «Supplier contact», компанию сделки поставщиком не считаем никогда
+    # (то же правило, что у очереди звонилки — call_queue.supplier_of, правило 14)
+    from call_queue import crm_refs, supplier_of
+    ct_ids = sorted({t for c in cards for fld in ("ufCrm18Supplier", "ufCrm18SupplContact") for t in crm_refs(c.get(fld))[1]},
+                    key=int)
+    ct_co = {}
+    for i in range(0, len(ct_ids), 50):
+        for x in client.call("crm.contact.list", {"filter": {"@ID": [int(v) for v in ct_ids[i:i + 50]]},
+                                                  "select": ["ID", "COMPANY_ID"], "start": -1}) or []:
+            ct_co[str(x.get("ID"))] = str(x.get("COMPANY_ID") or "")
+    moved = 0
+    for c in cards:
+        sup, _ = supplier_of(c, str((dd.get(str(c.get("parentId2") or "")) or {}).get("COMPANY_ID") or ""), ct_co)
+        moved += sup != str(c.get("companyId") or "")
+        c["companyId"] = sup
+    print(f"поставщик карточки: взят из полей Supplier вместо компании карточки у {moved} из {len(cards)}")
     cards_by_deal: dict[str, list[dict]] = defaultdict(list)
     for c in cards:
         cards_by_deal[str(c.get("parentId2") or "")].append(c)
