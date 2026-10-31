@@ -540,6 +540,9 @@ def read_by_ids(client, method: str, flt_key: str, ids: list[str], select: list[
     return out
 
 
+ДОМЕН_ПОРОГ = 10      # домен с меньшим числом писем в журнал не попадает (только в «прочие»)
+
+
 def read_my_companies(client) -> list[dict]:
     """Компании с признаком «Моя компания» — по ключу >ID, пачками по 50."""
     out, last = [], 0
@@ -634,6 +637,14 @@ def main(argv=None) -> int:
         override = {}
     senders, sst = sender_map(mine, override)
     print(f"наших компаний в Битриксе: {len(mine)}; " + "; ".join(f"{k}: {v}" for k, v in sorted(sst.items())))
+    # с каких доменов уходят наши письма: только домен и число писем (агрегат, правило 17);
+    # домены реже ДОМЕН_ПОРОГ писем — одной строкой «прочие», чтобы не светить единичные адреса
+    doms = Counter(email_domain((m.get("out") or {}).get("from")) or "(адрес не указан)"
+                   for cid, m in mails.items() if m.get("out"))
+    big = [(d, n) for d, n in doms.most_common() if n >= ДОМЕН_ПОРОГ]
+    print("домены отправителя наших писем: " + "; ".join(
+        f"{d} {n}{'' if sender_of('x@' + d, senders) else ' (не сопоставлен)'}" for d, n in big)
+        + f"; прочие: доменов {len(doms) - len(big)}, писем {sum(doms.values()) - sum(n for _, n in big)}")
     arms = parse_arms(os.environ.get("CALL_ARMS", ""))
     print("группы сравнения: " + ", ".join(f"{n} {w}" for n, w in arms))
     countries = parse_countries(os.environ.get("CALL_COUNTRIES", ""))

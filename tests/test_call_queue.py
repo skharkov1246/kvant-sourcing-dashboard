@@ -277,6 +277,7 @@ def test_main_dry_run_with_cards_without_deal(monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "карточек без сделки: 3" in out and "звонков: 3" in out and "поставщик не указан: 1" in out
     assert "наших компаний в Битриксе: 2" in out and "наша компания: название не латиницей: 1" in out
+    assert "домены отправителя наших писем: ; прочие: доменов 1, писем 4" in out          # меньше порога — без имени
     assert seen_ids["deals"] == ["900"]                                           # ни «None», ни «»
     assert all(isinstance(x, int) for m in ("crm.contact.list", "crm.company.list") for x in seen_ids[m])
 
