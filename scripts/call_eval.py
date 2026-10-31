@@ -217,23 +217,41 @@ def parse(resp) -> tuple[dict | None, str]:
         v = json.loads(raw)
     except ValueError:
         return None, ("обрезан" if getattr(resp, "stop_reason", None) == "max_tokens" else "не JSON")
-    if not isinstance(v, dict) or set(КРИТЕРИИ) - set((v.get("scores") or {})):
+    sc = v.get("scores") if isinstance(v, dict) else None
+    if not isinstance(sc, dict) or set(КРИТЕРИИ) - set(sc):
         return None, "не по схеме"
+    # 1–5 сверяется здесь: числовых ограничений схема API не принимает
+    if any(not isinstance(sc[k], int) or isinstance(sc[k], bool) or not 1 <= sc[k] <= 5 for k in КРИТЕРИИ):
+        return None, "оценка вне 1–5"
     return v, ""
 
 
+class CallError:
+    """Сбой вызова: класс, код и текст. Текст API печатается только для выдуманного набора (--smoke):
+    в ответе 400 API может процитировать запрос, а в настоящих звонках он закрытый."""
+
+    def __init__(self, e: BaseException | None = None, kind: str = ""):
+        self.kind = kind or type(e).__name__
+        self.status = getattr(e, "status_code", None)
+        self.text = str(getattr(e, "message", "") or e or "")[:400] if e is not None else ""
+
+    def billed(self) -> bool:
+        """4xx — запрос не исполнялся и не оплачен; связь и 5xx — мог быть исполнен."""
+        return not (isinstance(self.status, int) and 400 <= self.status < 500)
+
+
 def call_model(client, req: dict, sleep=None):
-    """(ответ, None) или (None, класс ошибки). Повтор — только после 429/529: запрос не исполнялся."""
+    """(ответ, None) или (None, CallError). Повтор — только после 429/529: запрос не исполнялся."""
     import time
     sleep = sleep or time.sleep
     for pause in (*ПАУЗЫ_ПЕРЕГРУЗКИ, None):
         try:
             return client.beta.messages.create(**req), None
-        except Exception as e:                       # noqa: BLE001 — наружу только класс
+        except Exception as e:                       # noqa: BLE001 — разбор ниже
             if pause is None or getattr(e, "status_code", None) not in (429, 529):
-                return None, type(e).__name__
+                return None, CallError(e)
             sleep(pause)
-    return None, "перегрузка"
+    return None, CallError(kind="перегрузка")
 
 
 # ───── балл ─────
@@ -289,7 +307,7 @@ def judge(records: list[dict], client, max_usd: float, model: str = МОДЕЛЬ
     order = list(records)
     random.Random(seed).shuffle(order)
     budget = Budget(max_usd)
-    st = {"звонков": len(order), "оценено": 0, "сбои": {}, "остановлено потолком": 0}
+    st = {"звонков": len(order), "оценено": 0, "сбои": {}, "остановлено потолком": 0, "_тексты_сбоев": []}
     lock = threading.Lock()
 
     def one(rec: dict) -> dict | None:
@@ -303,11 +321,13 @@ def judge(records: list[dict], client, max_usd: float, model: str = МОДЕЛЬ
                     st["остановлено потолком"] += 1
                 return None
             resp, err = call_model(client, req, sleep)
-            budget.settle(worst, spent_usd(resp, model) if resp is not None else worst)
-            j, bad = parse(resp) if resp is not None else (None, err)
+            budget.settle(worst, spent_usd(resp, model) if resp is not None else (worst if err.billed() else 0.0))
+            j, bad = parse(resp) if resp is not None else (None, f"{err.kind} {err.status or ''}".strip())
             if j is None:
                 with lock:
                     st["сбои"][bad] = st["сбои"].get(bad, 0) + 1
+                    if err is not None and err.text and len(st["_тексты_сбоев"]) < 3:
+                        st["_тексты_сбоев"].append(err.text)
                 return None
             got.append(j)
         with lock:
@@ -530,8 +550,12 @@ def main(argv=None) -> int:
         import anthropic
         client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"].strip(), max_retries=0, timeout=600)
         rows, st = judge(recs, client, a.max_usd, model)
+        texts = st.pop("_тексты_сбоев", [])
         for k, v in st.items():
             print(f"  {k}: {v}")
+        if a.smoke:                                       # набор выдуман — текст ошибки API печатать можно
+            for t in texts:
+                print(f"::error::ответ API: {t}")
         Path(a.out).write_text(json.dumps({"v": VERSION, "model": model, "usd": st["потрачено_usd"], "rows": rows},
                                           ensure_ascii=False), encoding="utf-8")
         if a.smoke:                                       # разговоры выдуманы — их ярлыки печатать можно
@@ -542,6 +566,9 @@ def main(argv=None) -> int:
             return 1 if bad else 0
         return 0 if st["оценено"] == len(recs) else 1
     data = json.loads(Path(a.scores).read_text(encoding="utf-8"))
+    if not data.get("rows"):
+        print("оценок нет — отчёт не собран")
+        return 1
     agg = aggregate(data["rows"])
     Path(a.html).write_text(render(agg, data["rows"], data), encoding="utf-8")
     for arm, v in agg["arms"].items():                     # в журнал — только агрегаты
