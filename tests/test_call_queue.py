@@ -204,3 +204,69 @@ def test_build_never_calls_customer():
     assert [c["company_id"] for c in calls] == ["5"] and calls[0]["phone"].startswith("+86")
     assert st["поставщик не указан"] == 1
     assert st["компания карточки — не поставщик (взят из поля Supplier)"] == 1
+
+
+# ───── номера записей CRM: карточка без сделки валила прогон ─────
+
+def test_num_id_rejects_junk():
+    assert [q.num_id(v) for v in (5, "17", " 0042 ", "CO_5", None, "", "None", 0, "0", 1.5, "²", True, "1" * 19)] == \
+        ["5", "17", "42", "", "", "", "", "", "", "", "", "", ""]
+    assert q.rfq_no({"id": 11, "parentId2": None}) == "11" and q.rfq_no({"id": 11, "parentId2": 900}) == "900-11"
+
+
+def test_main_dry_run_with_cards_without_deal(monkeypatch, capsys):
+    """Холостой прогон целиком на поддельном портале: карточки без сделки (None, «», 0), companyId
+    пустой и мусорный — прогон доходит до счётчиков и звонит только поставщику."""
+    import types
+
+    now = q.dt.datetime.now(q.MSK)
+    old = (now - q.dt.timedelta(days=12)).isoformat()
+    cards = [{"id": 11, "title": "RFQ 900-11", "stageId": "DT166_24:PREPARATION", "companyId": 5, "parentId2": None},
+             {"id": 12, "title": "RFQ 12", "stageId": "DT166_24:PREPARATION", "companyId": "", "parentId2": "",
+              "ufCrm18Supplier": ["CO_6"]},
+             {"id": 13, "title": "RFQ 13", "stageId": "DT166_24:PREPARATION", "companyId": None, "parentId2": 0,
+              "ufCrm18SupplContact": "C_31"},
+             {"id": 14, "title": "RFQ 900-14", "stageId": "DT166_24:PREPARATION", "companyId": 900, "parentId2": 900}]
+    acts = [{"ID": i, "OWNER_ID": str(c["id"]), "DIRECTION": q.OUT, "CREATED": old, "SUBJECT": c["title"],
+             "SETTINGS": {"EMAIL_META": {"from": "buy@example.ae", "to": "sales@example.cn"}}, "COMMUNICATIONS": []}
+            for i, c in enumerate(cards, 1)]
+    contacts = [{"ID": "31", "NAME": "Li", "LAST_NAME": "Wei", "PHONE": [{"VALUE": "+86 139 0013 9000"}], "COMPANY_ID": None}]
+    comps = [{"ID": "5", "TITLE": "Example Pumps Co", "PHONE": [{"VALUE": "+86 138 0013 8000"}]},
+             {"ID": "6", "TITLE": "Sample Valves Pte", "PHONE": [{"VALUE": "+65 6123 4567"}]},
+             {"ID": "900", "TITLE": "Customer JSC", "PHONE": [{"VALUE": "+7 495 123 4567"}]}]
+    seen_ids: dict[str, list] = {}
+
+    class FakeClient:
+        def __init__(self, url):
+            pass
+
+        def list_items(self, et, select, filter):
+            return [dict(c) for c in cards]
+
+        def call(self, method, params):
+            flt = params["filter"]
+            key = "OWNER_ID" if method == "crm.activity.list" else "@ID"
+            ids = {str(x) for x in flt[key]}
+            seen_ids.setdefault(method, []).extend(flt[key])
+            src = {"crm.activity.list": acts, "crm.contact.list": contacts, "crm.company.list": comps}[method]
+            col = key.lstrip("@")
+            return [x for x in src if str(x[col]) in ids and int(x["ID"]) > flt[">ID"]]
+
+        def deals_by_ids(self, ids, select=None):
+            seen_ids.setdefault("deals", []).extend(ids)
+            return {str(i): {"ID": str(i), "COMPANY_ID": "900"} for i in ids}
+
+    cfg = types.SimpleNamespace(SPA_CATEGORY_ID=24, SPA_ENTITY_TYPE_ID=166, RFQ_OFFER_FIELD="ufOffer",
+                                Settings=types.SimpleNamespace(load=lambda: types.SimpleNamespace(bitrix_webhook_url="x")))
+    monkeypatch.setitem(sys.modules, "config", cfg)
+    monkeypatch.setitem(sys.modules, "period", types.SimpleNamespace(workdays_ru=wd))
+    monkeypatch.setitem(sys.modules, "bitrix_client", types.SimpleNamespace(BitrixClient=FakeClient))
+    for k in ("CALL_PROMISE_FIELD", "CALL_ATTEMPTS_FIELD", "CALL_DNC_FIELD", "CALL_ARMS"):
+        monkeypatch.delenv(k, raising=False)
+    monkeypatch.setenv("CALL_OUR_COMPANY", "Example Trading FZE")
+    monkeypatch.setenv("CALL_AGENT_NAME", "Alex")
+    assert q.main([]) == 0
+    out = capsys.readouterr().out
+    assert "карточек без сделки: 3" in out and "звонков: 3" in out and "поставщик не указан: 1" in out
+    assert seen_ids["deals"] == ["900"]                                           # ни «None», ни «»
+    assert all(isinstance(x, int) for m in ("crm.contact.list", "crm.company.list") for x in seen_ids[m])
