@@ -17,7 +17,10 @@
                 CALL_PROMISE_FIELD; пока поля нет — причина не работает).
   • Письмо — дело CRM_EMAIL на карточке. Нет нашего письма в CRM — звонить не с чем (ссылаться не
     на что): строка считается, в очередь не идёт.
-  • Телефон — у контакта карточки (ufCrm18SupplContact), иначе у компании; приводится к виду
+  • Поставщик — поле «Supplier» (ufCrm18Supplier), затем «Supplier contact» и компании их контактов;
+    companyId карточки — последним и только если это не компания сделки: он бывает унаследован от
+    сделки, то есть это заказчик (зонд v61). Заказчику звонилка не звонит никогда.
+  • Телефон — у контакта поставщика, иначе у компании поставщика; приводится к виду
     +<код страны> библиотекой phonenumbers; невалидный — считается и не идёт. Страна и часовой
     пояс — по номеру; номер-отправитель — по стране (ПУЛ_НОМЕРОВ).
   • Не звонить: поле компании CALL_DNC_FIELD = «Да»; попыток (поле карточки CALL_ATTEMPTS_FIELD)
@@ -201,6 +204,37 @@ def reason(card: dict, mail: dict | None, today: dt.date, workdays, promise_fiel
     return ""
 
 
+def crm_refs(val) -> tuple[list[str], list[str]]:
+    """Значение crm-поля (['CO_5', 'C_7', 'CT_8', '9']) → (компании, контакты) в порядке поля;
+    то же правило, что probe_deal_rfq.ссылки_crm и main._crm_ref_ids."""
+    comps: list[str] = []
+    conts: list[str] = []
+    for x in (val if isinstance(val, list) else [val] if val else []):
+        s = str(x).strip()
+        if s.startswith("CO_"):
+            comps.append(s[3:])
+        elif s.startswith("CT_"):
+            conts.append(s[3:])
+        elif s.startswith("C_"):
+            conts.append(s[2:])
+        elif s.isdigit():
+            comps.append(s)
+    ok = lambda v: v.isdigit() and v != "0"                                   # noqa: E731
+    return [c for c in dict.fromkeys(comps) if ok(c)], [c for c in dict.fromkeys(conts) if ok(c)]
+
+
+def supplier_of(card: dict, deal_company: str, contact_company: dict[str, str]) -> tuple[str, list[str]]:
+    """Поставщик карточки → (компания, контакты). companyId карточки бывает унаследован от сделки —
+    это заказчик (зонд v61), поэтому порядок: поле «Supplier», «Supplier contact», компании их
+    контактов и только потом companyId; компания сделки поставщиком не бывает никогда."""
+    c1, t1 = crm_refs(card.get("ufCrm18Supplier"))
+    c2, t2 = crm_refs(card.get("ufCrm18SupplContact"))
+    conts = list(dict.fromkeys(t1 + t2))
+    comps = c1 + c2 + [contact_company.get(t, "") for t in conts] + [str(card.get("companyId") or "")]
+    comps = [c for c in dict.fromkeys(comps) if c and c != "0" and c != str(deal_company or "")]
+    return (comps[0] if comps else ""), conts
+
+
 def rfq_no(card: dict) -> str:
     """Номер запроса, как в теме письма: <сделка>-<карточка> (навык supplier-rfq)."""
     d = str(card.get("parentId2") or "").strip()
@@ -263,14 +297,19 @@ def call_texts(call: dict, settings: dict) -> tuple[str, str, list[str]]:
 
 def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], companies: dict[str, dict],
           today: dt.date, workdays, fields: dict | None = None, settings: dict | None = None,
-          arms: list[tuple[str, int]] | None = None) -> tuple[list[dict], Counter]:
-    """Звонки на сегодня и счётчики. contacts/companies — {id: {name, phones:[…], dnc}};
+          arms: list[tuple[str, int]] | None = None,
+          deal_company: dict[str, str] | None = None) -> tuple[list[dict], Counter]:
+    """Звонки на сегодня и счётчики. contacts — {id: {name, phones:[…], company}};
+    companies — {id: {name, phones:[…], dnc}}; deal_company — сделка → её компания (заказчик:
+    поставщиком не бывает);
     settings — {our_company, agent_name}: есть — к звонку прикладываются готовые тексты агента;
     arms — группы слепого сравнения (parse_arms): у звонка поле arm; «control» обработчик не набирает."""
     f = fields or {}
     arms = arms or parse_arms(ГРУППЫ_ПО_УМОЛЧАНИЮ)
+    deal_company = deal_company or {}
+    contact_company = {k: str(v.get("company") or "") for k, v in contacts.items()}
     st: Counter = Counter()
-    by_co: dict[str, list[tuple[dict, dict, str]]] = defaultdict(list)
+    by_co: dict[str, list[tuple[dict, dict, str, list[str]]]] = defaultdict(list)
     for c in cards:
         st["карточек"] += 1
         if c.get("_offer"):
@@ -284,26 +323,32 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
         if f.get("attempts") and int(c.get(f["attempts"]) or 0) >= ПРАВИЛА["попыток_макс"]:
             st["попыток исчерпано"] += 1
             continue
-        co = str(c.get("companyId") or "")
-        if co in ("", "0"):
-            st["нет компании"] += 1
+        co, conts = supplier_of(c, deal_company.get(str(c.get("parentId2") or ""), ""), contact_company)
+        if not co and not conts:
+            st["поставщик не указан"] += 1
             continue
+        if str(c.get("companyId") or "") not in ("", "0", co):
+            st["компания карточки — не поставщик (взят из поля Supplier)"] += 1
+        co = co or f"ct:{conts[0]}"
         if (companies.get(co) or {}).get("dnc"):
             st["компания: не звонить"] += 1
             continue
         st[f"причина {why}"] += 1
-        by_co[co].append((c, m or {}, why))
+        by_co[co].append((c, m or {}, why, conts))
     calls: list[dict] = []
     for co, items in by_co.items():
         comp = companies.get(co) or {}
         phone = None
         contact_name = ""
-        for c, _, _ in items:                  # телефон контакта карточки — первым
-            ct = contacts.get(str(c.get("ufCrm18SupplContact") or "")) or {}
-            for p in ct.get("phones") or []:
-                phone = phone_e164(p)
+        for _, _, _, conts in items:           # телефон контакта поставщика — первым
+            for t in conts:
+                ct = contacts.get(t) or {}
+                for p in ct.get("phones") or []:
+                    phone = phone_e164(p)
+                    if phone:
+                        contact_name = ct.get("name") or ""
+                        break
                 if phone:
-                    contact_name = ct.get("name") or ""
                     break
             if phone:
                 break
@@ -318,7 +363,7 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
         e164, country, tz = phone
         items.sort(key=lambda x: (x[1].get("out") or {}).get("t") or dt.datetime.max.replace(tzinfo=MSK))
         reqs = []
-        for c, m, why in items[:ПРАВИЛА["запросов_в_звонке"]]:
+        for c, m, why, _ in items[:ПРАВИЛА["запросов_в_звонке"]]:
             o = m.get("out") or {}
             reqs.append({"card": str(c.get("id")), "rfq_no": rfq_no(c), "subject": o.get("subject") or str(c.get("title") or ""),
                          "email_date": human_date(o.get("t")), "email_from": o.get("from", ""), "email_to": o.get("to", ""),
@@ -400,7 +445,8 @@ def main(argv=None) -> int:
     client = BitrixClient(config.Settings.load().bitrix_webhook_url)
     cat = config.SPA_CATEGORY_ID
     stages = [f"DT{config.SPA_ENTITY_TYPE_ID}_{cat}:{s}" for s in sorted(SENT | DIALOG)]
-    sel = ["id", "title", "stageId", "companyId", "parentId2", "ufCrm18SupplContact", "createdTime", "assignedById",
+    sel = ["id", "title", "stageId", "companyId", "parentId2", "ufCrm18Supplier", "ufCrm18SupplContact", "createdTime",
+           "assignedById",
            config.RFQ_OFFER_FIELD] + [v for k, v in fields.items() if v and k != "dnc"]
     cards = client.list_items(config.SPA_ENTITY_TYPE_ID, select=sel,
                               filter={"categoryId": cat, "@stageId": stages, ">=createdTime": since})
@@ -422,11 +468,25 @@ def main(argv=None) -> int:
     mails = last_emails(acts)
     print(f"писем на карточках: {len(acts)}; карточек с нашим письмом: {sum(1 for m in mails.values() if m['out'])}")
 
-    ct_ids = sorted({str(c.get("ufCrm18SupplContact")) for c in cards if str(c.get("ufCrm18SupplContact") or "0") != "0"}, key=int)
-    co_ids = sorted({str(c.get("companyId")) for c in cards if str(c.get("companyId") or "0") != "0"}, key=int)
+    live = [c for c in cards if not c["_offer"]]
+    ct_ids, co_ids = set(), set()
+    for c in live:
+        for fld in ("ufCrm18Supplier", "ufCrm18SupplContact"):
+            cs, ts_ = crm_refs(c.get(fld))
+            co_ids |= set(cs)
+            ct_ids |= set(ts_)
+        if str(c.get("companyId") or "0") != "0":
+            co_ids.add(str(c.get("companyId")))
     contacts = {str(x["ID"]): {"name": " ".join(p for p in (x.get("NAME"), x.get("LAST_NAME")) if p).strip(),
-                               "phones": multifield(x.get("PHONE"))}
-                for x in read_by_ids(client, "crm.contact.list", "@ID", ct_ids, ["ID", "NAME", "LAST_NAME", "PHONE"])}
+                               "phones": multifield(x.get("PHONE")), "company": str(x.get("COMPANY_ID") or "")}
+                for x in read_by_ids(client, "crm.contact.list", "@ID", sorted(ct_ids, key=int),
+                                     ["ID", "NAME", "LAST_NAME", "PHONE", "COMPANY_ID"])}
+    co_ids |= {v["company"] for v in contacts.values() if v["company"].isdigit() and v["company"] != "0"}
+    co_ids = sorted(co_ids, key=int)
+    deal_ids = sorted({str(c.get("parentId2")) for c in live if str(c.get("parentId2") or "0").isdigit()
+                       and str(c.get("parentId2")) != "0"}, key=int)
+    deal_company = {d: str(x.get("COMPANY_ID") or "") for d, x in
+                    client.deals_by_ids(deal_ids, select=["ID", "COMPANY_ID"]).items()}
     co_sel = ["ID", "TITLE", "PHONE"] + ([fields["dnc"]] if fields["dnc"] else [])
     companies = {str(x["ID"]): {"name": x.get("TITLE") or "", "phones": multifield(x.get("PHONE")),
                                 "dnc": bool(fields["dnc"]) and str(x.get(fields["dnc"]) or "").upper() in ("Y", "1", "TRUE", "ДА")}
@@ -438,7 +498,7 @@ def main(argv=None) -> int:
                                "не собираются — нет CALL_OUR_COMPANY или CALL_AGENT_NAME"))
     arms = parse_arms(os.environ.get("CALL_ARMS", ""))
     print("группы сравнения: " + ", ".join(f"{n} {w}" for n, w in arms))
-    calls, st = build(cards, mails, contacts, companies, today, period.workdays_ru, fields, settings, arms)
+    calls, st = build(cards, mails, contacts, companies, today, period.workdays_ru, fields, settings, arms, deal_company)
     # журнал — только счётчики, коды стран и пулов (правило 17)
     for k in sorted(st):
         print(f"  {k}: {st[k]}")

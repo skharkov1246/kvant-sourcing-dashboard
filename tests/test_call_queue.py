@@ -94,7 +94,7 @@ def _companies():
 
 
 def test_build_groups_by_company_and_skips():
-    cards = [card(11), card(12, contact="31"), card(13, offer=True), card(14, company="6"), card(15, company="7"),
+    cards = [card(11), card(12, contact="C_31"), card(13, offer=True), card(14, company="6"), card(15, company="7"),
              card(16)]
     mails = q.last_emails([mail("2026-10-20", owner="11"), mail("2026-10-21", owner="12", i=2),
                            mail("2026-10-20", owner="14", i=3), mail("2026-10-20", owner="15", i=4)])
@@ -173,3 +173,34 @@ def test_build_sets_arm_per_company():
     calls, st = q.build([card(11)], q.last_emails([mail("2026-10-20")]), {}, _companies(), TODAY, wd,
                         arms=[("eleven", 1)])
     assert calls[0]["arm"] == "eleven" and st["группа eleven"] == 1
+
+
+# ───── поставщик карточки: никогда не заказчик ─────
+
+def test_crm_refs_parse():
+    assert q.crm_refs(["CO_5", "C_7", "CT_8", "9", "CO_0", "x"]) == (["5", "9"], ["7", "8"])
+    assert q.crm_refs("C_31") == ([], ["31"]) and q.crm_refs(None) == ([], [])
+
+
+def test_supplier_of_skips_deal_customer():
+    c = card(11, company="900")                                   # companyId унаследован от сделки
+    assert q.supplier_of(c, "900", {}) == ("", [])
+    c["ufCrm18Supplier"] = ["CO_5"]
+    assert q.supplier_of(c, "900", {}) == ("5", [])
+    c2 = card(12, company="900")
+    c2["ufCrm18SupplContact"] = "C_31"
+    assert q.supplier_of(c2, "900", {"31": "6"}) == ("6", ["31"])  # компания контакта поставщика
+    assert q.supplier_of(card(13, company="5"), "900", {}) == ("5", [])   # companyId — не заказчик
+
+
+def test_build_never_calls_customer():
+    customer = {"900": {"name": "Customer JSC", "phones": ["+7 495 123 4567"], "dnc": False}}
+    comps = {**_companies(), **customer}
+    c_ok = card(11, company="900")
+    c_ok["ufCrm18Supplier"] = ["CO_5"]
+    c_bad = card(12, company="900")                               # поставщика нет — только заказчик
+    calls, st = q.build([c_ok, c_bad], q.last_emails([mail("2026-10-20", owner="11"), mail("2026-10-20", owner="12", i=2)]),
+                        {}, comps, TODAY, wd, deal_company={"900": "900"})
+    assert [c["company_id"] for c in calls] == ["5"] and calls[0]["phone"].startswith("+86")
+    assert st["поставщик не указан"] == 1
+    assert st["компания карточки — не поставщик (взят из поля Supplier)"] == 1
