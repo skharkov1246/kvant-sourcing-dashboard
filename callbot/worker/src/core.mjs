@@ -79,7 +79,7 @@ export async function dispatchNow(env, deps = {}) {
       prompt: call.prompt,
       voicemail: call.voicemail,
       agent_vars: call.agent_vars,
-      our_company: env.CALL_OUR_COMPANY || "",
+      our_company: (call.agent_vars && call.agent_vars.our_company) || "",
       agent_name: env.CALL_AGENT_NAME || "",
     };
     if (!job.phone) { counters["плохой номер"] = (counters["плохой номер"] || 0) + 1; continue; }

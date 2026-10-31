@@ -47,7 +47,8 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           # наша компания и имя агента — переменные репозитория (Settings → Variables), не код
-          CALL_OUR_COMPANY: ${{ vars.CALL_OUR_COMPANY }}
+          # домен почты → наша компания (если в Битриксе нет «Моей компании» с этим доменом); секрет — в журнале скрыт
+          CALL_SENDER_COMPANIES: ${{ secrets.CALL_SENDER_COMPANIES }}
           CALL_AGENT_NAME: ${{ vars.CALL_AGENT_NAME }}
           # поля карточки и компании, которые заводит админ Битрикса (алгоритм звонилки, шаг 2)
           CALL_PROMISE_FIELD: ${{ vars.CALL_PROMISE_FIELD }}

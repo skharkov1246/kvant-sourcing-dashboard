@@ -137,7 +137,8 @@ export function numberFromSip(value) {
 
 export function firstMessage(job) {
   const v = job.agent_vars || {};
-  return `Good day, this is ${job.agent_name || "the purchasing team"} from ${job.our_company || "our company"}, Dubai, purchasing department. May I speak with ${v.contact_name || "the person responsible for quotations"}?`;
+  const who = v.our_company_intro || job.our_company || "our company";
+  return `Good day, this is ${job.agent_name || "the purchasing team"} from ${who}, purchasing department. May I speak with ${v.contact_name || "the person responsible for quotations"}?`;
 }
 
 export function elevenOutboundBody(env, job) {

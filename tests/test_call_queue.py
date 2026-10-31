@@ -87,6 +87,9 @@ def test_human_date_english_without_locale():
 
 # ───── сборка очереди ─────
 
+SENDERS = {"example.ae": {"name": "Example Trading FZE", "city": "Dubai"}}
+
+
 def _companies():
     return {"5": {"name": "Example Pumps Co", "phones": ["+86 138 0013 8000"], "dnc": False},
             "6": {"name": "Sample Valves Pte", "phones": ["+65 6123 4567"], "dnc": True},
@@ -131,11 +134,12 @@ def test_pools_and_disclosure_by_country():
 def test_call_texts_rendered_without_placeholders(phone, mode):
     comps = {"5": {"name": "Example Pumps Co", "phones": [phone], "dnc": False}}
     calls, st = q.build([card(11)], q.last_emails([mail("2026-10-20")]), {}, comps, TODAY, wd,
-                        settings={"our_company": "Example Trading FZE", "agent_name": "Alex"}, countries=None)
+                        settings={"agent_name": "Alex"}, countries=None, senders=SENDERS)
     c = calls[0]
     assert c["agent_vars"]["disclosure"] == mode and st["тексты: неподставленные переменные"] == 0
     assert "{{" not in c["prompt"] and "{{" not in c["voicemail"]
-    assert "Example Trading FZE" in c["prompt"] and "RFQ 900-11" in c["prompt"] and "20 October 2026" in c["voicemail"]
+    assert "Example Trading FZE, Dubai" in c["prompt"] and "RFQ 900-11" in c["prompt"] and "20 October 2026" in c["voicemail"]
+    assert "from Example Trading FZE, Dubai, purchasing department" in c["voicemail"]
     assert ("This call was assisted by AI" in c["voicemail"]) == (mode == "end")
     assert ("I am an AI assistant calling" in c["prompt"]) == (mode == "start")
     assert "Never say that you are a human" in c["prompt"]                       # правда на прямой вопрос — всегда
@@ -235,6 +239,8 @@ def test_main_dry_run_with_cards_without_deal(monkeypatch, capsys):
              {"ID": "6", "TITLE": "Sample Valves Pte", "PHONE": [{"VALUE": "+65 6123 4567"}]},
              {"ID": "900", "TITLE": "Customer JSC", "PHONE": [{"VALUE": "+7 495 123 4567"}]}]
     seen_ids: dict[str, list] = {}
+    mine = [{"ID": "1", "TITLE": "Example Trading FZE", "EMAIL": [{"VALUE": "office@example.ae"}], "IS_MY_COMPANY": "Y"},
+            {"ID": "2", "TITLE": "ООО Пример", "EMAIL": [{"VALUE": "info@example.ru"}], "IS_MY_COMPANY": "Y"}]
 
     class FakeClient:
         def __init__(self, url):
@@ -245,6 +251,8 @@ def test_main_dry_run_with_cards_without_deal(monkeypatch, capsys):
 
         def call(self, method, params):
             flt = params["filter"]
+            if "IS_MY_COMPANY" in flt:
+                return [x for x in mine if int(x["ID"]) > flt[">ID"]]
             key = "OWNER_ID" if method == "crm.activity.list" else "@ID"
             ids = {str(x) for x in flt[key]}
             seen_ids.setdefault(method, []).extend(flt[key])
@@ -263,11 +271,12 @@ def test_main_dry_run_with_cards_without_deal(monkeypatch, capsys):
     monkeypatch.setitem(sys.modules, "bitrix_client", types.SimpleNamespace(BitrixClient=FakeClient))
     for k in ("CALL_PROMISE_FIELD", "CALL_ATTEMPTS_FIELD", "CALL_DNC_FIELD", "CALL_ARMS"):
         monkeypatch.delenv(k, raising=False)
-    monkeypatch.setenv("CALL_OUR_COMPANY", "Example Trading FZE")
+    monkeypatch.delenv("CALL_SENDER_COMPANIES", raising=False)
     monkeypatch.setenv("CALL_AGENT_NAME", "Alex")
     assert q.main([]) == 0
     out = capsys.readouterr().out
     assert "карточек без сделки: 3" in out and "звонков: 3" in out and "поставщик не указан: 1" in out
+    assert "наших компаний в Битриксе: 2" in out and "наша компания: название не латиницей: 1" in out
     assert seen_ids["deals"] == ["900"]                                           # ни «None», ни «»
     assert all(isinstance(x, int) for m in ("crm.contact.list", "crm.company.list") for x in seen_ids[m])
 
@@ -290,3 +299,38 @@ def test_build_skips_countries_outside_pilot():
     assert [c["country"] for c in calls] == ["CN"] and st["вне пилота: страна DE"] == 1
     calls, _ = q.build(cards, mails, {}, comps, TODAY, wd, countries=None)
     assert sorted(c["country"] for c in calls) == ["CN", "DE"]
+
+
+# ───── наша компания — та, с чьего адреса ушло письмо ─────
+
+def test_email_domain_and_sender_map():
+    assert q.email_domain("Buyer <buy@Mail.Example.AE>") == "mail.example.ae" and q.email_domain("no address") == ""
+    assert q.web_domain("https://www.example.ae/about") == "example.ae"
+    mine = [{"TITLE": "Example Trading FZE", "EMAIL": [{"VALUE": "a@example.ae"}], "WEB": [{"VALUE": "www.example-trading.com"}]},
+            {"TITLE": "ООО Пример", "EMAIL": [{"VALUE": "b@example.ru"}]},
+            {"TITLE": "Sample LLC", "EMAIL": [{"VALUE": "c@shared.example"}]},
+            {"TITLE": "Other LLC", "EMAIL": [{"VALUE": "d@shared.example"}]}]
+    m, st = q.sender_map(mine, {"example.hk": "Example HK Ltd", "@example.sg": {"name": "Example SG Pte", "city": "Singapore"},
+                                "bad.example": "Пример"})
+    assert m["example.ae"]["name"] == m["example-trading.com"]["name"] == "Example Trading FZE"
+    assert "example.ru" not in m and "shared.example" not in m and "bad.example" not in m
+    assert m["example.sg"] == {"name": "Example SG Pte", "city": "Singapore"} and m["example.hk"]["city"] == ""
+    assert st["наша компания: название не латиницей"] == 1 and st["домен у нескольких наших компаний — отброшен"] == 1
+    assert q.sender_of("Buyer <buy@mail.example.ae>", m)["name"] == "Example Trading FZE"       # поддомен
+    assert q.sender_of("someone@gmail.com", m) is None and q.sender_of("", m) is None
+
+
+def test_build_company_from_sender_and_split_by_sender():
+    senders = {"example.ae": {"name": "Example Trading FZE", "city": "Dubai"}, "example.hk": {"name": "Example HK Ltd", "city": ""}}
+    cards = [card(11), card(12), card(13)]
+    mails = q.last_emails([mail("2026-10-20", owner="11", frm="buy@example.ae"),
+                           mail("2026-10-20", owner="12", frm="Sales <s@example.hk>", i=2),
+                           mail("2026-10-20", owner="13", frm="x@gmail.com", i=3)])
+    calls, st = q.build(cards, mails, {}, _companies(), TODAY, wd, settings={"agent_name": "Alex"}, senders=senders)
+    assert sorted(c["our_company"] for c in calls) == ["Example HK Ltd", "Example Trading FZE"]
+    assert {c["company_id"] for c in calls} == {"5"}                         # один поставщик — два звонка
+    assert st["поставщиков с запросами от разных наших компаний"] == 1
+    assert st["отправитель письма не сопоставлен с нашей компанией"] == 1
+    hk = next(c for c in calls if c["our_company"] == "Example HK Ltd")
+    assert hk["agent_vars"]["our_company_intro"] == "Example HK Ltd" and "Dubai" not in hk["prompt"]
+    assert "from Example HK Ltd, purchasing department" in hk["voicemail"]

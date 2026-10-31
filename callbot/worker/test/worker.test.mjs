@@ -239,6 +239,11 @@ test("ElevenLabs: тело исходящего звонка с промптом
   assert.equal(b.conversation_initiation_client_data.dynamic_variables.job_id, "j1");
   assert.equal(b.conversation_initiation_client_data.conversation_config_override.agent.prompt.prompt, "P");
   assert.ok(b.conversation_initiation_client_data.conversation_config_override.agent.first_message.includes("Mr. Li"));
+  // наша компания — та, с чьего адреса ушло письмо (из переменных агента), без «Dubai» по умолчанию
+  const hk = elevenOutboundBody(env, { job_id: "j2", phone: "+85221234567", from_pool: "HK", prompt: "P",
+    agent_vars: { our_company_intro: "Example HK Ltd" } });
+  const fm = hk.conversation_initiation_client_data.conversation_config_override.agent.first_message;
+  assert.ok(fm.includes("from Example HK Ltd, purchasing department") && !fm.includes("Dubai"));
 });
 
 // ───── сессия GPT ─────
