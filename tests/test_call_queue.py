@@ -277,7 +277,8 @@ def test_main_dry_run_with_cards_without_deal(monkeypatch, capsys):
 def test_parse_countries():
     assert q.parse_countries("") == q.СТРАНЫ_ПИЛОТА and q.parse_countries("x, 1") == q.СТРАНЫ_ПИЛОТА
     assert q.parse_countries("cn, AE") == frozenset({"CN", "AE"}) and q.parse_countries("*") is None
-    assert {"CN", "HK", "AE", "SG", "VN"} <= q.СТРАНЫ_ПИЛОТА and not {"RU", "IN", "DE", "US"} & q.СТРАНЫ_ПИЛОТА
+    assert {"CN", "HK", "AE", "IN", "SG", "VN"} <= q.СТРАНЫ_ПИЛОТА and not {"RU", "TR", "DE", "US"} & q.СТРАНЫ_ПИЛОТА
+    assert q.ПУЛ_НОМЕРОВ["IN"] == "GB" and q.ОБЪЯВЛЕНИЕ.get("IN") is None      # Индия: номер +44, без объявления
 
 
 def test_build_skips_countries_outside_pilot():
