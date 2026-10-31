@@ -76,5 +76,7 @@ def test_today_and_order_split():
     js = TPL[TPL.index("const SO_TODAY="):]
     today = re.search(r"const SO_TODAY=\[([^\]]*)\]", js).group(1).split(",")
     cards = re.search(r"const SO_CARDS=\[([^\]]*)\]", js).group(1).split(",")
-    assert len(today) <= 6
+    # видимых дел «Сегодня» — не больше 6 (остальные — «Ещё N дел»), отметка в карточках — отдельно
+    # видов дел — до 10 (регламент v1.4: срок заказчика и норматив КП), видно всегда не больше 6
+    assert len(today) <= 10 and "_soRowsHtml(T," in js and "запроса нет.',6);" in js
     assert not set(today) & set(cards)
