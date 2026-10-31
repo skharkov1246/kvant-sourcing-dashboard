@@ -102,6 +102,109 @@ def части(ids: list[int], n: int) -> list[list[int]]:
     return [ids[i:i + k] for i in range(0, len(ids), k)]
 
 
+def текст_строк(html: str) -> tuple[int, int, int]:
+    """(непустых строк, строк таблицы <tr>, строк с артикулом) текста письма или поля: HTML → строки."""
+    import re
+    import bitrix_tkp
+    s = str(html or "")
+    tr = len(re.findall(r"(?i)<tr\b", s))
+    s = re.sub(r"(?i)<br\s*/?>|</p>|</div>|</tr>|</li>", "\n", s)
+    s = re.sub(r"<[^>]+>", " ", s)
+    lines = [x.strip() for x in s.splitlines() if x.strip()]
+    return len(lines), tr, sum(1 for x in lines if bitrix_tkp.find_pns(x))
+
+
+def без_файла(client, cards: list[dict], поля: dict, bitrix_tkp) -> None:
+    """7–10. Почему у карточек нет «Request file» и где у них позиции: доля с файлом по месяцам, по
+    автору (робот / человек) и по исполнителю (без имён); другие файловые поля; текст названия и
+    текстовых полей; исходящее письмо — вложение и строки в тексте. Только счётчики."""
+    import config
+    служ = set(config.SERVICE_ACCOUNT_IDS)
+    есть = lambda c: bool(файлы_поля(c.get(REQ_FIELD)))           # noqa: E731
+    # 7. доля с файлом: по месяцам, по автору, по исполнителю
+    по_мес, по_автору, по_исп = defaultdict(lambda: [0, 0]), defaultdict(lambda: [0, 0]), defaultdict(lambda: [0, 0])
+    for c in cards:
+        f = есть(c)
+        m = str(c.get("createdTime") or "")[:7]
+        a = "робот (служебная запись)" if str(c.get("createdBy") or "") in служ else "человек"
+        for d, k in ((по_мес, m), (по_автору, a), (по_исп, str(c.get("assignedById") or ""))):
+            d[k][0] += 1
+            d[k][1] += f
+    print("\n7. ДОЛЯ КАРТОЧЕК С «REQUEST FILE»:")
+    print("    по месяцу заведения: " + " · ".join(f"{k} {v[1]}/{v[0]} ({round(v[1] / v[0] * 100)} %)"
+                                                   for k, v in sorted(по_мес.items()) if v[0]))
+    print("    по автору карточки: " + " · ".join(f"{k} {v[1]}/{v[0]} ({round(v[1] / v[0] * 100)} %)"
+                                                  for k, v in по_автору.items() if v[0]))
+    исп = sorted(по_исп.values(), key=lambda v: -v[0])[:12]
+    print("    по исполнителю (без имён, по числу карточек): " + " · ".join(
+        f"№{i + 1} {v[1]}/{v[0]} ({round(v[1] / v[0] * 100)} %)" for i, v in enumerate(исп)))
+
+    # выборка карточек без файла — до 400, равномерно по номеру
+    нет = [c for c in cards if not есть(c)]
+    проба = нет[:: max(1, len(нет) // 400)][:400]
+    ids = [str(c["id"]) for c in проба]
+    file_f = [k for k, f in поля.items() if (f or {}).get("type") == "file" and k != REQ_FIELD]
+    text_f = [k for k, f in поля.items() if (f or {}).get("type") in ("string", "text") and not (f or {}).get("isReadOnly")]
+    подпись = lambda k: (поля.get(k) or {}).get("title") or (поля.get(k) or {}).get("listLabel") or k   # noqa: E731
+    full: list[dict] = []
+    for i in range(0, len(ids), 50):
+        try:
+            full += client.list_items(SPA, filter={"@id": [int(x) for x in ids[i:i + 50]]},
+                                      select=["id", "title"] + file_f + text_f)
+        except Exception as e:                                      # noqa: BLE001
+            print(f"  ⚠ карточки выборки не прочитаны: {type(e).__name__}")
+    print(f"\n8. ДРУГИЕ ФАЙЛОВЫЕ ПОЛЯ у карточек без «Request file» (выборка {len(full)} из {len(нет)}):")
+    for k in file_f:
+        n = sum(1 for c in full if файлы_поля(c.get(k)))
+        if n:
+            print(f"    «{подпись(k)}» {k}: {n} ({round(n / max(1, len(full)) * 100)} %)")
+    print(f"    ни одного файла ни в каком поле: {sum(1 for c in full if not any(файлы_поля(c.get(k)) for k in file_f))}")
+
+    # 9. название и текстовые поля: заполненность, строк, строк с артикулом
+    print("\n9. ТЕКСТ КАРТОЧЕК БЕЗ ФАЙЛА:")
+    tl = [текст_строк(c.get("title") or "") for c in full]
+    print(f"    название: с артикулом {sum(1 for x in tl if x[2])} из {len(tl)}; длина медиана "
+          f"{statistics.median([len(str(c.get('title') or '')) for c in full]) if full else '—'} знаков")
+    for k in text_f:
+        vals = [str(c.get(k) or "") for c in full if str(c.get(k) or "").strip()]
+        if len(vals) < max(3, len(full) // 50):
+            continue
+        st = [текст_строк(v) for v in vals]
+        lines = [x[0] for x in st]
+        print(f"    «{подпись(k)}» {k}: заполнено {len(vals)} ({round(len(vals) / max(1, len(full)) * 100)} %), "
+              f"строк медиана {statistics.median(lines)}, макс {max(lines)}, с артикулом {sum(1 for x in st if x[2])}, "
+              f"многострочных (≥ 3) {sum(1 for x in lines if x >= 3)}")
+
+    # 10. исходящие письма карточек без файла: есть ли, вложения, строки в тексте
+    acts: list[dict] = []
+    for i in range(0, len(ids), 50):
+        try:
+            acts += client.list_paged("crm.activity.list", {
+                "filter": {"OWNER_TYPE_ID": SPA, "OWNER_ID": ids[i:i + 50], "PROVIDER_ID": "CRM_EMAIL", "DIRECTION": 2},
+                "select": ["ID", "OWNER_ID", "DESCRIPTION", "FILES", "CREATED"], "order": {"ID": "ASC"}})
+        except Exception as e:                                      # noqa: BLE001
+            print(f"  ⚠ письма не прочитаны: {type(e).__name__}")
+    own = set(ids)
+    первое: dict[str, dict] = {}
+    for a in sorted(acts, key=lambda a: str(a.get("CREATED") or "")):
+        o = str(a.get("OWNER_ID") or "")
+        if o in own and o not in первое:
+            первое[o] = a
+    вл = [a for a in первое.values() if a.get("FILES")]
+    тексты = [текст_строк(a.get("DESCRIPTION") or "") for a in первое.values()]
+    print(f"\n10. ПЕРВОЕ ИСХОДЯЩЕЕ ПИСЬМО карточек без файла (выборка {len(ids)}): письмо есть у {len(первое)} "
+          f"({round(len(первое) / max(1, len(ids)) * 100)} %); с вложением {len(вл)}"
+          + (f", вложений медиана {statistics.median([len(a['FILES']) for a in вл])}" if вл else ""))
+    if тексты:
+        print(f"    текст письма: строк медиана {statistics.median([x[0] for x in тексты])}; с таблицей (<tr>) "
+              f"{sum(1 for x in тексты if x[1])}, строк таблицы медиана "
+              f"{statistics.median([x[1] for x in тексты if x[1]]) if any(x[1] for x in тексты) else '—'}; "
+              f"с артикулом {sum(1 for x in тексты if x[2])}, строк с артикулом медиана "
+              f"{statistics.median([x[2] for x in тексты if x[2]]) if any(x[2] for x in тексты) else '—'}")
+    без_всего = sum(1 for c in full if not any(файлы_поля(c.get(k)) for k in file_f) and str(c["id"]) not in первое)
+    print(f"    ни файла, ни исходящего письма: {без_всего} из {len(full)}")
+
+
 def main() -> int:
     import config
     import stages
@@ -122,7 +225,7 @@ def main() -> int:
     print(f"основа: поле «Request file» {REQ_FIELD}: тип {fobj.get('type', '—')}, "
           f"множественное {'да' if fobj.get('isMultiple') else 'нет'}")
 
-    sel = ["id", "createdTime", "stageId", "parentId2", REQ_FIELD]
+    sel = ["id", "createdTime", "stageId", "parentId2", "createdBy", "assignedById", REQ_FIELD]
     flt = {"categoryId": config.SPA_CATEGORY_ID, ">=createdTime": since + "T00:00:00"}
     # оценка и части по номеру карточки: первый и последний номер окна
     cards: list[dict] = []
@@ -187,7 +290,7 @@ def main() -> int:
     deals = sorted(by_deal, key=int)
     шаг = max(1, len(deals) // max(1, limit // 4))
     выбор, файлов = [], 0
-    for d in deals[::шаг]:
+    for d in (deals[::шаг] if limit > 0 else []):
         k = sum(len(файлы_поля(c.get(REQ_FIELD))) for c in by_deal[d])
         if файлов + k > limit and выбор:
             break
@@ -293,6 +396,7 @@ def main() -> int:
         print(f"\n6. СТРОК НА ЗАЯВКУ (сделку, разные файлы): n {len(на_сделку)}, медиана {statistics.median(на_сделку)}, "
               f"макс {max(на_сделку)}; по корзинам: " + " · ".join(
                   f"{lbl} — {Counter(корзина(x) for x in на_сделку).get(lbl, 0)}" for _hi, lbl in КОРЗИНЫ))
+    без_файла(client, cards, поля, bitrix_tkp)
     print("\n" + сводка_нагрузки())
     return 0
 

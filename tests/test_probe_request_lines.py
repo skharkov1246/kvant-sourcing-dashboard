@@ -56,3 +56,10 @@ def test_части_смежными_срезами():
     ch = P.части(list(range(1, 101)), 10)
     assert len(ch) == 10 and ch[0][0] == 1 and ch[-1][-1] == 100
     assert sum(len(c) for c in ch) == 100
+
+
+def test_строки_текста_письма():
+    html = "<p>Добрый день!</p><table><tr><td>1</td><td>6RS-2041-11</td></tr><tr><td>2</td><td>Фильтр</td></tr></table>Спасибо<br>Иванов"
+    непуст, tr, с_арт = P.текст_строк(html)
+    assert tr == 2 and непуст >= 4 and 0 <= с_арт <= непуст
+    assert P.текст_строк("") == (0, 0, 0)
