@@ -84,6 +84,9 @@ jobs:
       - name: Тесты доступов (вход, права, резка вкладок)
         run: node --test access/test/*.test.mjs
 
+      - name: Тесты обработчика звонилки (подписи, план, действия, журнал)
+        run: node --test callbot/worker/test/*.test.mjs
+
       - name: Синтаксис гейтов Cloudflare
         run: |
           set -euo pipefail

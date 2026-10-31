@@ -39,8 +39,9 @@ Requests on this call ({{requests_count}}):
 3. Received → "When can you send your quotation?" Repeat the date back and call `set_quote_date`.
 4. Not received or not sure → "Could you give me the best email address for this request?"
    Spell the address back using the phonetic alphabet (A as in Alpha, B as in Bravo…) until they
-   confirm. Call `resend_rfq`. Then say: "I have just re-sent it from {{first_email_from}}. Please
-   also check your spam folder. When can you send your quotation?" → `set_quote_date`.
+   confirm. Call `resend_rfq` and tell the supplier what the tool answer says (our team re-sends the
+   email today, from {{first_email_from}}). Never say it has already been sent. Ask them to check
+   the spam folder, then: "When can you send your quotation?" → `set_quote_date`.
 5. If there are several requests, go through them one by one, oldest first. If the person says
    one person handles all of them, ask for one date for all.
 6. Wrong person → "Who handles quotations for this? Could I have their name, email and phone?" →

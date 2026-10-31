@@ -1,0 +1,42 @@
+# Обработчик звонилки — отдельный воркер, вне Cloudflare Access (вебхуки приходят из интернета).
+# Деплой и расписание — только с согласия владельца (CLAUDE.md). Пока расписания нет: строка
+# [triggers] закомментирована, а набор дополнительно закрыт переменной CALLS_ENABLED.
+name = "kvant-callbot"
+main = "src/index.mjs"
+compatibility_date = "2026-10-01"
+
+[[kv_namespaces]]
+# тот же KV, что у портала: очередь callq:v1 пишет прогон call-queue.yml; id задаёт владелец при деплое
+binding = "KV"
+id = "SET_BY_OWNER"
+
+[[durable_objects.bindings]]
+name = "LEDGER"
+class_name = "Ledger"
+
+[[durable_objects.bindings]]
+name = "CALL_SESSION"
+class_name = "CallSession"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Ledger", "CallSession"]
+
+[vars]
+CALLS_ENABLED = "0"          # «1» — разрешить набор по расписанию
+CALL_ARMS_ACTIVE = "gpt,eleven"
+MAX_CONCURRENT = "2"         # Telnyx до проверки второго уровня — 2 одновременных
+DAILY_PER_ARM = "60"
+STAGE_MOVES = "0"            # «1» — отказ двигает карточку в «Отказ в КП»; иначе задача сорсеру
+OPENAI_MODEL = "gpt-realtime-2"
+OPENAI_VOICE = "marin"
+
+# [triggers]
+# crons = ["*/5 * * * *"]   # включает владелец
+
+# Секреты (wrangler secret put …), заводит владелец:
+#   TELNYX_API_KEY, TELNYX_PUBLIC_KEY, TELNYX_CONNECTION_ID, CALL_NUMBERS (JSON пул → номер)
+#   OPENAI_API_KEY, OPENAI_PROJECT_ID, OPENAI_WEBHOOK_SECRET
+#   ELEVENLABS_API_KEY, ELEVEN_AGENT_ID, ELEVEN_PHONE_IDS (JSON пул → phone_number_id),
+#   ELEVEN_WEBHOOK_SECRET, ELEVEN_TOOL_SECRET
+#   BITRIX_WRITE_WEBHOOK_URL, PUBLIC_URL, CALL_OUR_COMPANY, CALL_AGENT_NAME
