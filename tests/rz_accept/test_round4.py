@@ -93,6 +93,9 @@ def test_p09_закрытый_список_не_возвращается(open_pa
     b.click()
     pg.wait_for_timeout(300)
     assert "?d=" in pg.evaluate("location.hash")
+    # указатель уходит с панели: под ним бывает сокращение <abbr> с подсказкой, а Esc сначала закрывает
+    # подсказку (WCAG 1.4.13), и только следующий Esc — панель (как в tests/test_ork_drill_browser.py)
+    pg.mouse.move(0, 0)
     pg.keyboard.press("Escape")
     pg.wait_for_timeout(300)
     s = pg.evaluate("({on:document.getElementById('drw').classList.contains('on'),hash:location.hash,"
