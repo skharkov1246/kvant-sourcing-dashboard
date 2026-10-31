@@ -53,6 +53,8 @@ jobs:
           CALL_PROMISE_FIELD: ${{ vars.CALL_PROMISE_FIELD }}
           CALL_ATTEMPTS_FIELD: ${{ vars.CALL_ATTEMPTS_FIELD }}
           CALL_DNC_FIELD: ${{ vars.CALL_DNC_FIELD }}
+          # группы слепого сравнения моделей, напр. «gpt:1,eleven:1,control:1» (пусто — так и есть)
+          CALL_ARMS: ${{ vars.CALL_ARMS }}
           PARTS: ${{ inputs.parts }}
           BITRIX_RPS: "1.0"
           BITRIX_PARALLEL: "1"

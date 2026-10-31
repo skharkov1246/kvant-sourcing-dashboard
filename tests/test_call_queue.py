@@ -154,3 +154,22 @@ def test_agent_files_are_valid():
     assert "outcome" in schema["required"]
     disc = json.loads((q.AGENT_DIR / "disclosure.json").read_text(encoding="utf-8"))
     assert set(disc) - {"_comment"} == {"start", "end", "off"}
+
+
+# ───── группы слепого сравнения ─────
+
+def test_arms_stable_and_balanced():
+    arms = q.parse_arms("gpt:1,eleven:1,control:1")
+    assert arms == [("gpt", 1), ("eleven", 1), ("control", 1)]
+    assert q.parse_arms("bad,x:0") == q.parse_arms(q.ГРУППЫ_ПО_УМОЛЧАНИЮ)
+    assert q.arm_of("12345", arms) == q.arm_of("12345", arms)                   # навсегда за компанией
+    got = [q.arm_of(str(i), arms) for i in range(3000)]
+    for name in ("gpt", "eleven", "control"):
+        assert 900 < got.count(name) < 1100
+    assert {q.arm_of(str(i), [("gpt", 1)]) for i in range(50)} == {"gpt"}
+
+
+def test_build_sets_arm_per_company():
+    calls, st = q.build([card(11)], q.last_emails([mail("2026-10-20")]), {}, _companies(), TODAY, wd,
+                        arms=[("eleven", 1)])
+    assert calls[0]["arm"] == "eleven" and st["группа eleven"] == 1

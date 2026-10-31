@@ -22,6 +22,8 @@
     пояс — по номеру; номер-отправитель — по стране (ПУЛ_НОМЕРОВ).
   • Не звонить: поле компании CALL_DNC_FIELD = «Да»; попыток (поле карточки CALL_ATTEMPTS_FIELD)
     не меньше ПРАВИЛА["попыток_макс"]. Пока полей нет — проверки нет (счётчик печатается).
+  • Слепое сравнение моделей: компания навсегда попадает в группу gpt, eleven или control (arm_of);
+    по control не звоним — она мерит, сколько КП пришло бы без звонков.
   • Один звонок в день на компанию: все её молчащие запросы — в одном звонке, не больше
     ПРАВИЛА["запросов_в_звонке"], старейшие первыми; остальные — в следующий день.
 
@@ -39,6 +41,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
 import os
 import re
@@ -75,6 +78,35 @@ OUT, IN = "2", "1"                         # DIRECTION дела: исходящ�
 # Объявление об ИИ — по стране номера (решение владельца 31.10.2026: в начале не объявлять):
 # «start» — фраза в начале (ЕС: AI Act ст. 50 с 02.08.2026; США), «end» — короткая фраза в
 # конце (Китай: правила маркировки ИИ-контента с 01.09.2025 — до заключения юриста), «off».
+# Слепое сравнение моделей (решение владельца 31.10.2026: GPT-Realtime-2 против ElevenLabs, по сотне
+# разговоров каждой) и контроль без звонков. Группа — по компании, навсегда (хеш номера компании с
+# солью пилота): один поставщик не слышит разные голоса, попытки одного запроса идут одной моделью.
+# Доли — переменная CALL_ARMS «gpt:1,eleven:1,control:1»; новая соль — новый пилот.
+ГРУППЫ_ПО_УМОЛЧАНИЮ = "gpt:1,eleven:1,control:1"
+СОЛЬ_ПИЛОТА = "pilot-2026-11"
+
+
+def parse_arms(spec: str) -> list[tuple[str, int]]:
+    """«gpt:1,eleven:1,control:1» → [(группа, вес)]; мусор и нулевые веса отбрасываются."""
+    out = []
+    for part in str(spec or "").split(","):
+        name, _, w = part.strip().partition(":")
+        if re.fullmatch(r"[a-z]+", name or "") and w.strip().isdigit() and int(w) > 0:
+            out.append((name, int(w)))
+    return out or parse_arms(ГРУППЫ_ПО_УМОЛЧАНИЮ)
+
+
+def arm_of(company_id: str, arms: list[tuple[str, int]], salt: str = СОЛЬ_ПИЛОТА) -> str:
+    """Группа компании: детерминированно по хешу, пропорционально весам."""
+    h = int(hashlib.sha256(f"{salt}:{company_id}".encode()).hexdigest()[:12], 16)
+    x = h % sum(w for _, w in arms)
+    for name, w in arms:
+        if x < w:
+            return name
+        x -= w
+    return arms[-1][0]
+
+
 ЕС = ("AT BE BG HR CY CZ DK EE FI FR DE GR HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE "
       "IS LI NO").split()
 ОБЪЯВЛЕНИЕ = {**{c: "start" for c in ЕС + ["US", "CA", "GB"]}, **{c: "end" for c in ("CN", "HK", "MO")}}
@@ -230,10 +262,13 @@ def call_texts(call: dict, settings: dict) -> tuple[str, str, list[str]]:
 
 
 def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], companies: dict[str, dict],
-          today: dt.date, workdays, fields: dict | None = None, settings: dict | None = None) -> tuple[list[dict], Counter]:
+          today: dt.date, workdays, fields: dict | None = None, settings: dict | None = None,
+          arms: list[tuple[str, int]] | None = None) -> tuple[list[dict], Counter]:
     """Звонки на сегодня и счётчики. contacts/companies — {id: {name, phones:[…], dnc}};
-    settings — {our_company, agent_name}: есть — к звонку прикладываются готовые тексты агента."""
+    settings — {our_company, agent_name}: есть — к звонку прикладываются готовые тексты агента;
+    arms — группы слепого сравнения (parse_arms): у звонка поле arm; «control» обработчик не набирает."""
     f = fields or {}
+    arms = arms or parse_arms(ГРУППЫ_ПО_УМОЛЧАНИЮ)
     st: Counter = Counter()
     by_co: dict[str, list[tuple[dict, dict, str]]] = defaultdict(list)
     for c in cards:
@@ -291,7 +326,7 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
         st["отложено на завтра (больше 5 в звонке)"] += max(0, len(items) - ПРАВИЛА["запросов_в_звонке"])
         call = {"company_id": co, "company": comp.get("name") or f"company #{co}", "contact_name": contact_name,
                 "phone": e164, "country": country, "tz": tz, "from_pool": ПУЛ_НОМЕРОВ.get(country, ПУЛ_ПО_УМОЛЧАНИЮ),
-                "requests": reqs}
+                "arm": arm_of(co, arms), "requests": reqs}
         call["agent_vars"] = agent_vars(call)
         if settings and settings.get("our_company") and settings.get("agent_name"):
             call["prompt"], call["voicemail"], miss = call_texts(call, settings)
@@ -300,6 +335,7 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
         calls.append(call)
         st[f"страна {country or '??'}"] += 1
         st[f"пул {call['from_pool']}"] += 1
+        st[f"группа {call['arm']}"] += 1
     st["звонков"] = len(calls)
     st["запросов в звонках"] = sum(len(c["requests"]) for c in calls)
     return calls, st
@@ -400,7 +436,9 @@ def main(argv=None) -> int:
                 "agent_name": os.environ.get("CALL_AGENT_NAME", "").strip()}
     print("тексты агента: " + ("собираются" if all(settings.values()) else
                                "не собираются — нет CALL_OUR_COMPANY или CALL_AGENT_NAME"))
-    calls, st = build(cards, mails, contacts, companies, today, period.workdays_ru, fields, settings)
+    arms = parse_arms(os.environ.get("CALL_ARMS", ""))
+    print("группы сравнения: " + ", ".join(f"{n} {w}" for n, w in arms))
+    calls, st = build(cards, mails, contacts, companies, today, period.workdays_ru, fields, settings, arms)
     # журнал — только счётчики, коды стран и пулов (правило 17)
     for k in sorted(st):
         print(f"  {k}: {st[k]}")
