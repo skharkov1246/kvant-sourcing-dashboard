@@ -185,6 +185,82 @@ def email_meta(a: dict) -> dict:
             "from": str(meta.get("from") or "").strip(), "to": to.strip()}
 
 
+# Наши компании-отправители: домен почты → название, которое произносит агент (владелец, 31.10.2026:
+# «имя компании — та, от какой отправлялся запрос»; домены — по холостому прогону 41249254412, где
+# видно, с каких адресов уходят письма поставщикам). Новый домен — строка здесь или секрет
+# CALL_SENDER_COMPANIES; домена нет нигде — по его запросам не звоним.
+НАШИ_ОТПРАВИТЕЛИ: dict[str, dict] = {
+    "anyrotary.com": {"name": "Anyrotary", "city": ""},
+    "varkala.org": {"name": "Varkala", "city": ""},
+    "kvantpro.com": {"name": "Kvant", "city": ""},
+    "bravast.com": {"name": "Bravast", "city": ""},
+    "steza.cn": {"name": "Steza", "city": ""},
+}
+
+_EMAIL = re.compile(r"[A-Za-z0-9._%+'-]+@([A-Za-z0-9.-]+\.[A-Za-z]{2,})")
+_CYR = re.compile(r"[\u0400-\u04FF]")
+
+
+def email_domain(addr) -> str:
+    """«Имя <user@mail.example.ae>» → «mail.example.ae»; без адреса — «»."""
+    m = _EMAIL.search(str(addr or ""))
+    return m.group(1).lower().strip(".") if m else ""
+
+
+def web_domain(url) -> str:
+    s = re.sub(r"^[a-z]+://", "", str(url or "").strip().lower()).split("/")[0].split(":")[0]
+    return s[4:] if s.startswith("www.") else s
+
+
+def sender_map(my_companies: list[dict], override: dict | None = None) -> tuple[dict[str, dict], Counter]:
+    """Домен почты → наша компания {name, city}. Компания, от которой ушёл запрос (владелец,
+    31.10.2026: «имя компании — та, от какой отправлялся запрос»).
+    Источник 1 — компании Битрикса с признаком «Моя компания» (IS_MY_COMPANY): домены их почты и
+    сайта; название — TITLE, если оно латиницей (агент говорит по-английски).
+    Источник 2 — таблица НАШИ_ОТПРАВИТЕЛИ (решение владельца); главнее Битрикса.
+    Источник 3 — закрытая настройка CALL_SENDER_COMPANIES (секрет): {"домен": "Название"} или
+    {"домен": {"name": …, "city": …}}; главнее всех. Домен, который в Битриксе ведёт к двум разным
+    названиям, отбрасывается: агент не должен угадывать."""
+    st: Counter = Counter()
+    seen: dict[str, set] = defaultdict(set)
+    for c in my_companies or []:
+        name = re.sub(r"\s+", " ", str(c.get("TITLE") or "")).strip()
+        if not name:
+            continue
+        if _CYR.search(name):
+            st["наша компания: название не латиницей"] += 1
+            continue
+        doms = {email_domain(v) for v in multifield(c.get("EMAIL"))} | {web_domain(v) for v in multifield(c.get("WEB"))}
+        for d in doms - {""}:
+            seen[d].add(name)
+    out = {}
+    for d, names in seen.items():
+        if len(names) == 1:
+            out[d] = {"name": next(iter(names)), "city": ""}
+        else:
+            st["домен у нескольких наших компаний — отброшен"] += 1
+    st["доменов из Битрикса"] = len(out)
+    out.update({d: dict(v) for d, v in НАШИ_ОТПРАВИТЕЛИ.items()})
+    for d, v in (override or {}).items():
+        dom = str(d or "").strip().lower().lstrip("@")
+        val = v if isinstance(v, dict) else {"name": v}
+        name = re.sub(r"\s+", " ", str(val.get("name") or "")).strip()
+        if dom and name and not _CYR.search(name):
+            out[dom] = {"name": name, "city": re.sub(r"\s+", " ", str(val.get("city") or "")).strip()}
+            st["доменов из настройки"] += 1
+    return out, st
+
+
+def sender_of(email_from, smap: dict[str, dict]) -> dict | None:
+    """Наша компания по адресу отправителя: точный домен, затем родительские (mail.x.ae → x.ae)."""
+    d = email_domain(email_from)
+    while d and "." in d:
+        if d in smap:
+            return smap[d]
+        d = d.split(".", 1)[1]
+    return None
+
+
 def last_emails(acts: list[dict]) -> dict[str, dict]:
     """Карточка → {"out": последнее исходящее, "any": время последнего письма в любую сторону}."""
     out: dict[str, dict] = {}
@@ -283,8 +359,8 @@ def human_date(t: dt.datetime | None) -> str:
 
 
 def agent_vars(call: dict) -> dict:
-    """Переменные для агента (callbot/agent/system_prompt.md). Наша компания, имя агента и номер
-    подставляет обработчик из настроек — в очереди их нет."""
+    """Переменные для агента (callbot/agent/system_prompt.md). Наша компания — та, с чьего адреса
+    ушло письмо (build, senders); имя агента — из настроек."""
     lines = []
     for i, r in enumerate(call["requests"], 1):
         lines.append(f'{i}. RFQ {r["rfq_no"]}, subject "{r["subject"]}", emailed on {r["email_date"]} '
@@ -293,6 +369,8 @@ def agent_vars(call: dict) -> dict:
             "requests_count": str(len(call["requests"])), "requests_block": "\n".join(lines),
             "first_rfq_no": call["requests"][0]["rfq_no"], "first_email_date": call["requests"][0]["email_date"],
             "first_subject": call["requests"][0]["subject"], "first_email_from": call["requests"][0]["email_from"],
+            "our_company": call.get("our_company", ""),
+            "our_company_intro": ", ".join(x for x in (call.get("our_company", ""), call.get("our_city", "")) if x),
             "disclosure": ОБЪЯВЛЕНИЕ.get(call["country"], "off")}
 
 
@@ -328,19 +406,24 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
           today: dt.date, workdays, fields: dict | None = None, settings: dict | None = None,
           arms: list[tuple[str, int]] | None = None,
           deal_company: dict[str, str] | None = None,
-          countries: frozenset | None = СТРАНЫ_ПИЛОТА) -> tuple[list[dict], Counter]:
+          countries: frozenset | None = СТРАНЫ_ПИЛОТА,
+          senders: dict[str, dict] | None = None) -> tuple[list[dict], Counter]:
     """Звонки на сегодня и счётчики. contacts — {id: {name, phones:[…], company}};
     companies — {id: {name, phones:[…], dnc}}; deal_company — сделка → её компания (заказчик:
     поставщиком не бывает);
     settings — {our_company, agent_name}: есть — к звонку прикладываются готовые тексты агента;
     arms — группы слепого сравнения (parse_arms): у звонка поле arm; «control» обработчик не набирает;
-    countries — страны пилота по номеру телефона (None — все)."""
+    countries — страны пилота по номеру телефона (None — все);
+    senders — домен почты → наша компания (sender_map): от её имени звонит агент. Запрос, чьё письмо
+    ушло с несопоставленного адреса, не звонится. Запросы одному поставщику от разных наших компаний —
+    разные звонки (обработчик разносит их по дням: один звонок в день на компанию).
+    None — без сопоставления (тексты агента тогда не собираются)."""
     f = fields or {}
     arms = arms or parse_arms(ГРУППЫ_ПО_УМОЛЧАНИЮ)
     deal_company = deal_company or {}
     contact_company = {k: str(v.get("company") or "") for k, v in contacts.items()}
     st: Counter = Counter()
-    by_co: dict[str, list[tuple[dict, dict, str, list[str]]]] = defaultdict(list)
+    by_co: dict[tuple[str, str], list[tuple]] = defaultdict(list)
     for c in cards:
         st["карточек"] += 1
         if c.get("_offer"):
@@ -364,14 +447,23 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
         if (companies.get(co) or {}).get("dnc"):
             st["компания: не звонить"] += 1
             continue
+        sender = None
+        if senders is not None:
+            sender = sender_of(((m or {}).get("out") or {}).get("from"), senders)
+            if not sender:
+                st["отправитель письма не сопоставлен с нашей компанией"] += 1
+                continue
         st[f"причина {why}"] += 1
-        by_co[co].append((c, m or {}, why, conts))
+        by_co[(co, sender["name"] if sender else "")].append((c, m or {}, why, conts, sender))
     calls: list[dict] = []
-    for co, items in by_co.items():
+    per_supplier = Counter(co for co, _ in by_co)
+    st["поставщиков с запросами от разных наших компаний"] = sum(1 for n in per_supplier.values() if n > 1)
+    for (co, _sender_name), items in by_co.items():
+        sender = items[0][4]
         comp = companies.get(co) or {}
         phone = None
         contact_name = ""
-        for _, _, _, conts in items:           # телефон контакта поставщика — первым
+        for _, _, _, conts, _ in items:        # телефон контакта поставщика — первым
             for t in conts:
                 ct = contacts.get(t) or {}
                 for p in ct.get("phones") or []:
@@ -398,7 +490,7 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
             continue
         items.sort(key=lambda x: (x[1].get("out") or {}).get("t") or dt.datetime.max.replace(tzinfo=MSK))
         reqs = []
-        for c, m, why, _ in items[:ПРАВИЛА["запросов_в_звонке"]]:
+        for c, m, why, _, _ in items[:ПРАВИЛА["запросов_в_звонке"]]:
             o = m.get("out") or {}
             reqs.append({"card": str(c.get("id")), "rfq_no": rfq_no(c), "subject": o.get("subject") or str(c.get("title") or ""),
                          "email_date": human_date(o.get("t")), "email_from": o.get("from", ""), "email_to": o.get("to", ""),
@@ -406,9 +498,10 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
         st["отложено на завтра (больше 5 в звонке)"] += max(0, len(items) - ПРАВИЛА["запросов_в_звонке"])
         call = {"company_id": co, "company": comp.get("name") or f"company #{co}", "contact_name": contact_name,
                 "phone": e164, "country": country, "tz": tz, "from_pool": ПУЛ_НОМЕРОВ.get(country, ПУЛ_ПО_УМОЛЧАНИЮ),
-                "arm": arm_of(co, arms), "requests": reqs}
+                "arm": arm_of(co, arms), "requests": reqs,
+                "our_company": sender["name"] if sender else "", "our_city": sender["city"] if sender else ""}
         call["agent_vars"] = agent_vars(call)
-        if settings and settings.get("our_company") and settings.get("agent_name"):
+        if settings and settings.get("agent_name") and call["our_company"]:
             call["prompt"], call["voicemail"], miss = call_texts(call, settings)
             if miss:
                 st["тексты: неподставленные переменные"] += 1
@@ -459,6 +552,26 @@ def read_by_ids(client, method: str, flt_key: str, ids: list[str], select: list[
             if len(ch) < 50:
                 break
     return out
+
+
+ДОМЕН_ПОРОГ = 10      # домен с меньшим числом писем в журнал не попадает (только в «прочие»)
+
+
+def read_my_companies(client) -> list[dict]:
+    """Компании с признаком «Моя компания» — по ключу >ID, пачками по 50."""
+    out, last = [], 0
+    while True:
+        ch = client.call("crm.company.list", {"filter": {"IS_MY_COMPANY": "Y", ">ID": last},
+                                              "select": ["ID", "TITLE", "EMAIL", "WEB", "IS_MY_COMPANY"],
+                                              "order": {"ID": "ASC"}, "start": -1}) or []
+        if isinstance(ch, dict):
+            ch = list(ch.values())
+        if any(str(x.get("IS_MY_COMPANY") or "") != "Y" for x in ch):
+            raise RuntimeError("фильтр IS_MY_COMPANY crm.company.list не сработал")
+        out += ch
+        if len(ch) < 50:
+            return out
+        last = int(ch[-1]["ID"])
 
 
 def main(argv=None) -> int:
@@ -527,16 +640,31 @@ def main(argv=None) -> int:
                                 "dnc": bool(fields["dnc"]) and str(x.get(fields["dnc"]) or "").upper() in ("Y", "1", "TRUE", "ДА")}
                  for x in read_by_ids(client, "crm.company.list", "@ID", co_ids, co_sel)}
 
-    settings = {"our_company": os.environ.get("CALL_OUR_COMPANY", "").strip(),
-                "agent_name": os.environ.get("CALL_AGENT_NAME", "").strip()}
-    print("тексты агента: " + ("собираются" if all(settings.values()) else
-                               "не собираются — нет CALL_OUR_COMPANY или CALL_AGENT_NAME"))
+    settings = {"agent_name": os.environ.get("CALL_AGENT_NAME", "").strip()}
+    print("тексты агента: " + ("собираются" if all(settings.values()) else "не собираются — нет CALL_AGENT_NAME"))
+    mine = read_my_companies(client)
+    try:
+        override = json.loads(os.environ.get("CALL_SENDER_COMPANIES") or "{}")
+        override = override if isinstance(override, dict) else {}
+    except ValueError:
+        print("::warning::CALL_SENDER_COMPANIES — не JSON, пропущена")
+        override = {}
+    senders, sst = sender_map(mine, override)
+    print(f"наших компаний в Битриксе: {len(mine)}; " + "; ".join(f"{k}: {v}" for k, v in sorted(sst.items())))
+    # с каких доменов уходят наши письма: только домен и число писем (агрегат, правило 17);
+    # домены реже ДОМЕН_ПОРОГ писем — одной строкой «прочие», чтобы не светить единичные адреса
+    doms = Counter(email_domain((m.get("out") or {}).get("from")) or "(адрес не указан)"
+                   for cid, m in mails.items() if m.get("out"))
+    big = [(d, n) for d, n in doms.most_common() if n >= ДОМЕН_ПОРОГ]
+    print("домены отправителя наших писем: " + "; ".join(
+        f"{d} {n}{'' if sender_of('x@' + d, senders) else ' (не сопоставлен)'}" for d, n in big)
+        + f"; прочие: доменов {len(doms) - len(big)}, писем {sum(doms.values()) - sum(n for _, n in big)}")
     arms = parse_arms(os.environ.get("CALL_ARMS", ""))
     print("группы сравнения: " + ", ".join(f"{n} {w}" for n, w in arms))
     countries = parse_countries(os.environ.get("CALL_COUNTRIES", ""))
     print("страны пилота: " + ("все" if countries is None else ", ".join(sorted(countries))))
     calls, st = build(cards, mails, contacts, companies, today, period.workdays_ru, fields, settings, arms, deal_company,
-                      countries)
+                      countries, senders)
     # журнал — только счётчики, коды стран и пулов (правило 17)
     for k in sorted(st):
         print(f"  {k}: {st[k]}")
