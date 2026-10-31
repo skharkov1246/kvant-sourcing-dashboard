@@ -258,6 +258,8 @@ def _mail_activities(client: BitrixClient, start_iso: str, end_iso: str) -> list
                 # строки запроса (reqlines.py): таблица позиций в исходящем письме — строк и хэш текста
                 **(dict(zip(("tr", "tk"), reqlines_mod.table_rows(a.get("DESCRIPTION"))))
                    if str(a.get("DIRECTION") or "") == "2" and "<tr" in str(a.get("DESCRIPTION") or "").lower() else {}),
+                # и номера файлов вложений исходящего письма (читаются только вебхуком файлов)
+                **({"fa": _fa} if str(a.get("DIRECTION") or "") == "2" and (_fa := reqlines_mod.attach_ids(a.get("FILES"))) else {}),
                 "dt": (a.get("CREATED") or "")[:16].replace("T", " "),
                 "dtx": a.get("CREATED") or "",
             })
@@ -265,6 +267,33 @@ def _mail_activities(client: BitrixClient, start_iso: str, end_iso: str) -> list
         if len(ch) < 50:
             break
     return out
+
+
+def _attach_fetcher(client: BitrixClient, bt):
+    """Чтение вложения письма по номеру файла Диска — только вебхуком файлов (BITRIX_FILES_WEBHOOK_URL).
+
+    Основной вебхук на Дисках ящиков получает ACCESS_DENIED (зонд 25.09.2026), вебхук файлов —
+    файл (зонд v64 31.10.2026: disk.file.get 168 из 171). Нет секрета в сборке — None: вложения не
+    читаются, строки ручных карточек — из текста письма (reqlines.py). Очередь частоты — основного
+    клиента: второй клиент со своей очередью удвоил бы частоту сверх 2 запросов/с на портал."""
+    url = os.environ.get("BITRIX_FILES_WEBHOOK_URL", "").strip()
+    if not url:
+        return None
+    files = BitrixClient(url)
+    files._throttle = client._throttle
+
+    def fetch(fid: str):
+        for method in ("disk.file.get", "disk.attachedObject.get"):
+            try:
+                r = files.call(method, {"id": fid}, retries=1) or {}
+            except Exception:                                # noqa: BLE001 — отказ по файлу (правило 13)
+                continue
+            link = r.get("DOWNLOAD_URL") if isinstance(r, dict) else ""
+            if link:
+                body, _why, name = bt.fetch(link)
+                return body, name
+        return None, ""
+    return fetch
 
 
 def _inbound_mail(acts: list[dict]) -> list[dict]:
@@ -656,15 +685,18 @@ def run(args) -> int:
         _bt._ОЧЕРЕДЬ = client                                # закачки — через общую очередь портала
         _first_out: dict[str, dict] = {}
         for a in sorted((a for a in _acts if a["dir"] == "2"), key=lambda a: a["dtx"]):
-            _first_out.setdefault(a["cid"], {k: a[k] for k in ("tr", "tk") if k in a})
+            _first_out.setdefault(a["cid"], {k: a[k] for k in ("tr", "tk", "fa") if k in a})
         _cache = reqlines_mod.load_cache(os.environ.get("REQLINES_PATH"))
-        _rl, _rl_new, _rl_st = reqlines_mod.build(rfqs, _first_out, _cache, fetch=_bt.fetch, parse=_bt.parse)
+        _rl, _rl_new, _rl_st = reqlines_mod.build(rfqs, _first_out, _cache, fetch=_bt.fetch, parse=_bt.parse,
+                                                  fetch_attach=_attach_fetcher(client, _bt))
         m["reqLines"] = _rl_st
         _out = os.environ.get("REQLINES_OUT")
         if _out:
             Path(_out).write_text(json.dumps({"v": 1, "f": {**_cache["f"], **_rl_new}}, ensure_ascii=False), encoding="utf-8")
         print(f"• Строки запроса: карточек {_rl_st['cards']}, групп {_rl_st['groups']}, источники {_rl_st['src']}; "
-              f"файлов {_rl_st['files']}, скачано {_rl_st['fetched']}, в очереди {_rl_st['pending']}")
+              f"файлов {_rl_st['files']}, скачано {_rl_st['fetched']}, в очереди {_rl_st['pending']}; "
+              f"вложений писем {_rl_st['att']}, прочитано {_rl_st['attFetched']} (без файла {_rl_st['attMiss']}), "
+              f"в очереди {_rl_st['attPending']}{' · вебхук файлов не отдаёт файлы — вложения отложены' if _rl_st['attBroken'] else ''}")
     except Exception as e:                                   # noqa: BLE001
         print(f"  ⚠ строки запроса не посчитаны: {type(e).__name__}: {без_вебхука(e)}")
         _rl = {}
