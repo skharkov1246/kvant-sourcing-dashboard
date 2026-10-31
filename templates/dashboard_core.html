@@ -2536,6 +2536,7 @@
   #tab-sourcing :where(.sopulse .sotr){width:10%}
   #tab-sourcing :where(.sospark i.part){opacity:.45}
   #tab-sourcing :where(.sopulse td.sopart){color:var(--mut)}
+  #tab-sourcing :where(.socoh) :where(td,th[scope=row]){vertical-align:middle}
   #tab-sourcing :where(.soreg td){vertical-align:top}
   #tab-sourcing :where(.sottlrow){display:flex;align-items:flex-end;justify-content:space-between;gap:8px 16px;flex-wrap:wrap}
   #tab-sourcing :where(.soas){display:flex;align-items:center;gap:8px;margin:0 0 4px;font-size:var(--so-sm)}
@@ -2648,12 +2649,12 @@
     #tab-sourcing :where(.solink){min-height:44px;min-width:44px}
     #tab-sourcing :where(.ownrow){flex-wrap:wrap}
     #tab-sourcing :where(.ownrow .ocnt){min-width:0;text-align:left}
-    #tab-sourcing :where(.sotd,.sopl,.sops,.soled) :where(thead){display:none}
-    #tab-sourcing table:is(.sotd,.sopl,.sops,.soled){display:block;width:100%;min-width:0}
-    #tab-sourcing :where(.sotd,.sopl,.sops,.soled) :where(tbody,tr){display:block;width:100%}
-    #tab-sourcing :where(.sotd,.sopl,.sops,.soled) :where(tbody tr){border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:0 0 10px}
-    #tab-sourcing :where(.sotd,.sopl,.sops,.soled) :where(td){display:inline-block;vertical-align:top;border:0;padding:4px 16px 4px 0;text-align:left;max-width:100%}
-    #tab-sourcing :where(.soled th[scope=row]){display:block;border:0;padding:0 0 2px}
+    #tab-sourcing :where(.sotd,.sopl,.sops,.soled,.socoh) :where(thead){display:none}
+    #tab-sourcing table:is(.sotd,.sopl,.sops,.soled,.socoh){display:block;width:100%;min-width:0}
+    #tab-sourcing :where(.sotd,.sopl,.sops,.soled,.socoh) :where(tbody,tr){display:block;width:100%}
+    #tab-sourcing :where(.sotd,.sopl,.sops,.soled,.socoh) :where(tbody tr){border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:0 0 10px}
+    #tab-sourcing :where(.sotd,.sopl,.sops,.soled,.socoh) :where(td){display:inline-block;vertical-align:top;border:0;padding:4px 16px 4px 0;text-align:left;max-width:100%}
+    #tab-sourcing :where(.soled,.socoh) :where(th[scope=row]){display:block;border:0;padding:0 0 2px}
     /* «Пульс» на телефоне: показатель, ход, две последние полные недели и «за неделю» — без прокрутки вбок */
     #tab-sourcing :where(.sopulse .sowo){display:none}
     #tab-sourcing table.sopulse{min-width:0;table-layout:auto}
@@ -2662,7 +2663,7 @@
     #tab-sourcing :where(.sopulse) :where(th,td){padding-left:4px;padding-right:4px}
     #tab-sourcing :where(.sotd,.sopl,.sops) :where(td:first-child,td[data-l="Что сделать"],td[data-l="Почему"]){display:block;padding-right:0}
     #tab-sourcing :where(.sotd td.sonc){white-space:normal}
-    #tab-sourcing :where(.sotd,.sopl,.sops,.soled) :where(td[data-l])::before{content:attr(data-l);display:block;font-size:var(--so-sm);font-weight:600;color:var(--mut)}
+    #tab-sourcing :where(.sotd,.sopl,.sops,.soled,.socoh) :where(td[data-l])::before{content:attr(data-l);display:block;font-size:var(--so-sm);font-weight:600;color:var(--mut)}
     #tab-sourcing :where(.sotd,.sopl) :where(td[data-l="Что сделать"])::before{display:none}
     #tab-sourcing :where(.sopl tfoot){display:block}
     #tab-sourcing :where(.sopl tfoot tr){display:flex;flex-wrap:wrap;gap:8px}
@@ -3460,6 +3461,19 @@
       <p>Неделя — с понедельника по воскресенье. Неполная неделя (первая в периоде или текущая) помечена «k из 5 раб. дн.» и в сравнение «за неделю» не идёт: сравниваются две последние полные недели. «Лучше» и «хуже» — по смыслу показателя: больше КП — лучше, больше сделок без запроса — хуже.</p>
       <p><b>КП засчитано</b> — карточки с файлом в поле «Offer from supplier»; КП в почте, в сделке или в чате сделки не засчитывается. До 19.10.2026 файл не был обязателен — в неделях до правил число может быть ниже числа полученных КП. <b>КП с итогом</b> — карточки на Selected или «не выбран», по стадии, без проверки файла: это независимый счёт, разница двух строк — не число КП без итога.</p>
       <p>КП датированы по последнему движению карточки: отдельной даты у файла КП выдача не отдаёт. «Сорсеров в отделе» — по окнам работы людей (с приёма по уход).</p>
+    </div></details>
+  </section>
+</section>
+<section class="sosec" id="soCohS" aria-labelledby="soCohH" hidden>
+  <h2 class="secttl" id="soCohH">КП по когортам недель</h2>
+  <p class="sowhy">Какая доля строк запросов отдела, ушедших поставщикам в неделю, получила цену за 7, 14 и 30 дней. Строка, отправленная нескольким поставщикам, считается один раз; расценена — если КП дал хотя бы один. Когорта зреет: доля за N дней — по строкам старше N дней.</p>
+  <section class="card soc"><div class="twrap"><table class="sopulse socoh" data-xl-name="КП по когортам недель"><thead><tr><th scope="col">Неделя заведения</th><th scope="col" class="r">Запросов</th><th scope="col" class="r">КП за 7 дней</th><th scope="col" class="r">КП за 14 дней</th><th scope="col" class="r">КП за 30 дней</th><th scope="col" class="r">КП на сегодня</th></tr></thead><tbody id="soCoh"></tbody></table></div>
+    <p class="sonote" id="soCohSrc"></p>
+    <details class="sohow"><summary>Как читать</summary><div class="sohowb">
+      <p>Строки запроса — позиции, которые ушли поставщику. Берутся по порядку: из файла «Request file» карточки (его кладёт робот пресейла); из поля «Individual letter text»; из таблицы позиций в первом письме поставщику; иначе запрос — одна позиция. Вложения писем вебхук прочитать не может, поэтому у ручного запроса с файлом в письме строк столько, сколько видно в тексте письма. Файл, который ещё не разобран, в счёт не идёт: в строке недели — «строки не разобраны у N».</p>
+      <p>Сквозной счёт: одно содержание в одной сделке (тот же файл, текст или позиция) — одна группа строк, сколько бы поставщиков её ни получили; строка расценена, когда хотя бы один из них дал КП — первый вход его запроса в стадию КП (Price at Work, Selected, не выбран, прежняя «КП получено») по истории стадий. Когорта — неделя первого запроса группы.</p>
+      <p>Доля за N дней — из запросов когорты, которым на день сборки исполнилось N дней: младшие ещё в пути и в знаменатель не идут. Когорта, где часть запросов моложе N дней, помечена «неполная»; где все моложе — «—». «На сегодня» — доля всех запросов когорты, у которых КП уже было, без ограничения срока.</p>
+      <p>Это не то же, что «КП засчитано» в таблице выше: там КП файлом в запросе по неделе последнего движения карточки, здесь — получение КП по стадии по неделе заведения запроса.</p>
     </div></details>
   </section>
 </section>
@@ -4973,6 +4987,62 @@ _soTiles('');
       // мера «на сорсера» — не счёт множества: её записи — запросы той же недели строкой выше
       const ratio=/на сорсера/.test(nm);
       return `<td class="num r${part?' sopart':''}${ratio?' soratio':''}${wo(i)}" data-l="${_esc(wl(W[i]))}">${k&&v&&!ratio?_soBtn(k,v,`${nm}, ${wl(W[i])}`,'','solink'):(v===0?'<span class="sozero">0</span>':fx(v))}</td>`;}).join('')}<td class="num r sodelta" data-l="За неделю">${dl}</td></tr>`;}).join('');
+})();
+
+// ---- КП по когортам недель — сквозной счёт по строкам запроса (владелец 31.10.2026: «нужен срез по
+// строкам запроса», «не надо взвешивать, просто считай сквозно по строкам»). Группа строк (d.lg, reqlines.py) —
+// одно содержание в одной сделке: файл «Request file», текст поля, таблица письма или название; ушла
+// нескольким поставщикам — строки один раз; строка расценена, когда КП дал хоть один поставщик группы
+// (первый вход в стадию КП, kpd). Когорта — неделя первого запроса группы; зрелость — от конца периода.
+// Строк нет (сборка без reqlines) — группа = запрос, одна строка: таблица по запросам, как прежде
+(function(){
+  const tb=document.getElementById('soCoh'), sec=document.getElementById('soCohS'); if(!tb||!sec||!M.kpHist) return;
+  const W=(M.weekly||[]).slice(-12), off=(M.weekly||[]).length-W.length, END=String((M.period||{}).end||'');
+  if(!W.length||!END) return;
+  const day=s=>{const t=Date.parse(String(s||'').slice(0,10)+'T00:00:00Z'); return isNaN(t)?null:Math.round(t/864e5);};
+  const endD=day(END);
+  const wl=w=>{const MN=['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+    const m=String(w.d||'').match(/^(\d{1,2})(?:\.(\d{2}))?\s*[–-]\s*(\d{1,2})\.(\d{2})$/); if(!m) return w.d||w.w;
+    const m2=MN[+m[4]-1]||m[4], m1=m[2]?(MN[+m[2]-1]||m[2]):m2; return m1===m2?`${+m[1]}–${+m[3]} ${m2}`:`${+m[1]} ${m1} – ${+m[3]} ${m2}`;};
+  const SRC={f:'строки из файла запроса',x:'строки из текста письма в карточке',t:'строки из таблицы в письме',o:'одна позиция',u:'строки ещё не разобраны'};
+  const byLines=A.some(s=>_unpack(s.details).some(d=>d.lg!=null));
+  // группы строк по всем запросам отдела
+  const G=new Map();
+  A.forEach(s=>_unpack(s.details).forEach(d=>{const k=d.lg!=null?'g'+d.lg:'c'+d.id;
+    const g=G.get(k)||{k,cards:[],lines:d.ls==='u'?null:(d.ln??1),src:d.ls||'o'}; g.cards.push({s,d}); G.set(k,g);}));
+  G.forEach(g=>{const ds=g.cards.map(x=>day(x.d.dt)).filter(x=>x!=null); g.start=ds.length?Math.min(...ds):null;
+    const first=g.cards.find(x=>day(x.d.dt)===g.start)||g.cards[0]; g.wk=first.d.wk;
+    const pr=g.cards.filter(x=>x.d.kpd!=null&&day(x.d.dt)!=null).map(x=>day(x.d.dt)-g.start+x.d.kpd); g.kp=pr.length?Math.min(...pr):null;
+    g.age=g.start!=null&&endD!=null?endD-g.start:null;});
+  const fmt=n=>Number(n).toLocaleString('ru-RU');
+  const row=(x,g)=>({kind:'card',id:x.d.id,t:x.d.subj||x.d.mailSubj||'—',sup:x.d.sup,uid:String(x.s.id),who:_gone(x.s)?`${SO_HEAD} (сорсер ушёл)`:x.s.n,
+    why:[STG[x.d.st]||x.d.st||'',g.lines!=null?_soN(g.lines,'строка','строки','строк')+(g.cards.length>1?` на ${_soN(g.cards.length,'запрос','запроса','запросов')}`:''):SRC.u,
+      x.d.kpd!=null?`КП через ${_soN(x.d.kpd,'день','дня','дней')}`:''].filter(Boolean).join(' · '),days:x.d.kpd??null});
+  const reg=(key,act,def,gs)=>{const rows=[]; gs.forEach(g=>g.cards.forEach(x=>rows.push(row(x,g)))); rows.sort((a,b)=>(b.days??-1)-(a.days??-1));
+    SOQ.by[key]={key,act,who:'сорсер запроса',unit:'card',def,rows,n:rows.length,max:-1,fact:1}; return rows.length;};
+  const U=byLines?'строк':'запросов';
+  const cell=(gs,pick,key,lbl,part)=>{const known=gs.filter(g=>g.lines!=null), L=known.reduce((s,g)=>s+g.lines,0);
+    if(!L) return '<span class="dimv" title="строк старше срока в когорте нет">—</span>';
+    const P=known.filter(pick), Lp=P.reduce((s,g)=>s+g.lines,0), n=reg(key,lbl,`${lbl}. ${byLines?'Сквозной счёт: строка расценена, если КП дал хотя бы один поставщик из тех, кому ушли эти строки; список — запросы с этими строками.':'Запросы с первым входом в стадию КП в срок.'}`,P);
+    return `<b>${Math.round(Lp/L*100)}%</b><div class="dep">${fmt(Lp)} из ${fmt(L)} ${U}${part?' · неполная':''}</div>`
+      +(n?`<div class="dep">запросов ${_soBtn(key,n,lbl,'','solink')}</div>`:'');};
+  let unkAll=0;
+  tb.innerHTML=W.map((w,i)=>{const j=off+i, lab=wl(w), C=[...G.values()].filter(g=>g.wk===j);
+    const unk=C.filter(g=>g.lines==null).reduce((s,g)=>s+g.cards.length,0); unkAll+=unk;
+    const known=C.filter(g=>g.lines!=null), L=known.reduce((s,g)=>s+g.lines,0), nq=C.reduce((s,g)=>s+g.cards.length,0);
+    const cells=[7,14,30].map(N=>{const ripe=C.filter(g=>g.age!=null&&g.age>=N);
+      return `<td class="num r" data-l="КП за ${N} дней">${cell(ripe,g=>g.kp!=null&&g.kp<=N,`kpc${j}_${N}`,`КП за ${N} дней, ${lab}`,ripe.length&&ripe.length<C.length)}</td>`;}).join('');
+    const kq=`kpc${j}_n`; if(nq) reg(kq,`Запросы отдела, неделя ${lab}`,`Запросы отдела, с которых в неделю ${lab} начались группы строк${byLines?' (одно содержание в одной сделке)':''}.`,C);
+    return `<tr><th scope="row">${_esc(lab)}${w.part!=null?`<div class="dep">неполная неделя</div>`:''}</th>`
+      +`<td class="num r" data-l="${byLines?'Строк':'Запросов'}">${L?`<b>${fmt(L)}</b>`:'<span class="sozero">0</span>'}${nq?`<div class="dep">запросов ${_soBtn(kq,nq,`Запросы отдела, ${lab}`,'','solink')}</div>`:''}${unk?`<div class="dep">строк не знаем у ${_soN(unk,'запроса','запросов','запросов')}</div>`:''}</td>`
+      +cells+`<td class="num r" data-l="КП на сегодня">${cell(C,g=>g.kp!=null,`kpc${j}_all`,`КП получено, ${lab}`,false)}</td></tr>`;}).join('');
+  // подпись: по строкам или по запросам, источники строк
+  const h=document.getElementById('soCohH'), th=sec.querySelector('thead th:nth-child(2)');
+  if(byLines){ if(h) h.textContent='КП по когортам недель — по строкам запроса'; if(th) th.textContent='Строк';
+    const sn={}; G.forEach(g=>{sn[g.src]=(sn[g.src]||0)+g.cards.length;});
+    const leg=document.getElementById('soCohSrc');
+    if(leg) leg.textContent='Откуда строки у запросов отдела: '+Object.keys(SRC).filter(k=>sn[k]).map(k=>`${SRC[k]} — ${fmt(sn[k])}`).join(', ')+'.';}
+  sec.hidden=false;
 })();
 
 // ---- список за числом: что считает → кто → записи, дольше ждущие сверху → Битрикс

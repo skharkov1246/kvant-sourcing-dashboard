@@ -1182,6 +1182,37 @@ def ps_tkp_history() -> dict:
             "8009": [("C32:READY", t(45))]}
 
 
+def kp_cohorts(m: dict) -> dict:
+    """КП по когортам недель (main.py кладёт kpd по истории стадий СП-166): карточкам на стадиях КП
+    — придуманные дни от заведения до первого входа в КП, 0–39 (часть позже 30 дней)."""
+    import stages
+    g = 0
+    for s in m["sourcersA"]:
+        prev = None
+        for i, d in enumerate(s["details"]):
+            if d.get("st") in stages.KP_STAGES:
+                d["kpd"] = (int(d["id"]) * 7) % 40
+            # строки запроса (main.py кладёт lg/ln/ls по reqlines): каждая пятая карточка — файл на
+            # 2–201 строку, следующая за ней — тот же файл другому поставщику; каждая седьмая — файл не
+            # разобран; прочие — одна позиция
+            if prev is not None:
+                d["lg"], d["ln"], d["ls"] = prev["lg"], prev["ln"], "f"
+                prev = None
+            elif i % 7 == 6:
+                d["lg"], d["ls"] = g, "u"
+                g += 1
+            elif i % 5 == 0:
+                d["lg"], d["ln"], d["ls"] = g, (int(d["id"]) * 13) % 200 + 2, "f"
+                prev = d
+                g += 1
+            else:
+                d["lg"] = g
+                g += 1
+    m["kpHist"] = True
+    m["reqLines"] = {"cards": 0, "groups": g}
+    return m
+
+
 def build_presale(*, chat: bool = True, tkp: bool = False) -> dict:
     """Синтетика → настоящий presale.compute с общим читателем чатов и чтением чатов
     кандидатов «мяч у КАМа» (kamqueue.chat_wanted) — как main.py. tkp — сорсеры сделок, запросы с
