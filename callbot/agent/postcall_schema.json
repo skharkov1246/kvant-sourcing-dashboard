@@ -1,0 +1,26 @@
+{
+  "_comment": "Итог звонка, который платформа извлекает из разговора после звонка (post-call analysis). Обработчик пишет его комментарием в карточки СП-166, двигает счётчик попыток и следующую дату (алгоритм звонилки, п. 7). Без адресов и телефонов в журнале — только в Битрикс и закрытую базу.",
+  "type": "object",
+  "properties": {
+    "outcome": {
+      "type": "string",
+      "enum": ["quote_date_set", "resent", "wrong_person_new_contact", "declined", "escalated", "voicemail",
+               "no_answer", "refused_to_talk", "language_barrier", "do_not_call"],
+      "description": "Main result of the call"
+    },
+    "reached_person": {"type": "boolean", "description": "A human answered and talked"},
+    "email_received": {"type": "string", "enum": ["yes", "no", "unsure", "not_asked"]},
+    "quote_dates": {
+      "type": "array",
+      "items": {"type": "object", "properties": {"rfq_no": {"type": "string"}, "date": {"type": "string"}}},
+      "description": "Promised quotation dates per RFQ, YYYY-MM-DD"
+    },
+    "new_email": {"type": "string"},
+    "new_contact_name": {"type": "string"},
+    "declined_reason": {"type": "string"},
+    "questions_for_manager": {"type": "array", "items": {"type": "string"}},
+    "asked_if_ai": {"type": "boolean", "description": "The person asked whether they were talking to an AI"},
+    "summary": {"type": "string", "description": "Two or three sentences, in English"}
+  },
+  "required": ["outcome", "reached_person", "summary"]
+}

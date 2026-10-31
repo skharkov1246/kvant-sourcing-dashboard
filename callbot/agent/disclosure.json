@@ -1,0 +1,6 @@
+{
+  "_comment": "Объявление об ИИ по стране номера поставщика (решение владельца 31.10.2026: в начале не объявлять; scripts/call_queue.py, ОБЪЯВЛЕНИЕ). start — ЕС (AI Act ст. 50 с 02.08.2026), США, Канада, Великобритания; end — Китай, Гонконг, Макао (правила маркировки ИИ-контента с 01.09.2025, до заключения юриста); off — остальные. opening — фраза в начале (промпт и автоответчик), closing — указание агенту в промпте, closing_spoken — фраза в конце автоответчика.",
+  "start": {"opening": "I am an AI assistant calling on behalf of our purchasing team. ", "closing": "", "closing_spoken": ""},
+  "end": {"opening": "", "closing": "Then, before hanging up, say: \"This call was assisted by AI.\"", "closing_spoken": "This call was assisted by AI."},
+  "off": {"opening": "", "closing": "", "closing_spoken": ""}
+}
