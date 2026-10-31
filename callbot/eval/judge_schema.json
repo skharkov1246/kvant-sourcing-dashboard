@@ -7,13 +7,13 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "goal": {"type": "integer", "enum": [1, 2, 3, 4, 5]},
-        "accuracy": {"type": "integer", "enum": [1, 2, 3, 4, 5]},
-        "rules": {"type": "integer", "enum": [1, 2, 3, 4, 5]},
-        "email_reference": {"type": "integer", "enum": [1, 2, 3, 4, 5]},
-        "naturalness": {"type": "integer", "enum": [1, 2, 3, 4, 5]},
-        "listening": {"type": "integer", "enum": [1, 2, 3, 4, 5]},
-        "efficiency": {"type": "integer", "enum": [1, 2, 3, 4, 5]}
+        "goal": {"type": "integer", "description": "1 to 5"},
+        "accuracy": {"type": "integer", "description": "1 to 5"},
+        "rules": {"type": "integer", "description": "1 to 5"},
+        "email_reference": {"type": "integer", "description": "1 to 5"},
+        "naturalness": {"type": "integer", "description": "1 to 5"},
+        "listening": {"type": "integer", "description": "1 to 5"},
+        "efficiency": {"type": "integer", "description": "1 to 5"}
       },
       "required": ["goal", "accuracy", "rules", "email_reference", "naturalness", "listening", "efficiency"]
     },

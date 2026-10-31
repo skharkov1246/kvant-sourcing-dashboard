@@ -55,7 +55,9 @@ jobs:
         run: |
           set -euo pipefail
           [ -f /tmp/ce/scores.json ] || { echo "оценок нет — отчёта нет"; exit 0; }
-          python scripts/call_eval.py report --scores /tmp/ce/scores.json --html /tmp/ce/report.html
+          # пустой отчёт владельцу не уходит: нет оценок — нет PDF
+          python scripts/call_eval.py report --scores /tmp/ce/scores.json --html /tmp/ce/report.html \
+            || { echo "отчёта нет"; exit 0; }
           google-chrome --headless --disable-gpu --no-sandbox --no-pdf-header-footer \
             --run-all-compositor-stages-before-draw --virtual-time-budget=60000 \
             --print-to-pdf=/tmp/ce/report.pdf file:///tmp/ce/report.html > /dev/null 2>&1

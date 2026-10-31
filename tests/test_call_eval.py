@@ -202,3 +202,44 @@ def test_smoke_set_valid_and_checked(tmp_path, capsys):
     rows[0] = {"label": ev.label("smoke-good"), "arm": "x", **ev.combine(judgement(2), judgement(2))}
     assert ev.check_smoke(data, rows) == ["smoke-good: балл 25.0 < 70"]
     assert ev.check_smoke(data, rows[1:])[0] == "smoke-good: не оценён"
+
+
+# ───── сбои вызова: 400 не оплачивается, текст API — только для выдуманного набора ─────
+
+class Err400(Exception):
+    status_code = 400
+    message = "output_config.format.schema: example validation message"
+
+
+class Failing:
+    def __init__(self, exc):
+        self.calls, self.exc = 0, exc
+        self.beta = types.SimpleNamespace(messages=types.SimpleNamespace(create=self.create))
+
+    def create(self, **req):
+        self.calls += 1
+        raise self.exc
+
+
+def test_bad_request_not_billed_and_text_kept():
+    rows, st = ev.judge(_records()[:2], Failing(Err400()), max_usd=50, threads=1)
+    assert not rows and st["сбои"] == {"Err400 400": 2} and st["потрачено_usd"] == 0
+    assert st["_тексты_сбоев"][0].startswith("output_config.format.schema")
+    conn = ConnectionError("reset")
+    rows, st = ev.judge(_records()[:1], Failing(conn), max_usd=50, threads=1)
+    assert st["потрачено_usd"] > 0                                        # обрыв мог быть оплачен
+
+
+def test_parse_rejects_scores_out_of_range():
+    j = judgement(4)
+    j["scores"]["goal"] = 7
+    resp = types.SimpleNamespace(stop_reason="end_turn", content=[types.SimpleNamespace(type="text", text=json.dumps(j))])
+    assert ev.parse(resp) == (None, "оценка вне 1–5")
+    assert "enum" not in json.dumps(ev.schema()["properties"]["scores"])   # API не принимает enum у целых
+
+
+def test_report_refuses_empty_scores(tmp_path):
+    sf = tmp_path / "s.json"
+    sf.write_text(json.dumps({"model": "m", "usd": 0, "rows": []}), encoding="utf-8")
+    assert ev.main(["report", "--scores", str(sf), "--html", str(tmp_path / "r.html")]) == 1
+    assert not (tmp_path / "r.html").exists()
