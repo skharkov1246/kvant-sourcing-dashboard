@@ -280,6 +280,7 @@ try{
   snap(document.getElementById('orkPulseB').closest('table'),'people');
   snap(document.getElementById('orkLed').closest('table'),'ledger');
   snap(document.getElementById('orkLedD').closest('table'),'ledgerD');
+  var l0=document.getElementById('orkLed0'); if(l0) snap(l0.closest('table'),'ledger0');
   // список за числом (дровер): в имени файла — подвкладка и направление числа, как у таблиц вкладки
   // «N заказов в работе» — в шапке вкладки (R4, WP-A), по выбранному направлению; в панели — если есть
   var od=function(sel,key){var b=document.querySelector(sel+' button[data-od="w:live"]')||document.querySelector('#ctLive button[data-od="w:live"]'); b.click();
@@ -399,7 +400,8 @@ def test_число_со_списком_заказов_идёт_в_файл(page
     out, r, _m = page_run
     led = out["ledger"]
     assert led["head"][:3] == ["Шаг заказа", "Кто делает", "Заказов на шаге"]
-    L = [s for s in r["contracts"]["ork"]["week"]["ledger"] if s["no"] not in (1, 2, 3, 13)]
+    # шаг 0 «Подтверждение передачи в ОРК» (решение владельца 31.10.2026) — своей таблицей «Заказы — шаг 0»
+    L = [s for s in r["contracts"]["ork"]["week"]["ledger"] if s["no"] not in (0, 1, 2, 3, 13)]
     rows = _rows(led["b64"])[1:1 + led["rows"]]
     assert led["rows"] == len(L) + 1 and sum(1 for s in L if s["now"]) > 0     # + строка «Всего заказов на шагах 4–12»
     for row, s in zip(rows, L):
@@ -410,6 +412,13 @@ def test_число_со_списком_заказов_идёт_в_файл(page
     rd = _rows(ld["b64"])[1:1 + ld["rows"]]
     assert ld["rows"] == 4 + 1 and [str(x[0]).split(" ")[0] for x in rd[:-1]] == ["1", "2", "3", "13"]
     assert rd[-1][0] == "Всего сделок на шагах 1–3 и 13" and rd[-1][2] == sum(int(x[2]) for x in rd[:-1]) > 0
+    # шаг 0: одна строка, «Заказов на шаге» и «Дольше 5 раб. дн.» — числами, как в ведомости
+    l0 = out["ledger0"]
+    s0 = next(s for s in r["contracts"]["ork"]["week"]["ledger"] if s["no"] == 0)
+    assert l0["file"].endswith(".xlsx") and "Заказы — шаг 0" in l0["file"]
+    assert l0["head"][:4] == ["Шаг 0 — до передачи в ОРК", "Кто делает", "Заказов на шаге", "Дольше 5 раб. дн., заказов"]
+    r0 = _rows(l0["b64"])[1:1 + l0["rows"]]
+    assert l0["rows"] == 1 and r0[0][2] == s0["now"] > 0 and r0[0][3] == s0["over"]
 
 
 def test_список_за_числом_имя_файла_с_подвкладкой_и_направлением(page_run):
