@@ -212,6 +212,9 @@ jobs:
           # строки запроса: прочитанный кэш (reqlines.json) и кэш сборки — его шаг после деплоя кладёт в reqlines:v1
           REQLINES_PATH: ${{ runner.temp }}/reqlines.json
           REQLINES_OUT: ${{ runner.temp }}/reqlines_out.json
+          # вебхук файлов — только чтение вложений первого письма запроса (строки «a», reqlines.py;
+          # решение владельца 31.10.2026); нет — вложения не читаются, строки — из текста письма
+          BITRIX_FILES_WEBHOOK_URL: ${{ secrets.BITRIX_FILES_WEBHOOK_URL }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           # Идентификаторы служебных учётных записей портала через запятую
           # (Settings → Secrets and variables → Actions → Variables). Их карточки
