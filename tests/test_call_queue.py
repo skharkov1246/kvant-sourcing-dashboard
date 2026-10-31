@@ -131,7 +131,7 @@ def test_pools_and_disclosure_by_country():
 def test_call_texts_rendered_without_placeholders(phone, mode):
     comps = {"5": {"name": "Example Pumps Co", "phones": [phone], "dnc": False}}
     calls, st = q.build([card(11)], q.last_emails([mail("2026-10-20")]), {}, comps, TODAY, wd,
-                        settings={"our_company": "Example Trading FZE", "agent_name": "Alex"})
+                        settings={"our_company": "Example Trading FZE", "agent_name": "Alex"}, countries=None)
     c = calls[0]
     assert c["agent_vars"]["disclosure"] == mode and st["тексты: неподставленные переменные"] == 0
     assert "{{" not in c["prompt"] and "{{" not in c["voicemail"]
@@ -270,3 +270,22 @@ def test_main_dry_run_with_cards_without_deal(monkeypatch, capsys):
     assert "карточек без сделки: 3" in out and "звонков: 3" in out and "поставщик не указан: 1" in out
     assert seen_ids["deals"] == ["900"]                                           # ни «None», ни «»
     assert all(isinstance(x, int) for m in ("crm.contact.list", "crm.company.list") for x in seen_ids[m])
+
+
+# ───── страны пилота ─────
+
+def test_parse_countries():
+    assert q.parse_countries("") == q.СТРАНЫ_ПИЛОТА and q.parse_countries("x, 1") == q.СТРАНЫ_ПИЛОТА
+    assert q.parse_countries("cn, AE") == frozenset({"CN", "AE"}) and q.parse_countries("*") is None
+    assert {"CN", "HK", "AE", "SG", "VN"} <= q.СТРАНЫ_ПИЛОТА and not {"RU", "IN", "DE", "US"} & q.СТРАНЫ_ПИЛОТА
+
+
+def test_build_skips_countries_outside_pilot():
+    comps = {"5": {"name": "Example Pumps Co", "phones": ["+86 138 0013 8000"], "dnc": False},
+             "6": {"name": "Sample Valves GmbH", "phones": ["+49 30 1234567"], "dnc": False}}
+    cards = [card(11), card(12, company="6")]
+    mails = q.last_emails([mail("2026-10-20", owner="11"), mail("2026-10-20", owner="12", i=2)])
+    calls, st = q.build(cards, mails, {}, comps, TODAY, wd)
+    assert [c["country"] for c in calls] == ["CN"] and st["вне пилота: страна DE"] == 1
+    calls, _ = q.build(cards, mails, {}, comps, TODAY, wd, countries=None)
+    assert sorted(c["country"] for c in calls) == ["CN", "DE"]

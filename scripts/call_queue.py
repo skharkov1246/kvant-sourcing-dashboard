@@ -78,6 +78,20 @@ OUT, IN = "2", "1"                         # DIRECTION дела: исходящ�
     **{c: "GB" for c in ("AE", "SA", "QA", "OM", "KW", "BH", "IN", "TR")},
 }
 ПУЛ_ПО_УМОЛЧАНИЮ = "GB"
+# Кому звоним (владелец, 31.10.2026: «Китай / Дубай / Юго-Восточная Азия»): страна — по номеру
+# телефона. Холостой прогон 31.10 показал, что без фильтра в очередь идут Россия (205 звонков),
+# Индия (196), ЕС и США — вне задачи пилота. Переменная CALL_COUNTRIES: список кодов через запятую
+# («CN,HK,AE») или «*» — все страны.
+СТРАНЫ_ПИЛОТА = frozenset(("CN", "HK", "MO", "TW", "AE", "SG", "MY", "TH", "VN", "ID", "PH", "KH", "MM", "LA", "BN"))
+
+
+def parse_countries(spec: str) -> frozenset | None:
+    """«CN,HK,AE» → набор; «*» → None (все страны); пусто или мусор → СТРАНЫ_ПИЛОТА."""
+    spec = str(spec or "").strip()
+    if spec == "*":
+        return None
+    got = frozenset(x.strip().upper() for x in spec.split(",") if re.fullmatch(r"[A-Za-z]{2}", x.strip()))
+    return got or СТРАНЫ_ПИЛОТА
 # Объявление об ИИ — по стране номера (решение владельца 31.10.2026: в начале не объявлять):
 # «start» — фраза в начале (ЕС: AI Act ст. 50 с 02.08.2026; США), «end» — короткая фраза в
 # конце (Китай: правила маркировки ИИ-контента с 01.09.2025 — до заключения юриста), «off».
@@ -312,12 +326,14 @@ def call_texts(call: dict, settings: dict) -> tuple[str, str, list[str]]:
 def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], companies: dict[str, dict],
           today: dt.date, workdays, fields: dict | None = None, settings: dict | None = None,
           arms: list[tuple[str, int]] | None = None,
-          deal_company: dict[str, str] | None = None) -> tuple[list[dict], Counter]:
+          deal_company: dict[str, str] | None = None,
+          countries: frozenset | None = СТРАНЫ_ПИЛОТА) -> tuple[list[dict], Counter]:
     """Звонки на сегодня и счётчики. contacts — {id: {name, phones:[…], company}};
     companies — {id: {name, phones:[…], dnc}}; deal_company — сделка → её компания (заказчик:
     поставщиком не бывает);
     settings — {our_company, agent_name}: есть — к звонку прикладываются готовые тексты агента;
-    arms — группы слепого сравнения (parse_arms): у звонка поле arm; «control» обработчик не набирает."""
+    arms — группы слепого сравнения (parse_arms): у звонка поле arm; «control» обработчик не набирает;
+    countries — страны пилота по номеру телефона (None — все)."""
     f = fields or {}
     arms = arms or parse_arms(ГРУППЫ_ПО_УМОЛЧАНИЮ)
     deal_company = deal_company or {}
@@ -375,6 +391,10 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
             st["нет годного телефона (компаний)"] += 1
             continue
         e164, country, tz = phone
+        if countries is not None and country not in countries:
+            st[f"вне пилота: страна {country or '??'}"] += 1
+            st["вне пилота (компаний)"] += 1
+            continue
         items.sort(key=lambda x: (x[1].get("out") or {}).get("t") or dt.datetime.max.replace(tzinfo=MSK))
         reqs = []
         for c, m, why, _ in items[:ПРАВИЛА["запросов_в_звонке"]]:
@@ -512,7 +532,10 @@ def main(argv=None) -> int:
                                "не собираются — нет CALL_OUR_COMPANY или CALL_AGENT_NAME"))
     arms = parse_arms(os.environ.get("CALL_ARMS", ""))
     print("группы сравнения: " + ", ".join(f"{n} {w}" for n, w in arms))
-    calls, st = build(cards, mails, contacts, companies, today, period.workdays_ru, fields, settings, arms, deal_company)
+    countries = parse_countries(os.environ.get("CALL_COUNTRIES", ""))
+    print("страны пилота: " + ("все" if countries is None else ", ".join(sorted(countries))))
+    calls, st = build(cards, mails, contacts, companies, today, period.workdays_ru, fields, settings, arms, deal_company,
+                      countries)
     # журнал — только счётчики, коды стран и пулов (правило 17)
     for k in sorted(st):
         print(f"  {k}: {st[k]}")
