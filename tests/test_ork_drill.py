@@ -125,8 +125,11 @@ def test_день_отсчёта_у_строки_как_у_пункта_очер
         rows = {r["k"]: r for r in _rows(v["ork"]["week"])}
         for r in rows.values():
             if r.get("wd") is not None:
+                # шаг 0 — «создана задача подтверждения», приёмка с закрытия задачи — «подтверждена
+                # передача» (решение владельца 31.10.2026)
                 assert re.fullmatch(r"с \d\d\.\d\d(\.\d{4})? \((вход в шаг|назначение|доставка|создан заказ|"
-                                    r"вход в реализацию)\)", r.get("since", "")), (name, r["k"], r.get("since"))
+                                    r"вход в реализацию|создана задача подтверждения|подтверждена передача)\)",
+                                    r.get("since", "")), (name, r["k"], r.get("since"))
             else:
                 assert "since" not in r, (name, r["k"])
         for q in v["life"]["queue"]:

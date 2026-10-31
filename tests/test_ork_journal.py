@@ -29,6 +29,7 @@ sys.modules.setdefault("dotenv", types.SimpleNamespace(load_dotenv=lambda *a, **
 
 import contracts as contracts_mod  # noqa: E402
 import ork  # noqa: E402
+import ork_confirm  # noqa: E402
 import orkview  # noqa: E402
 from tests import fixture  # noqa: E402
 
@@ -51,8 +52,10 @@ def _build(stub=None):
     orkview.build = spy
     try:
         stub = stub or fixture.ContractsStub()
+        # задачи подтверждения передачи — как build_contracts (шаг 0, решение владельца 31.10.2026)
+        tasks, stats = ork_confirm.load(stub)
         data = contracts_mod.compute(stub, as_of=fixture.CT_TODAY, people=fixture.CT_ROSTER,
-                                     departments=stub.departments())
+                                     departments=stub.departments(), confirm_tasks=tasks, confirm_stats=stats)
     finally:
         orkview.build = orig
         if old is None:

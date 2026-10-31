@@ -548,6 +548,27 @@ class BitrixClient:
             start = nxt
         return out
 
+    def tasks_list(self, filter: dict | None = None, select: Iterable[str] | None = None, *,
+                   max_pages: int = 10) -> list[dict]:
+        """Задачи tasks.task.list по фильтру: строки — result["tasks"] (у метода это словарь, не
+        список: list_paged не годится), страницы — по `next`, не больше max_pages. Через
+        call_envelope: общий темп портала, ожидание на 429/503, снимок и счётчик запросов —
+        как у всех вызовов. Ключи строк — как отдаёт портал (camelCase): разбор — у вызывающего."""
+        params = {"filter": dict(filter or {}), "select": list(select or ["ID"])}
+        out: list[dict] = []
+        start = 0
+        for _ in range(max(1, max_pages)):
+            params["start"] = start
+            data = self.call_envelope("tasks.task.list", params) or {}
+            res = data.get("result") or {}
+            rows = (res.get("tasks") if isinstance(res, dict) else res) or []
+            out.extend(r for r in rows if isinstance(r, dict))
+            nxt = data.get("next")
+            if not nxt or not rows:
+                break
+            start = nxt
+        return out
+
     def list_deals_fast(
         self,
         *,
