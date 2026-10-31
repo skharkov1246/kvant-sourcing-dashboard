@@ -523,4 +523,8 @@ if __name__ == "__main__":
         sys.exit(main())
     except Exception as e:                     # noqa: BLE001 — в публичный журнал только класс ошибки
         print(f"::error::сбой: {type(e).__name__}" + (f": {e}" if type(e) is RuntimeError else ""))
+        # где упало — только файл, строка и функция, без значений и текста ошибки (правило 17)
+        import traceback
+        for fr in traceback.extract_tb(e.__traceback__)[-6:]:
+            print(f"  в {Path(fr.filename).name}:{fr.lineno} {fr.name}")
         sys.exit(1)
