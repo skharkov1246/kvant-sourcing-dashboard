@@ -1,0 +1,84 @@
+{
+  "_comment": "Инструменты агента во время звонка (формат function calling: OpenAI Realtime, Retell, ElevenLabs). Каждый вызов уходит обработчику портала, тот пишет в Битрикс (алгоритм звонилки, п. 6). rfq_no — из списка запросов звонка.",
+  "tools": [
+    {
+      "name": "resend_rfq",
+      "description": "Re-send our request for quotation email to the supplier, optionally to a corrected address. Call it as soon as the supplier says they did not receive the email and confirms the address.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "rfq_no": {"type": "string", "description": "RFQ number from the list of requests on this call"},
+          "email": {"type": "string", "description": "Confirmed email address to send to; empty if the original address is correct"}
+        },
+        "required": ["rfq_no"]
+      }
+    },
+    {
+      "name": "remind_email",
+      "description": "Send a short reminder email about the request(s). Use after leaving a voicemail.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "rfq_no": {"type": "string", "description": "RFQ number, or 'all' for every request on this call"}
+        },
+        "required": ["rfq_no"]
+      }
+    },
+    {
+      "name": "add_contact",
+      "description": "Save the person who handles quotations at the supplier.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "email": {"type": "string"},
+          "phone": {"type": "string", "description": "With country code if given"},
+          "position": {"type": "string"}
+        },
+        "required": ["name"]
+      }
+    },
+    {
+      "name": "set_quote_date",
+      "description": "Record the date by which the supplier promised to send the quotation.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "rfq_no": {"type": "string", "description": "RFQ number, or 'all'"},
+          "date": {"type": "string", "description": "Promised date, YYYY-MM-DD"}
+        },
+        "required": ["rfq_no", "date"]
+      }
+    },
+    {
+      "name": "mark_declined",
+      "description": "The supplier cannot quote this request.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "rfq_no": {"type": "string"},
+          "reason": {"type": "string", "description": "Reason in the supplier's words, e.g. not our product, discontinued, cannot export"},
+          "alternative_supplier": {"type": "string", "description": "Who could supply it, if the supplier said"}
+        },
+        "required": ["rfq_no", "reason"]
+      }
+    },
+    {
+      "name": "escalate",
+      "description": "Pass a question the agent must not answer (price, technical, terms, project, end use) or a special situation to the responsible sourcing manager. The manager answers by email the same day.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "rfq_no": {"type": "string"},
+          "question": {"type": "string", "description": "The supplier's question or the situation, in English"}
+        },
+        "required": ["question"]
+      }
+    },
+    {
+      "name": "do_not_call",
+      "description": "The supplier asked not to be called again. Future contact by email only.",
+      "parameters": {"type": "object", "properties": {}, "required": []}
+    }
+  ]
+}

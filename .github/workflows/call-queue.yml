@@ -1,0 +1,59 @@
+name: Звонилка — очередь звонков поставщикам
+
+# Очередь молчащих запросов СП-166 для голосового агента (решения владельца 31.10.2026: звонит
+# только агент, на английском, со ссылкой на наше письмо). Скрипт scripts/call_queue.py читает
+# карточки, письма, контакты и компании и пишет очередь в закрытый ключ KV callq:v1 — только с
+# входом write. Без него — холостой прогон: в журнале счётчики (правило «сначала меряют»).
+#
+# Публичность: в журнал — только счётчики, коды стран и пулов номеров; ни названий, ни
+# телефонов, ни адресов. Расписания нет: включается вместе с обработчиком звонков, по решению
+# владельца (CLAUDE.md: планировщик — сначала спросить).
+on:
+  workflow_dispatch:
+    inputs:
+      write:
+        description: "Записать очередь в KV callq:v1 (иначе холостой прогон)"
+        type: boolean
+        default: false
+      parts:
+        # распоряжение 22.09.2026 о дроблении: письма карточек читаются столькими частями
+        description: "Число частей чтения писем"
+        type: choice
+        default: "10"
+        options: ["10", "25", "50"]
+
+permissions:
+  contents: read
+
+concurrency:
+  # общая очередь чтения портала (CLAUDE.md, «Битрикс не перегружать»)
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Очередь
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # наша компания и имя агента — переменные репозитория (Settings → Variables), не код
+          CALL_OUR_COMPANY: ${{ vars.CALL_OUR_COMPANY }}
+          CALL_AGENT_NAME: ${{ vars.CALL_AGENT_NAME }}
+          # поля карточки и компании, которые заводит админ Битрикса (алгоритм звонилки, шаг 2)
+          CALL_PROMISE_FIELD: ${{ vars.CALL_PROMISE_FIELD }}
+          CALL_ATTEMPTS_FIELD: ${{ vars.CALL_ATTEMPTS_FIELD }}
+          CALL_DNC_FIELD: ${{ vars.CALL_DNC_FIELD }}
+          PARTS: ${{ inputs.parts }}
+          BITRIX_RPS: "1.0"
+          BITRIX_PARALLEL: "1"
+        run: python scripts/call_queue.py ${{ inputs.write && '--write' || '' }}
