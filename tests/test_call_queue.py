@@ -335,3 +335,12 @@ def test_build_company_from_sender_and_split_by_sender():
     hk = next(c for c in calls if c["our_company"] == "Example HK Ltd")
     assert hk["agent_vars"]["our_company_intro"] == "Example HK Ltd" and "Dubai" not in hk["prompt"]
     assert "from Example HK Ltd, purchasing department" in hk["voicemail"]
+
+
+def test_owner_sender_table():
+    m, _ = q.sender_map([], None)
+    assert {d: v["name"] for d, v in m.items()} == {"anyrotary.com": "Anyrotary", "varkala.org": "Varkala",
+                                                    "kvantpro.com": "Kvant", "bravast.com": "Bravast", "steza.cn": "Steza"}
+    assert q.sender_of("Buyer <buy@anyrotary.com>", m)["name"] == "Anyrotary"
+    m2, _ = q.sender_map([{"TITLE": "Other Name", "EMAIL": [{"VALUE": "x@varkala.org"}]}], {"kvantpro.com": "Kvant Pro"})
+    assert m2["varkala.org"]["name"] == "Varkala" and m2["kvantpro.com"]["name"] == "Kvant Pro"   # таблица > Битрикс; секрет > всех

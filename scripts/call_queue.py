@@ -185,6 +185,18 @@ def email_meta(a: dict) -> dict:
             "from": str(meta.get("from") or "").strip(), "to": to.strip()}
 
 
+# Наши компании-отправители: домен почты → название, которое произносит агент (владелец, 31.10.2026:
+# «имя компании — та, от какой отправлялся запрос»; домены — по холостому прогону 41249254412, где
+# видно, с каких адресов уходят письма поставщикам). Новый домен — строка здесь или секрет
+# CALL_SENDER_COMPANIES; домена нет нигде — по его запросам не звоним.
+НАШИ_ОТПРАВИТЕЛИ: dict[str, dict] = {
+    "anyrotary.com": {"name": "Anyrotary", "city": ""},
+    "varkala.org": {"name": "Varkala", "city": ""},
+    "kvantpro.com": {"name": "Kvant", "city": ""},
+    "bravast.com": {"name": "Bravast", "city": ""},
+    "steza.cn": {"name": "Steza", "city": ""},
+}
+
 _EMAIL = re.compile(r"[A-Za-z0-9._%+'-]+@([A-Za-z0-9.-]+\.[A-Za-z]{2,})")
 _CYR = re.compile(r"[\u0400-\u04FF]")
 
@@ -205,8 +217,9 @@ def sender_map(my_companies: list[dict], override: dict | None = None) -> tuple[
     31.10.2026: «имя компании — та, от какой отправлялся запрос»).
     Источник 1 — компании Битрикса с признаком «Моя компания» (IS_MY_COMPANY): домены их почты и
     сайта; название — TITLE, если оно латиницей (агент говорит по-английски).
-    Источник 2 — закрытая настройка CALL_SENDER_COMPANIES (секрет): {"домен": "Название"} или
-    {"домен": {"name": …, "city": …}}; она главнее Битрикса. Домен, который ведёт к двум разным
+    Источник 2 — таблица НАШИ_ОТПРАВИТЕЛИ (решение владельца); главнее Битрикса.
+    Источник 3 — закрытая настройка CALL_SENDER_COMPANIES (секрет): {"домен": "Название"} или
+    {"домен": {"name": …, "city": …}}; главнее всех. Домен, который в Битриксе ведёт к двум разным
     названиям, отбрасывается: агент не должен угадывать."""
     st: Counter = Counter()
     seen: dict[str, set] = defaultdict(set)
@@ -227,6 +240,7 @@ def sender_map(my_companies: list[dict], override: dict | None = None) -> tuple[
         else:
             st["домен у нескольких наших компаний — отброшен"] += 1
     st["доменов из Битрикса"] = len(out)
+    out.update({d: dict(v) for d, v in НАШИ_ОТПРАВИТЕЛИ.items()})
     for d, v in (override or {}).items():
         dom = str(d or "").strip().lower().lstrip("@")
         val = v if isinstance(v, dict) else {"name": v}
