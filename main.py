@@ -38,6 +38,7 @@ import period as period_mod
 import presale as presale_mod
 import reps as reps_mod
 from bitrix_client import BitrixClient, chat_reader_client, drop_lost, без_вебхука
+import stages as stages_mod
 from stages import classify_stage
 
 RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
@@ -626,6 +627,19 @@ def run(args) -> int:
     print("• Отправлено vs создано (письма)…")
     m["send"] = _send_stats(_acts, rfqs, m["sourcersA"], dept_a_ids)
 
+    # КП по когортам недель: первый вход карточки в стадию КП (Price at Work, Selected, не выбран,
+    # прежняя «КП получено») по истории стадий — дней от заведения (определения зонда «не расценено
+    # через месяц», scripts/probe_unpriced.py). Фильтр STAGE_ID, с начала окна (≈ 1 запрос на 50 входов).
+    # Не прочитана — поля нет: на странице «—», а не «ноль КП»
+    _kp_first: dict[str, str] | None = None
+    try:
+        _kh = client.stage_history(166, since=p.start.isoformat(), stage_ids=stages_mod.kp_stage_ids())
+        _kp_first = {cid: min(t for _s, t in ent if t) for cid, ent in _kh.items() if any(t for _s, t in ent)}
+        print(f"• Когорты КП: карточек с входом в стадию КП с {p.start.isoformat()} — {len(_kp_first)}")
+        m["kpHist"] = True                                   # история прочитана: нет kpd у карточки — КП не было
+    except Exception as e:                                   # noqa: BLE001
+        print(f"  ⚠ история стадий КП не прочитана — когорты КП не считаются: {type(e).__name__}: {без_вебхука(e)}")
+
     # обогащаем детали каждого сорсера письмами (тема · получатель · превью · вложение)
     _by_card = m["send"].pop("byCard", {})
     _mail_cards = 0
@@ -633,6 +647,14 @@ def run(args) -> int:
         for d in s.get("details", []):
             mails = _by_card.get(str(d.get("id"))) or []
             d["mailN"] = len(mails)
+            if _kp_first is not None:
+                # kpd — дней от заведения до первого входа в стадию КП; входа нет — поля нет
+                _k = _kp_first.get(str(d.get("id")))
+                if _k and d.get("dt"):
+                    try:
+                        d["kpd"] = max(0, (dt.date.fromisoformat(_k[:10]) - dt.date.fromisoformat(str(d["dt"])[:10])).days)
+                    except ValueError:
+                        pass
             # регламент сорсера (v1.4): ответа нет — повторное письмо на 2-й раб. день, звонок на 3-й,
             # на 10-й — «Ответ не получен (в срок)». Рабочих дней от ПЕРВОГО письма (письма — новые
             # сверху) по день сборки; писем нет — от создания карточки (письмо ушло не из Битрикса)

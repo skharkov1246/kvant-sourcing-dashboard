@@ -1182,6 +1182,18 @@ def ps_tkp_history() -> dict:
             "8009": [("C32:READY", t(45))]}
 
 
+def kp_cohorts(m: dict) -> dict:
+    """КП по когортам недель (main.py кладёт kpd по истории стадий СП-166): карточкам на стадиях КП
+    — придуманные дни от заведения до первого входа в КП, 0–39 (часть позже 30 дней)."""
+    import stages
+    for s in m["sourcersA"]:
+        for d in s["details"]:
+            if d.get("st") in stages.KP_STAGES:
+                d["kpd"] = (int(d["id"]) * 7) % 40
+    m["kpHist"] = True
+    return m
+
+
 def build_presale(*, chat: bool = True, tkp: bool = False) -> dict:
     """Синтетика → настоящий presale.compute с общим читателем чатов и чтением чатов
     кандидатов «мяч у КАМа» (kamqueue.chat_wanted) — как main.py. tkp — сорсеры сделок, запросы с

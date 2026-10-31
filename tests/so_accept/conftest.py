@@ -33,7 +33,7 @@ def smoke(tmp_path_factory):
     import dashboard
     from tests import fixture
     out = tmp_path_factory.mktemp("so_accept") / "index.html"
-    m = fixture.build_metrics()
+    m = fixture.kp_cohorts(fixture.build_metrics())   # КП по когортам недель
     m["presale"] = fixture.build_presale(tkp=True)   # КП → ТКП по истории стадий (зонд v62)
     m["coverage"]["uncovered"] = UNCOVERED
     m["coverage"]["withoutReq"] = len(UNCOVERED)

@@ -113,7 +113,7 @@ def page(tmp_path_factory):
         pytest.skip("нет рабочего Chromium/Chrome — проверка страницы пропущена")
     import dashboard
     from tests import fixture
-    m = fixture.build_metrics()
+    m = fixture.kp_cohorts(fixture.build_metrics())   # КП по когортам недель
     m["presale"] = fixture.build_presale(tkp=True)   # КП → ТКП по истории стадий (зонд v62)
     m["coverage"]["uncovered"] = UNCOVERED
     m["coverage"]["withoutReq"] = len(UNCOVERED)
@@ -164,7 +164,7 @@ def test_число_открывает_ровно_свои_записи(page):
         # адрес — пока у ограничителя записей в историю есть место (40 за 10 с); число строк — всегда
         assert not c["room"] or (re.fullmatch(r"#sourcing/[a-z]+\?.*", c["hash"]) and c["hash"].endswith(want)), c
         # список-факт за числом таблицы («Куда дошли», «Письмо ушло») — без «Что сделать»
-        fact = c["key"].startswith(("stg:", "mail:", "st:", "ps:"))
+        fact = c["key"].startswith(("stg:", "mail:", "st:", "ps:", "kpc"))
         assert c["why"].startswith("Почему в списке.") and (fact or "Что сделать." in c["why"]), c["why"]
         for ln in c["links"]:
             assert ln and ln[1] == "_blank" and ln[2] == "noopener", c
