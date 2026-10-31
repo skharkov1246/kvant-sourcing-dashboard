@@ -78,6 +78,20 @@ OUT, IN = "2", "1"                         # DIRECTION дела: исходящ�
     **{c: "GB" for c in ("AE", "SA", "QA", "OM", "KW", "BH", "IN", "TR")},
 }
 ПУЛ_ПО_УМОЛЧАНИЮ = "GB"
+# Кому звоним (владелец, 31.10.2026: «Китай / Дубай / Юго-Восточная Азия»): страна — по номеру
+# телефона. Холостой прогон 31.10 показал, что без фильтра в очередь идут Россия (205 звонков),
+# Индия (196), ЕС и США — вне задачи пилота. Переменная CALL_COUNTRIES: список кодов через запятую
+# («CN,HK,AE») или «*» — все страны.
+СТРАНЫ_ПИЛОТА = frozenset(("CN", "HK", "MO", "TW", "AE", "SG", "MY", "TH", "VN", "ID", "PH", "KH", "MM", "LA", "BN"))
+
+
+def parse_countries(spec: str) -> frozenset | None:
+    """«CN,HK,AE» → набор; «*» → None (все страны); пусто или мусор → СТРАНЫ_ПИЛОТА."""
+    spec = str(spec or "").strip()
+    if spec == "*":
+        return None
+    got = frozenset(x.strip().upper() for x in spec.split(",") if re.fullmatch(r"[A-Za-z]{2}", x.strip()))
+    return got or СТРАНЫ_ПИЛОТА
 # Объявление об ИИ — по стране номера (решение владельца 31.10.2026: в начале не объявлять):
 # «start» — фраза в начале (ЕС: AI Act ст. 50 с 02.08.2026; США), «end» — короткая фраза в
 # конце (Китай: правила маркировки ИИ-контента с 01.09.2025 — до заключения юриста), «off».
@@ -204,6 +218,19 @@ def reason(card: dict, mail: dict | None, today: dt.date, workdays, promise_fiel
     return ""
 
 
+def num_id(v) -> str:
+    """Номер записи CRM → строка ASCII-цифр без ведущих нулей или «». Пустое поле, None, 0, «None»,
+    дробь, надстрочные цифры — «»: str(None) == «None» уже валил прогон (карточка без сделки)."""
+    if isinstance(v, bool):
+        return ""
+    if isinstance(v, int):
+        return str(v) if v > 0 else ""
+    s = str(v if v is not None else "").strip()
+    if not re.fullmatch(r"[0-9]{1,18}", s):
+        return ""
+    return str(int(s)) if int(s) > 0 else ""
+
+
 def crm_refs(val) -> tuple[list[str], list[str]]:
     """Значение crm-поля (['CO_5', 'C_7', 'CT_8', '9']) → (компании, контакты) в порядке поля;
     то же правило, что probe_deal_rfq.ссылки_crm и main._crm_ref_ids."""
@@ -217,10 +244,11 @@ def crm_refs(val) -> tuple[list[str], list[str]]:
             conts.append(s[3:])
         elif s.startswith("C_"):
             conts.append(s[2:])
-        elif s.isdigit():
+        else:
             comps.append(s)
-    ok = lambda v: v.isdigit() and v != "0"                                   # noqa: E731
-    return [c for c in dict.fromkeys(comps) if ok(c)], [c for c in dict.fromkeys(conts) if ok(c)]
+    comps = [num_id(c) for c in comps]
+    conts = [num_id(c) for c in conts]
+    return [c for c in dict.fromkeys(comps) if c], [c for c in dict.fromkeys(conts) if c]
 
 
 def supplier_of(card: dict, deal_company: str, contact_company: dict[str, str]) -> tuple[str, list[str]]:
@@ -230,15 +258,15 @@ def supplier_of(card: dict, deal_company: str, contact_company: dict[str, str]) 
     c1, t1 = crm_refs(card.get("ufCrm18Supplier"))
     c2, t2 = crm_refs(card.get("ufCrm18SupplContact"))
     conts = list(dict.fromkeys(t1 + t2))
-    comps = c1 + c2 + [contact_company.get(t, "") for t in conts] + [str(card.get("companyId") or "")]
-    comps = [c for c in dict.fromkeys(comps) if c and c != "0" and c != str(deal_company or "")]
+    comps = c1 + c2 + [num_id(contact_company.get(t)) for t in conts] + [num_id(card.get("companyId"))]
+    comps = [c for c in dict.fromkeys(comps) if c and c != num_id(deal_company)]
     return (comps[0] if comps else ""), conts
 
 
 def rfq_no(card: dict) -> str:
     """Номер запроса, как в теме письма: <сделка>-<карточка> (навык supplier-rfq)."""
-    d = str(card.get("parentId2") or "").strip()
-    return f"{d}-{card.get('id')}" if d and d != "0" else str(card.get("id"))
+    d = num_id(card.get("parentId2"))
+    return f"{d}-{card.get('id')}" if d else str(card.get("id"))
 
 
 МЕСЯЦЫ = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
@@ -298,12 +326,14 @@ def call_texts(call: dict, settings: dict) -> tuple[str, str, list[str]]:
 def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], companies: dict[str, dict],
           today: dt.date, workdays, fields: dict | None = None, settings: dict | None = None,
           arms: list[tuple[str, int]] | None = None,
-          deal_company: dict[str, str] | None = None) -> tuple[list[dict], Counter]:
+          deal_company: dict[str, str] | None = None,
+          countries: frozenset | None = СТРАНЫ_ПИЛОТА) -> tuple[list[dict], Counter]:
     """Звонки на сегодня и счётчики. contacts — {id: {name, phones:[…], company}};
     companies — {id: {name, phones:[…], dnc}}; deal_company — сделка → её компания (заказчик:
     поставщиком не бывает);
     settings — {our_company, agent_name}: есть — к звонку прикладываются готовые тексты агента;
-    arms — группы слепого сравнения (parse_arms): у звонка поле arm; «control» обработчик не набирает."""
+    arms — группы слепого сравнения (parse_arms): у звонка поле arm; «control» обработчик не набирает;
+    countries — страны пилота по номеру телефона (None — все)."""
     f = fields or {}
     arms = arms or parse_arms(ГРУППЫ_ПО_УМОЛЧАНИЮ)
     deal_company = deal_company or {}
@@ -320,14 +350,14 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
         if not why:
             st["нет нашего письма в CRM" if not (m and m.get("out")) else "срок не наступил"] += 1
             continue
-        if f.get("attempts") and int(c.get(f["attempts"]) or 0) >= ПРАВИЛА["попыток_макс"]:
+        if f.get("attempts") and int(num_id(c.get(f["attempts"])) or 0) >= ПРАВИЛА["попыток_макс"]:
             st["попыток исчерпано"] += 1
             continue
-        co, conts = supplier_of(c, deal_company.get(str(c.get("parentId2") or ""), ""), contact_company)
+        co, conts = supplier_of(c, deal_company.get(num_id(c.get("parentId2")), ""), contact_company)
         if not co and not conts:
             st["поставщик не указан"] += 1
             continue
-        if str(c.get("companyId") or "") not in ("", "0", co):
+        if num_id(c.get("companyId")) not in ("", co):
             st["компания карточки — не поставщик (взят из поля Supplier)"] += 1
         co = co or f"ct:{conts[0]}"
         if (companies.get(co) or {}).get("dnc"):
@@ -361,6 +391,10 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
             st["нет годного телефона (компаний)"] += 1
             continue
         e164, country, tz = phone
+        if countries is not None and country not in countries:
+            st[f"вне пилота: страна {country or '??'}"] += 1
+            st["вне пилота (компаний)"] += 1
+            continue
         items.sort(key=lambda x: (x[1].get("out") or {}).get("t") or dt.datetime.max.replace(tzinfo=MSK))
         reqs = []
         for c, m, why, _ in items[:ПРАВИЛА["запросов_в_звонке"]]:
@@ -459,7 +493,7 @@ def main(argv=None) -> int:
         c["_offer"] = bool(c.get(config.RFQ_OFFER_FIELD))
     print(f"карточек в работе за {ПРАВИЛА['возраст_дней']} дн.: {len(cards)}")
 
-    ids = sorted({str(c["id"]) for c in cards if not c["_offer"]}, key=int)
+    ids = sorted({num_id(c.get("id")) for c in cards if not c["_offer"]} - {""}, key=int)
     acts: list[dict] = []
     for part in _parts(ids, max(10, a.parts)):
         acts += read_by_ids(client, "crm.activity.list", "OWNER_ID", part,
@@ -475,17 +509,17 @@ def main(argv=None) -> int:
             cs, ts_ = crm_refs(c.get(fld))
             co_ids |= set(cs)
             ct_ids |= set(ts_)
-        if str(c.get("companyId") or "0") != "0":
-            co_ids.add(str(c.get("companyId")))
+        if num_id(c.get("companyId")):
+            co_ids.add(num_id(c.get("companyId")))
     contacts = {str(x["ID"]): {"name": " ".join(p for p in (x.get("NAME"), x.get("LAST_NAME")) if p).strip(),
-                               "phones": multifield(x.get("PHONE")), "company": str(x.get("COMPANY_ID") or "")}
+                               "phones": multifield(x.get("PHONE")), "company": num_id(x.get("COMPANY_ID"))}
                 for x in read_by_ids(client, "crm.contact.list", "@ID", sorted(ct_ids, key=int),
                                      ["ID", "NAME", "LAST_NAME", "PHONE", "COMPANY_ID"])}
-    co_ids |= {v["company"] for v in contacts.values() if v["company"].isdigit() and v["company"] != "0"}
+    co_ids |= {v["company"] for v in contacts.values() if v["company"]}
     co_ids = sorted(co_ids, key=int)
-    deal_ids = sorted({str(c.get("parentId2")) for c in live if str(c.get("parentId2") or "0").isdigit()
-                       and str(c.get("parentId2")) != "0"}, key=int)
-    deal_company = {d: str(x.get("COMPANY_ID") or "") for d, x in
+    deal_ids = sorted({num_id(c.get("parentId2")) for c in live} - {""}, key=int)
+    print(f"карточек без сделки: {sum(1 for c in live if not num_id(c.get('parentId2')))}")
+    deal_company = {d: num_id(x.get("COMPANY_ID")) for d, x in
                     client.deals_by_ids(deal_ids, select=["ID", "COMPANY_ID"]).items()}
     co_sel = ["ID", "TITLE", "PHONE"] + ([fields["dnc"]] if fields["dnc"] else [])
     companies = {str(x["ID"]): {"name": x.get("TITLE") or "", "phones": multifield(x.get("PHONE")),
@@ -498,7 +532,10 @@ def main(argv=None) -> int:
                                "не собираются — нет CALL_OUR_COMPANY или CALL_AGENT_NAME"))
     arms = parse_arms(os.environ.get("CALL_ARMS", ""))
     print("группы сравнения: " + ", ".join(f"{n} {w}" for n, w in arms))
-    calls, st = build(cards, mails, contacts, companies, today, period.workdays_ru, fields, settings, arms, deal_company)
+    countries = parse_countries(os.environ.get("CALL_COUNTRIES", ""))
+    print("страны пилота: " + ("все" if countries is None else ", ".join(sorted(countries))))
+    calls, st = build(cards, mails, contacts, companies, today, period.workdays_ru, fields, settings, arms, deal_company,
+                      countries)
     # журнал — только счётчики, коды стран и пулов (правило 17)
     for k in sorted(st):
         print(f"  {k}: {st[k]}")
@@ -523,4 +560,8 @@ if __name__ == "__main__":
         sys.exit(main())
     except Exception as e:                     # noqa: BLE001 — в публичный журнал только класс ошибки
         print(f"::error::сбой: {type(e).__name__}" + (f": {e}" if type(e) is RuntimeError else ""))
+        # где упало — только файл, строка и функция, без значений и текста ошибки (правило 17)
+        import traceback
+        for fr in traceback.extract_tb(e.__traceback__)[-6:]:
+            print(f"  в {Path(fr.filename).name}:{fr.lineno} {fr.name}")
         sys.exit(1)

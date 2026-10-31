@@ -1,0 +1,73 @@
+name: Звонилка — робот-оценщик разговоров
+
+# Решение владельца 31.10.2026: звонки оценивает робот, слепо; сравнение GPT-Realtime-2 и
+# ElevenLabs по сотне разговоров каждой (scripts/call_eval.py, рубрика callbot/eval/rubric.md).
+# Режим smoke — проверочный набор выдуманных разговоров с заранее известным ответом
+# (callbot/eval/smoke_calls.json): проверяет путь вызова API и то, что оценщик ловит нарушения.
+# Режим настоящих звонков появится с обработчиком звонилки (записи разговоров — закрытые).
+#
+# Публичность: в журнал — счётчики, доли и баллы групп; замечания оценщика — только в PDF,
+# который уходит ботом в личную переписку владельца (имя получателя — хешем).
+on:
+  workflow_dispatch:
+    inputs:
+      max_usd:
+        description: "Потолок расхода на оценку, $"
+        default: "2"
+      to_sha256:
+        description: "SHA-256 имени получателя PDF в Telegram (пусто — без отправки)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: call-eval
+  cancel-in-progress: false
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install -r requirements.txt pdfminer.six
+
+      - name: Оценка проверочного набора
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          MAX_USD: ${{ inputs.max_usd }}
+        run: |
+          mkdir -p /tmp/ce
+          python scripts/call_eval.py judge --smoke --records callbot/eval/smoke_calls.json \
+            --out /tmp/ce/scores.json --max-usd "$MAX_USD"
+
+      - name: Отчёт и PDF
+        if: always()
+        run: |
+          set -euo pipefail
+          [ -f /tmp/ce/scores.json ] || { echo "оценок нет — отчёта нет"; exit 0; }
+          python scripts/call_eval.py report --scores /tmp/ce/scores.json --html /tmp/ce/report.html
+          google-chrome --headless --disable-gpu --no-sandbox --no-pdf-header-footer \
+            --run-all-compositor-stages-before-draw --virtual-time-budget=60000 \
+            --print-to-pdf=/tmp/ce/report.pdf file:///tmp/ce/report.html > /dev/null 2>&1
+          python scripts/pdf_check.py /tmp/ce/report.pdf
+
+      - name: Отправка в Telegram
+        if: ${{ always() && inputs.to_sha256 != '' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TO_SHA256: ${{ inputs.to_sha256 }}
+        run: |
+          [ -f /tmp/ce/report.pdf ] || { echo "PDF нет — отправлять нечего"; exit 0; }
+          pip install psycopg2-binary==2.9.10 > /dev/null
+          python scripts/premia_telegram.py --to-sha256 "$TO_SHA256" --name "Звонилка_оценка" /tmp/ce/report.pdf
