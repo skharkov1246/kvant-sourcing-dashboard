@@ -121,6 +121,15 @@ def test_каждый_живой_заказ_путь_из_13_шагов(run):
                 assert f'<b class="op-num">{o["stepWd"]}</b> <abbr' in h
             if o["stepOver"]:
                 assert "дольше нормы на" in h and "op-stuck is-over" in h and "Где застрял" in h
+            # шаг 0 сверх 5 раб. дн. — подсвечен (stepPreOver), словами «передача не подтверждена», не «дольше нормы»
+            if o["step"] == 0 and o.get("stepPreOver"):
+                assert "передача в ОРК не подтверждена дольше" in t and "op-stuck is-over" in h, o["id"]
+                assert "op-bad\">дольше нормы на" not in h, o["id"]
+            # заказ, не переданный в ОРК (whoOut, решение владельца 31.10.2026, заказ 968/2): делает ответственный
+            # заказа, «не из ОРК — заказ не передан в ОРК», менеджера ОРК назначает рук. ОРК
+            if o.get("stepWhoOut"):
+                assert "(не из ОРК — заказ не передан в ОРК)" in t and "назначает менеджера ОРК: рук. ОРК" in t, o["id"]
+                assert not re.search(r"(?i)менеджер ОРК\s+" + re.escape(o["stepWho"].split(" (")[0]), t), o["id"]
             # пройденные шаги пути — с датами входа (строка шага — «дд.мм»)
             for st, day, _wd in o["path"][:-1]:
                 y, m, dd = day.split("-")

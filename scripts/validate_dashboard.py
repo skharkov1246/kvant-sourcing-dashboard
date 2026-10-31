@@ -147,6 +147,48 @@ def check_content(blobs: dict, errors: list[str], allow_empty: bool) -> None:
         errors.append("нет недельной разбивки (weekly) — метрики неполные")
 
 
+def check_step0(blobs: dict, errors: list[str]) -> None:
+    """Шаг 0 «Подтверждение передачи в ОРК» (решение владельца 31.10.2026) — по данным, без браузера, в
+    основном виде и в виде направления: строка 0 ведомости (now) = заказов шага 0 в строках «Недели» =
+    строке «до передачи в ОРК» «Кто сколько ведёт» = ключам w:step/0/now; «дольше 5 раб. дн.» (over) =
+    заказам с пунктом s0Over = ключам w:step/0/over; у строк шага 0 нет «дольше нормы» (Σ pulse.over = W2
+    остаётся); пункт s0Over — исполнителя задачи (confirmResp), в курсе КАМ; задачи не прочитаны
+    (nodata) — шага 0 нет ни у одного заказа и списков за ним пусто."""
+    C = blobs.get("__CONTRACTS__")
+    if not isinstance(C, dict):
+        return
+    for nm, V in (("основной вид", C), ("направление", C.get("sep") or {})):
+        W = ((V.get("ork") or {}).get("week")) or {}
+        L0 = next((s for s in W.get("ledger") or [] if s.get("no") == 0), None)
+        if L0 is None:
+            continue
+        orders = [o for o in W.get("orders") or [] if isinstance(o, dict)]
+        s0 = [o for o in orders if o.get("step") == 0]
+        pre = sum(r.get("n") or 0 for r in (W.get("pulse") or {}).get("rows") or [] if r.get("kind") == "pre")
+        D0 = ((W.get("drill") or {}).get("step") or {}).get("0") or {}
+        k_now = (D0.get("now") or {}).get("k") or []
+        k_over = (D0.get("over") or {}).get("k") or []
+        q0 = [q for q in (V.get("life") or {}).get("queue") or [] if q.get("code") == "s0Over" and q.get("order")]
+        tag = f"Реализация, шаг 0 ({nm})"
+        if L0.get("nodata"):
+            if s0 or k_now or k_over or q0 or pre:
+                errors.append(f"{tag}: задачи подтверждения не прочитаны, а шаг 0 есть — заказов {len(s0)}, "
+                              f"ключей {len(k_now)}, пунктов s0Over {len(q0)}")
+            continue
+        now, over = L0.get("now") or 0, L0.get("over") or 0
+        if not (now == len(s0) == pre == len(k_now)):
+            errors.append(f"{tag}: на шаге 0 — ведомость {now}, строк «Недели» {len(s0)}, «до передачи в ОРК» {pre}, "
+                          f"ключей w:step/0/now {len(k_now)}")
+        if not (over == len({str(q['order']) for q in q0}) == len(k_over)):
+            errors.append(f"{tag}: дольше 5 раб. дн. — ведомость {over}, заказов с пунктом s0Over "
+                          f"{len({str(q['order']) for q in q0})}, ключей w:step/0/over {len(k_over)}")
+        if any(o.get("over") for o in s0):
+            errors.append(f"{tag}: у заказа шага 0 «дольше нормы» — шаг 0 не срок ОРК (Σ «Кто сколько ведёт» ≠ W2)")
+        bad = [q for q in q0 if q.get("role") != "confirmResp" or q.get("copyRole") != "kam"]
+        if bad:
+            errors.append(f"{tag}: пункт s0Over не у исполнителя задачи с КАМом в курсе — {len(bad)}")
+
+
 def _chrome_run(chrome: str, path: Path, extra: list[str], timeout: int, headless: str = "--headless=new"):
     """Один прогон Chromium. Возвращает (dom, log); dom пуст, если браузер ничего не отдал."""
     # ignore_cleanup_errors: Chrome оставляет фоновые процессы, которые ещё пишут
@@ -452,6 +494,26 @@ def _with_tabs_opened(path: Path) -> Path:
               "if(!SH()||RW()!==n)kvFail('Реализация: «'+z[0]+'» '+id+' = '+n+', а в списке строк '+RW());XX()})});"
               "var MS3=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"main\"]');if(MS3)MS3.click()}}"
               "catch(e){kvFail('Реализация, плитки, «Пульс», смежники, гигиена, «Месяц» и «Квартал»: '+e)}"
+              # шаг 0 «Подтверждение передачи в ОРК» (решение владельца 31.10.2026): строка #wkPre над столбцами
+              # ведомости; с данными — её числа и счётчик шапки открывают ровно столько строк списка; задачи не
+              # прочитаны — «Нет данных», кнопок шага 0 на «Неделе» нет; в столбцах и итогах шагов 4–12 шага 0 нет
+              "try{var CX5=window.__CONTRACTS__,W5=CX5&&CX5.ork&&CX5.ork.week,"
+              "L5=W5&&(W5.ledger||[]).filter(function(s){return +s.no===0})[0],WK5=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"week\"]');"
+              "if(L5&&WK5){WK5.click();var PB=document.querySelector('#ctPanel-main #wkPre');"
+              "if(!PB)kvFail('Реализация: нет строки шага 0 (#wkPre) в ведомости «Недели»');"
+              "else if(L5.nodata){if(PB.textContent.indexOf('Нет данных')<0)kvFail('Реализация: шаг 0 без данных — в строке нет «Нет данных»');"
+              "if(document.querySelector('#ctPanel-main [data-od^=\"w:step/0/\"]'))kvFail('Реализация: шаг 0 без данных, а кнопки его списков есть')}"
+              "else{[['now',L5.now||0],['over',L5.over||0]].forEach(function(z){var b=PB.querySelector('button[data-od=\"w:step/0/'+z[0]+'\"]');"
+              "if(!z[1]){if(b)kvFail('Реализация: шаг 0 '+z[0]+' = 0, а кнопка есть');return}"
+              "if(!b){kvFail('Реализация: шаг 0 '+z[0]+' = '+z[1]+', а кнопки в #wkPre нет');return}"
+              "if(parseInt(b.textContent,10)!==z[1])kvFail('Реализация: шаг 0 '+z[0]+' — на кнопке '+b.textContent+', в ведомости '+z[1]);"
+              "b.click();var R5=document.querySelectorAll('#drwBody table.odt tbody tr[data-odk]').length;"
+              "if(R5!==z[1])kvFail('Реализация: шаг 0 '+z[0]+' = '+z[1]+', а в списке строк '+R5);"
+              "var X5=document.getElementById('drwX');if(X5)X5.click()})}"
+              "if(document.querySelector('#ctPanel-main #orkLed [data-od^=\"w:step/0/\"],#ctPanel-main .wkhists [data-od^=\"w:step/0/\"]'))"
+              "kvFail('Реализация: шаг 0 попал в столбцы или таблицу шагов 4–12');"
+              "var MS5=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"main\"]');if(MS5)MS5.click()}}"
+              "catch(e){kvFail('Реализация, шаг 0: '+e)}"
               # фишка «Без хозяина» «Сделок и денег» — то же число сделок, что счётчик «Недели»; отбор даёт
               # столько же строк таблицы сделок
               "try{var CX4=window.__CONTRACTS__,NO4=CX4&&CX4.ork&&CX4.ork.week&&CX4.ork.week.noOwner,"
@@ -523,6 +585,7 @@ def main() -> int:
     sizes: dict[str, int] = {}
     blobs = extract_data(html, errors, sizes)
     check_content(blobs, errors, a.allow_empty)
+    check_step0(blobs, errors)
     if not a.no_browser:
         check_browser(path, errors, warns, notes)
 
