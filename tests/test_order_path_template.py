@@ -101,13 +101,19 @@ def test_каждый_живой_заказ_путь_из_13_шагов(run):
                 assert "Заказ закрыт" in h and 'class="op-steps"' not in h
                 continue
             live += 1
-            assert h.count('<li class="op-s ') == 13, o["id"]
+            # шаг 0 «Подтверждение передачи в ОРК» (решение владельца 31.10.2026) — в пути, только если
+            # заказ на нём сейчас или был (путь с записью шага 0): тогда 14 шагов, иначе прежние 13
+            has0 = o["step"] == 0 or any(st == 0 for st, _day, _wd in o["path"])
+            assert h.count('<li class="op-s ') == (14 if has0 else 13), o["id"]
             cur = re.findall(r'<li class="op-s ([^"]*)" aria-current="step" data-ops="\d+"><button [^>]*><span class="op-dot" aria-hidden="true">(\d+)</span>', h)
             if o["step"] is None:
                 assert not cur and "неизвестна регламенту" in h and "сверить стадию заказа в Битриксе" in h
                 continue
             assert len(cur) == 1 and int(cur[0][1]) == o["step"] and "is-cur" in cur[0][0], o["id"]
-            assert f"Шаг {o['step']} из 13" in h
+            if o["step"] == 0:
+                assert "Шаг 0 · до передачи в ОРК" in h and "Шаг 0 из 13" not in h, o["id"]
+            else:
+                assert f"Шаг {o['step']} из 13" in h
             if o["stepWd"] is not None:
                 seg = h[h.index('aria-current="step"'):]
                 seg = seg[:seg.index("</li>")]
@@ -115,6 +121,15 @@ def test_каждый_живой_заказ_путь_из_13_шагов(run):
                 assert f'<b class="op-num">{o["stepWd"]}</b> <abbr' in h
             if o["stepOver"]:
                 assert "дольше нормы на" in h and "op-stuck is-over" in h and "Где застрял" in h
+            # шаг 0 сверх 5 раб. дн. — подсвечен (stepPreOver), словами «передача не подтверждена», не «дольше нормы»
+            if o["step"] == 0 and o.get("stepPreOver"):
+                assert "передача в ОРК не подтверждена дольше" in t and "op-stuck is-over" in h, o["id"]
+                assert "op-bad\">дольше нормы на" not in h, o["id"]
+            # заказ, не переданный в ОРК (whoOut, решение владельца 31.10.2026, заказ 968/2): делает ответственный
+            # заказа, «не из ОРК — заказ не передан в ОРК», менеджера ОРК назначает рук. ОРК
+            if o.get("stepWhoOut"):
+                assert "(не из ОРК — заказ не передан в ОРК)" in t and "рук. ОРК: принять заказ и назначить менеджера ОРК" in t, o["id"]
+                assert not re.search(r"(?i)менеджер ОРК\s+" + re.escape(o["stepWho"].split(" (")[0]), t), o["id"]
             # пройденные шаги пути — с датами входа (строка шага — «дд.мм»)
             for st, day, _wd in o["path"][:-1]:
                 y, m, dd = day.split("-")

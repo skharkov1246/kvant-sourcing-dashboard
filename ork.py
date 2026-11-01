@@ -29,6 +29,15 @@ assign_at. После назначения идёт шаг 4 «Подготов�
 Срок шага и откуда он меряется — clock: шаг 4 — от назначения, и после направления заказа
 («Заказ направлен» — тот же шаг 4), возврат — от повторного входа.
 
+Решение владельца 31.10.2026 (зонд v63): шаг 0 «Подтверждение передачи в ОРК» — задача Битрикса
+«Подтверждение готовности передачи…», привязанная к заказу (ork_confirm). Пока задача открыта, заказ
+в «Заказ создан» стоит на шаге 0 (PRE_STEP): хозяин — исполнитель задачи (confirmResp), КАМ в копии,
+норма 5 р.д.; это не приёмка ОРК и не «сверх нормы» ОРК: judged отдаёт preOver, а не over (как waitUtd
+у шага 12), пункт s0Over (PRE_CODE). Приёмка (шаг 1) начинается с закрытия задачи: t0 заказа =
+max(прежнее начало, закрытие задачи), прежнее — t0Raw. Стадия или факты выше шага 1 сильнее открытой
+задачи — шаг по ним, задача — замечание гигиены confirmOpen. Шаг 0 — первый в STEPS, а 0 ложно:
+проверять шаг только на None (tests/test_step_zero_guard.py).
+
 Пороги доверия (GATES) — предложение, ждут решения владельца.
 """
 from __future__ import annotations
@@ -47,19 +56,26 @@ ROLES = {
     "oss": "ОСС",
     "log": "логистика",
     "sup": "поставщик",
+    # шаг 0 (решение владельца 31.10.2026): исполнитель задачи Битрикса «Подтверждение готовности
+    # передачи…» — кто бы он ни был (из ОРК таких 3 из 22, зонд v63)
+    "confirmResp": "исполнитель задачи подтверждения передачи",
 }
 # смежники ОРК: пункт, где мяч у них, — «ждёт смежника», а не «сверх нормы» менеджера
 ADJACENT = ("kam", "oss", "log", "sup")
 OWNER_RULE = "step"          # хозяин пункта — исполнитель шага (решение владельца 26.10.2026, п. 1)
 NO_PAUSE = "без пауз"        # паузы срока менеджера в Битриксе не ведутся (W4 — нет данных)
 
-# --- 13 шагов регламента -----------------------------------------------------------------
+# --- 13 шагов регламента и шаг 0 до передачи в ОРК -----------------------------------------
 # no, name, role — исполнитель; also — кто ещё участвует; norm — норма шага в рабочих днях,
 # которую портал меряет (None — не меряет); seg — сегмент «Системы аналитики», который меряет
 # шаг; waits — смежник, от которого шаг зависит; esc — кому эскалирует исполнитель (в копии
 # пункта очереди). Норма по документу — NORM_DOC: регламент её задаёт, но портал её не
 # меряет («нет данных», шаг 6) — это не «не нормируется».
 STEPS = (
+    # шаг 0 — до передачи в ОРК (решение владельца 31.10.2026): задача подтверждения передачи
+    # открыта; не шаг ОРК — смежником (ADJACENT) не считается, в W2 и «сверх нормы» не идёт
+    {"no": 0, "name": "Подтверждение передачи в ОРК", "role": "confirmResp", "also": (), "norm": 5,
+     "seg": None, "waits": None, "esc": "kam"},
     {"no": 1, "name": "Приёмка сделки", "role": "orkHead", "also": (), "norm": 1, "seg": "S1",
      "waits": "kam", "esc": "kam"},
     {"no": 2, "name": "Подготовка и согласование договора с заказчиком", "role": "kam",
@@ -93,6 +109,7 @@ STEPS = (
 # регламент или решение владельца нормы не задают (2–3, 7, 9–11, 13: медиана и P80 или шаг
 # смежника)
 NORM_DOC = {
+    0: ("5 р.д.", "norm", ""),
     1: ("1 р.д.", "norm", ""), 2: ("", "none", ""), 3: ("", "none", ""), 4: ("2 р.д.", "norm", ""),
     5: ("≤ 9 р.д.", "norm", ""),
     6: ("1–2 р.д.", "nodata", "даты Order confirmation и оплаты поставщику в заказе"),
@@ -194,6 +211,20 @@ FACT_FLOOR = (
 # брошенная карточка, сегменты S1/S2): в fact_floor её нет, «стадия позади фактов» её не видит —
 # стадия при назначении не отстала
 ASSIGN_FLOOR = 4
+# шаг 0 (решение владельца 31.10.2026): задача подтверждения передачи открыта, стадия — шага 1
+PRE_STEP = 0
+
+
+def confirm_open(order: dict) -> bool:
+    """Задача подтверждения передачи заказа в ОРК открыта (ork_confirm, contracts: order["confirm"])."""
+    return bool((order.get("confirm") or {}).get("open"))
+
+
+def pre_open(order: dict) -> bool:
+    """Заказ на шаге 0 по задаче: задача подтверждения открыта, стадия — шага 1 и факты шаг не подняли
+    (как step_now). Стадия или факты дальше шага 1 при открытой задаче — не шаг 0 (решение владельца
+    31.10.2026, а: стадия сильнее, замечание confirmOpen): назначение и сегменты — как без задачи."""
+    return confirm_open(order) and bool(order.get("stage")) and step_of(order.get("stage"), order) == 1
 
 # --- сегменты S1–S10 «Системы аналитики» ----------------------------------------------------
 # начало и конец — первый выход заказа на шаг не ниже указанного (по всем переходам);
@@ -347,9 +378,10 @@ def step_of(stage_name, facts: dict | None = None, *, kind: str = "order",
 
 
 def _start_day(order: dict) -> dt.date | None:
-    """День начала приёмки по МСК: t0 (max(создание заказа, вход сделки в реализацию)), без него
-    — день создания заказа."""
-    return _d(order.get("t0")) or _d(order.get("created"))
+    """День начала заказа по МСК для сверки «Даты записи нового ответственного»: t0Raw
+    (max(создание заказа, вход сделки в реализацию), без закрытия задачи подтверждения — счёт
+    assign_stale и assign_no_mgr прежний), без него — t0, без него — день создания заказа."""
+    return _d(order.get("t0Raw") or order.get("t0")) or _d(order.get("created"))
 
 
 def assign_at(order: dict) -> dt.date | None:
@@ -359,9 +391,34 @@ def assign_at(order: dict) -> dt.date | None:
     — дата скопирована или устарела (assign_stale); ответственный не из ОРК — менеджер ОРК не
     назначен, приёмка не сделана (assign_no_mgr): не в счёт, оба — счётом. Дата позже конца окна
     отброшена при чтении (contracts: на конец окна назначения ещё не было). Дня начала нет —
-    None: сверить не с чем."""
+    None: сверить не с чем.
+
+    Шаг 0 (решение владельца 31.10.2026): пока заказ на шаге 0 (pre_open: задача подтверждения
+    открыта, стадия — шага 1) — None (приёмки ещё нет); стадия ушла дальше при открытой задаче —
+    назначение как без задачи (стадия сильнее, решение 31.10.2026, а); назначение раньше закрытия
+    задачи — с дня закрытия (max(дата, t0)): приёмка идёт с закрытия, раньше неё не кончается."""
+    if pre_open(order):
+        return None
     a, s = _d(order.get("assignDate")), _start_day(order)
-    return a if a and s and a >= s and order.get("orkMgr") else None
+    if not (a and s and a >= s and order.get("orkMgr")):
+        return None
+    t0 = _d(order.get("t0"))
+    return max(a, t0) if t0 else a
+
+
+def seg_assign(order: dict) -> dt.date | None:
+    """«Дата записи нового ответственного» для сегментов S1/S2 (segments, facts.assignAt): нет
+    даты, ответственный не из ОРК или заказ на шаге 0 (pre_open) — None; дата не раньше начала
+    заказа (t0Raw) — max(дата, t0): с закрытия задачи; раньше — сырая дата (segments сам пометит
+    её «раньше начала», assignIgnored). Без задачи — та же дата, что раньше."""
+    a = _d(order.get("assignDate"))
+    if a is None or not order.get("orkMgr") or pre_open(order):
+        return None
+    s = _start_day(order)
+    if s is not None and a >= s:
+        t0 = _d(order.get("t0"))
+        return max(a, t0) if t0 else a
+    return a
 
 
 def assign_stale(order: dict) -> bool:
@@ -389,10 +446,16 @@ def step_now(order: dict, *, unknown: Counter | None = None) -> int | None:
     Стадия шага 1 («Заказ создан»), факты шаг не подняли, а назначение менеджера ОРК записано
     (assign_at) — шаг 4 «Подготовка договора с поставщиком» (мягкая граница ASSIGN_FLOOR, вопрос
     владельца 29.10.2026): приёмка сделана, срок шага 4 — от назначения (clock), хозяин —
-    менеджер ОРК. Это не «стадия позади фактов»: до направления заказа стадия законно стоит."""
+    менеджер ОРК. Это не «стадия позади фактов»: до направления заказа стадия законно стоит.
+
+    Стадия шага 1, а задача подтверждения передачи открыта (confirm_open) — шаг 0 (PRE_STEP,
+    решение владельца 31.10.2026): заказ ещё не передан в ОРК. Стадия или факты выше шага 1
+    сильнее открытой задачи (замечание гигиены confirmOpen)."""
     if order.get("stage"):
         st = step_of(order.get("stage"), order)
-        if st == 1 and assign_at(order):
+        if st == 1 and confirm_open(order):
+            st = PRE_STEP
+        elif st == 1 and assign_at(order):
             st = ASSIGN_FLOOR
     else:
         st = fact_floor(order)
@@ -465,7 +528,7 @@ def reach_times(transitions: list, names: dict) -> dict[int, str]:
 
 
 def segments(transitions: list, names: dict, workdays_fn=period_mod.workdays_ru, *,
-             t0=None, facts: dict | None = None) -> dict:
+             t0=None, facts: dict | None = None, pre_open: bool = False) -> dict:
     """Переходы одного заказа [(STAGE_ID, CREATED_TIME), …] (все, с повторами, по времени)
     → сегменты S1–S10.
 
@@ -493,7 +556,10 @@ def segments(transitions: list, names: dict, workdays_fn=period_mod.workdays_ru,
     сегмент не «в норме за 0 р.д.»: в своевременность и сроки он не идёт, а считается отдельно.
     Назначение пропуск не отменяет: стадия прыгнула из «Заказ создан» сразу на шаг ≥ 5 — S2
     пропущен и при начале с назначения (startBy «назначение», wd — от него; в своевременность
-    S2 не идёт, как и без назначения), — тот же счёт пропусков, что у зонда v60 (по переходам)."""
+    S2 не идёт, как и без назначения), — тот же счёт пропусков, что у зонда v60 (по переходам).
+
+    pre_open — заказ на шаге 0 (задача подтверждения передачи открыта, решение владельца
+    31.10.2026): приёмка не начата — S1 не начат и открытым не считается."""
     tr = _sorted_tr(transitions)
     steps = [stage_step(names.get(s, s)) for s, _ in tr]
     unknown = sum(1 for x in steps if x is None)
@@ -510,7 +576,7 @@ def segments(transitions: list, names: dict, workdays_fn=period_mod.workdays_ru,
         prev = st
     reach = _reach(tr, steps)
     facts = facts or {}
-    point = {"t0": (_ts(t0), None) if t0 else reach.get(1, (None, None)),
+    point = {"t0": (None, None) if pre_open else (_ts(t0), None) if t0 else reach.get(1, (None, None)),
              "delFact": (_ts(facts.get("delFact")), None),
              "utdRaw": (_ts(facts.get("utdRaw")), None)}
     # назначение менеджера ОРК раньше выхода из «Заказ создан» (по дню МСК) — выход на шаги 2–4
@@ -606,6 +672,7 @@ def _first_stay(order: dict, step: int) -> bool:
 def clock(order: dict, step: int | None) -> tuple[dt.date | None, str]:
     """(день, от которого меряется срок шага живого заказа, чем он дан) — один у overrun,
     очереди («с дд.мм» у пункта), карточки заказа и брошенной карточки (hygiene):
+      шаг 0 — от создания открытой задачи подтверждения передачи («задача подтверждения»);
       шаг 12 — от факта доставки клиенту («доставка», Рег. 14.2.5);
       шаг 1 — от начала приёмки t0 («начало приёмки»), без t0 — от входа в шаг;
       шаг 4 — от назначения менеджера ОРК («назначение», assign_at; вопрос владельца
@@ -615,6 +682,8 @@ def clock(order: dict, step: int | None) -> tuple[dt.date | None, str]:
         повторного входа, в том числе возврат в «Заказ создан» после шагов ≥ 2 (по переходам
         _reach): от возврата, а назначение позже возврата — от него;
       иначе — от входа в шаг по стадии (stepSince, без него — stageSince; «вход в шаг»)."""
+    if step == PRE_STEP:
+        return _d((order.get("confirm") or {}).get("from")), "задача подтверждения"
     entry = _d(order.get("stepSince")) or _d(order.get("stageSince"))
     if step == 12:
         return _d(order.get("delFact")), "доставка"
@@ -648,7 +717,7 @@ def overrun(order: dict, today: dt.date, workdays_fn=None) -> dict:
     fn = workdays_fn or period_mod.workdays_ru
     step = step_now(order)
     doc = NORM_DOC.get(step, ("", "none", ""))
-    out = {"step": step, "role": EXECUTOR.get(step) if step else None, "norm": None, "wd": None,
+    out = {"step": step, "role": EXECUTOR.get(step) if step is not None else None, "norm": None, "wd": None,
            "normDoc": doc[0], "normState": doc[1],
            "over": None, "by": None, "since": "", "sinceBy": "", "label": NO_PAUSE, "why": ""}
     if step is None:
@@ -693,13 +762,18 @@ def judged(order: dict, today: dt.date, *, in_cat0: bool = True, workdays_fn=Non
     ставит по waitUtd; W2, ведомость (столбец «сверх нормы»), «Сверх нормы по менеджерам» и
     «Замедлено» — по over.
 
+    Шаг 0 (решение владельца 31.10.2026) — тоже не «сверх нормы» ОРК: дольше 5 р.д. — preOver
+    («передача в ОРК не подтверждена»), over — False. Пункт s0Over (PRE_CODE) очередь ставит по
+    preOver; «Замедлено» сделки его учитывает (contracts, решение 31.10.2026, г), W2, ведомость
+    (столбец «сверх нормы» шагов ОРК), «Сверх нормы по менеджерам» и Σ «Пульса» — нет.
+
     → overrun + {rawOver — over до отбора, hyg, hygWhy, counted — в счёте срока (over
     True/False), termUnknown — шаг с нормой в счёте, а срок не посчитать, waitUtd — ждём УПД от
-    клиента}."""
+    клиента, preOver — шаг 0 дольше нормы}."""
     ov = overrun(order, today, workdays_fn)
     hy = hygiene(order, today, workdays_fn)
     out = {**ov, "rawOver": ov["over"], "hyg": bool(hy["exclude"]), "hygWhy": hy["why"],
-           "counted": False, "termUnknown": False, "waitUtd": False}
+           "counted": False, "termUnknown": False, "waitUtd": False, "preOver": False}
     if ov["norm"] is None:
         return out
     if ov["step"] == 1 and not in_cat0:
@@ -715,6 +789,10 @@ def judged(order: dict, today: dt.date, *, in_cat0: bool = True, workdays_fn=Non
         # заказа остаются — сырой счёт overrun; «сверх нормы» читать только по over, ни по rawOver,
         # ни по by > 0 (решение владельца 27.10.2026, Б)
         out.update(over=False, waitUtd=True)
+    if ov["step"] in PRE_CODE and ov["over"]:
+        # передача в ОРК не подтверждена дольше нормы — работа исполнителя задачи, не ОРК: в
+        # «сверх нормы» ОРК не идёт (решение владельца 31.10.2026, п. 1)
+        out.update(over=False, preOver=True)
     return out
 
 
@@ -734,7 +812,9 @@ def path(order: dict, transitions: list, names: dict, today: dt.date, workdays_f
     STAGE_STEP; стадия не из таблицы шаг не меняет), не ниже датированных фактов (PATH_FACTS:
     отгрузка или приход на склад — 9, доставка клиенту — 11, УПД — 13), доставлено без УПД —
     шаг 12; стадия шага 1 после назначения менеджера ОРК (assign_at) — шаг 4 (ASSIGN_FLOOR:
-    приёмку закончило назначение). Соседние одинаковые шаги — одна запись; возврат — новая.
+    приёмку закончило назначение); стадия шага 1 в дни, когда задача подтверждения передачи была
+    открыта (confirm.spans, по дням МСК), — шаг 0. Соседние одинаковые шаги — одна запись; возврат
+    — новая.
 
     Последняя запись — текущий шаг заказа (step_now). У шага с нормой — с днём, от которого
     меряется его срок (clock), — тем же, что stepFrom и stepWd строки заказа: путь и строка
@@ -755,6 +835,12 @@ def path(order: dict, transitions: list, names: dict, today: dt.date, workdays_f
     asg_t = day(asg) if asg else None
     utd_t = next((t for t, _fl, k in facts if k == "utdRaw"), None)
     del_t = next((t for t, _fl, k in facts if k == "delFact"), None)
+    # дни, когда задача подтверждения передачи была открыта: [(с, по или None — открыта)]
+    spans = []
+    for a, b in ((order.get("confirm") or {}).get("spans") or []):
+        da, db = _d(a), _d(b)
+        if da is not None and da <= today:
+            spans.append((da, db if db is not None and db <= today else None))
 
     def at(t: dt.datetime) -> int | None:
         st = None
@@ -763,16 +849,20 @@ def path(order: dict, transitions: list, names: dict, today: dt.date, workdays_f
                 break
             if s is not None:
                 st = s
+        td = t.astimezone(msk).date()
+        if st == 1 and any(a <= td and (b is None or td < b) for a, b in spans):
+            st = PRE_STEP
         if st == 1 and asg_t is not None and asg_t <= t:
             st = ASSIGN_FLOOR
         fl = [f for tt, f, _k in facts if tt <= t]
         if fl:
-            st = max(st or 1, max(fl))
+            st = max(st if st is not None else 1, max(fl))
         if (st is None or st == 11) and del_t is not None and del_t <= t and not (utd_t and utd_t <= t):
             st = 12
         return st
 
-    times = sorted({t for t, _ in pts} | {t for t, _f, _k in facts} | ({asg_t} if asg_t else set()))
+    times = sorted({t for t, _ in pts} | {t for t, _f, _k in facts} | ({asg_t} if asg_t else set())
+                   | {day(d) for sp in spans for d in sp if d is not None})
     out: list[list] = []                                   # [шаг, день]
     for t in times:
         st = at(t)
@@ -857,7 +947,10 @@ def hygiene(order: dict, today: dt.date, workdays_fn=None) -> dict:
     — застой карточки от последнего движения стадии (stepSince), а не от назначения: срок шага 4
     (overrun) у направленного заказа идёт от назначения, но карточку, которую двигали 7 р.д.
     назад, брошенной не назовёшь.
-    → {behind, abandoned, old, unknown, exclude, why}."""
+    Шаг 0 (задача подтверждения передачи открыта) меряется от создания задачи (clock) при норме 5
+    р.д. — брошенной на нём не бывает. confirmOpen — задача открыта, а заказ по стадии или фактам
+    уже не на шаге 0 (решение владельца 31.10.2026, а): замечание, из счёта срока не исключает.
+    → {behind, abandoned, old, unknown, confirmOpen, exclude, why}."""
     fn = workdays_fn or period_mod.workdays_ru
     base = stage_step(order.get("stage"))
     floor = fact_floor(order)
@@ -870,9 +963,10 @@ def hygiene(order: dict, today: dt.date, workdays_fn=None) -> dict:
         why.append("стадия не из таблицы шагов")
     if behind:
         why.append(f"стадия — шаг {base}, по фактам — не ниже {floor}")
-    # шаг карточки — по стадии; при стадии шага 1 и назначении — шаг 4 (step_now)
-    eff = ASSIGN_FLOOR if (base == 1 and now == ASSIGN_FLOOR) else base
-    norm = NORM_WD.get(eff) if eff else None
+    # шаг карточки — по стадии; при стадии шага 1 и назначении — шаг 4, при открытой задаче
+    # подтверждения — шаг 0 (step_now)
+    eff = now if (base == 1 and now in (PRE_STEP, ASSIGN_FLOOR)) else base
+    norm = NORM_WD.get(eff) if eff is not None else None
     if norm is not None and norm <= GATES["abandoned_norm_max"] and not behind:
         # мягкая граница — от назначения (clock); шаг по стадии — от последнего движения стадии
         since = (clock(order, eff)[0] if eff != base else
@@ -892,10 +986,15 @@ def hygiene(order: dict, today: dt.date, workdays_fn=None) -> dict:
     if now == 12 and df and (today - df).days > CLOSE_DAYS:
         old = True
         why.append(f"старая доставка без УПД: {(today - df).days} дн. назад (> {CLOSE_DAYS})")
+    # задача подтверждения открыта, а стадия или факты увели заказ с шага 0 — замечание
+    confirm_left = confirm_open(order) and now != PRE_STEP
+    if confirm_left:
+        why.append("задача подтверждения передачи открыта, а заказ уже на шаге "
+                   + (str(now) if now is not None else "вне таблицы"))
     exclude = old or ((behind or abandoned) and now != 12)
     return {"behind": behind, "abandoned": abandoned, "old": old,
             "unknown": base is None and bool(order.get("stage")),
-            "exclude": exclude, "why": "; ".join(why)}
+            "confirmOpen": confirm_left, "exclude": exclude, "why": "; ".join(why)}
 
 
 # --- контракт показателя -------------------------------------------------------------------
@@ -943,14 +1042,22 @@ def metric_state(value, n: int | None, cover: float | None, gates: dict = GATES,
 _ESC_STEP = object()
 # роль → поля people, из которых берётся человек роли, по порядку (первое непустое). Одна таблица у
 # подписи (owner) и у id человека (role_id): «Смотреть как» (R4, Д-11а) отбирает пункты по id, и id
-# обязан быть id того же человека, чьё имя показано. Логистика и поставщик — подписи ролей, без id
-ROLE_KEYS = {"orkMgr": ("orkMgr", "dealOrk"), "orkHead": ("orkHead",), "kam": ("kam",),
-             "oss": ("ossOrder", "ossDeal"), "log": (), "sup": ()}
+# обязан быть id того же человека, чьё имя показано. Логистика и поставщик — подписи ролей, без id.
+# Менеджер ОРК: ответственный заказа из ОРК (orkMgr), иначе «Ответственный за реализацию» сделки
+# (dealOrk; руководитель ОРК в этом поле менеджером не считается — contracts, решение владельца
+# 31.10.2026), иначе ответственный заказа не из ОРК (resp): заказ не передан в ОРК, исполнитель шага
+# — он, с пометкой (owner: out), руководителю ОРК — принять заказ и назначить менеджера ОРК (OUT_ACT)
+ROLE_KEYS = {"orkMgr": ("orkMgr", "dealOrk", "resp"), "orkHead": ("orkHead",), "kam": ("kam",),
+             "oss": ("ossOrder", "ossDeal"), "log": (), "sup": (), "confirmResp": ("confirmResp",)}
+# исполнитель шага — ответственный заказа не из ОРК (решение владельца 31.10.2026, заказ 968/2)
+OUT_MARK = "не из ОРК — заказ не передан в ОРК"
+OUT_ACT = "принять заказ и назначить менеджера ОРК"
 
 
 def role_id(role: str | None, people: dict, ids: dict) -> str:
     """id Битрикса человека роли: id того поля people, чьё имя выбрал owner (ROLE_KEYS), иначе ''.
-    ids — те же ключи, что у people (orkMgr, dealOrk, orkHead, kam, ossOrder, ossDeal)."""
+    ids — те же ключи, что у people (orkMgr, dealOrk, resp, orkHead, kam, ossOrder, ossDeal,
+    confirmResp)."""
     for k in ROLE_KEYS.get(role or "", ()):
         if people.get(k) not in (None, "", "—"):
             v = ids.get(k)
@@ -959,14 +1066,25 @@ def role_id(role: str | None, people: dict, ids: dict) -> str:
 
 
 def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP,
-          role: str | None = None) -> dict:
+          role: str | None = None, pre: bool = False) -> dict:
     """Хозяин пункта очереди — исполнитель шага. people — уже найденные люди заказа и
     сделки: orkMgr (ответственный заказа, если он из отдела ОРК), dealOrk (поле сделки
-    «Ответственный за реализацию»), orkHead (руководитель отдела ОРК), kam, ossOrder,
-    ossDeal. Долг клиента (debt) — КАМ, ОСС в копии. esc — роль в копии для пункта со своей
-    эскалацией (по умолчанию — STEP[шаг]['esc']); role — роль хозяина, если пункт задаёт её
-    сам (ITEM), иначе исполнитель шага. → {role, who, copy, copyRole}; who — «не назначен»,
-    если человека роли нет (логистика — подпись роли)."""
+    «Ответственный за реализацию», не руководитель ОРК), resp (ответственный заказа не из ОРК),
+    orkHead (руководитель отдела ОРК), kam, ossOrder, ossDeal, confirmResp (исполнитель задачи
+    подтверждения передачи, шаг 0). Долг клиента (debt) — КАМ, ОСС в копии. esc — роль в копии
+    для пункта со своей эскалацией (по умолчанию — STEP[шаг]['esc']); role — роль хозяина, если
+    пункт задаёт её сам (ITEM), иначе исполнитель шага. → {role, who, copy, copyRole, out?}; who
+    — «не назначен», если человека роли нет (логистика — подпись роли).
+
+    out (решение владельца 31.10.2026, заказ 968/2): менеджера ОРК нет, исполнитель — ответственный
+    заказа не из ОРК (заказ не передан в ОРК, OUT_MARK); копии у пункта нет — в копии руководитель
+    ОРК (ему — OUT_ACT); у пункта своя копия — руководитель ОРК вторым в копии (alsoCopy,
+    alsoCopyRole).
+
+    pre — заказ на шаге 0 (PRE_STEP: задача подтверждения передачи открыта, решение владельца
+    31.10.2026, пп. 1–2): заказ ещё не в ОРК — пункт, который регламент отдаёт менеджеру ОРК (срок
+    клиента, производство, чат, договор поставщика), делает исполнитель задачи подтверждения, КАМ
+    сделки — в копии; «принять заказ и назначить менеджера ОРК» (out) до закрытия задачи не ставится."""
     def nm(*keys):
         for k in keys:
             v = people.get(k)
@@ -979,17 +1097,31 @@ def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP,
             "kam": lambda: nm(*ROLE_KEYS["kam"]),
             "oss": lambda: nm(*ROLE_KEYS["oss"]),
             "log": lambda: ROLES["log"],
-            "sup": lambda: ROLES["sup"]}
+            "sup": lambda: ROLES["sup"],
+            "confirmResp": lambda: nm(*ROLE_KEYS["confirmResp"])}
     if debt:
         role, copy_role = "kam", "oss"
     else:
-        role = role or (EXECUTOR.get(step) if step else "orkHead")
-        copy_role = (STEP[step]["esc"] if step else None) if esc is _ESC_STEP else esc
+        role = role or (EXECUTOR.get(step) if step is not None else "orkHead")
+        copy_role = (STEP[step]["esc"] if step is not None else None) if esc is _ESC_STEP else esc
+        if pre and role == "orkMgr":
+            role, copy_role = EXECUTOR[PRE_STEP], STEP[PRE_STEP]["esc"]
         if copy_role == role:
             copy_role = None
     who = find[role]() or "не назначен"
+    # менеджера ОРК нет ни у заказа, ни у сделки — исполнитель ответственный заказа не из ОРК
+    out = not pre and role == "orkMgr" and not nm("orkMgr", "dealOrk") and bool(nm("resp"))
+    if out and not copy_role:
+        copy_role = "orkHead"
     copy = (find[copy_role]() or "не назначен") if copy_role else ""
-    return {"role": role, "who": who, "copy": copy, "copyRole": copy_role or ""}
+    res = {"role": role, "who": who, "copy": copy, "copyRole": copy_role or ""}
+    if out:
+        res["out"] = True
+        # у пункта своя копия (КАМ: срок клиента, производство) — руководитель ОРК вторым в копии:
+        # ему — OUT_ACT, и «Смотреть как» руководителя ОРК пункт не теряет
+        if copy_role != "orkHead":
+            res["alsoCopy"], res["alsoCopyRole"] = find["orkHead"](), "orkHead"
+    return res
 
 
 # --- пункт очереди → шаг, хозяин и копия (решение 26.10.2026, п. 1; правило 4) -------------
@@ -1017,6 +1149,12 @@ ITEM = {
     # «назначить менеджера ОРК на новый заказ» у руководителя ОРК, без КАМа (не разговор с клиентом)
     "s1Over": (1, "orkHead", "kam"),
     "ordAssign": (1, "orkHead", None),
+    # шаг 0 (решение владельца 31.10.2026): передача в ОРК не подтверждена дольше 5 р.д. — хозяин
+    # исполнитель задачи подтверждения, КАМ сделки в копии; задача открыта, а заказ уже дальше шага
+    # 0 по стадии или фактам — порядок в карточке: закрыть задачу (исполнитель), руководитель ОРК в
+    # копии (стадию двигает ОРК)
+    "s0Over": (0, "confirmResp", "kam"),
+    "confirmOpen": (None, "confirmResp", "orkHead"),
     "s2Over": (4, "orkMgr", "orkHead"),
     "s3Over": (5, "orkMgr", "orkHead"),
     "s6Over": (8, "orkMgr", "orkHead"),
@@ -1069,9 +1207,14 @@ OVER_CODE = {1: "s1Over", 4: "s2Over", 5: "s3Over", 8: "s6Over"}
 # «сверх нормы» менеджера (W2, по менеджерам, ведомость, «Замедлено») он не идёт
 WAIT_CODE = {12: "noUtd"}
 WAIT_UTD = "ждём УПД от клиента"
+# срок шага до передачи в ОРК → код пункта (решение владельца 31.10.2026): шаг 0 дольше 5 р.д. —
+# передача не подтверждена (judged.preOver); не «сверх нормы» ОРК: OVER_CODE и STEP_CODES (W2,
+# «Сверх нормы по менеджерам», noCalendar, lifecycle.over_norm) его не знают
+PRE_CODE = {0: "s0Over"}
+PRE_WHAT = "передача в ОРК не подтверждена"
 # все сроки шагов регламента в р.д. → код пункта очереди (inWd у пункта). Шаг 1 — ПЕРВАЯ приёмка
 # сделки (s1Over, пункт сделки: решение владельца 30.10.2026, п. 1)
-TERM_CODE = {**OVER_CODE, **WAIT_CODE}
+TERM_CODE = {**OVER_CODE, **WAIT_CODE, **PRE_CODE}
 # тот же срок шага 1 у заказа, добавленного в уже принятую сделку: назначить менеджера ОРК на
 # новый заказ (код → шаг). Дни — рабочие, как у TERM_CODE
 TERM_EXTRA = {"ordAssign": 1}
@@ -1085,11 +1228,12 @@ STEP_CODES = {st: (code, *(c for c, s in TERM_EXTRA.items() if s == st)) for st,
 def item_owner(code: str, step_now: int | None, people: dict, *, key: str | None = None) -> dict:
     """Хозяин пункта очереди по таблице ITEM: {step, role, who, copy, copyRole}. key —
     строка ITEM с уточнением (вид срока из чата, сторона договора), нет её — по коду. Код не
-    из таблицы — исполнитель текущего шага и его эскалация."""
+    из таблицы — исполнитель текущего шага и его эскалация. step_now — шаг заказа сейчас: шаг 0
+    — пункт менеджера ОРК у исполнителя задачи подтверждения (owner: pre)."""
     k = key if key in ITEM else code
     st, role, copy = ITEM.get(k, (None, None, _ESC_STEP))
     step = st if st is not None else step_now
-    out = owner(step, people, role=role, esc=copy if k in ITEM else _ESC_STEP)
+    out = owner(step, people, role=role, esc=copy if k in ITEM else _ESC_STEP, pre=step_now == PRE_STEP)
     return {"step": step, **out}
 
 

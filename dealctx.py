@@ -676,10 +676,20 @@ def _reg(code: str, r: dict, ppl: dict, key: str | None = None, order: dict | No
     регламент даёт пункт менеджеру ОРК (чаты, договор поставщика), хозяин — руководитель ОРК, а
     менеджеры заказов сделки — в копии списком («менеджеры заказов: …»); шаг — шаг сделки."""
     if order is not None:
-        pp = {**ppl, "orkMgr": _nm(order.get("orkMgr")), "ossOrder": _nm(order.get("oss"))}
+        # исполнитель задачи подтверждения передачи — хозяин шага 0 (решение владельца 31.10.2026);
+        # resp — ответственный заказа не из ОРК при пустом менеджере ОРК (respOut строки заказа: заказ
+        # не передан в ОРК, решение 31.10.2026, заказ 968/2): исполнитель — он (whoOut), руководителю
+        # ОРК — outAct
+        pp = {**ppl, "orkMgr": _nm(order.get("orkMgr")), "ossOrder": _nm(order.get("oss")),
+              "confirmResp": _nm(order.get("confirmWho")), "resp": _nm(order.get("respOut"))}
         ow = ork.item_owner(code, order.get("step"), pp, key=key)
-        return {"step": order.get("step"), "role": ow["role"], "roleName": ork.ROLES.get(ow["role"], ""),
-                "who": ow["who"], "escalateTo": ow["copy"], "copyRole": ow["copyRole"]}
+        res = {"step": order.get("step"), "role": ow["role"], "roleName": ork.ROLES.get(ow["role"], ""),
+               "who": ow["who"], "escalateTo": ow["copy"], "copyRole": ow["copyRole"]}
+        if ow.get("out"):
+            res.update(whoOut=True, outAct=ork.OUT_ACT)
+            if ow.get("alsoCopyRole"):
+                res.update(alsoCopy=ow["alsoCopy"], alsoCopyRole=ow["alsoCopyRole"])
+        return res
     st = _step_now(r)
     ow = ork.item_owner(code, st, ppl, key=key)
     role, who, copy, copy_role = ow["role"], ow["who"], ow["copy"], ow["copyRole"]
@@ -763,6 +773,7 @@ def person_ids(queue: list[dict], life_queue: list[dict], rows: list[dict]) -> N
         put(q.get("who"), q.get("whoId"))
         put(q.get("escalateTo"), q.get("escalateToId"))
         put(q.get("kam"), q.get("kamId"))
+        put(q.get("alsoCopy"), q.get("alsoCopyId"))
     for r in rows:
         put(r.get("kam"), r.get("kamId"))
     for q in queue:
@@ -770,6 +781,10 @@ def person_ids(queue: list[dict], life_queue: list[dict], rows: list[dict]) -> N
             q["whoId"] = ids[_nm(q.get("who"))]
         if q.get("escalateTo") and not _nm(q.get("escalateToId")) and ids.get(_nm(q.get("escalateTo"))):
             q["escalateToId"] = ids[_nm(q.get("escalateTo"))]
+        # ответственный заказа не из ОРК (whoOut): руководитель ОРК — вторым в копии (alsoCopy), как
+        # у пункта очереди (lifecycle.item: alsoCopyId) — «Смотреть как» руководителя ОРК его видит
+        if q.get("whoOut") and q.get("alsoCopy") and not _nm(q.get("alsoCopyId")) and ids.get(_nm(q.get("alsoCopy"))):
+            q["alsoCopyId"] = ids[_nm(q.get("alsoCopy"))]
 
 
 def _unit_payload(queue: list[dict], prefix: str) -> dict:

@@ -185,7 +185,9 @@ def js(ct):
            "parse": ["#contracts/week", "#contracts/sep", "#contracts/main/sep?d=950&o=7120",
                      "#contracts/week?n=w%3AW3&o=7001&s=5", "#contracts/month?n=m%3A9.S1&o=7003&s=1",
                      "#contracts/week?n=w%3AW3&f=tag.late&k=31", "#contracts/week?o=Иван&d=950x&s=14&k=a1",
-                     "#contracts/nope", "#reps/kam", "#contracts/how/"],
+                     "#contracts/nope", "#reps/kam", "#contracts/how/",
+                     # шаг 0 «Подтверждение передачи в ОРК» (решение владельца 31.10.2026) — допустим
+                     "#contracts/week?n=w%3Astep%2F0%2Fnow&o=7060&s=0"],
            "href": [{"sub": "week", "n": "w:W3", "f": "part.late,cause.our", "o": "7001", "s": "5"},
                     {"sub": "main", "sep": True, "d": "973"}, {"sub": "quarter"}],
            "days": [["late", 35, {}], ["risk", 0, {}], ["risk", 4, {}], ["forecast", 20, {}], ["planAfterDl", 3, {}],
@@ -206,8 +208,9 @@ def test_адрес_разбор(js):
     assert (P[3]["n"], P[3]["o"], P[3]["s"]) == ("w:W3", "7001", "5")
     assert (P[4]["sub"], P[4]["n"], P[4]["s"]) == ("month", "m:9.S1", "1")
     assert (P[5]["f"], P[5]["k"]) == ("tag.late", "31")
-    # имена и мусор в адресе не проходят: d, o, k — только цифры, s — 1–13
+    # имена и мусор в адресе не проходят: d, o, k — только цифры, s — 0–13 (s=14 — нет)
     assert (P[6]["o"], P[6]["d"], P[6]["s"], P[6]["k"]) == ("", "", "", "")
+    assert (P[10]["n"], P[10]["o"], P[10]["s"]) == ("w:step/0/now", "7060", "0")
     assert P[7]["sub"] == "week" and P[8]["sub"] == "week" and P[9]["sub"] == "how"
 
 

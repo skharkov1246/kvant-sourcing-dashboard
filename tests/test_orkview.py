@@ -22,6 +22,7 @@ sys.modules.setdefault("dotenv", types.SimpleNamespace(load_dotenv=lambda *a, **
 import contracts as contracts_mod  # noqa: E402
 import lifecycle  # noqa: E402
 import ork  # noqa: E402
+import ork_confirm  # noqa: E402
 import orkview  # noqa: E402
 from tests import fixture  # noqa: E402
 
@@ -46,6 +47,8 @@ def _orders(stub=None, **kw) -> tuple[dict, list[dict]]:
     orkview.build = spy
     try:
         stub = stub or fixture.ContractsStub()
+        if "confirm_tasks" not in kw:      # задачи подтверждения передачи — как build_contracts (шаг 0)
+            kw["confirm_tasks"], kw["confirm_stats"] = ork_confirm.load(stub)
         data = contracts_mod.compute(stub, as_of=СЕГОДНЯ, people=fixture.CT_ROSTER,
                                      departments=stub.departments(), **kw)
     finally:
@@ -90,7 +93,9 @@ def test_неделя_все_блоки_с_данными(ct):
     assert t["W1"]["noOrder"] == c.get("noOrder", 0) >= 1
     assert t["W3"]["by"]["late"] == c["late"] and t["W3"]["label"] == "результат поставщика и логистики"
     led = {r["no"]: r for r in w["ledger"]}
-    assert len(led) == 13 and led[5]["roleName"] == "менеджер ОРК" and led[1]["roleName"] == "руководитель ОРК"
+    # 13 шагов регламента и строка 0 «Подтверждение передачи в ОРК» (решение владельца 31.10.2026)
+    assert len(led) == 14 and led[5]["roleName"] == "менеджер ОРК" and led[1]["roleName"] == "руководитель ОРК"
+    assert led[0]["role"] == "confirmResp" and led[0]["unit"] == "order" and led[0]["norm"] == 5
     assert led[7]["over"] is None and led[7]["waits"] == "sup", "производство не нормируется — ждём поставщика"
     assert led[5]["artReq"] >= led[5]["artMiss"] > 0
     assert w["adjacent"]["log"]["orders"] > 0 and w["overByWho"] and w["risk"]

@@ -176,7 +176,7 @@ def test_contracts_rows_tail_invariant():
                 if st is None:                     # «стадия вне регламента» — только последней записью
                     assert i == len(p) - 1 and o["step"] is None, o["id"]
                     continue
-                assert isinstance(st, int) and 1 <= st <= 13
+                assert isinstance(st, int) and 0 <= st <= 13       # шаг 0 — до передачи в ОРК
                 dt.date.fromisoformat(day)
                 assert wd is None or isinstance(wd, int)
             assert [x[1] for x in p] == sorted(x[1] for x in p)          # по времени

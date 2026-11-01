@@ -158,7 +158,8 @@ def test_ждём_упд_от_клиента_отдельно_от_сверх_н
     ct = copy.deepcopy(built["contracts"])
     w = ct["ork"]["week"]
     n = w["waitUtd"]["n"]
-    assert n > 0 and w["ledger"][11]["no"] == 12 and w["ledger"][11]["waitUtd"] == n
+    led12 = next(r for r in w["ledger"] if r["no"] == 12)        # строки — по номеру шага (шаг 0 первым)
+    assert n > 0 and led12["waitUtd"] == n
     out = _plain(_render({"main": ct}, built["ork_month"])["main"]["week"])
     led = out[out.index('id="orkLed"'):]
     row12 = led[led.index('<span class="wkstn">12</span>'):]
