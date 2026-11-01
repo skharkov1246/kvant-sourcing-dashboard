@@ -28,6 +28,7 @@ import datetime as dt
 import re
 from collections import Counter, defaultdict
 
+import handover
 import lifecycle
 import ork
 import period as period_mod
@@ -269,9 +270,11 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     wait_unknown = sum(1 for o in L if step[o["id"]] in ork.WAIT_CODE and ov[o["id"]]["termUnknown"])
 
     def not_counted(o) -> bool:
-        """Шаг с нормой, а срок не в счёте: гигиена карточки или приёмка вне «Реализации»."""
+        """Шаг с нормой, а срок не в счёте: гигиена карточки или приёмка вне «Реализации». Заказ,
+        ждущий подтверждения готовности (handover, waitHo), — не «не в счёте»: приёмка не началась,
+        у него свой счёт (ledger[1].waitHo, week.handover)."""
         v = ov[o["id"]]
-        return v["norm"] is not None and not v["counted"] and not v["termUnknown"]
+        return v["norm"] is not None and not v["counted"] and not v["termUnknown"] and not v.get("waitHo")
     reach_of = {o["id"]: o.get("_reach") or {} for o in orders}
     # «Квартал» — раньше недели: P80 производства (S5) по ВСЕМ заказам — порог сигнала шага 7
     quarter = _quarter_view(measure, today)
@@ -286,12 +289,14 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
         d = dl_by.get(did) or {}
         known = bool(d.get("cat0At")) and period_mod.workdays_ru(_d(d["cat0At"]), today) is not None
         c = d.get("stepCell") or {}
-        d1[did] = {"counted": known, "unk": not known, "nc": False, "over": did in acc_q,
+        d1[did] = {"counted": known, "unk": not known, "nc": False, "ho": False, "over": did in acc_q,
                    "wd": c.get("wd") if known else None}
     for did, os1 in s1_of.items():
         cnt = any(ov[o["id"]]["counted"] for o in os1)
         tu = not cnt and any(ov[o["id"]]["termUnknown"] for o in os1)
-        d1[did] = {"counted": cnt, "unk": tu, "nc": not cnt and not tu,
+        # все заказы приёмки сделки ждут подтверждения готовности (handover): приёмка не началась
+        ho = not cnt and not tu and bool(os1) and all(ov[o["id"]].get("waitHo") for o in os1)
+        d1[did] = {"counted": cnt, "unk": tu, "nc": not cnt and not tu and not ho, "ho": ho,
                    "over": any(o["id"] in over_ids[1] for o in os1),
                    "wd": max((ov[o["id"]]["wd"] for o in os1 if ov[o["id"]]["counted"]
                               and ov[o["id"]]["wd"] is not None), default=None)}
@@ -329,6 +334,10 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                            "over": sum(1 for x in row1 if x["over"]) if normed else None,
                            "ordersOver": len(over_ids[1]) if no == 1 else None,
                            "waitUtd": None,
+                           # приёмка не началась: ждём подтверждения готовности к передаче в ОРК
+                           # (handover) — сделок и заказов; не «сверх нормы» и не «не в счёте»
+                           "waitHo": sum(1 for x in row1 if x.get("ho")) if no == 1 else None,
+                           "ordersWaitHo": sum(1 for o in here if ov[o["id"]].get("waitHo")) if no == 1 else None,
                            "overUnknown": sum(1 for x in row1 if x["unk"]) if normed else None,
                            "notCounted": sum(1 for x in row1 if x["nc"]) if normed else None,
                            "artReq": req, "artMiss": miss, "artOrders": len(miss_o), "artUnit": "file",
@@ -416,7 +425,9 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                        "units": {"value": "deal", "n": "deal", "accept": "deal", "noOrder": "deal",
                                  "byAssign": "deal", "excluded": "deal", "assignStale": "order",
                                  "assignNoMgr": "order"},
-                       "excluded": sum(1 for x in deals_at[1] if d1[x]["nc"])})
+                       "excluded": sum(1 for x in deals_at[1] if d1[x]["nc"]),
+                       # сделки, чья приёмка не началась: ждём подтверждения готовности (handover)
+                       "waitHo": sum(1 for x in deals_at[1] if d1[x].get("ho"))})
     W1o = _count(len(w1o_over), w1o_n, (sum(1 for o in o1_pop if ov[o["id"]]["counted"]) / w1o_n)
                  if w1o_n else None, src="s1Over (ordAssign) у принятой сделки", unknown=len(o1_unk),
                  extra={"unit": "order", "label": ork.NO_PAUSE,
@@ -606,6 +617,13 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
             # (решение владельца 27.10.2026, Б); пункт noUtd — у менеджера ОРК, КАМ в копии
             "waitUtd": {"n": wait_n, "unknown": wait_unknown, "label": ork.WAIT_UTD, "src": "noUtd",
                         "norm": ork.NORM_WD[12], "unit": "order"},
+            # подтверждение готовности к передаче в ОРК (handover, владелец 01.11.2026): заказы на
+            # шаге 1, чья задача открыта, — приёмка не началась; из них срок задачи прошёл (пункт
+            # hoOver у исполнителя задачи); read — прочитаны ли задачи (contracts ставит состояние)
+            "handover": {"n": sum(1 for o in L if ov[o["id"]].get("waitHo")),
+                         "overdue": sum(1 for o in L if ov[o["id"]].get("waitHo") and ov[o["id"]].get("hoOverdue")),
+                         "deals": sum(1 for x in deals_at[1] if d1[x].get("ho")),
+                         "label": handover.WAIT, "src": "hoOver", "unit": "order", "read": ""},
             # n — заказы, remarks — замечания (пары «заказ × вид»): «N заказов, K замечаний» (E26)
             "hygiene": {"n": len(hyg_items), "unit": "order", "remarks": sum(len(x["kinds"]) for x in hyg_items),
                         "by": dict(hc), "excluded": hyg_excl, "byExcl": dict(hc_excl),
@@ -1130,12 +1148,15 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
             "без заказа > 1 р.д. от входа в реализацию или с живыми заказами только в «Заказ создан», из которых хоть "
             "один без назначения менеджера ОРК с р.д.(t0, сегодня) > 1; заказ на шаге 1 у сделки, где другой заказ "
             "ушёл дальше или исполнен, — не приёмка, а назначение менеджера ОРК на новый заказ (W1o, в заказах); "
-            "t0 = max(создание заказа, вход сделки в реализацию); приёмка кончается "
+            "t0 = max(создание заказа, вход сделки в реализацию, закрытие задачи «Подтверждение готовности передачи "
+            "поставщика в ОРК»); пока эта задача открыта, приёмка не началась — заказ «ждёт подтверждения готовности», "
+            "срок руководителя ОРК не идёт, хозяин — исполнитель задачи, её крайний срок прошёл — пункт hoOver (шага нет "
+            "в регламенте ОРК, владелец 01.11.2026); приёмка кончается "
             "раньше из двух: выход из «Заказ создан» по стадии или «Дата записи нового ответственного» (не раньше "
             "дня t0 и ответственный заказа из отдела ОРК, иначе не в счёте) — после назначения заказ на шаге 4, срок "
             "договора с поставщиком (2 р.д.) — от назначения; брошенные карточки и сделки вне «Реализации» — не в "
             "счёте; сделка, где у живых заказов стадия не из таблицы, — в n как «срок неизвестен»",
-            "createdTime, crm.stagehistory, ufCrm20_1787924508120", t["W1"]),
+            "createdTime, crm.stagehistory, ufCrm20_1787924508120, tasks.task.list (UF_CRM_TASK «Tac_<id>»)", t["W1"]),
         row("W2", "Сверх нормы, только ОРК", "шаги 4, 5, 8 (заказы; приёмка сделки — W1): р.д. от входа в шаг > "
             "нормы (шаг 4 — от назначения "
             "менеджера ОРК, если приёмку закончило оно, ork.clock); стадия позади фактов, "
@@ -1860,6 +1881,8 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
              # W1o), не приёмка сделки: путь заказа и карточка говорят то же, что очередь
              "asg": st == 1 and o.get("deal") in DS["accepted"],
              "wu": bool(v.get("waitUtd")), "tu": bool(v.get("termUnknown")),
+             # ждёт подтверждения готовности к передаче в ОРК (handover): срок задачи прошёл — hoL
+             "ho": bool(v.get("waitHo")), "hoL": bool(v.get("hoOverdue")),
              "nc": nc(o), "hyg": h.get("kinds") or [], "hw": h.get("why") or "",
              "waits": waits_of.get(st, "") if st else "",
              "c12": oid in c12, "p80": str(oid) in p80s,
@@ -1913,6 +1936,8 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
                 e["unk"] = Dl(x for x in ids if d1[x]["unk"])
                 e["nc"] = Dl(x for x in ids if d1[x]["nc"])
                 e["ordersOver"] = O(o for o in here if o["id"] in over_ids.get(1, set()))
+                e["ho"] = Dl(x for x in ids if d1[x].get("ho"))
+                e["ordersHo"] = O(o for o in here if ov[o["id"]].get("waitHo"))
             if no == 13:
                 # «к закрытию»: пункты dealClose («Оплата получена») — прежний список; now — и dealOpen
                 e["close"] = Dl(x for x in ids if DS["closeKind"].get(x) == "dealClose")

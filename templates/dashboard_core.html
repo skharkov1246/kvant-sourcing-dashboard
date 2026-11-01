@@ -6473,7 +6473,7 @@ function _ctdEcon(x,dcx,FX){
 const _ctBxDeal=id=>`https://kvantpro.bitrix24.ru/crm/deal/details/${encodeURIComponent(id)}/`;
 const _ctBxOrd=id=>`https://kvantpro.bitrix24.ru/crm/type/172/details/${encodeURIComponent(id)}/`;
 // исполнитель шага регламента ОРК (ork.ROLES) — словом
-const _CT_ROLE={orkHead:'руководитель ОРК',orkMgr:'менеджер ОРК',kam:'КАМ',oss:'ОСС',log:'логистика',sup:'поставщик'};
+const _CT_ROLE={orkHead:'руководитель ОРК',orkMgr:'менеджер ОРК',kam:'КАМ',oss:'ОСС',log:'логистика',sup:'поставщик',hoResp:'исполнитель задачи «Подтверждение готовности»'};
 // что значат дни пункта очереди (lifecycle.order_exceptions: у каждого кода свой отсчёт) — словами,
 // а не голым «35 дн» (владелец 29.10.2026: «расшифровывать»); сроки шагов — рабочие дни на шаге
 function _ctDaysTxt(q,max){
@@ -6513,15 +6513,16 @@ function _ctOrdHtml(o,x,opt){
   if(o.live&&o.step){
     const n=o.stepNorm, wd=o.stepWd;
     const over=o.stepOver&&wd!=null&&n!=null?wd-n:null;
-    const body=n!=null?(o.stepWaitUtd?`ждём УПД от клиента · ${wd} раб. дн. от доставки при норме ${n} — подпись за клиентом`
+    const body=o.stepWaitHo?`ждём подтверждения готовности к передаче в ОРК · ${wd!=null?wd:'—'} раб. дн. с постановки задачи${o.hoDl?`, срок задачи ${_orkDy(o.hoDl)}`:''}${o.hoOverdue?` — <b class="ctd-bad">просрочено${o.hoBy!=null?` на ${o.hoBy} раб. дн.`:''}</b>`:''}`
+      :n!=null?(o.stepWaitUtd?`ждём УПД от клиента · ${wd} раб. дн. от доставки при норме ${n} — подпись за клиентом`
         :`${wd!=null?wd:'—'} раб. дн. на шаге при норме ${n}${over!=null?` — <b class="ctd-bad">дольше нормы на ${over} раб. дн.</b>`:''}${o.stepHyg?' · карточка с ошибкой, срок не считаем':o.stepClosed?' · сделка закрыта, срок не считаем':''}`)
       :(o.stepNormState==='nodata'?`норма ${_esc(_ctdT(o.stepNormDoc||''))} — нет дат в Битриксе`:'срок регламентом не задан');
-    const from=n!=null&&o.stepFrom?` · с ${_orkDy(o.stepFrom)}${o.stepFromBy==='назначение'?' (назначение)':''}`:'';
-    const who=_ctdNm(o.stepWho);
-    const role=_CT_ROLE[o.stepRole]||o.stepRole||'';
+    const from=n!=null&&o.stepFrom&&!o.stepWaitHo?` · с ${_orkDy(o.stepFrom)}${o.stepFromBy==='назначение'?' (назначение)':o.stepFromBy==='подтверждение готовности'?' (подтверждена готовность)':''}`:'';
+    const who=_ctdNm(o.stepWaitHo?o.hoWho:o.stepWho);
+    const role=o.stepWaitHo?_CT_ROLE.hoResp:(_CT_ROLE[o.stepRole]||o.stepRole||'');
     st=`<div class="step"${o.stepWhy?` title="${_esc(_ctdT(o.stepWhy))}"`:''}>${_ctStepNm(o.step)} · ${body}${from}</div>`
       +`<div class="who">Делает: ${who==='не назначен'||!who?`<span class="ctd-amb">${_esc(role||'исполнитель')} не назначен — назначает рук. ОРК</span>`:`${_esc(role)}${role?' — ':''}${_esc(who)}`}</div>`;
-    stS=o.stepAcc?'шаг 1 · ждёт приёмки сделки':`шаг ${o.step}${o.stepOver?' · дольше нормы':o.stepWaitUtd?' · ждём УПД':''}`;
+    stS=o.stepWaitHo?'до приёмки · ждём подтверждения готовности':o.stepAcc?'шаг 1 · ждёт приёмки сделки':`шаг ${o.step}${o.stepOver?' · дольше нормы':o.stepWaitUtd?' · ждём УПД':''}`;
   } else stS=o.delivered?`доставлен ${o.delivered}`:o.live?'шаг не определён':'закрыт';
   const late=o.late&&!x.closed;
   const dl=o.dl?`<div class="ctd-odl">срок клиента ${_esc(o.dl)}${late?` · <b class="ctd-bad">просрочен на ${o.dlDays} дн.</b>`:(x.closed&&o.live&&o.dlDays>0&&!o.delivered?' · сделка закрыта, не в счёте':'')}</div>`
@@ -8083,6 +8084,7 @@ function _orkWeekLedger(C){
   // шаги сделки: приёмка дольше нормы — сделки W1; шаг 13 — «клиент не оплатил» сделками (не заказы шага 12)
   const overD=s=>{const no=+s.no;
     if(no===1) return (U.w1.v?`<span class="wkred">${_wkN(U.w1.v,'w:W1','Приёмка сделки дольше нормы')}</span>`:'<span class="rzfinal">0</span>')
+      +(s.ordersWaitHo?`<div class="wkmut">ждём подтверждения готовности: ${_wkN(s.ordersWaitHo,'w:step/1/ordersHo','Шаг 1: ждём подтверждения готовности к передаче в ОРК')} ${uo(s.ordersWaitHo)}</div>`:'')
       +(s.unit!=='deal'&&s.notCounted?`<div class="wkmut">у заказов шага: срок не считаем ${_wkN(s.notCounted,`w:step/1/nc`,'Шаг 1: на шаге, но срок не считаем')} ${uo(s.notCounted)}</div>`:'');
     if(no===13) return UP.deals?`<span class="wkred">клиент не оплатил ${_wkN(UP.deals,(W.drill||{}).unpaidDeals?'w:unpaidDeals':'w:unpaid','Клиент не оплатил в срок')} ${ud(UP.deals)}</span>${UP.orders?`<div class="wkmut">${UP.orders} ${uo(UP.orders)} в них</div>`:''}`:'<span class="wkmut">—</span>';
     return '<span class="wkmut">—</span>';};
@@ -9245,7 +9247,7 @@ if(typeof document!=='undefined'&&document.addEventListener) document.addEventLi
 // «← к списку»). Esc закрывает, Tab ходит по кругу внутри, фокус возвращается на число; после
 // «Пункты в очереди →» — на отбор очереди.
 const _OD_CL={1:'snew',2:'sdlg',3:'sdlg',4:'ssent',5:'ssent',6:'spaw',7:'spaw',8:'ssel',9:'ssel',10:'snot',11:'snot',12:'sref',13:'soth',x:'soth'};
-const _OD_ROLE={orkHead:'руководитель ОРК',orkMgr:'менеджер ОРК',kam:'КАМ',oss:'ОСС',log:'логистика',sup:'поставщик',dealResp:'ответственный сделки'};
+const _OD_ROLE={orkHead:'руководитель ОРК',orkMgr:'менеджер ОРК',kam:'КАМ',oss:'ОСС',log:'логистика',sup:'поставщик',dealResp:'ответственный сделки',hoResp:'исполнитель задачи «Подтверждение готовности»'};
 const _OD_GROUP=w=>w==='ответственный вне ОРК'||w==='не назначен';
 const _OD={};
 const _OD_UNP=new WeakMap();
@@ -10536,7 +10538,7 @@ const _OP_END={1:'назначен менеджер ОРК или стадия �
   8:'стадия «Подготовка к отгрузке»: Packing list, фото груза, документы для логистики',9:'стадия «Заказ отгружен» или «Подготовка груза/Поиск транспорта»',
   10:'стадия «Заказ получен клиентом»',11:'дата «Customer delivery date, actual» в заказе',12:'подписанный УПД в заказе',
   13:'платёжка клиента в заказе и стадия «Закрытие заказа»'};
-const _OP_BY={'начало приёмки':'начало приёмки','назначение':'назначение менеджера ОРК','вход в шаг':'вход в шаг','доставка':'доставка клиенту'};
+const _OP_BY={'начало приёмки':'начало приёмки','назначение':'назначение менеджера ОРК','вход в шаг':'вход в шаг','доставка':'доставка клиенту','подтверждение готовности':'подтверждена готовность к передаче в ОРК','задача подтверждения':'поставлена задача «Подтверждение готовности»'};
 // кого ждёт шаг — винительный падеж («Ждём: логистику»)
 const _OP_WAIT={kam:'клиента и КАМа',oss:'ОСС',log:'логистику',sup:'поставщика'};
 // главная причина (week.orders[].cause, WP-B; без неё — по пунктам заказа и шагу), запасные подписи
@@ -10693,6 +10695,7 @@ function _opStuck(o,S,P,w,D,d){
   }
   if(o.step==null) return `<section class="op-card op-stuck is-over" aria-labelledby="opStuckH"><h3 class="op-h" id="opStuckH">Где застрял</h3>`
     +`<p class="op-ttl">Стадия «${_esc(o.stageName||'—')}» неизвестна регламенту</p><p class="op-line">Её нет в таблице «стадия Битрикса → шаг регламента», поэтому шаг и срок не определить — сверить стадию заказа в Битриксе.</p></section>`;
+  if(o.stepWaitHo) return _opWaitHo(o,_opWdU(),d);
   const wd=o.stepWd!=null?o.stepWd:(last&&last[0]===o.step?last[2]:null), norm=o.stepNorm, U=_opWdU();
   const tone=o.stepOver?'is-over':o.stepWaitUtd?'is-wait':'';
   // «Где застрял» — шаг дольше нормы, заказ просрочен или производство дольше обычного; иначе «Где сейчас»
@@ -10722,6 +10725,24 @@ function _opStuck(o,S,P,w,D,d){
     +(from?`<p class="op-meta">с ${_esc(_orkD(from))} · ${_esc(asg&&/приём/.test(_OP_BY[by]||by)?'создан заказ':(_OP_BY[by]||by))}${norm!=null?' · паузы не вычтены':''}</p>`:'')
     +`<p class="op-who">Делает: ${_opWho(o.stepWho,role)}${mgr?` · ${_opWho(mgr,'orkMgr')}`:''}${kam?` · <span class="op-mut">в курсе:</span> ${_opWho(kam,'kam')}`:''}</p>`
     +(wt?`<p class="op-who">Ждём: ${_opT(wt)}</p>`:'')
+    +`</section>`;
+}
+// заказ на шаге 1, задача «Подтверждение готовности передачи поставщика в ОРК» открыта (владелец
+// 01.11.2026): приёмка не началась, срок руководителя ОРК не идёт; р.д. — от постановки задачи,
+// норма — её крайний срок; делает — исполнитель задачи, ждёт — руководитель ОРК. Шага нет в регламенте
+function _opWaitHo(o,U,d){
+  const late=!!o.hoOverdue, wd=o.stepWd;
+  const big=wd!=null?`<b class="op-num">${wd}</b> ${U} с постановки задачи${o.hoDl?` · срок задачи ${_esc(_orkD(o.hoDl))}`:''}`
+    +(late?` — <span class="op-bad">просрочено${o.hoBy!=null?` на ${o.hoBy} ${U}`:''}</span>`:o.hoDl?' — в срок':'')
+    :`<span class="op-mut">Дату постановки задачи не прочитать</span>`;
+  const kam=d&&d.kam&&d.kam!=='—'?String(d.kam):'';
+  return `<section class="op-card op-stuck ${late?'is-over':'is-wait'}" aria-labelledby="opStuckH"><h3 class="op-h" id="opStuckH">${late?'Где застрял':'Где сейчас'}</h3>`
+    +`<p class="op-ttl"><span class="op-stepk">До приёмки</span> · подтверждение готовности к передаче в ${_opAb('ОРК')}</p>`
+    +`<p class="op-big">${big}</p>`
+    +`<p class="op-line op-mut">Пока задача «Подтверждение готовности передачи поставщика в ${_opAb('ОРК')}» открыта, приёмка не началась: проверка поставщика, свежий оффер, документы. Срок руководителя ${_opAb('ОРК')} не идёт. Шага нет в регламенте ${_opAb('ОРК')}.</p>`
+    +(o.hoSince?`<p class="op-meta">с ${_esc(_orkD(o.hoSince))} · поставлена задача</p>`:'')
+    +`<p class="op-who">Делает: ${_opWho(o.hoWho,'hoResp')}${kam?` · <span class="op-mut">в курсе:</span> ${_opWho(kam,'kam')}`:''}</p>`
+    +`<p class="op-who">Ждёт: ${_opT(_OD_ROLE.orkHead)} — примет сделку после подтверждения</p>`
     +`</section>`;
 }
 // пункт очереди: действие, почему, кто делает, кто в курсе (роль один раз)
@@ -11440,13 +11461,14 @@ function _ctPanel(X,el,opt){
     const wd=c.label==='закрыть сделку'?(c.close==='open'?'все заказы закрыты — закрыть сделку':'оплата получена — закрыть сделку')
       :c.norm==null?(c.normState==='nodata'?`норма ${_esc(_ctdT(c.normDoc||''))} — нет дат в Битриксе`:(c.wd!=null?`${c.wd} раб. дн., норма не задана`:'норма не задана'))
       :(c.wd==null?`норма ${c.norm} раб. дн., срок не посчитать: нет календаря`:c.waitUtd?`ждём УПД от клиента · ${c.wd} раб. дн. от доставки`:`${c.wd} раб. дн. при норме ${c.norm}${c.hyg?' · карточка с ошибкой, срок не считаем':''}`);
+    const wdH=c.role==='hoResp'?`ждём подтверждения готовности${c.wd!=null?` · ${c.wd} раб. дн.`:''}${c.hoOverdue?' — <span class="ctd-bad">срок задачи прошёл</span>':''}`:'';
     const w=_ctdNm(c.who||'не назначен'), role=_CT_ROLE[c.role]||c.role||'';
-    const sl=dealStep?`${stN(c.step).replace(/^Шаг /,'Шаг сделки ')}${c.step===1&&!(x.orders||[]).length?' · заказа нет':c.accept?` · ${_ctN(c.accept,'заказ ждёт','заказа ждут','заказов ждут')} менеджера ${'ОРК'}`:''}`
+    const sl=c.role==='hoResp'?'До приёмки':dealStep?`${stN(c.step).replace(/^Шаг /,'Шаг сделки ')}${c.step===1&&!(x.orders||[]).length?' · заказа нет':c.accept?` · ${_ctN(c.accept,'заказ ждёт','заказа ждут','заказов ждут')} менеджера ${'ОРК'}`:''}`
       :`${stN(c.step)}${co&&co.lbl?` · <span class="mono">${_esc(co.lbl)}</span>`:''}`;
     const oth=(x.closed?[]:(x.orders||[]).filter(o=>o.live&&o.step!=null&&!(c.accept&&o.stepAcc)&&(!co||String(o.id)!==String(co.id))))
       .sort((a,b)=>(+!!b.stepOver-+!!a.stepOver)||(a.step-b.step)||String(a.lbl).localeCompare(String(b.lbl)));
     const othT=oth.length?`<div class="ctd-c3">ещё ${_ctN(oth.length,'заказ','заказа','заказов')}: ${oth.slice(0,2).map(o=>`шаг ${o.step} · <span class="mono">${_esc(o.lbl||'')}</span>${o.stepOver?' <span class="ctd-bad">дольше нормы</span>':''}`).join(', ')}${oth.length>2?` и ещё ${oth.length-2}`:''}</div>`:'';
-    return n+`<div class="ctd-c3"${c.why?` title="${_esc(_ctdT(c.why))}"`:''}>${sl} · ${wd}</div>`
+    return n+`<div class="ctd-c3"${c.why?` title="${_esc(_ctdT(c.why))}"`:''}>${sl} · ${wdH||wd}</div>`
       +`<div class="ctd-c3">${w==='не назначен'?`<span class="ctd-amb">${_esc(_orkCap(role))} не назначен</span>`:`${_esc(_orkCap(role))}: ${_esc(w)}`}</div>`
       +(c.closeNote?`<div class="ctd-c3 ctd-amb">${_esc(_ctdT(String(c.closeNote).replace(/\s*\(Рег\.[^)]*\)/g,'')))}</div>`:'')+othT;};
   // «Срок клиента»: ближайший срок недоставленного заказа с номером, счёт заказов (E33); сорван — у какого
