@@ -548,6 +548,34 @@ class BitrixClient:
             start = nxt
         return out
 
+    def tasks_list(self, filter: dict | None = None, select: Iterable[str] | None = None, *,
+                   max_pages: int = 10, info: dict | None = None) -> list[dict]:
+        """Задачи tasks.task.list по фильтру: строки — result["tasks"] (у метода это словарь, не
+        список: list_paged не годится), страницы — по `next`, не больше max_pages. Через
+        call_envelope: общий темп портала, ожидание на 429/503, снимок и счётчик запросов —
+        как у всех вызовов. Ключи строк — как отдаёт портал (camelCase): разбор — у вызывающего.
+        info (словарь) — куда записать pages (прочитано страниц) и truncated: после max_pages у
+        портала ещё есть `next` — прочитано не всё (правило 15: обрезка не молчит)."""
+        params = {"filter": dict(filter or {}), "select": list(select or ["ID"])}
+        out: list[dict] = []
+        start, pages, nxt = 0, 0, None
+        for _ in range(max(1, max_pages)):
+            params["start"] = start
+            data = self.call_envelope("tasks.task.list", params) or {}
+            pages += 1
+            res = data.get("result") or {}
+            rows = (res.get("tasks") if isinstance(res, dict) else res) or []
+            out.extend(r for r in rows if isinstance(r, dict))
+            nxt = data.get("next")
+            if not nxt or not rows:
+                nxt = None
+                break
+            start = nxt
+        if info is not None:
+            info["pages"] = info.get("pages", 0) + pages
+            info["truncated"] = bool(info.get("truncated") or nxt)
+        return out
+
     def list_deals_fast(
         self,
         *,

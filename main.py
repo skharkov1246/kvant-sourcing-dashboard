@@ -32,6 +32,8 @@ import kaminc as kaminc_mod
 import kamqueue as kamqueue_mod
 import contracts as contracts_mod
 import metrics as metrics_mod
+import ork
+import ork_confirm
 import people as people_mod
 import premia as premia_mod
 import period as period_mod
@@ -964,6 +966,10 @@ def run(args) -> int:
               f"отброшено записей не по форме {real_ctx['bad']}")
     try:
         print("• Контракты в реализации (СП-172, все непроигранные)…")
+        # шаг 0 «Подтверждение передачи в ОРК» (решение владельца 31.10.2026): задачи Битрикса по
+        # заказам — 1–5 запросов; отказ — None: шага 0 нет, числа прежние. В журнал — только счёт
+        confirm_tasks, confirm_stats = ork_confirm.load(client)
+        print("  " + ork_confirm.summary(confirm_stats))
         contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster, service_ids=service_ids,
                                                chat_reader=chat_reader,
                                                ctx_chats=real_ctx["chats"] if real_ctx else None,
@@ -973,7 +979,8 @@ def run(args) -> int:
                                                # отдел ОРК и его руководитель — без нового запроса
                                                departments=client.departments(),
                                                fx_loader=_cbr_loader(),
-                                               stage_meta=(_presale_in or {}).get("stage_meta"))
+                                               stage_meta=(_presale_in or {}).get("stage_meta"),
+                                               confirm_tasks=confirm_tasks, confirm_stats=confirm_stats)
         ork_month_data = contracts_data.pop("orkMonth", None)
         _ork_head = contracts_data.pop("_orkHead", "") or ""
         # календарь РФ кончается — сроки менеджера следующего года не посчитать: громко заранее
@@ -998,6 +1005,17 @@ def run(args) -> int:
               f"{_tr.get('oldNoUtd', 0)}; «Замедлено» до чата: было {_cmp.get('old', 0)}, "
               f"стало {_cmp.get('new', 0)} (хуже у {_cmp.get('worse', 0)}, лучше у {_cmp.get('better', 0)}); "
               f"менеджеров ОРК в «Месяце» {len(((ork_month_data or {}).get('main') or {}).get('people') or [])}")
+        # шаг 0 — подтверждение передачи в ОРК (решение владельца 31.10.2026): только счёт
+        _cf = (contracts_data.get("head") or {}).get("confirm") or {}
+        _cfr = {True: "прочитаны", False: "не прочитаны", "partial": "прочитаны не все"}.get(_cf.get("read"), "прочитано 0")
+        print(f"  шаг 0 (подтверждение передачи в ОРК): задачи {_cfr}; "
+              f"живых заказов на шаге 0 {_tr.get('pre', 0)}, сверх {ork.NORM_WD[ork.PRE_STEP]} р.д. "
+              f"{(_lc.get('counts') or {}).get('s0Over', 0)}; приёмка (t0) сдвинута закрытием задачи у "
+              f"{_cf.get('t0Moved', 0)}, S1 из-за этого «конец раньше начала» у {_cf.get('s1Neg', 0)}, "
+              f"закрыта, когда стадия уже дальше шага 1 (приёмка с ухода стадии, 0 р.д.), у {_cf.get('t0Late', 0)}; "
+              f"задача открыта, а заказ дальше шага 0 — {(_lc.get('counts') or {}).get('confirmOpen', 0)}")
+        if _cf.get("read") in ("empty", "partial"):
+            print(f"  ⚠ {_cf.get('why')}")
         # приёмка кончается назначением менеджера ОРК (вопрос владельца 29.10.2026) — только счёт
         _t1, _lcc = ((_wk.get("tiles") or {}).get("W1") or {}), (_lc.get("counts") or {})
         print(f"  приёмка: сверх нормы {_lcc.get('s1Over', 0)}, договор с поставщиком сверх нормы "

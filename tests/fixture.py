@@ -460,8 +460,39 @@ def ct_fx_loader(codes, days, today):
     return fx.load_cbr(codes, days, today=today, fetch=ct_cbr_fetch)
 
 
+def ct_task(tid, oid, created: str, *, status="2", closed: str = "", resp="33", links=None,
+            title: str | None = None) -> dict:
+    """Задача tasks.task.list, как её отдаёт портал (camelCase; зонд v63): «Подтверждение готовности
+    передачи заказа … в работу ОРК», привязка к заказу СП-172 «Tac_<id>». Номера, люди и даты
+    придуманы (CLAUDE.md, правило 18)."""
+    return {"id": str(tid), "title": title if title is not None else f"Подтверждение готовности передачи заказа {oid} в работу ОРК",
+            "status": str(status), "createdDate": created, "closedDate": closed or None,
+            "responsibleId": str(resp), "ufCrmTask": list(links) if links is not None else [f"Tac_{oid}"]}
+
+
+def ct_tasks_page(tasks: list[dict], params: dict | None) -> dict:
+    """Ответ tasks.task.list по фильтру (%TITLE — подстрока без регистра, >=CREATED_DATE) с
+    постраничностью по 50 и полем next — как у портала."""
+    p = params or {}
+    f = p.get("filter") or {}
+    sub = str(f.get("%TITLE") or "").casefold()
+    since = str(f.get(">=CREATED_DATE") or "")
+    rows = [t for t in tasks if sub in str(t.get("title") or "").casefold()
+            and (not since or dt.datetime.fromisoformat(t["createdDate"]) >= dt.datetime.fromisoformat(since))]
+    start = int(p.get("start") or 0)
+    out = {"result": {"tasks": rows[start:start + 50]}, "total": len(rows)}
+    if start + 50 < len(rows):
+        out["next"] = start + 50
+    return out
+
+
 class ContractsStub:
-    """Ровно те методы клиента, которые зовёт contracts.compute."""
+    """Ровно те методы клиента, которые зовёт contracts.compute (и ork_confirm.load — задачи
+    подтверждения передачи tasks.task.list: тем же кодом постраничности, что у BitrixClient)."""
+
+    def tasks_list(self, filter=None, select=None, *, max_pages=10, info=None):
+        from bitrix_client import BitrixClient
+        return BitrixClient.tasks_list(self, filter, select, max_pages=max_pages, info=info)
 
     def __init__(self):
         import contracts as ct
@@ -476,6 +507,9 @@ class ContractsStub:
 
         self.deals, self.orders, self.hist = [], [], {2: [], 172: []}
         self.offer_hist: list[tuple[str, str, str]] = []
+        # задачи «Подтверждение готовности передачи…» (шаг 0, ork_confirm): по умолчанию — одна,
+        # у сделки 934 ниже
+        self.tasks: list[dict] = []
         stages = ["C0:NEW", "C0:PREPARATION", "C0:EXECUTING", "C0:FINAL_INVOICE"]
         oid = 7000
         # поля регламента ОРК — своим генератором: прежние даты и суммы корпуса не сдвигаются
@@ -658,6 +692,22 @@ class ContractsStub:
                             "createdTime": t(70), "movedTime": t(30), ct.OSS_F: "23", ct.DL_CUSTOMER: d(-30),
                             "assignedById": "32"})
         self.hist[172] += [(str(oid), "DT172_26:NEW", t(70)), (str(oid), "DT172_26:UC_OLD", t(30))]
+        # шаг 0 (решение владельца 31.10.2026): сделка 934 — заказ «Заказ создан» в среду 07.10, в тот
+        # же день — задача подтверждения передачи; открыта 8 р.д. (> 5): пункт s0Over у исполнителя
+        # задачи (снабжение, не ОРК), КАМ в копии — smoke и валидатор видят строку 0
+        self.deals.append({"ID": "6034", "TITLE": "934. Передача в ОРК не подтверждена", "OPPORTUNITY": "35000",
+                           "CURRENCY_ID": "EUR", "COMPANY_ID": "302", "STAGE_ID": "C0:NEW",
+                           "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": t(20),
+                           "ASSIGNED_BY_ID": "11", ct.OSS_DEAL: ["22"], ct.KAM_F: "11"})
+        self.hist[2].append(("6034", "C0:NEW", t(20)))
+        oid += 1
+        self.orders.append({"id": oid, "title": "934/1. Узел до передачи", "companyId": "403", "parentId2": 6034,
+                            "opportunity": 7_000, "currencyId": "EUR", "stageId": "DT172_26:NEW",
+                            "createdTime": t(12), "movedTime": t(12), ct.OSS_F: "22", ct.DL_CUSTOMER: d(-60),
+                            ct.PROD_START: d(-10), ct.PROD_END: d(-40), ct.DEL_BUDGET: d(-60),
+                            "assignedById": "31"})
+        path(oid, "NEW", 12, 12)
+        self.tasks.append(ct_task(5001, oid, t(12 - 1 / 48), resp="33"))
 
     @staticmethod
     def _ork_fields(o: dict, kind: int, age: int, d, rnd2: random.Random, ct) -> None:
@@ -703,6 +753,8 @@ class ContractsStub:
             rq = [{"ID": str(800 + int(c)), "ENTITY_ID": c, "PRESET_ID": "1" if c in CT_RU_CO else "2",
                    "RQ_INN": ""} for c in sorted(CT_RU_CO + (CT_FOREIGN_CO,)) if c in ids]
             return [r for r in rq if int(r["ID"]) > int(f.get(">ID") or 0)]
+        if method == "tasks.task.list":
+            return ct_tasks_page(self.tasks, params)["result"]
         if method == "im.dialog.messages.get":
             # чётные чаты — человек писал вчера, нечётные — месяц назад, кратные 5 — нет доступа
             n = int(str(params["DIALOG_ID"]).removeprefix("chat")) - 9000
@@ -737,7 +789,10 @@ class ContractsStub:
 
     def call_envelope(self, method, params=None, **kw):
         """crm.stagehistory.list для дат КП (contracts → зонд v59): ВСЕ входы — в стадии
-        предложения (offer_hist) и в кат. 0 (hist[2], без отсечки HIST_SINCE)."""
+        предложения (offer_hist) и в кат. 0 (hist[2], без отсечки HIST_SINCE); tasks.task.list —
+        задачи подтверждения передачи (self.tasks, постранично по next)."""
+        if method == "tasks.task.list":
+            return ct_tasks_page(self.tasks, params)
         assert method == "crm.stagehistory.list"
         f = (params or {}).get("filter") or {}
         own = {str(x) for x in f.get("OWNER_ID") or []}
@@ -927,6 +982,106 @@ class СделкаИЗаказы(ContractsStub):
         return "Тимур (ОРК)" if str(uid) == self.GONE_ID else super().user_name(uid)
 
 
+class ПодтверждениеПередачи(ContractsStub):
+    """Шаг 0 «Подтверждение передачи в ОРК» (решения владельца 31.10.2026). Базовый корпус — без
+    изменений; поверх — придуманные сделки 937–949 (сделки 6300–6312, заказы 99701+, КАМ '10'),
+    сегодня — пн 19.10.2026 (CT_TODAY). Номера, люди и даты придуманы (CLAUDE.md, правило 18):
+      • 940 — задача открыта со ср 14.10 (3 р.д.): шаг 0, пункта нет, сделка не на приёмке;
+      • 941 — задача открыта с пт 09.10 (6 р.д.), исполнитель '33' не из ОРК: один s0Over; чат
+        сделки тихий — сделка «Замедлено» (решение 31.10.2026, г);
+      • 942 — задача закрыта ср 14.10 15:00: приёмка с 14.10, s1Over 3 р.д.; 943 — закрыта пт
+        16.10: 1 р.д., s1Over нет;
+      • 944 — задача открыта, а «Дата записи нового ответственного» есть: всё равно шаг 0;
+      • 945 — задача открыта, а заказ «Заказ направлен»: шаг 4 (стадия сильнее) и confirmOpen;
+      • 946 — назначение 13.10 раньше закрытия задачи 14.10: S1 0 р.д., конец — «назначение»;
+      • 947 — две задачи (закрыта 09.10 и открыта с 15.10): шаг 0, путь 0 → 1 → 0;
+      • 948 — приманки: задача к сделке («D_»), «Перешлите: …» к заказу, без привязки и задача
+        до SINCE — шага 0 нет, заказ на приёмке;
+      • 949 — статус 4 («Ждёт контроля») с датой закрытия: открыта, шаг 0;
+      • 939 — исполнитель задачи уволен (id 36): «(уволен)»;
+      • 938 — открытая задача у нового заказа принятой сделки: шаг 0, ordAssign нет;
+      • 937 — заказ не передан в ОРК (решение 31.10.2026, заказ 968/2): ответственный '33' не из
+        ОРК, в поле сделки «Ответственный за реализацию» — руководитель ОРК '30': исполнитель шага —
+        ответственный заказа (whoOut), руководитель ОРК — в копии, не менеджер заказа.
+    roster — справочник людей с уволенным (передать в contracts.compute как people)."""
+
+    GONE_ID = "36"
+    KAM = "10"
+
+    def __init__(self):
+        super().__init__()
+        import contracts as ct
+        now = dt.datetime.fromisoformat(CT_NOW)
+        t = lambda a: (now - dt.timedelta(days=a)).isoformat()      # noqa: E731
+        d = lambda a: (CT_TODAY - dt.timedelta(days=a)).isoformat()  # noqa: E731
+        T = lambda day, hm="10:00": f"2026-10-{day}T{hm}:00+03:00"  # noqa: E731
+        self.roster = {**CT_ROSTER, self.GONE_ID: {"name": "Ульяна (снабжение)", "active": False, "depts": ["60"]}}
+        plan = {ct.PROD_START: d(-5), ct.PROD_END: d(-40), ct.DEL_BUDGET: d(-80), ct.DL_CUSTOMER: d(-90)}
+        for did, seq, title, extra in (
+                # 941: чат сделки тихий (нечётный номер чата стаба — человек писал месяц назад):
+                # шаг 0 дольше нормы при тихом чате — «Замедлено» (решение 31.10.2026, г)
+                ("6300", 940, "Задача открыта три дня", {}),
+                ("6301", 941, "Задача открыта шесть дней", {"UF_CRM_1734380921": "9301"}),
+                ("6302", 942, "Задача закрыта в среду", {}), ("6303", 943, "Задача закрыта в пятницу", {}),
+                ("6304", 944, "Назначен при открытой задаче", {}), ("6305", 945, "Стадия ушла при открытой задаче", {}),
+                ("6306", 946, "Назначен до закрытия задачи", {}), ("6307", 947, "Две задачи", {}),
+                ("6308", 948, "Приманки", {}), ("6309", 949, "Ждёт контроля", {}),
+                ("6310", 939, "Исполнитель задачи уволен", {}), ("6311", 938, "Новый заказ принятой сделки", {}),
+                ("6312", 937, "Заказ не передан в ОРК", {ct.ORK_RESP: "30"})):
+            self.deals.append({"ID": did, "TITLE": f"{seq}. {title}", "OPPORTUNITY": "30000", "CURRENCY_ID": "EUR",
+                               "COMPANY_ID": "305", "STAGE_ID": "C0:EXECUTING", "STAGE_SEMANTIC_ID": "P",
+                               "CATEGORY_ID": "0", "DATE_CREATE": t(40), "ASSIGNED_BY_ID": "11",
+                               ct.OSS_DEAL: ["21"], ct.KAM_F: self.KAM, **extra})
+            self.hist[2] += [(did, "C0:NEW", t(30)), (did, "C0:EXECUTING", t(25))]
+
+        def order(oid, did, lbl, created, resp="31", stages=(("NEW", None),), **extra):
+            last = stages[-1][0]
+            self.orders.append({"id": oid, "title": f"{lbl}. Узел", "companyId": "404", "parentId2": int(did),
+                                "opportunity": 9_000, "currencyId": "EUR", "stageId": f"DT172_26:{last}",
+                                "createdTime": created, "movedTime": stages[-1][1] or created, ct.OSS_F: "21",
+                                "assignedById": resp, **plan, **extra})
+            for st, at in stages:
+                self.hist[172].append((str(oid), f"DT172_26:{st}", at or created))
+
+        order(99701, "6300", "940/1", T(14))
+        self.tasks.append(ct_task(5101, 99701, T(14, "11:00"), resp="32"))
+        order(99711, "6301", "941/1", T("09"))
+        self.tasks.append(ct_task(5111, 99711, T("09", "12:00"), resp="33"))
+        order(99721, "6302", "942/1", T(13))
+        self.tasks.append(ct_task(5121, 99721, T(13, "11:00"), status="5", closed=T(14, "15:00")))
+        order(99731, "6303", "943/1", T(13))
+        self.tasks.append(ct_task(5131, 99731, T(13, "11:00"), status="5", closed=T(16, "15:00")))
+        order(99741, "6304", "944/1", T(12), **{ct.ASSIGN_AT: "2026-10-14"})
+        self.tasks.append(ct_task(5141, 99741, T(12, "11:00")))
+        order(99751, "6305", "945/1", T(12), stages=(("NEW", T(12)), ("SENT", T(13))))
+        self.tasks.append(ct_task(5151, 99751, T(12, "11:00")))
+        order(99761, "6306", "946/1", T(12), **{ct.ASSIGN_AT: "2026-10-13"})
+        self.tasks.append(ct_task(5161, 99761, T(12, "11:00"), status="5", closed=T(14, "15:00")))
+        order(99771, "6307", "947/1", T("08"))
+        self.tasks += [ct_task(5171, 99771, T("08", "11:00"), status="5", closed=T("09", "12:00")),
+                       ct_task(5172, 99771, T(15))]
+        order(99781, "6308", "948/1", T(15))
+        self.tasks += [ct_task(5181, 99781, T(15, "11:00"), links=["D_6308"]),
+                       ct_task(5182, 99781, T(15, "11:30"),
+                               title="Перешлите: Подтверждение готовности передачи заказа 948/1"),
+                       ct_task(5183, 99781, T(15, "12:00"), links=[]),
+                       ct_task(5184, 99781, "2026-08-20T10:00:00+03:00")]
+        order(99791, "6309", "949/1", T(15))
+        self.tasks.append(ct_task(5191, 99791, T(15, "11:00"), status="4", closed=T(16, "09:00")))
+        order(99801, "6310", "939/1", T(15))
+        self.tasks.append(ct_task(5201, 99801, T(15, "11:00"), resp=self.GONE_ID))
+        order(99811, "6311", "938/1", "2026-09-01T10:00:00+03:00", stages=tuple(
+            (s_, f"2026-09-{1 + 2 * k:02d}T10:00:00+03:00") for k, s_ in enumerate(CT_PATH[:CT_PATH.index("PREPARATION") + 1])),
+            **{ct.SUP_PAID: 100})
+        order(99812, "6311", "938/2", T(13))
+        self.tasks.append(ct_task(5211, 99812, T(13, "11:00")))
+        order(99821, "6312", "937/1", "2026-09-20T10:00:00+03:00", resp="33",
+              stages=(("NEW", "2026-09-20T10:00:00+03:00"), ("SENT", "2026-10-05T10:00:00+03:00")))
+
+    def user_name(self, uid):
+        return "Ульяна (снабжение)" if str(uid) == self.GONE_ID else super().user_name(uid)
+
+
 def build_contracts(**kw) -> dict:
     """Синтетика → настоящий contracts.compute → данные вкладки «Реализация». Руководителя
     ОРК (служебный ключ «_orkHead») main.py забирает до записи страницы — здесь так же;
@@ -934,6 +1089,7 @@ def build_contracts(**kw) -> dict:
     import os
 
     import contracts as contracts_mod
+    import ork_confirm
     keep_head = kw.pop("keep_head", False)
     old = os.environ.get("KVANT_NOW")
     os.environ["KVANT_NOW"] = CT_NOW
@@ -942,6 +1098,10 @@ def build_contracts(**kw) -> dict:
         kw.setdefault("people", CT_ROSTER)
         kw.setdefault("departments", stub.departments())
         kw.setdefault("fx_loader", ct_fx_loader)
+        # задачи подтверждения передачи — как main.py: ork_confirm.load по тому же клиенту;
+        # confirm_tasks=None в kw — «задачи не прочитаны» (отказ без последствий)
+        if "confirm_tasks" not in kw:
+            kw["confirm_tasks"], kw["confirm_stats"] = ork_confirm.load(stub)
         ct = contracts_mod.compute(stub, as_of=CT_TODAY, **kw)
         if not keep_head:
             ct.pop("_orkHead", None)
@@ -1035,14 +1195,16 @@ def realctx_raw() -> dict:
     return {"version": 1, "at": t(0.2), "chats": chats, "contracts": contracts, "econ": econ, "facts": facts}
 
 
-def build_realization(hist: bool = True) -> dict:
+def build_realization(hist: bool = True, stub=None) -> dict:
     """«Реализация» со сводом чатов и договоров — как main.py: contracts.compute с чатами и
     финальной экономикой свода, затем dealctx.build. → {"contracts": …, "dealctx": …, "ork_month": …}
-    для dashboard.write."""
+    для dashboard.write. stub — другая заглушка портала (например, ПодтверждениеПередачи: её
+    справочник людей с уволенным — roster)."""
     import dealctx
     ctx = dealctx.clean(realctx_raw())
+    kw = {"stub": stub, "people": getattr(stub, "roster", CT_ROSTER)} if stub is not None else {}
     ct = build_contracts(ctx_chats=ctx["chats"], ctx_econ=ctx["econ"], ctx_contracts=ctx["contracts"],
-                         keep_head=True)
+                         keep_head=True, **kw)
     ork_month = ct.pop("orkMonth", None)  # как main.py: поимённое — не в данные вкладки, своим массивом
     ork_head = ct.pop("_orkHead", "")
     import contracts as contracts_mod

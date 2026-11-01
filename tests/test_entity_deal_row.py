@@ -93,7 +93,8 @@ def test_ячейка_шага_с_номером_заказа(R):
         c = x["stepCell"]
         if not c:
             continue
-        live = sorted((o["id"], o["step"]) for o in x["orders"] if o["live"] and o["step"])
+        # шаг 0 (до передачи в ОРК) — тоже шаг: проверка на None, не на истинность
+        live = sorted((o["id"], o["step"]) for o in x["orders"] if o["live"] and o["step"] is not None)
         assert sorted((y["order"], y["step"]) for y in c["orders"]) == live, x["deal"]
         if c["unit"] == "order":
             n_order += 1
@@ -199,15 +200,24 @@ def test_у_каждого_пункта_единица_и_часть_очере�
 
 def test_менеджер_заказа_один_у_строки_и_у_очереди(R):
     """orders[].orkMgr строки — тот же менеджер ОРК, что у пунктов заказа очереди lifecycle
-    (ответственный заказа из ОРК, иначе «Ответственный за реализацию» сделки)."""
+    (ответственный заказа из ОРК, иначе «Ответственный за реализацию» сделки). Менеджера ОРК нет, а
+    ответственный заказа есть — исполнитель пункта он (whoOut, решение владельца 31.10.2026): у
+    строки менеджера ОРК (orkMgr) нет, а на шаге менеджера ОРК — тот же исполнитель шага (stepWho) с
+    пометкой stepWhoOut."""
     rows = _rows(R)
-    n = 0
+    n = out = 0
     for q in R["contracts"]["life"]["queue"]:
         if q.get("order") and q["role"] == "orkMgr":
             o = next(o for o in rows[q["deal"]]["orders"] if o["id"] == str(q["order"]))
-            assert q["who"] == (o["orkMgr"] or "не назначен"), (q["code"], q["order"])
+            if q.get("whoOut"):
+                assert not o["orkMgr"] and q["who"] not in ("", "не назначен"), (q["code"], q["order"])
+                if o["stepRole"] == "orkMgr":          # шаг заказа — менеджера ОРК: тот же исполнитель
+                    assert o.get("stepWhoOut") and o["stepWho"] == q["who"], (q["code"], q["order"])
+                out += 1
+            else:
+                assert q["who"] == (o["orkMgr"] or "не назначен"), (q["code"], q["order"])
             n += 1
-    assert n > 5
+    assert n > 5 and out > 0
 
 
 def test_флаг_договора_с_заказом_пункт_этого_заказа():

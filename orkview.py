@@ -6,7 +6,10 @@
 Подвкладки:
   week    — неделя руководителя ОРК: W1 приёмка, W2 сверх нормы (только шаги ОРК), W3 зона
             риска, W4 эскалации и паузы (нет данных), W5 контрольные точки недели; ведомость
-            13 шагов, сверх нормы по исполнителям, ждут смежников, гигиена карточек;
+            13 шагов и строка 0 «Подтверждение передачи в ОРК» (решение владельца 31.10.2026:
+            до передачи в ОРК — не шаг ОРК: в W2, «сверх нормы по менеджерам» и Σ «Пульса» не
+            идёт, свой столбец «дольше нормы» — по judged.preOver), сверх нормы по исполнителям,
+            ждут смежников, гигиена карточек;
   month   — M1 своевременность S1/S2/S3/S6, M2 полнота карточки, M3 загрузка, доставка в
             срок по месяцам (результат поставщика и логистики), показатели Ан. §4 без данных;
             «Журнал шагов» — срок каждого заказа на S1/S2/S3/S6 в окне M1 (journal);
@@ -189,14 +192,19 @@ def _dist(segs: list[dict], *, n_key="n_min", src="", val=lambda s: s.get("cd"))
 
 def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.date, *,
           measure: list[dict] | None = None, otd: dict | None = None,
-          ork_head: str = "") -> tuple[dict, dict]:
+          ork_head: str = "", confirm: dict | None = None) -> tuple[dict, dict]:
     """orders — заказы вида (contracts.life_orders: stage, stepSince, t0, факты, _segs,
     _reach, art, orkMgr, respOrk, prepayShare, assignDate…); deals — строки сделок вида;
     queue — очередь lifecycle вида; measure — все заказы (мерило квартала: свойства
     поставщиков и процесса, а не вида). → (раздел «ork» без «Месяца», «Месяц» под правом:
     {month — показатели отдела, people — менеджеры ОРК поимённо, how — строки M1–M3 «Как
-    считается»})."""
+    считается»}).
+
+    confirm — сводка чтения задач подтверждения передачи (contracts.head.confirm: read true |
+    false | "empty", why): не прочитаны или прочитано 0 при живых заказах — строка 0 ведомости
+    «Нет данных», а не ноль (правило 15); None — как не прочитаны."""
     measure = orders if measure is None else measure
+    confirm = confirm or {"read": False, "why": "задачи подтверждения передачи не прочитаны"}
     deal_by = {d["deal"]: d for d in deals}
     U = [o for o in orders if o.get("live") and (d := deal_by.get(o.get("deal")))
          and not d.get("lost") and not d.get("closed")]
@@ -235,7 +243,10 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     # Шаг 1 — приёмка СДЕЛКИ (решение владельца 30.10.2026, В1 а): в W2 не идёт; пункт s1Over
     # заказа на приёмке сделки — w1 (сделка в W1), заказа уже принятой сделки — w1o (W1o,
     # «назначить менеджера ОРК на новый заказ»)
-    over_ids: dict[int, set] = {st: {o["id"] for o in L if step[o["id"]] == st and ov[o["id"]]["over"]}
+    # шаг 0 (решение владельца 31.10.2026): «дольше нормы» строки 0 — judged.preOver (передача в ОРК
+    # не подтверждена), over у него False; STEP_CODES шага 0 не знают — флагов w1/w2 от него нет
+    over_ids: dict[int, set] = {st: {o["id"] for o in L if step[o["id"]] == st
+                                     and (ov[o["id"]]["over"] or ov[o["id"]].get("preOver"))}
                                 for st in ork.NORM_WD}
     DS = deal_steps(orders, deals, U, step, queue)
     for st, codes in ork.STEP_CODES.items():       # шаг 1 — приёмка сделки (s1Over) и ordAssign
@@ -341,6 +352,13 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
             continue
         if waits:
             adjacent[waits]["orders"] += len(here)
+        # строка 0: задачи подтверждения не прочитаны (или прочитано 0 при живых заказах) — «Нет
+        # данных», а не «на шаге 0 никого» (правило 15); прочитаны не все (предел страниц, «partial»)
+        # — счёт есть, но с оговоркой: у части заказов шаг 0 может не стоять
+        rd = confirm.get("read")
+        pre_nodata = ({} if no != ork.PRE_STEP or rd is True
+                      else {"partial": True, "why": confirm.get("why") or ""} if rd == "partial"
+                      else {"nodata": True, "why": confirm.get("why") or "задачи подтверждения передачи не прочитаны"})
         ledger.append({"no": no, "name": s["name"], "role": s["role"], "roleName": ork.ROLES[s["role"]],
                        "also": [ork.ROLES[r] for r in s["also"]], "norm": s["norm"], "unit": "order",
                        "now": len(here),
@@ -359,7 +377,7 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                        # шаг 7 регламент не нормирует: «дольше P80 S5» — сигнал, не «сверх нормы»
                        "longP80": (long_p80["k"] if long_p80["state"] in ("show", "prelim") else None)
                        if no == 7 else None,
-                       "waitsName": ork.ROLES.get(waits or "", ""), "seg": s["seg"] or ""})
+                       "waitsName": ork.ROLES.get(waits or "", ""), "seg": s["seg"] or "", **pre_nodata})
 
     # --- W1 приёмка СДЕЛКИ (В1 а, решение владельца 30.10.2026) и W1o — назначение менеджера ОРК
     # на новый заказ уже принятой сделки. W1 — в сделках: n — сделки на шаге 1 в счёте (без
@@ -393,7 +411,8 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     by_assign = sum(1 for s in s1_recent if _clean(s) and s.get("wd") is not None
                     and s.get("endBy") == "назначение")
     # дата записи у «Заказ создан» не в счёте: раньше начала приёмки / ответственный не из ОРК
-    st1 = [o for o in U if ork.stage_step(o.get("stage")) == 1]
+    # заказ на шаге 0 (задача подтверждения открыта) приёмку не начал — не в этих счётах
+    st1 = [o for o in U if ork.stage_step(o.get("stage")) == 1 and step[o["id"]] != ork.PRE_STEP]
     agree_s1, agree_n = _s1_agree(orders)
     recent = (_timeliness(s1_recent, "S1", agree=agree_s1) if back else
               _ms(None, 0, None, src="S1", need=f"нет производственного календаря на {today.year} год "
@@ -509,8 +528,9 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     asg_who: dict[str, set] = defaultdict(set)
 
     def mrow(q: dict) -> dict:
-        w = q.get("who") or "не назначен"
-        return mgr.setdefault(w, {"who": w, "gone": bool(q.get("whoGone")), "role": q.get("role") or "",
+        w = q_who(q)
+        return mgr.setdefault(w, {"who": w, "gone": bool(q.get("whoGone")) and not q.get("whoOut"),
+                                  "role": q.get("role") or "",
                                   "roleName": q.get("roleName") or "", "n": 0, "waitUtd": 0,
                                   "accept": 0, "assign": 0, "byStep": Counter(),
                                   "units": {"n": "order", "waitUtd": "order", "accept": "deal",
@@ -530,10 +550,10 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
         if (c == ork.OVER_CODE[1] and q.get("w1")) or (c in ACCEPT_DEAL_CODES and not q.get("order")
                                                        and q.get("deal") in d1 and d1[q["deal"]]["over"]):
             mrow(q)
-            acc_who[q.get("who") or "не назначен"].add(q.get("deal"))
+            acc_who[q_who(q)].add(q.get("deal"))
         elif (c == ork.OVER_CODE[1] and q.get("w1o")) or c in ASSIGN_CODES:
             mrow(q)
-            asg_who[q.get("who") or "не назначен"].add(q.get("order"))
+            asg_who[q_who(q)].add(q.get("order"))
     for w, ids in acc_who.items():
         mgr[w]["accept"] = len(ids)
     for w, ids in asg_who.items():
@@ -547,8 +567,12 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     hyg_items, hc = [], Counter()
     for o in L:
         h = hy[o["id"]]
-        kinds = [k for k in ("behind", "abandoned", "old", "unknown") if h.get(k)]
-        if (o.get("own") or {}).get("role") == "orkMgr" and (o.get("own") or {}).get("who") == "не назначен":
+        # confirmOpen — задача подтверждения передачи открыта, а заказ уже дальше шага 0 (решение
+        # владельца 31.10.2026, а): замечание, из счёта не исключает
+        kinds = [k for k in HYG_KINDS if h.get(k)]
+        # менеджера ОРК нет: исполнитель — «не назначен» или ответственный заказа не из ОРК (out)
+        _own = o.get("own") or {}
+        if _own.get("role") == "orkMgr" and (_own.get("who") == "не назначен" or _own.get("out")):
             kinds.append("noMgr")
         for k in kinds:
             hc[k] += 1
@@ -573,7 +597,7 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     # «Клиент не оплатил в срок» — главное число в СДЕЛКАХ (долг по договору), заказы — в скобках,
     # деньги — доля продажи этих заказов (оценка по доле закупки), не сумма сделок (§1.5, E20)
     unpaid = _unpaid(q_by.get("unpaid", []), deal_by, today)
-    late_who = Counter((q.get("who") or PULSE_NONE) for q in risk_q
+    late_who = Counter(q_who(q) for q in risk_q
                        if heavy.get(q.get("order")) == "late" and q["code"] == "late")
     late_tile = {"hist": late_hist(orders, deal_by, today), "fridays": [d.isoformat() for d in _fridays(today)],
                  "label": "переносы срока не хранятся — по нынешнему сроку клиента", "unit": "order"}
@@ -615,7 +639,9 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     # заказы за числами «Недели» и «Пульс ОРК» (решение владельца 29.10.2026) — те же множества
     # вид заказа — тем же правилом, что «Пульс ОРК» (pulse_who): «без менеджера ОРК» сделки
     # делится на заказы без ответственного и с ответственным вне ОРК
-    own = no_owner(deals, today, {str(o["id"]): pulse_who(o, deal_by.get(o.get("deal")))[1]
+    # заказ на шаге 0 (до передачи в ОРК) — вид «pre»: менеджера ОРК у него ещё не должно быть
+    own = no_owner(deals, today, {str(o["id"]): ("pre" if ork.step_now(o) == ork.PRE_STEP
+                                                 else pulse_who(o, deal_by.get(o.get("deal")))[1])
                                   for o in orders if o.get("live")})
     week.update(_week_drill(L=L, U=U, C12=C12, deals=deals, queue=queue, step=step, ov=ov,
                             over_ids=over_ids, wait_ids=wait_ids, long_p80=long_p80, cps=cps,
@@ -649,7 +675,7 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     # Д-7: сорванный срок по исполнителю пункта — ключи рядом с «дольше нормы» и «ждём УПД»
     for q in risk_q:
         if q["code"] == "late" and heavy.get(q.get("order")) == "late":
-            D["who"].setdefault(q.get("who") or PULSE_NONE, {"over": [], "wait": []}) \
+            D["who"].setdefault(q_who(q), {"over": [], "wait": []}) \
                 .setdefault("late", []).append(str(q.get("order") or ""))
     for m in over_mgr:                       # строка человека только с приёмкой — пустые списки заказов
         D["who"].setdefault(m["who"], {"over": [], "wait": []})
@@ -687,7 +713,11 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
              # ответственный живого заказа — из отдела ОРК по справочнику (people.ORK_DEPT): ноль —
              # название отдела не совпало, «менеджер ОРК не назначен» затопит очередь
              "respOrk": sum(1 for o in U if o.get("respOrk")),
-             "oldNoUtd": sum(1 for o in L if hy[o["id"]].get("old"))}
+             "oldNoUtd": sum(1 for o in L if hy[o["id"]].get("old")),
+             # шаг 0 (решение владельца 31.10.2026): задачи подтверждения передачи прочитаны (true |
+             # false | "empty" | "partial") и живых заказов на шаге 0
+             "confirmRead": confirm.get("read"),
+             "pre": sum(1 for o in L if step[o["id"]] == ork.PRE_STEP)}
     return ({"asOf": today.isoformat(), "trust": trust, "week": week, "quarter": quarter,
              "how": how, "gatesNote": ork.GATES_NOTE},
             {"month": month, "people": month_people, "how": m_rows, "journal": journal})
@@ -1130,7 +1160,8 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
             "без заказа > 1 р.д. от входа в реализацию или с живыми заказами только в «Заказ создан», из которых хоть "
             "один без назначения менеджера ОРК с р.д.(t0, сегодня) > 1; заказ на шаге 1 у сделки, где другой заказ "
             "ушёл дальше или исполнен, — не приёмка, а назначение менеджера ОРК на новый заказ (W1o, в заказах); "
-            "t0 = max(создание заказа, вход сделки в реализацию); приёмка кончается "
+            "t0 = max(создание заказа, вход сделки в реализацию) или закрытие задачи подтверждения передачи, "
+            "если оно позже (шаг 0: пока задача открыта, заказ на шаге 0 и в W1 не идёт); приёмка кончается "
             "раньше из двух: выход из «Заказ создан» по стадии или «Дата записи нового ответственного» (не раньше "
             "дня t0 и ответственный заказа из отдела ОРК, иначе не в счёте) — после назначения заказ на шаге 4, срок "
             "договора с поставщиком (2 р.д.) — от назначения; брошенные карточки и сделки вне «Реализации» — не в "
@@ -1281,11 +1312,16 @@ def _how_steps() -> list[dict]:
     out = []
     for s in ork.STEPS:
         no = s["no"]
-        # где меряем: стадии какой карточки ведут шаг (у шага 1 — «Заказ создан» заказа)
-        meas = "order" if any(v == no for v in ork.STAGE_STEP["order"].values()) else "deal"
-        table = ork.STAGE_STEP[meas]
-        stages = [k for k, v in table.items() if v == no]
-        nxt = next((k for k, v in table.items() if v > no), "")
+        if no == ork.PRE_STEP:
+            # шаг 0 меряет задача Битрикса «Подтверждение готовности передачи…» (решение владельца
+            # 31.10.2026): своих стадий у него нет — заказ в «Заказ создан», пока задача открыта
+            meas, stages, nxt = "task", [], ""
+        else:
+            # где меряем: стадии какой карточки ведут шаг (у шага 1 — «Заказ создан» заказа)
+            meas = "order" if any(v == no for v in ork.STAGE_STEP["order"].values()) else "deal"
+            table = ork.STAGE_STEP[meas]
+            stages = [k for k, v in table.items() if v == no]
+            nxt = next((k for k, v in table.items() if v > no), "")
         # E48: чей шаг по регламенту — 1–3 сделки (приёмка, договор с заказчиком), 4–12 заказа,
         # 13 — сделки и заказа (закрытие заказа и сделки); measure — где портал его меряет
         kind = STEP_KIND.get(no, "order")
@@ -1296,9 +1332,10 @@ def _how_steps() -> list[dict]:
     return out
 
 
-# чей шаг по регламенту (E48): 1–3 — сделка, 4–12 — заказ, 13 — сделка и заказ
-STEP_KIND = {**{n: "deal" for n in (1, 2, 3)}, **{n: "order" for n in range(4, 13)}, 13: "both"}
-KIND_NAME = {"deal": "сделка", "order": "заказ", "both": "сделка и заказ"}
+# чей шаг по регламенту (E48): 1–3 — сделка, 4–12 — заказ, 13 — сделка и заказ; шаг 0 — заказ
+# (задача подтверждения передачи привязана к заказу), меряет его задача Битрикса (task)
+STEP_KIND = {0: "order", **{n: "deal" for n in (1, 2, 3)}, **{n: "order" for n in range(4, 13)}, 13: "both"}
+KIND_NAME = {"deal": "сделка", "order": "заказ", "both": "сделка и заказ", "task": "задача Битрикса"}
 # единица n показателя «Как считается» (E49): W1 — сделки, M1 — отрезки, M2 — файлы, M3 — менеджеры
 HOW_UNIT = {"W1": "deal", "W2": "order", "W3": "order", "W4": "order", "W5": "order", "M1": "segment",
             "M2": "file", "M3": "manager", "Q1": "order", "Q2": "segment", "Q3": "order"}
@@ -1332,7 +1369,12 @@ HOW_UNIT = {"W1": "deal", "W2": "order", "W3": "order", "W4": "order", "W5": "or
 # =============================================================================================
 PULSE_OUT = "ответственный вне ОРК"      # менеджера ОРК нет, ответственный заказа — не из ОРК
 PULSE_NONE = "не назначен"               # ни менеджера ОРК, ни ответственного заказа
-PULSE_ORDER = {"mgr": 0, "out": 1, "none": 2}
+# заказ на шаге 0 — ещё не передан в ОРК (решение владельца 31.10.2026): своя строка «Пульса»
+# (делает исполнитель задачи подтверждения, в курсе КАМ); не в «не назначен» и не у менеджера
+PULSE_PRE = "до передачи в ОРК"
+PULSE_ORDER = {"mgr": 0, "out": 1, "none": 2, "pre": 3}
+# виды замечаний гигиены карточки (ork.hygiene); noMgr — отдельно (хозяин шага)
+HYG_KINDS = ("behind", "abandoned", "old", "unknown", "confirmOpen")
 
 
 def order_no(o: dict) -> str:
@@ -1344,6 +1386,13 @@ def order_no(o: dict) -> str:
 
 def _nm(v) -> str:
     return "" if v in (None, "", "—", PULSE_NONE) else str(v)
+
+
+def q_who(q: dict) -> str:
+    """Человек пункта очереди в счётах «по людям» («Сверх нормы по менеджерам», приёмки, сорванный
+    срок): who; ответственный заказа не из ОРК (whoOut — заказ не передан в ОРК, решение владельца
+    31.10.2026) — «не назначен», как и прежде: менеджером ОРК он не числится."""
+    return PULSE_NONE if q.get("whoOut") else (q.get("who") or PULSE_NONE)
 
 
 def pulse_who(o: dict, d: dict | None) -> tuple[str, str]:
@@ -1461,13 +1510,16 @@ OUR_CODES = frozenset(c for cs in ork.STEP_CODES.values() for c in cs) | {"noOrd
 # cause2. our — шаг ОРК дольше нормы; sup — производство дольше плана или шаг ждёт поставщика;
 # log / kam / oss — шаг ждёт этот отдел; nodata — нет плановых дат или срока, шаг неизвестен;
 # ничего не подошло — мяч у ОРК на его шаге в норме (our)
-CAUSES = ("our", "sup", "log", "kam", "oss", "nodata")
+CAUSES = ("our", "sup", "log", "kam", "oss", "nodata", "pre")
 
 
 def order_cause(codes, step, over: bool = False) -> tuple[str, str]:
     """(cause, cause2) заказа «Недели»: одна причина на заказ — сумма причин по любому списку
     равна числу заказов в нём (инвариант Д-4). Порядок: our (шаг ОРК дольше нормы) → sup → log →
-    kam → oss → nodata; ни одна не подошла — ork (на шаге ОРК, срок в норме)."""
+    kam → oss → nodata; ни одна не подошла — ork (на шаге ОРК, срок в норме). Шаг 0 — pre: заказ
+    ещё не передан в ОРК (решение владельца 31.10.2026), причина у исполнителя задачи, не у ОРК."""
+    if step == ork.PRE_STEP:
+        return "pre", ""
     cs = set(codes or ())
     w = STEP_WAITS.get(step, "") if step is not None else ""
     hit = [c for c, ok in (("our", over or bool(cs & OUR_CODES)),
@@ -1542,7 +1594,11 @@ def deal_steps(orders: list[dict], deals: list[dict], U: list[dict], step: dict,
     на шаге 1 — назначение менеджера ОРК на новый заказ (W1o), а не приёмка сделки. Шаги 2–3 — открытые сделки на стадии
     договора с заказчиком (dealStep 2 или 3; у шага 3 своей стадии сделки в Битриксе нет). Шаг 13
     — сделки к закрытию: пункты dealClose («Оплата получена», сделка не закрыта) и dealOpen (все
-    заказы исполнены, сделка открыта)."""
+    заказы исполнены, сделка открыта).
+
+    Шаг 0 (решение владельца 31.10.2026): сделка, где все живые заказы на шаге 0 (задача
+    подтверждения передачи открыта), — pre: не на приёмке (в W1 и его n не идёт) и не «срок
+    неизвестен»; заказ на шаге 0 сделку принятой не делает."""
     u_by: dict = defaultdict(list)
     for o in U:
         u_by[o.get("deal")].append(o)
@@ -1556,7 +1612,7 @@ def deal_steps(orders: list[dict], deals: list[dict], U: list[dict], step: dict,
             close.setdefault(q["deal"], q["code"])
     no_order = [d["deal"] for d in deals if not d.get("closed") and not d.get("lost") and d.get("inCat0", True)
                 and not d.get("norders") and d["deal"] not in close]
-    accepted, accept, unk, contract = set(), [], [], {2: [], 3: []}
+    accepted, accept, unk, pre, contract = set(), [], [], [], {2: [], 3: []}
     for d in deals:
         did = d["deal"]
         if d.get("closed") or d.get("lost") or did in close:
@@ -1566,7 +1622,7 @@ def deal_steps(orders: list[dict], deals: list[dict], U: list[dict], step: dict,
         # (lifecycle._deal_accept: по нему срок шага 1 — s1Over приёмки или ordAssign нового
         # заказа), чтобы W1/W1o и пункты очереди не расходились. Без заказа на шаге 1 стадия не из
         # таблицы — «срок неизвестен» (unk), а не «принята» (правило 15)
-        past = did in done or any(step.get(o["id"]) not in (1, None) for o in os_) or (
+        past = did in done or any(step.get(o["id"]) not in (ork.PRE_STEP, 1, None) for o in os_) or (
             any(step.get(o["id"]) == 1 for o in os_) and lifecycle._deal_accept(all_by.get(did) or []))
         if past:
             accepted.add(did)
@@ -1575,6 +1631,8 @@ def deal_steps(orders: list[dict], deals: list[dict], U: list[dict], step: dict,
             if any(step.get(o["id"]) == 1 for o in os_):
                 accept.append(did)
                 at1 = True
+            elif all(step.get(o["id"]) == ork.PRE_STEP for o in os_):
+                pre.append(did)
             else:
                 unk.append(did)
         if not at1 and did not in no_order and d.get("dealStep") in contract:
@@ -1583,8 +1641,9 @@ def deal_steps(orders: list[dict], deals: list[dict], U: list[dict], step: dict,
     at.update({did: 1 for did in no_order + accept})
     for no, ids in contract.items():
         at.update({did: no for did in ids})
-    return {"noOrder": no_order, "accept": set(accept), "acceptL": accept, "unk": unk, "contract": contract,
-            "close": list(close), "closeKind": close, "accepted": accepted, "at": at, "uBy": u_by}
+    return {"noOrder": no_order, "accept": set(accept), "acceptL": accept, "unk": unk, "pre": pre,
+            "contract": contract, "close": list(close), "closeKind": close, "accepted": accepted, "at": at,
+            "uBy": u_by}
 
 
 def first_accept(orders: list[dict]) -> set:
@@ -1709,12 +1768,16 @@ def owner_gaps(d: dict, kind_of: dict | None = None) -> list[dict]:
             add(role, "gone")
     live = [o for o in (d.get("orders") or []) if o.get("live")]
     mgrs = {m for m in [_nm(d.get("orkResp"))] + [_nm(o.get("orkMgr")) for o in live] if m}
+    kinds = [(kind_of or {}).get(str(o.get("id")), "none") for o in live]
+    # заказы на шаге 0 (до передачи в ОРК, решение владельца 31.10.2026) менеджера ОРК не ждут:
+    # все живые заказы такие — пропуска «менеджер ОРК» нет
+    rest = [k for k in kinds if k != "pre"]
     if not mgrs:
-        kinds = [(kind_of or {}).get(str(o.get("id")), "none") for o in live]
-        n_out = sum(1 for k in kinds if k == "out")
-        n_none = len(kinds) - n_out
-        add("orkMgr", "out" if kinds and not n_none else "none")
-        out[-1].update(ordNone=n_none, ordOut=n_out)
+        if rest or not kinds:
+            n_out = sum(1 for k in rest if k == "out")
+            n_none = len(rest) - n_out
+            add("orkMgr", "out" if rest and not n_none else "none")
+            out[-1].update(ordNone=n_none, ordOut=n_out)
     elif all(_gone_nm(m) for m in mgrs):
         add("orkMgr", "gone")
     if d.get("managerGone"):
@@ -1836,7 +1899,9 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
         oid = o["id"]
         d = deal_by.get(o.get("deal")) or {}
         v, st = ov[oid], step[oid]
-        who, kind = pulse_who(o, d)
+        # шаг 0 — до передачи в ОРК (решение владельца 31.10.2026): не у менеджера ОРК и не «не
+        # назначен» — своя строка «Пульса»
+        who, kind = (PULSE_PRE, "pre") if st == ork.PRE_STEP else pulse_who(o, d)
         own = o.get("own") or {}
         h = hyg_of.get(oid) or {}
         r = {"k": str(oid), "no": order_no(o), "deal": str(o.get("deal") or ""), "seq": o.get("seq") or 0,
@@ -1844,6 +1909,8 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
              "wd": v.get("wd"), "norm": v.get("norm"), "mgr": who, "mk": kind,
              "gone": who.endswith("(уволен)"),
              "own": own.get("who") or "", "ownR": own.get("role") or "", "kam": _nm(d.get("kam")),
+             # исполнитель — ответственный заказа не из ОРК: заказ не передан в ОРК (ork.owner, out)
+             "ownOut": bool(own.get("out")),
              "dl": _iso(o.get("dl")), "fc": _iso(lifecycle.forecast(o, today, med, sup_slip)),
              "q": codes_of.get(str(oid), []),
              # от какого дня считаны р.д. шага — «с 14.10 (назначение)», как у пункта очереди
@@ -1860,8 +1927,10 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
              # W1o), не приёмка сделки: путь заказа и карточка говорят то же, что очередь
              "asg": st == 1 and o.get("deal") in DS["accepted"],
              "wu": bool(v.get("waitUtd")), "tu": bool(v.get("termUnknown")),
+             # шаг 0 дольше нормы — передача в ОРК не подтверждена (judged.preOver): не over
+             "po": bool(v.get("preOver")),
              "nc": nc(o), "hyg": h.get("kinds") or [], "hw": h.get("why") or "",
-             "waits": waits_of.get(st, "") if st else "",
+             "waits": waits_of.get(st, "") if st is not None else "",
              "c12": oid in c12, "p80": str(oid) in p80s,
              # почему срок не посчитать / не в счёте (ork.judged, гигиена) — Д-9
              "why": v.get("why") or "" if (v.get("termUnknown") or nc(o)) else "",
@@ -1962,7 +2031,7 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
                              + [(c, "wait", "waitUtd") for c in ork.WAIT_CODE.values()]):
         for q in q_by.get(code, []):
             if q.get(mark):
-                w = q.get("who") or "не назначен"
+                w = q_who(q)
                 who_d.setdefault(w, {"over": [], "wait": []})[flag].append(str(q.get("order") or ""))
     D["who"] = {"unit": "order", **who_d}
     H: dict = {"all": _u("order", [str(x["order"]) for x in hyg_items]),
@@ -1970,6 +2039,8 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
                "noMgr": _u("order", [str(x["order"]) for x in hyg_items if "noMgr" in x["kinds"]])}
     for k in ("behind", "abandoned", "old", "unknown"):
         H["x" + k] = _u("order", [str(x["order"]) for x in hyg_items if x["excl"] and k in x["kinds"]])
+    # задача подтверждения открыта, а заказ уже дальше шага 0 — из счёта не исключает (без «x»)
+    H["confirmOpen"] = _u("order", [str(x["order"]) for x in hyg_items if "confirmOpen" in x["kinds"]])
     D["hyg"] = H
     # «Моя приёмка»: «в срок за 20 р.д.: k из n» — отрезки S1 в счёте (_timeliness: не пропущен,
     # без «пачки», возврата и обратного порядка меток, р.д. посчитаны); скрытая — без списка.
@@ -2052,11 +2123,13 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
     for r, o in zip(rows, L):
         d = deal_by.get(o.get("deal")) or {}
         g = G.setdefault(r["mgr"], {"who": r["mgr"], "kind": r["mk"], "gone": bool(r.get("gone")),
-                                    "keys": [], "overKeys": [], "waitKeys": [], "deals": set(),
+                                    "keys": [], "overKeys": [], "waitKeys": [], "preKeys": [], "deals": set(),
                                     "cust": set(), "byStep": Counter()})
         g["keys"].append(r["k"])
         if r.get("over"):
             g["overKeys"].append(r["k"])
+        if r.get("po"):
+            g["preKeys"].append(r["k"])
         if r.get("wu"):
             g["waitKeys"].append(r["k"])
         g["deals"].add(r["deal"])
@@ -2067,6 +2140,8 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
              "pct": round(len(g["keys"]) * 100 / live_n, 1) if live_n else None,
              "deals": len(g["deals"]), "customers": len(g["cust"]),
              "over": len(g["overKeys"]), "wait": len(g["waitKeys"]),
+             # строка «до передачи в ОРК»: из них дольше нормы шага 0 — не over (Σ over = W2)
+             **({"preOver": len(g["preKeys"])} if g["kind"] == "pre" else {}),
              "byStep": dict(sorted(g["byStep"].items()))}
             for g in sorted(G.values(), key=lambda g: (PULSE_ORDER[g["kind"]], g["who"].casefold()))]
     # заказы строки «Пульса» ключами не дублируются: это строки week.orders с mgr == who (сверх
@@ -2080,7 +2155,7 @@ def _week_drill(*, L, U, C12, deals, queue, step, ov, over_ids, wait_ids, long_p
              "units": {"n": "order", "deals": "deal", "customers": "customer", "over": "order", "wait": "order"},
              "customers": len({(deal_by.get(x) or {}).get("customer") for x in all_deals} - {None, "", "—"}),
              "over": sum(p["over"] for p in prow), "wait": sum(p["wait"] for p in prow),
-             "out": PULSE_OUT, "none": PULSE_NONE}
+             "out": PULSE_OUT, "none": PULSE_NONE, "pre": PULSE_PRE}
     for r in rows:
         r.pop("mk", None)                               # вид — у строки «Пульса» (kind)
     dl_rows = [_compact(x) for x in deals_out.values()]

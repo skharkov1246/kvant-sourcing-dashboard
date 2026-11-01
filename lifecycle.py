@@ -106,6 +106,16 @@ EXC = {
     # оплата поставщику без договора с заказчиком (Рег. 2.4, 7.6.4): сделка ни разу не была на
     # стадии «Договор с заказчиком подписан» или дальше, и договора заказчика нет в разборе договоров
     "payNoContract": (3, "оплачено поставщику, договор с заказчиком не подписан по стадии и не найден", "проверить договор заказчика; без него оплату не проводить"),
+    # шаг 0 (решение владельца 31.10.2026): задача «Подтверждение готовности передачи…» открыта
+    # дольше нормы — хозяин исполнитель задачи, КАМ сделки в копии (ork.ITEM); важность — как у
+    # приёмки: заказ не идёт в работу ОРК
+    "s0Over": (4, f"передача в ОРК не подтверждена дольше {ork.NORM_WD[ork.PRE_STEP]} р.д.",
+               "закрыть задачу подтверждения или назвать, чего не хватает: проверка поставщика, "
+               "свежий оффер, смена поставщика"),
+    # задача подтверждения открыта, а заказ по стадии или фактам уже дальше шага 0 (решение
+    # владельца 31.10.2026, а) — порядок в карточках, из счёта срока не исключает
+    "confirmOpen": (12, "задача подтверждения передачи открыта, а заказ уже дальше «Заказ создан»",
+                    "закрыть задачу подтверждения или вернуть стадию"),
 }
 # действие для шапки сделки над строками её заказов (§1.7 спецификации «сделка и заказ»):
 # разговор с клиентом — один на сделку, у КАМа; в счёт пунктов не идёт
@@ -121,7 +131,7 @@ ACT_CLIENT = {
 UNIT = {
     **{c: "order" for c in ("late", "risk", "forecast", "planAfterDl", "prodDev", "noUtd",
                             "s2Over", "s3Over", "s6Over", "ordAssign", "goneOrd",
-                            "noDl", "noPlanDates", "noFact")},
+                            "noDl", "noPlanDates", "noFact", "s0Over", "confirmOpen")},
     **{c: "deal" for c in ("unpaid", "noPayPlan", "s1Over", "noOrder", "payNoContract",
                            "dealClose", "dealOpen", "gone",
                            # пункты закрытой части (dealctx): договор поставщика с заказом — order
@@ -133,13 +143,13 @@ UNIT = {
 # (решения владельца 30.10.2026, п. 2 и 3: dealClose и noPayPlan — сюда)
 BUCKET = {
     **{c: "exec" for c in ("late", "risk", "forecast", "planAfterDl", "prodDev", "noUtd",
-                           "s2Over", "s3Over", "s6Over", "ordAssign")},
+                           "s2Over", "s3Over", "s6Over", "ordAssign", "s0Over")},
     **{c: "deal" for c in ("unpaid", "noOrder", "s1Over", "payNoContract",
                            "chatReply", "chatRisk", "chatDue", "contractRisk",
                            "contractMissing:customer", "contractMissing:both")},
     **{c: "hyg" for c in ("dealClose", "dealOpen", "noPayPlan", "gone", "goneOrd",
                           "noPlanDates", "noFact", "noDl", "econGap", "contractUnreadable",
-                          "contractMissing", "contractMissing:supplier")},
+                          "contractMissing", "contractMissing:supplier", "confirmOpen")},
 }
 # пункт закрытой части с заказом (договор поставщика, сверка договоров с f.order) — дело заказа
 BUCKET_ORDER = {"contractMissing": "exec", "contractMissing:supplier": "exec", "contractRisk": "exec"}
@@ -170,7 +180,8 @@ PLAN_DATES = (("prodStart", "начало производства"), ("prodEnd"
 # начало счёта срока шага (ork.clock) → как его назвать у пункта: по этой подписи день
 # проверяется в Битриксе (создание заказа, история стадий, «Дата записи нового
 # ответственного», «Customer delivery date, actual»)
-SINCE_WORD = {"назначение": "назначение", "вход в шаг": "вход в шаг", "доставка": "доставка"}
+SINCE_WORD = {"назначение": "назначение", "вход в шаг": "вход в шаг", "доставка": "доставка",
+              "задача подтверждения": "создана задача подтверждения"}
 # кто из хозяев сделки уволен — признаки строки сделки contracts.py (справочник людей). Прежний
 # счёт counts.gone — сделки с любым из трёх; пункты с 30.10.2026 разведены: gone — люди СДЕЛКИ
 # (ответственный, ОСС сделки), goneOrd — ответственный или ОСС ЗАКАЗА (orders[] строки сделки)
@@ -495,8 +506,9 @@ def order_exceptions(o: dict, today: dt.date, fc: dt.date | None = None, *,
             out.append(("noDl", None))
         if any(not o.get(k) for k, _ in PLAN_DATES):
             out.append(("noPlanDates", None))
-        # сверх нормы шага регламента (ork.OVER_CODE) и «ждём УПД от клиента» (ork.WAIT_CODE,
-        # шаг 12 — noUtd): ork.judged — то же правило, что у таблицы сделок, ведомости и W2.
+        # сверх нормы шага регламента (ork.OVER_CODE), «ждём УПД от клиента» (ork.WAIT_CODE,
+        # шаг 12 — noUtd) и передача в ОРК не подтверждена (ork.PRE_CODE, шаг 0 — s0Over, решение
+        # владельца 31.10.2026): ork.judged — то же правило, что у таблицы сделок, ведомости и W2.
         # Шаги 1, 4, 5, 8 — только со стадией из портала; шаг 12 — 10 р.д. от СЫРОЙ даты
         # доставки (delFact), на 11-й р.д. — пункт (Рег. 14.2.5, 14.3.1). Гигиена (стадия позади
         # фактов, брошенная карточка, доставка старше CLOSE_DAYS без УПД) в счёт не идёт
@@ -507,8 +519,13 @@ def order_exceptions(o: dict, today: dt.date, fc: dt.date | None = None, *,
         if code and ov["termUnknown"] and ov["why"] == "год без производственного календаря" \
                 and nocal is not None:
             nocal[LEGACY_CODE.get(code, code)] += 1
-        if code and (ov["over"] or ov["waitUtd"]):
+        if code and (ov["over"] or ov["waitUtd"] or ov.get("preOver")):
             out.append((code, ov["wd"]))
+        # задача подтверждения передачи открыта, а заказ уже дальше шага 0 (ork.hygiene): порядок
+        # в карточке; дни — календарные от создания задачи
+        if ork.confirm_open(o) and ork.hygiene(o, today)["confirmOpen"]:
+            c0 = _date_of((o.get("confirm") or {}).get("from"))
+            out.append(("confirmOpen", (today - c0).days if c0 else None))
         # закрытие — только у живого заказа и только за CLOSE_DAYS: закрытый заказ
         # закрытие прошёл, а старые доставки без файла платёжки — пробел учёта до
         # появления поля, а не долг клиента
@@ -545,12 +562,16 @@ def _dmy(d: dt.date | None) -> str:
 def since_text(since, by: str, o: dict, today: dt.date) -> str:
     """«с 14.10 (назначение)» — день (МСК), от которого считаны дни срока шага (ork.clock), и чем
     он дан; год — только если не текущий. Начало приёмки t0 — «создан заказ» или «вход в
-    реализацию» (t0 = позднее из двух). Дня нет — пустая строка."""
+    реализацию» (t0 = позднее из двух), а с закрытия задачи подтверждения передачи (t0Src
+    confirm, решение владельца 31.10.2026) — «подтверждена передача»; шаг 0 — «создана задача
+    подтверждения». Дня нет — пустая строка."""
     d = _date_of(since)
     if d is None:
         return ""
     s = d.strftime("%d.%m") if d.year == today.year else d.strftime("%d.%m.%Y")
-    if by == "начало приёмки":
+    if by == "начало приёмки" and o.get("t0Src") == "confirm":
+        word = "подтверждена передача"
+    elif by == "начало приёмки":
         word = "создан заказ" if _date_of(o.get("created")) == d else "вход в реализацию"
     else:
         word = SINCE_WORD.get(by, by)
@@ -823,10 +844,14 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         return v if v not in (None, "", "—") else ""
 
     def ppl(o: dict | None, d: dict | None) -> dict:
-        """Люди заказа и сделки для ork.owner."""
+        """Люди заказа и сделки для ork.owner. dealOrk — поле сделки «Ответственный за реализацию»
+        (руководителя ОРК в нём contracts уже не пишет: решение владельца 31.10.2026); resp —
+        ответственный заказа (исполнитель шага, если менеджера ОРК нет: заказ не передан в ОРК);
+        confirmResp — исполнитель задачи подтверждения передачи (шаг 0)."""
         o, d = o or {}, d or {}
         return {"orkMgr": _nm(o.get("orkMgr")), "dealOrk": _nm(d.get("orkResp")), "orkHead": _nm(ork_head),
-                "kam": _nm(d.get("kam")), "ossOrder": _nm(o.get("oss")), "ossDeal": _nm(d.get("ossDeal"))}
+                "kam": _nm(d.get("kam")), "ossOrder": _nm(o.get("oss")), "ossDeal": _nm(d.get("ossDeal")),
+                "resp": _nm(o.get("resp")), "confirmResp": _nm(o.get("confirmWho"))}
 
     def pid(o: dict | None, d: dict | None) -> dict:
         """id Битрикса людей заказа и сделки — те же ключи, что у ppl (R4, Д-11а)."""
@@ -834,7 +859,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         oi, di = o.get("_pid") or {}, d.get("_pid") or {}
         return {"orkMgr": oi.get("orkMgr"), "dealOrk": di.get("dealOrk"), "orkHead": ork_head_id,
                 "kam": d.get("kamId") or di.get("kam"), "ossOrder": oi.get("ossOrder"),
-                "ossDeal": di.get("ossDeal")}
+                "ossDeal": di.get("ossDeal"), "resp": oi.get("resp"), "confirmResp": oi.get("confirmResp")}
 
     def item(code: str, o: dict | None, d: dict | None) -> dict:
         """Шаг, роль, исполнитель и копия пункта (ork.ITEM): who — хозяин пункта. whoId и
@@ -850,9 +875,17 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
              "escalateToId": ork.role_id(ow["copyRole"], pp, ids) if ow["copyRole"] else ""}
         # «не назначен» — одно определение на экране (E25): менеджера ОРК нет И ответственного
         # заказа нет (orkview.pulse_who, вид none). Менеджера ОРК нет, а ответственный заказа есть,
-        # но не из ОРК, — whoOut: «ответственный не из ОРК — назначить менеджера ОРК», своим счётом
-        if ow["role"] == "orkMgr" and ow["who"] == "не назначен" and o and _nm(o.get("resp")):
+        # но не из ОРК, — whoOut, своим счётом: исполнитель шага — он (who, whoId; заказ не передан
+        # в ОРК, решение владельца 31.10.2026, заказ 968/2), руководителю ОРК — outAct «принять заказ
+        # и назначить менеджера ОРК» (в копии, если у пункта своей копии нет, иначе вторым в копии —
+        # alsoCopy: ork.owner). Заказ на шаге 0 (задача подтверждения открыта) — не whoOut: пункт
+        # менеджера ОРК у исполнителя задачи, КАМ в копии (ork.owner: pre)
+        if ow.get("out"):
             r["whoOut"] = True
+            r["outAct"] = ork.OUT_ACT
+            if ow.get("alsoCopyRole"):
+                r.update(alsoCopy=ow["alsoCopy"], alsoCopyRole=ow["alsoCopyRole"],
+                         alsoCopyId=ork.role_id(ow["alsoCopyRole"], pp, ids))
         return r
 
     def gone(name: str) -> bool:
@@ -880,7 +913,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     # вселенная — та же, что у таблицы сделок: заказы известных сделок, без
     # проигранных; у закрытой (выигранной) сделки сроки заказов уже не отклонения
     СРОКИ = {"late", "risk", "forecast", "prodDev", "planAfterDl", "noDl", "noPlanDates",
-             "s1Over", "s2Over", "s3Over", "s6Over"}
+             "s1Over", "s2Over", "s3Over", "s6Over", "s0Over", "confirmOpen"}
     ОПЛАТА = {"unpaid", "noPayPlan"}       # у закрытой выигранной сделки оплата получена
     # заказы сделки и принятые сделки (_deal_accept): срок шага 1 заказа принятой сделки — не
     # приёмка, а ordAssign (решение владельца 30.10.2026, п. 1)

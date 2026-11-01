@@ -45,10 +45,13 @@ FORBIDDEN: list[tuple[str, str, str]] = [
     ("Ан. §", r"Ан\.\s?§", "«разд. N аналитики ОРК»"),
     ("Рег.", r"(?<![А-Яа-яЁё])Рег\.\s", "«п. N регламента»"),
     ("ISO-дата", r"(?<!\d)20\d\d-[01]\d-[0-3]\d(?!\d)", "«ДД.ММ.ГГГГ»"),
-    ("имя кода", r"\b(?:s[1-9]Over|noUtd|noPayPlan|noPlanDates|prodDev|planAfterDl|payNoContract|dealClose|dealOpen"
+    # шаг 0 «Подтверждение передачи в ОРК» (решение владельца 31.10.2026): s0Over, confirmOpen,
+    # confirmResp и preOver — тоже имена кода
+    ("имя кода", r"\b(?:s\dOver|noUtd|noPayPlan|noPlanDates|prodDev|planAfterDl|payNoContract|dealClose|dealOpen"
                  r"|noOrder|noDl|noFact|chatDue|chatRisk|chatReply|contractRisk|contractMissing|econGap|waitUtd"
-                 r"|stepWaitUtd|orkMgr|orkHead|ork\.\w+|lifecycle\.\w+)\b", "слова, а не имя кода"),
-    ("S-код без шага", r"(?<![\w-])S(?:10|[1-9])(?![\w])(?!\s*\(шаг)", "«S3 (шаг 5)»"),
+                 r"|stepWaitUtd|orkMgr|orkHead|confirmOpen|confirmResp|stepPreOver|preOver|ork\.\w+|lifecycle\.\w+)\b",
+     "слова, а не имя кода"),
+    ("S-код без шага", r"(?<![\w-])S(?:10|\d)(?![\w])(?!\s*\(шаг)", "«S3 (шаг 5)»"),
     # ревью раунда 3: «13 из 2 раб. дн.» читалось как «13 из 2»; «Пункты очереди» — жаргон (rz_decode)
     ("N из M раб. дн.", r"\d+ из \d+ раб\. дн\.", "«13 раб. дн. при норме 2»"),
     ("Пункты очереди", r"Пункты очереди", "«Что сделать по этому шагу»"),

@@ -38,6 +38,7 @@ import chat_activity
 import dealctx
 import lifecycle
 import ork
+import ork_confirm
 import orkview
 import people as people_mod
 import period as period_mod
@@ -252,6 +253,42 @@ def _parse_dt(s: str) -> dt.datetime | None:
     except (ValueError, TypeError):
         return None
     return d.replace(tzinfo=_MSK) if d.tzinfo is None else d   # метки Bitrix — портал (МСК)
+
+
+# «Замедлено» из-за шага 0 (решение владельца 31.10.2026, г): причина в подписи сделки
+PRE_SLOW_WHY = f"подтверждение передачи в ОРК дольше {ork.NORM_WD[ork.PRE_STEP]} раб. дн. (исполнитель задачи)"
+
+
+def _confirm_of(tasks: dict | None, oid: str, today: dt.date) -> dict | None:
+    """Задача подтверждения передачи заказа (ork_confirm.load) на конец окна today (МСК), как у
+    «Даты записи нового ответственного»: задача, созданная позже, — как не заведена (None);
+    закрытая позже — на конец окна была открыта. Задачи не прочитаны (tasks None) — None."""
+    cf = (tasks or {}).get(str(oid)) if tasks is not None else None
+    if not cf:
+        return None
+    a = _parse_dt(cf.get("from") or "")
+    if a is not None and a.astimezone(_MSK).date() > today:
+        return None
+    at = _parse_dt(cf.get("at") or "")
+    if not cf.get("open") and at is not None and at.astimezone(_MSK).date() > today:
+        return {**cf, "open": True, "at": ""}
+    return dict(cf)
+
+
+def _t0_src(created: str, cat0: str) -> str:
+    """Чем дано t0Raw = max(создание заказа, вход сделки в реализацию): created | cat0 | ''."""
+    a, b = _parse_dt(created) if created else None, _parse_dt(cat0) if cat0 else None
+    if b is not None and (a is None or b > a):
+        return "cat0"
+    return "created" if a is not None else ""
+
+
+def _is_ork_head(uid: str, name: str, head_uid: str, head_name: str) -> bool:
+    """В поле сделки «Ответственный за реализацию» — руководитель ОРК (справочник отделов): по id
+    Битрикса, а без id — по подписи (решение владельца 31.10.2026, заказ 968/2)."""
+    if uid and head_uid:
+        return str(uid) == str(head_uid)
+    return bool(name) and bool(head_name) and name == head_name
 
 
 def _days_between(a: str, b: str) -> float | None:
@@ -554,7 +591,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             ctx_econ: dict[str, dict] | None = None,
             ctx_contracts: dict[str, dict] | None = None,
             departments: list[dict] | None = None,
-            fx_loader=None, stage_meta: dict[str, dict] | None = None) -> dict:
+            fx_loader=None, stage_meta: dict[str, dict] | None = None,
+            confirm_tasks: dict[str, dict] | None = None, confirm_stats: dict | None = None) -> dict:
     """people — справочник {uid: {name, active}} с ушедшими (main._people): без него
     уволенный ответственный или ОСС показывался заглушкой «user#N», а его живые
     сделки и заказы не были видны как работа без хозяина.
@@ -575,7 +613,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     нужные даты (main.py — base.fx.load_cbr); None или ЦБ недоступен — курсы Битрикса с
     плашкой «курсы Битрикса (ЦБ недоступен)» и счётом в head «fx».
     stage_meta — справочник стадий сделок (client.deal_stage_meta), если сборка его уже
-    прочитала (пресейл): для стадий «предложение выдано» второй раз портал не спрашивается."""
+    прочитала (пресейл): для стадий «предложение выдано» второй раз портал не спрашивается.
+    confirm_tasks, confirm_stats — задачи «Подтверждение готовности передачи…» по заказам и их счёт
+    (ork_confirm.load, решение владельца 31.10.2026): открытая задача — заказ на шаге 0, закрытая
+    — приёмка (t0) с её закрытия. None — задачи не прочитаны: шага 0 нет, числа прежние, строка 0
+    ведомости — «Нет данных» (head.confirm.read — false)."""
     today = as_of or dt.date.today()
     now_iso = period_mod.now(_MSK).isoformat()
     people = people or {}
@@ -915,7 +957,23 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         # вход в шаг (шаг 5 — три стадии заказа): по всем переходам, если последний из них —
         # вход в текущую стадию; иначе — вход в стадию
         _since = ork.step_since(tr, ostages)[1] if (_ol and _ol[0] == osid and tr) else ""
-        t0 = _t0(str(o.get("createdTime") or ""), deal_cat0.get(did, ""))
+        # начало приёмки: прежнее t0Raw = max(создание заказа, вход сделки в реализацию); задача
+        # подтверждения передачи закрыта позже — с её закрытия (шаг 0, решение владельца 31.10.2026)
+        t0_raw = _t0(str(o.get("createdTime") or ""), deal_cat0.get(did, ""))
+        cf = _confirm_of(confirm_tasks, oid, today)
+        t0, t0_src = t0_raw, _t0_src(str(o.get("createdTime") or ""), deal_cat0.get(did, ""))
+        if cf is not None and not cf["open"]:
+            _cat = _parse_dt(cf.get("at") or "")
+            _raw = _parse_dt(t0_raw) if t0_raw else None
+            # в момент закрытия стадия уже на шаге ≥ 2 — ОРК взял заказ при открытой задаче: шаг 0 до
+            # ухода стадии, приёмка 0 р.д. (решение владельца 01.11.2026; живые 01.11: 9 заказов, у
+            # которых S1 «кончался раньше начала» и выпадал из M1). t0Src «confirmLate» — счёт в журнал
+            if _cat is not None and (_raw is None or _cat > _raw):
+                _late = ork.confirm_late_t0(tr, ostages, _cat, _raw)
+                if _late is not None:
+                    t0, t0_src = _late.isoformat(), "confirmLate"
+                else:
+                    t0, t0_src = _cat.isoformat(), "confirm"
         utd_raw = _pdate(o.get(UTD_DATE))            # сырая дата УПД — без подстановки
         _rs = [x for x in (ork.stage_step(ostages.get(sid, sid)) for sid, _ in tr) if x is not None]
         # номер заказа, как его пишет портал («900/1»), — у пункта очереди, в таблицах недели,
@@ -935,9 +993,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "resp": _resp[0], "respOrk": is_ork(uid_of(o.get("assignedById"))),
             "orkMgr": _ork_mgr,
             # id Битрикса тех же людей — отбор «Смотреть как» (R4, Д-11а); в страницу не идёт
-            # (life_orders — внутренний список)
+            # (life_orders — внутренний список). resp — ответственный заказа не из ОРК: исполнитель
+            # шага, если менеджера ОРК нет (ork.owner, решение владельца 31.10.2026); confirmResp —
+            # исполнитель задачи подтверждения передачи (шаг 0)
             "_pid": {"orkMgr": uid_of(o.get("assignedById")) if _ork_mgr else "",
-                     "ossOrder": uid_of(o.get(OSS_F))},
+                     "ossOrder": uid_of(o.get(OSS_F)),
+                     "resp": "" if _ork_mgr else uid_of(o.get("assignedById")),
+                     "confirmResp": uid_of((cf or {}).get("resp"))},
             "live": sm == "P", "success": sm == "S", "closedRecent": bool(sm == "S" and moved and moved >= recent_from),
             "created": _pdate(o.get("createdTime")), "dl": _pdate(o.get(DL_CUSTOMER)),
             "shipPlan": _pdate(o.get(SHIP_PLAN)), "shipFact": _pdate(o.get(SHIP_FACT)),
@@ -956,6 +1018,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             # регламент ОРК: стадия, вход в неё и в шаг, начало приёмки, вход сделки в реализацию
             "stage": _stage_name(osid), "stageId": osid, "stageSince": oin, "stepSince": _since or oin,
             "t0": t0, "dealCat0": deal_cat0.get(did, ""),
+            # шаг 0 (решение владельца 31.10.2026): t0Raw — начало без задачи подтверждения, t0Src —
+            # чем дано t0 (created | cat0 | confirm — закрытие задачи; confirmLate — задача закрыта, когда
+            # стадия уже на шаге ≥ 2: t0 — уход стадии с шага 1), confirm — задача заказа
+            # (ork_confirm: open, from, at, spans, n, resp, status) или None, confirmWho — её исполнитель
+            "t0Raw": t0_raw, "t0Src": t0_src, "confirm": cf,
+            "confirmWho": who((cf or {}).get("resp"))[0] if cf is not None else "",
             "reachMax": max(_rs) if _rs else None,
             "kamOrder": who(o.get(KAM_ORDER))[0], "direction": str(o.get(DIRECTION_F) or ""),
             # «Дата записи нового ответственного»: приёмка кончается назначением, если оно раньше
@@ -963,13 +1031,16 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "prepayShare": _share(o.get(PREPAY_F)), "assignDate": assign,
             # артефакты шагов (ork.ARTIFACTS): файл, флажок, дата есть — содержимое не проверено
             "art": {a["key"]: _has(o.get(a["field"])) for a in ork.ARTIFACTS},
-            # только для расчёта (в страницу не идут): первый выход на шаги и сегменты S1–S10
+            # только для расчёта (в страницу не идут): первый выход на шаги (сегменты S1–S10 — ниже)
             "_reach": ork.reach_times(tr, ostages),
-            # назначение — в сегменты только у ответственного из ОРК (то же правило, что ork.assign_at)
-            "_segs": ork.segments(tr, ostages, t0=t0 or None,
-                                  facts={"delFact": _pdate(o.get(DEL_FACT)), "utdRaw": utd_raw,
-                                         "assignAt": assign if _ork_mgr else None}),
         }
+        # сегменты — по готовому заказу: назначение — только у ответственного из ОРК и не раньше
+        # закрытия задачи подтверждения (ork.seg_assign — то же правило, что ork.assign_at); заказ
+        # на шаге 0 приёмку не начал (pre_open: S1 не начат)
+        lo["_segs"] = ork.segments(tr, ostages, t0=lo["t0"] or None,
+                                   facts={"delFact": _pdate(o.get(DEL_FACT)), "utdRaw": utd_raw,
+                                          "assignAt": ork.seg_assign(lo)},
+                                   pre_open=ork.step_now(lo) == ork.PRE_STEP)
         a = lo["art"]
         a["planDates"] = bool(lo["prodStart"] and lo["prodEnd"])
         a["prodConf"], a["utd"], a["dl"] = lo["prodConf"], lo["utd"], bool(lo["dl"])
@@ -1127,9 +1198,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         # --- заказы: стадия, возраст стадии, дедлайн клиенту, замедленность
         ords_det = []
         slow_orders = 0            # живых заказов сверх нормы шага регламента (р.д., «без пауз»)
+        pre_slow = 0               # … и на шаге 0 дольше нормы (передача в ОРК не подтверждена)
         slow_old = 0               # … и прежним порогом 2× медианы — только для сравнения
-        # люди сделки для хозяина шага (ork.owner): менеджер ОРК на сделке, КАМ, ОСС
-        d_people = {"dealOrk": who(d.get(ORK_RESP))[0], "orkHead": ork_head,
+        # люди сделки для хозяина шага (ork.owner): менеджер ОРК на сделке, КАМ, ОСС. Руководитель
+        # ОРК в поле «Ответственный за реализацию» менеджером заказа не считается (решение
+        # владельца 31.10.2026, заказ 968/2): исполнитель — ответственный заказа (ork.owner, out)
+        d_ork_head = _is_ork_head(uid_of(d.get(ORK_RESP)), who(d.get(ORK_RESP))[0], ork_head_uid, ork_head)
+        d_people = {"dealOrk": "" if d_ork_head else who(d.get(ORK_RESP))[0], "orkHead": ork_head,
                     "kam": who(d.get(KAM_F) or d.get(KAM_OLD))[0], "ossDeal": who(d.get(OSS_DEAL))[0]}
         late_orders = 0            # заказов с просроченным обещанием клиенту
         worst_late = None          # самая глубокая просрочка по сделке, дн
@@ -1162,16 +1237,21 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             ov = ork.judged(lo, today, in_cat0=in_cat0)
             ostep = ov["step"]
             lo["kamDeal"] = d_people["kam"]
-            lo["own"] = own = ork.owner(ostep, {**d_people, "orkMgr": lo["orkMgr"], "ossOrder": lo["oss"]}) \
-                if ostep else {"role": "", "who": "", "copy": "", "copyRole": ""}
+            lo["own"] = own = ork.owner(ostep, {**d_people, "orkMgr": lo["orkMgr"], "ossOrder": lo["oss"],
+                                                "resp": lo["resp"], "confirmResp": lo["confirmWho"]}) \
+                if ostep is not None else {"role": "", "who": "", "copy": "", "copyRole": ""}
             # закрытая выигранная сделка (в том числе «Оплата получена») — в счёте только шаг 12
             # (УПД, Рег. 14.2.4–14.3.2), проигранная — ничего: та же совокупность, что ведомость,
             # W2 и очередь (C12 orkview, lifecycle). Остальные шаги закрытой сделки — не
             # отклонения: ни красной строки заказа, ни «замедлена» в карточке
             ojudge = bool(olive and (not closed or (ostep == 12 and sem != "F")))
-            oslow = bool(ojudge and ov["over"])
-            ostep_closed = bool(olive and not ojudge and ostep and ov["norm"] is not None)
-            if oslow:
+            # «Замедлено» — счёт сделки, не обвинение ОРК: шаг 0 дольше нормы (preOver) — тоже
+            # (решение владельца 31.10.2026, г), а в W2 и «сверх нормы» ОРК он не идёт
+            oslow = bool(ojudge and (ov["over"] or ov["preOver"]))
+            ostep_closed = bool(olive and not ojudge and ostep is not None and ov["norm"] is not None)
+            if ojudge and ov["preOver"]:
+                pre_slow += 1
+            elif oslow:
                 slow_orders += 1
             # обещание клиенту: та же дата, по которой снабжение ведёт «Контроль дедлайнов»
             dl = _pdate(o.get(DL_CUSTOMER))
@@ -1255,6 +1335,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "stepOver": ov["over"] if ojudge else None,
                 # шаг 12 больше 10 р.д. без УПД — «ждём УПД от клиента», не «сверх нормы»
                 "stepWaitUtd": bool(ojudge and ov["waitUtd"]),
+                # шаг 0 дольше нормы — передача в ОРК не подтверждена (решение владельца 31.10.2026):
+                # не «сверх нормы» ОРК (stepOver — False), но «Замедлено» сделки
+                "stepPreOver": bool(ojudge and ov["preOver"]),
                 # шаг живого заказа закрытой сделки вне счёта (не шаг 12 выигранной) — подпись
                 # «сделка закрыта, не в счёте» вместо оценки срока
                 "stepClosed": ostep_closed,
@@ -1266,6 +1349,17 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 # остаётся его собственное «почему» («шаг не нормируется», «нет данных»)
                 "stepWhy": (("сделка закрыта: в счёте только шаг 12 (УПД)" if sem != "F" else "сделка проиграна")
                             if ostep_closed else ov["why"] if olive else ""),
+                # исполнитель шага — ответственный заказа не из ОРК: заказ не передан в ОРК
+                # (ork.owner, решение владельца 31.10.2026) — только когда так
+                **({"stepWhoOut": True} if own.get("out") else {}),
+                # исполнитель задачи подтверждения передачи (шаг 0) — у заказа с задачей
+                **({"confirmWho": lo["confirmWho"]} if lo.get("confirm") is not None else {}),
+                # ответственный заказа не из ОРК при пустом менеджере ОРК — исполнитель заказа, не
+                # переданного в ОРК (решение владельца 31.10.2026, заказ 968/2): пункт заказа dealctx
+                # (чат, договор поставщика) отдаёт ему, как очередь (ork.owner: out), — только когда
+                # так; подпись ответственного из ОРК в строку по-прежнему не идёт (он — orkMgr)
+                **({"respOut": lo["resp"]} if lo["resp"] and not (_nm_or_empty(lo.get("orkMgr"))
+                                                                  or _nm_or_empty(d_people["dealOrk"])) else {}),
             })
             if olive:
                 # путь живого заказа по шагам регламента (ork.path, владелец 29.10.2026: «провалиться
@@ -1302,8 +1396,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                        if (not closed and in_cat0 and not ords and entered_real) else None)
         no_orders_slow = bool(no_order_wd is not None and no_order_wd > ork.NORM_WD[1])
         late = bool(not closed and late_orders)
-        # простой по стадии — только кандидат: «подвисла» решает чат сделки (ниже)
-        stuck = bool(slow_orders > 0 or no_orders_slow)
+        # простой по стадии — только кандидат: «подвисла» решает чат сделки (ниже); шаг 0 дольше
+        # нормы — тоже кандидат (решение владельца 31.10.2026, г)
+        stuck = bool(slow_orders > 0 or pre_slow > 0 or no_orders_slow)
         # прежний кандидат (2× медианы, неделя без заказа) — для «сумма прячет потерю»
         stuck_old = bool((not closed and in_cat0 and stage_days is not None and stage_days > dthr)
                          or slow_old > 0
@@ -1315,6 +1410,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             why.append(f"просрочено обещание клиенту: {late_orders} заказ(ов), макс. {worst_late} дн")
         if slow_orders:
             why.append(f"сверх нормы шага: {slow_orders} заказ(ов), {ork.NO_PAUSE}")
+        if pre_slow:
+            why.append(f"{PRE_SLOW_WHY}: {pre_slow} заказ(ов)")
         if no_orders_slow:
             why.append(f"нет ни одного заказа {no_order_wd} р.д. после входа в реализацию")
 
@@ -1337,7 +1434,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         # «Оплата получена» или все заказы закрыты, а сделка открыта — шаг 13, ОСС закрывает
         # сделку (решение 26.10.2026, п. 4; dealClose / dealOpen очереди)
         d_step = _dstep(cur_stage) if in_cat0 else None
-        _live_st = [x for x in ords_det if x["live"] and x["step"]]
+        _live_st = [x for x in ords_det if x["live"] and x["step"] is not None]
         # приёмка — одна на сделку (решение владельца 30.10.2026, п. 1): пока сделку не приняли
         # (lifecycle._deal_accept), заказы на шаге 1 ждут приёмки СДЕЛКИ — у них не свой срок
         # «дольше нормы», а один шаг сделки на всех (stepAcc); у принятой сделки новый заказ на
@@ -1355,15 +1452,19 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         # заказов на шагах …»; шаг сделки из шага одного заказа без номера не показывается
         _cell_orders = [{"order": x["id"], "lbl": x["lbl"], "step": x["step"]}
                         for x in sorted(_live_st, key=lambda x: (x["step"], x["ordNo"] is None, x["ordNo"] or 0))]
-        if _cand and (any(x["stepOver"] or x["stepWaitUtd"] for x in _cand) or not paid):
-            c = min(_cand, key=lambda x: (not x["stepOver"], not x["stepWaitUtd"], x["step"]))
+        if _cand and (any(x["stepOver"] or x["stepWaitUtd"] or x["stepPreOver"] for x in _cand) or not paid):
+            # шаг 0 дольше нормы — тоже «почему замедлена» (решение 31.10.2026, г), но после «сверх нормы»
+            # ОРК: заказ шага 0 не прячет в ячейке сделки срыв нормы ОРК другого заказа (решение 31.10.2026, п. 1)
+            c = min(_cand, key=lambda x: (not x["stepOver"], not x["stepPreOver"], not x["stepWaitUtd"], x["step"]))
             step_cell = {"step": c["step"], "role": c["stepRole"], "who": c["stepWho"], "wd": c["stepWd"],
                          "norm": c["stepNorm"], "over": c["stepOver"], "waitUtd": c["stepWaitUtd"],
+                         "preOver": c["stepPreOver"],
                          "normDoc": c["stepNormDoc"],
                          "normState": c["stepNormState"], "hyg": c["stepHyg"], "why": c["stepWhy"],
                          "label": ork.NO_PAUSE, "close": "paid" if paid else "", "closeNote": _close_note,
                          # шаг взят у этого заказа: номер — рядом с шагом (E32)
-                         "unit": "order", "order": c["id"], "lbl": c["lbl"], "orders": _cell_orders}
+                         "unit": "order", "order": c["id"], "lbl": c["lbl"], "orders": _cell_orders,
+                         **({"whoOut": True} if c.get("stepWhoOut") else {})}
             if c.get("stepAcc"):
                 # шаг сделки 1 «Приёмка сделки»: один на сделку, её заказы на шаге 1 ждут менеджера
                 # ОРК — счётом рядом (accept), срок — худший из них (E3)
@@ -1375,14 +1476,16 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         elif paid or _all_done:
             _o = ork.owner(13, d_people)
             step_cell = {"step": 13, "role": _o["role"], "who": _o["who"], "wd": None, "norm": None,
-                         "over": None, "waitUtd": False, "normDoc": "", "normState": "none", "hyg": False, "why": "",
+                         "over": None, "waitUtd": False, "preOver": False, "normDoc": "", "normState": "none",
+                         "hyg": False, "why": "",
                          "label": "закрыть сделку", "close": "paid" if paid else "open", "closeNote": _close_note,
                          # шаг 13 — шаг сделки (закрыть сделку), а не заказа
                          "unit": "deal", "order": "", "lbl": "", "orders": _cell_orders}
         elif not closed and in_cat0 and not ords:
             _h = ork.owner(1, d_people)
             step_cell = {"step": 1, "role": _h["role"], "who": _h["who"], "wd": no_order_wd,
-                         "norm": ork.NORM_WD[1], "over": no_orders_slow if no_order_wd is not None else None, "waitUtd": False,
+                         "norm": ork.NORM_WD[1], "over": no_orders_slow if no_order_wd is not None else None,
+                         "waitUtd": False, "preOver": False,
                          "normDoc": ork.NORM_DOC[1][0], "normState": "norm", "hyg": False, "why": "",
                          "label": ork.NO_PAUSE, "close": "", "closeNote": "",
                          # приёмка сделки без заказа — шаг сделки
@@ -1502,9 +1605,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             # регламент ОРК: вход в реализацию, менеджер ОРК на сделке, шаг сделки по стадии и
             # наибольший по всем переходам, ячейка шага для таблицы сделок
             "cat0At": str(entered_real or ""), "orkResp": d_people["dealOrk"],
+            # в поле «Ответственный за реализацию» — руководитель ОРК: менеджером заказов сделки он не
+            # считается (orkResp пуст; решение владельца 31.10.2026) — только когда так (правило 16)
+            **({"orkRespHead": True} if d_ork_head else {}),
             # id людей сделки для whoId / escalateToId пунктов очереди (R4, Д-11а); снимается
             # до выдачи в страницу (ниже, вместе с _stuckOld)
-            "_pid": {"dealOrk": uid_of(d.get(ORK_RESP)), "kam": uid_of(d.get(KAM_F) or d.get(KAM_OLD)),
+            "_pid": {"dealOrk": "" if d_ork_head else uid_of(d.get(ORK_RESP)),
+                     "kam": uid_of(d.get(KAM_F) or d.get(KAM_OLD)),
                      "ossDeal": uid_of(d.get(OSS_DEAL))},
             "dealStep": d_step, "dealStepMax": max(_dmax) if _dmax else None,
             "stepCell": step_cell, "_stuckOld": stuck_old, "_stuckNew": stuck,
@@ -1624,6 +1731,26 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                             "buy": _money(v) if v else "", "noRate": v is None})
 
     ork_month: dict[str, dict] = {}         # «Месяц» (отдел и поимённо) — по виду, под правом
+    # шаг 0 (решение владельца 31.10.2026): прочитаны ли задачи подтверждения передачи и сколько —
+    # одна сводка на оба вида (шапка, «Как считается», строка 0 ведомости «Нет данных», правило 15).
+    # Задачи не прочитаны (confirm_tasks None) — read false, как бы ни был заполнен счёт
+    if confirm_tasks is None:
+        _cst = confirm_stats if (confirm_stats and not confirm_stats.get("read")) else {
+            "read": False, "why": "не читались"}
+    else:
+        _cst = confirm_stats or {"read": True, "n": len(confirm_tasks), "orders": len(confirm_tasks),
+                                 "open": sum(1 for x in confirm_tasks.values() if (x or {}).get("open"))}
+    _since = _parse_dt(ork_confirm.SINCE).astimezone(_MSK).date()
+    confirm_head = ork_confirm.head(_cst, sum(1 for lo in life_orders if lo["live"] and lo["created"]
+                                              and lo["created"] >= _since))
+    # счёт сдвига приёмки (в журнал main.py и «Как считается»): t0 сдвинут закрытием задачи;
+    # S1 таких заказов кончился раньше начала (стадия ушла дальше до закрытия задачи) — выпал из
+    # своевременности M1, это потеря n, её видно числом
+    confirm_head["t0Moved"] = sum(1 for lo in life_orders if lo["t0Src"] == "confirm")
+    confirm_head["s1Neg"] = sum(1 for lo in life_orders if lo["t0Src"] == "confirm"
+                                and ((lo["_segs"].get("segs") or {}).get("S1") or {}).get("neg"))
+    # задача закрыта, когда стадия уже на шаге ≥ 2, — приёмка с ухода стадии, 0 р.д. (01.11.2026)
+    confirm_head["t0Late"] = sum(1 for lo in life_orders if lo["t0Src"] == "confirmLate")
 
     def _view(rows_v: list[dict], life_v: dict | None, orders_v: list[dict] | None = None,
               key: str = "main") -> dict:
@@ -1879,7 +2006,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         if life_v is not None and orders_v is not None:
             ork_v, ork_month[key] = orkview.build(orders_v, rows_v, life_v.get("queue") or [], today,
                                                   measure=life_orders, otd=life_v.get("otd"),
-                                                  ork_head=ork_head)
+                                                  ork_head=ork_head, confirm=confirm_head)
             ork_v["slowCmp"] = slow_cmp
 
         return {
@@ -1918,6 +2045,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "planProfit": _money(plan_profit_live), "planProfitNum": round(plan_profit_live),
                 "planN": len(plan_live_rows), "planLive": n_plan_live, "planTotal": n_plan,
                 "planSusp": n_plan_susp, "planNeg": n_plan_neg, "planAsOf": plan_asof,
+                # задачи подтверждения передачи в ОРК (шаг 0): read true | false | "empty", n, why
+                "confirm": dict(confirm_head),
             },
             "kpis": [{"lbl": l, "val": v, "meta": m, "clz": c} for l, v, m, c in kpis],
             "deadlines": deadlines,

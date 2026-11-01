@@ -340,7 +340,10 @@ def test_смотреть_как_дело_человека(page):
     n = 0
     for deal, z in rowsK.items():
         items = sorted(_q(r, deal), key=lambda i: i.get("sev") if i.get("sev") is not None else 99)
-        mine = [i for i in items if "30" in (str(i.get("whoId") or ""), str(i.get("kamId") or ""), str(i.get("escalateToId") or ""))]
+        # alsoCopyId — руководитель ОРК вторым в копии у пункта заказа, не переданного в ОРК (whoOut, решение
+        # владельца 31.10.2026): «Смотреть как» его видит (_rzKamOk)
+        mine = [i for i in items if "30" in (str(i.get("whoId") or ""), str(i.get("kamId") or ""), str(i.get("escalateToId") or ""),
+                                             str(i.get("alsoCopyId") or ""))]
         if not mine or items[0] in mine:
             continue
         act = mine[0]["act"][:18].lower()

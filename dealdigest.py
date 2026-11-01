@@ -75,15 +75,18 @@ def _put(d: dict, k: str, v) -> None:
 def _stage(r: dict, step_name) -> dict:
     out: dict = {}
     c = r.get("stepCell") or {}
-    step = c.get("step") or r.get("dealStep")
+    # шаг 0 (до передачи в ОРК, решение владельца 31.10.2026) — тоже шаг: проверка на None, не на истинность
+    step = c.get("step") if c.get("step") is not None else r.get("dealStep")
     _put(out, "name", _s(r.get("stageName")))
     _put(out, "days", _n(round(r["stageDays"])) if _n(r.get("stageDays")) is not None else None)
     _put(out, "step", step)
-    _put(out, "stepName", _s(step_name(step)) if step else "")
+    _put(out, "stepName", _s(step_name(step)) if step is not None else "")
     if c.get("over") is not None:
         out["over"] = bool(c["over"])
     if c.get("waitUtd"):
         out["waitUtd"] = True
+    if c.get("preOver"):
+        out["preOver"] = True
     return out
 
 
@@ -179,6 +182,8 @@ def _order(o: dict) -> dict:
         out["over"] = bool(o["stepOver"])
     if o.get("stepWaitUtd"):
         out["waitUtd"] = True
+    if o.get("stepPreOver"):
+        out["preOver"] = True
     return out
 
 
