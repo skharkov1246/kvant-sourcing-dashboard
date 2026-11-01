@@ -95,7 +95,7 @@ jobs:
       # уже записан по ходу и должен уехать владельцу.
       - name: Выгрузка результата артефактом
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tkp-full
           path: |
@@ -127,7 +127,7 @@ jobs:
 
       - name: Выгрузка документа артефактом
         if: always() && inputs.dry_run != true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tkp-pdf
           path: ${{ runner.temp }}/pdf/*.pdf
