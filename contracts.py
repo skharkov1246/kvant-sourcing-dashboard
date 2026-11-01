@@ -965,8 +965,16 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         if cf is not None and not cf["open"]:
             _cat = _parse_dt(cf.get("at") or "")
             _raw = _parse_dt(t0_raw) if t0_raw else None
+            # стадия ушла с шага 1 раньше закрытия задачи — приёмку шли по стадии (стадия сильнее,
+            # решение 31.10.2026, а): t0 прежний, иначе S1 «конец раньше начала» и выпадает из M1
+            # (живые 01.11.2026: 9 заказов). t0Src «confirmLate» — счёт в журнал (правило 16)
+            _r2 = ork.reach_times(tr, ostages).get(2)
+            _left = _parse_dt(_r2) if _r2 else None
             if _cat is not None and (_raw is None or _cat > _raw):
-                t0, t0_src = _cat.isoformat(), "confirm"
+                if _left is not None and _left < _cat:
+                    t0_src = "confirmLate"
+                else:
+                    t0, t0_src = _cat.isoformat(), "confirm"
         utd_raw = _pdate(o.get(UTD_DATE))            # сырая дата УПД — без подстановки
         _rs = [x for x in (ork.stage_step(ostages.get(sid, sid)) for sid, _ in tr) if x is not None]
         # номер заказа, как его пишет портал («900/1»), — у пункта очереди, в таблицах недели,
@@ -1012,7 +1020,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "stage": _stage_name(osid), "stageId": osid, "stageSince": oin, "stepSince": _since or oin,
             "t0": t0, "dealCat0": deal_cat0.get(did, ""),
             # шаг 0 (решение владельца 31.10.2026): t0Raw — начало без задачи подтверждения, t0Src —
-            # чем дано t0 (created | cat0 | confirm — закрытие задачи), confirm — задача заказа
+            # чем дано t0 (created | cat0 | confirm — закрытие задачи; confirmLate — задача закрыта после
+            # ухода стадии с шага 1, t0 прежний), confirm — задача заказа
             # (ork_confirm: open, from, at, spans, n, resp, status) или None, confirmWho — её исполнитель
             "t0Raw": t0_raw, "t0Src": t0_src, "confirm": cf,
             "confirmWho": who((cf or {}).get("resp"))[0] if cf is not None else "",
@@ -1741,6 +1750,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     confirm_head["t0Moved"] = sum(1 for lo in life_orders if lo["t0Src"] == "confirm")
     confirm_head["s1Neg"] = sum(1 for lo in life_orders if lo["t0Src"] == "confirm"
                                 and ((lo["_segs"].get("segs") or {}).get("S1") or {}).get("neg"))
+    # задача закрыта, когда стадия уже ушла с шага 1, — t0 прежний (стадия сильнее)
+    confirm_head["t0Late"] = sum(1 for lo in life_orders if lo["t0Src"] == "confirmLate")
 
     def _view(rows_v: list[dict], life_v: dict | None, orders_v: list[dict] | None = None,
               key: str = "main") -> dict:
