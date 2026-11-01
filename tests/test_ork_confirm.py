@@ -801,39 +801,98 @@ def test_ревью_пункт_заказа_dealctx_не_переданного_
     assert not [x for rr in R["ct"]["rows"] for x in rr["orders"] if x.get("respOut") and x.get("orkMgr")]
 
 
+
 class ЗакрытаПослеСтадии(fixture.ПодтверждениеПередачи):
     """Живые 01.11.2026: у 9 заказов задачу подтверждения закрыли, когда стадия уже ушла с шага 1
-    (ОРК принял заказ до закрытия задачи). Приёмка (t0) сдвигалась закрытием — S1 «конец раньше
-    начала» и выпадал из M1. Стадия сильнее (решение 31.10.2026, а): t0 прежний. Придумано (правило 18):
-      • 934 — заказ заведён пн 12.10, «Заказ направлен» вт 13.10, задача закрыта ср 14.10 15:00."""
+    (ОРК взял заказ при открытой задаче). Приёмка (t0) сдвигалась закрытием — S1 «конец раньше
+    начала» и выпадал из M1. Решение владельца 01.11.2026: шаг 0 до ухода стадии, приёмка 0 р.д.
+    Придумано (правило 18), сегодня — пн 19.10:
+      • 934 — заказ заведён пн 12.10, «Заказ направлен» вт 13.10, задача закрыта ср 14.10 15:00;
+      • 933 — «Заказ направлен» вт 13.10, возврат в «Заказ создан» ср 14.10, задача закрыта пт 16.10:
+        в момент закрытия — шаг 1, приёмка с закрытия (как без правки);
+      • 932 — назначение вт 13.10 при открытой задаче, «Заказ направлен» чт 15.10, задача закрыта пт
+        16.10: шаг 0 до 15.10, назначение — с 15.10 (не 13.10), срок шага 4 — с 15.10."""
 
     def __init__(self):
         super().__init__()
         import contracts as ct
         T_ = lambda day, hm="10:00": f"2026-10-{day}T{hm}:00+03:00"  # noqa: E731
         d = lambda a: (fixture.CT_TODAY - dt.timedelta(days=a)).isoformat()  # noqa: E731
-        self.deals.append({"ID": "6397", "TITLE": "934. Задача закрыта после ухода стадии", "OPPORTUNITY": "30000",
-                           "CURRENCY_ID": "EUR", "COMPANY_ID": "305", "STAGE_ID": "C0:EXECUTING",
-                           "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": T_("01"),
-                           "ASSIGNED_BY_ID": "11", ct.OSS_DEAL: ["21"], ct.KAM_F: self.KAM})
-        self.hist[2] += [("6397", "C0:NEW", T_("02")), ("6397", "C0:EXECUTING", T_("05"))]
-        self.orders.append({"id": 99971, "title": "934/1. Узел", "companyId": "404", "parentId2": 6397,
-                            "opportunity": 9_000, "currencyId": "EUR", "stageId": "DT172_26:SENT",
-                            "createdTime": T_(12), "movedTime": T_(13), ct.OSS_F: "21", "assignedById": "31",
-                            ct.PROD_START: d(-5), ct.PROD_END: d(-40), ct.DEL_BUDGET: d(-80), ct.DL_CUSTOMER: d(-90)})
-        self.hist[172] += [("99971", "DT172_26:NEW", T_(12)), ("99971", "DT172_26:SENT", T_(13))]
-        self.tasks.append(fixture.ct_task(5401, 99971, T_(12, "11:00"), status="5", closed=T_(14, "15:00")))
+        plan = {ct.PROD_START: d(-5), ct.PROD_END: d(-40), ct.DEL_BUDGET: d(-80), ct.DL_CUSTOMER: d(-90)}
+        for did, seq, oid, stages, close, extra in (
+                ("6397", 934, 99971, (("NEW", T_(12)), ("SENT", T_(13))), T_(14, "15:00"), {}),
+                ("6398", 933, 99972, (("NEW", T_(12)), ("SENT", T_(13)), ("NEW", T_(14))), T_(16, "15:00"), {}),
+                ("6399", 932, 99973, (("NEW", T_(12)), ("SENT", T_(15))), T_(16, "15:00"), {ct.ASSIGN_AT: "2026-10-13"})):
+            self.deals.append({"ID": did, "TITLE": f"{seq}. Задача закрыта после ухода стадии", "OPPORTUNITY": "30000",
+                               "CURRENCY_ID": "EUR", "COMPANY_ID": "305", "STAGE_ID": "C0:EXECUTING",
+                               "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": T_("01"),
+                               "ASSIGNED_BY_ID": "11", ct.OSS_DEAL: ["21"], ct.KAM_F: self.KAM})
+            self.hist[2] += [(did, "C0:NEW", T_("02")), (did, "C0:EXECUTING", T_("05"))]
+            self.orders.append({"id": oid, "title": f"{seq}/1. Узел", "companyId": "404", "parentId2": int(did),
+                                "opportunity": 9_000, "currencyId": "EUR", "stageId": f"DT172_26:{stages[-1][0]}",
+                                "createdTime": T_(12), "movedTime": stages[-1][1], ct.OSS_F: "21",
+                                "assignedById": "31", **plan, **extra})
+            self.hist[172] += [(str(oid), f"DT172_26:{st_}", at) for st_, at in stages]
+            self.tasks.append(fixture.ct_task(5400 + oid % 100, oid, T_(12, "11:00"), status="5", closed=close))
 
 
-def test_задача_закрыта_после_ухода_стадии_t0_прежний():
+@pytest.fixture(scope="module")
+def L():
     st = ЗакрытаПослеСтадии()
     ct, got = _build(st)
-    lo = {o["id"]: o for o in got["o"]}["99971"]
-    assert lo["t0Src"] == "confirmLate" and lo["t0"] == lo["t0Raw"]
+    return {"ct": ct, "lo": {o["id"]: o for o in got["o"]}}
+
+
+def test_задача_закрыта_после_ухода_стадии_приёмка_0_рд(L):
+    """934: в момент закрытия стадия на шаге 4 — t0 = уход стадии (вт 13.10), S1 0 р.д., в норме, без
+    «конец раньше начала» — входит в M1 (решение владельца 01.11.2026)."""
+    lo = L["lo"]["99971"]
+    assert lo["t0Src"] == "confirmLate" and lo["t0"] == "2026-10-13T10:00:00+03:00"
     s1 = lo["_segs"]["segs"]["S1"]
-    assert not s1["neg"] and s1["endBy"] == "стадия" and s1["wd"] == 1
-    c = ct["head"]["confirm"]
-    assert c["t0Late"] == 1 and c["s1Neg"] == 0 and c["t0Moved"] == 3
-    # шаг по стадии, путь шага 0 — задача закрыта; ни confirmOpen, ни s0Over
-    assert _ord(ct, "99971")["step"] == 4
-    assert not _q(ct, "99971", "confirmOpen") and not _q(ct, "99971", "s0Over")
+    assert not s1["neg"] and s1["wd"] == 0 and s1["inNorm"] is True and orkview._clean(s1)
+    assert _ord(L["ct"], "99971")["step"] == 4
+    assert not _q(L["ct"], "99971", "confirmOpen") and not _q(L["ct"], "99971", "s0Over")
+
+
+def test_возврат_на_шаг_1_до_закрытия_приёмка_с_закрытия(L):
+    """933: вернули в «Заказ создан» до закрытия задачи — в момент закрытия шаг 1: приёмка с закрытия
+    (решение 31.10.2026, 1), срок шага 1 — 1 р.д., пунктов приёмки нет."""
+    lo = L["lo"]["99972"]
+    assert lo["t0Src"] == "confirm" and lo["t0"] == "2026-10-16T15:00:00+03:00"
+    assert ork.clock(lo, 1)[0] == dt.date(2026, 10, 16)
+    assert not _q(L["ct"], "99972", "s1Over") and not _q(L["ct"], "99972", "ordAssign")
+
+
+def test_назначение_при_открытой_задаче_с_ухода_стадии(L):
+    """932: назначение вт 13.10 при открытой задаче — это ещё шаг 0; приёмка и назначение — с ухода
+    стадии чт 15.10, S1 0 р.д., срок шага 4 — с 15.10, s2Over нет (пт 16.10 и пн 19.10 — 2 р.д.)."""
+    lo = L["lo"]["99973"]
+    assert lo["t0Src"] == "confirmLate" and lo["t0"] == "2026-10-15T10:00:00+03:00"
+    assert ork.assign_at(lo) == dt.date(2026, 10, 15) and ork.seg_assign(lo) == dt.date(2026, 10, 15)
+    s1 = lo["_segs"]["segs"]["S1"]
+    assert s1["wd"] == 0 and not s1["neg"]
+    assert not _q(L["ct"], "99973", "s2Over")
+
+
+def test_счёт_сдвига_приёмки_в_шапке(L):
+    """t0Late — 934 и 932; t0Moved — 942, 943, 946 и 933. «Конец раньше начала» остаётся только у
+    возвращённого 933: первый выход на шаг ≥ 2 (13.10) раньше приёмки с закрытия (16.10) — возврат,
+    S1 вне M1, как без правки."""
+    c = L["ct"]["head"]["confirm"]
+    assert c["t0Late"] == 2 and c["t0Moved"] == 4 and c["s1Neg"] == 1
+    assert L["lo"]["99972"]["_segs"]["segs"]["S1"]["neg"]
+
+
+def test_confirm_late_t0_граничные_случаи():
+    names = {"N": "Заказ создан", "S": "Заказ направлен"}
+    T_ = lambda day, hm="10:00": f"2026-10-{day}T{hm}:00+03:00"  # noqa: E731
+    at = dt.datetime.fromisoformat
+    # переходов нет / задача не закрыта — None (приёмка как без правки)
+    assert ork.confirm_late_t0([], names, T_(14)) is None
+    assert ork.confirm_late_t0([("N", T_(12)), ("S", T_(13))], names, None) is None
+    # заказ заведён сразу на шаге ≥ 2 — t0 = первый переход, не раньше t0Raw
+    assert ork.confirm_late_t0([("S", T_(12))], names, T_(14), T_(11)) == at(T_(12))
+    # переход в тот же день, что закрытие, но позже — в момент закрытия шаг 1
+    assert ork.confirm_late_t0([("N", T_(12)), ("S", T_(14, "16:00"))], names, T_(14, "15:00")) is None
+    # t0Raw позже ухода стадии (сделка вошла в реализацию позже) — t0Raw
+    assert ork.confirm_late_t0([("N", T_(12)), ("S", T_(13))], names, T_(16), T_(14)) == at(T_(14))
