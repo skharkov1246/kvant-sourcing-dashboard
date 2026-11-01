@@ -917,7 +917,8 @@ def run(args) -> int:
         print(f"  шаг 0 (подтверждение передачи в ОРК): задачи {_cfr}; "
               f"живых заказов на шаге 0 {_tr.get('pre', 0)}, сверх {ork.NORM_WD[ork.PRE_STEP]} р.д. "
               f"{(_lc.get('counts') or {}).get('s0Over', 0)}; приёмка (t0) сдвинута закрытием задачи у "
-              f"{_cf.get('t0Moved', 0)}, S1 из-за этого «конец раньше начала» у {_cf.get('s1Neg', 0)}; "
+              f"{_cf.get('t0Moved', 0)}, S1 из-за этого «конец раньше начала» у {_cf.get('s1Neg', 0)}, "
+              f"закрыта, когда стадия уже дальше шага 1 (приёмка с ухода стадии, 0 р.д.), у {_cf.get('t0Late', 0)}; "
               f"задача открыта, а заказ дальше шага 0 — {(_lc.get('counts') or {}).get('confirmOpen', 0)}")
         if _cf.get("read") in ("empty", "partial"):
             print(f"  ⚠ {_cf.get('why')}")
