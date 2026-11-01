@@ -799,3 +799,41 @@ def test_ревью_пункт_заказа_dealctx_не_переданного_
     assert own["whoOut"] and own["copyRole"] == "kam" and own["alsoCopy"] == "Роза (рук. ОРК)"
     # ответственный из ОРК — подписи в строке нет
     assert not [x for rr in R["ct"]["rows"] for x in rr["orders"] if x.get("respOut") and x.get("orkMgr")]
+
+
+class ЗакрытаПослеСтадии(fixture.ПодтверждениеПередачи):
+    """Живые 01.11.2026: у 9 заказов задачу подтверждения закрыли, когда стадия уже ушла с шага 1
+    (ОРК принял заказ до закрытия задачи). Приёмка (t0) сдвигалась закрытием — S1 «конец раньше
+    начала» и выпадал из M1. Стадия сильнее (решение 31.10.2026, а): t0 прежний. Придумано (правило 18):
+      • 934 — заказ заведён пн 12.10, «Заказ направлен» вт 13.10, задача закрыта ср 14.10 15:00."""
+
+    def __init__(self):
+        super().__init__()
+        import contracts as ct
+        T_ = lambda day, hm="10:00": f"2026-10-{day}T{hm}:00+03:00"  # noqa: E731
+        d = lambda a: (fixture.CT_TODAY - dt.timedelta(days=a)).isoformat()  # noqa: E731
+        self.deals.append({"ID": "6397", "TITLE": "934. Задача закрыта после ухода стадии", "OPPORTUNITY": "30000",
+                           "CURRENCY_ID": "EUR", "COMPANY_ID": "305", "STAGE_ID": "C0:EXECUTING",
+                           "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": T_("01"),
+                           "ASSIGNED_BY_ID": "11", ct.OSS_DEAL: ["21"], ct.KAM_F: self.KAM})
+        self.hist[2] += [("6397", "C0:NEW", T_("02")), ("6397", "C0:EXECUTING", T_("05"))]
+        self.orders.append({"id": 99971, "title": "934/1. Узел", "companyId": "404", "parentId2": 6397,
+                            "opportunity": 9_000, "currencyId": "EUR", "stageId": "DT172_26:SENT",
+                            "createdTime": T_(12), "movedTime": T_(13), ct.OSS_F: "21", "assignedById": "31",
+                            ct.PROD_START: d(-5), ct.PROD_END: d(-40), ct.DEL_BUDGET: d(-80), ct.DL_CUSTOMER: d(-90)})
+        self.hist[172] += [("99971", "DT172_26:NEW", T_(12)), ("99971", "DT172_26:SENT", T_(13))]
+        self.tasks.append(fixture.ct_task(5401, 99971, T_(12, "11:00"), status="5", closed=T_(14, "15:00")))
+
+
+def test_задача_закрыта_после_ухода_стадии_t0_прежний():
+    st = ЗакрытаПослеСтадии()
+    ct, got = _build(st)
+    lo = {o["id"]: o for o in got["o"]}["99971"]
+    assert lo["t0Src"] == "confirmLate" and lo["t0"] == lo["t0Raw"]
+    s1 = lo["_segs"]["segs"]["S1"]
+    assert not s1["neg"] and s1["endBy"] == "стадия" and s1["wd"] == 1
+    c = ct["head"]["confirm"]
+    assert c["t0Late"] == 1 and c["s1Neg"] == 0 and c["t0Moved"] == 3
+    # шаг по стадии, путь шага 0 — задача закрыта; ни confirmOpen, ни s0Over
+    assert _ord(ct, "99971")["step"] == 4
+    assert not _q(ct, "99971", "confirmOpen") and not _q(ct, "99971", "s0Over")

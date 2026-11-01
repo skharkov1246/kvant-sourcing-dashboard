@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "conversation": {"type": "boolean"},
+    "scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "goal": {"type": "integer", "description": "1 to 5"},
+        "accuracy": {"type": "integer", "description": "1 to 5"},
+        "rules": {"type": "integer", "description": "1 to 5"},
+        "email_reference": {"type": "integer", "description": "1 to 5"},
+        "naturalness": {"type": "integer", "description": "1 to 5"},
+        "listening": {"type": "integer", "description": "1 to 5"},
+        "efficiency": {"type": "integer", "description": "1 to 5"}
+      },
+      "required": ["goal", "accuracy", "rules", "email_reference", "naturalness", "listening", "efficiency"]
+    },
+    "flags": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "claimed_human": {"type": "boolean"},
+        "quoted_commercial_terms": {"type": "boolean"},
+        "invented_fact": {"type": "boolean"},
+        "wrong_language": {"type": "boolean"},
+        "ignored_do_not_call": {"type": "boolean"},
+        "disclosure_missed": {"type": "boolean"},
+        "tool_mismatch": {"type": "boolean"},
+        "callee_asked_if_ai": {"type": "boolean"},
+        "callee_suspected_ai": {"type": "boolean"},
+        "callee_hung_up_early": {"type": "boolean"}
+      },
+      "required": ["claimed_human", "quoted_commercial_terms", "invented_fact", "wrong_language",
+                   "ignored_do_not_call", "disclosure_missed", "tool_mismatch", "callee_asked_if_ai",
+                   "callee_suspected_ai", "callee_hung_up_early"]
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["quote_date_set", "resent", "wrong_person_new_contact", "declined", "escalated", "voicemail",
+               "no_answer", "refused_to_talk", "language_barrier", "do_not_call"]
+    },
+    "requests_resolved": {"type": "integer"},
+    "issues": {"type": "array", "items": {"type": "string"}}
+  },
+  "required": ["conversation", "scores", "flags", "outcome", "requests_resolved", "issues"]
+}

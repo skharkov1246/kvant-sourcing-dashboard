@@ -78,6 +78,21 @@ OUT, IN = "2", "1"                         # DIRECTION дела: исходящ�
     **{c: "GB" for c in ("AE", "SA", "QA", "OM", "KW", "BH", "IN", "TR")},
 }
 ПУЛ_ПО_УМОЛЧАНИЮ = "GB"
+# Кому звоним (владелец, 31.10.2026: «Китай / Дубай / Юго-Восточная Азия»; Индия — добавлена
+# владельцем 31.10.2026 после холостого прогона): страна — по номеру телефона. Без фильтра в очередь
+# идут Россия (205 звонков), ЕС и США — вне задачи пилота. Переменная CALL_COUNTRIES: список кодов
+# через запятую («CN,HK,AE») или «*» — все страны.
+СТРАНЫ_ПИЛОТА = frozenset(("CN", "HK", "MO", "TW", "AE", "IN", "SG", "MY", "TH", "VN", "ID", "PH", "KH", "MM", "LA",
+                           "BN"))
+
+
+def parse_countries(spec: str) -> frozenset | None:
+    """«CN,HK,AE» → набор; «*» → None (все страны); пусто или мусор → СТРАНЫ_ПИЛОТА."""
+    spec = str(spec or "").strip()
+    if spec == "*":
+        return None
+    got = frozenset(x.strip().upper() for x in spec.split(",") if re.fullmatch(r"[A-Za-z]{2}", x.strip()))
+    return got or СТРАНЫ_ПИЛОТА
 # Объявление об ИИ — по стране номера (решение владельца 31.10.2026: в начале не объявлять):
 # «start» — фраза в начале (ЕС: AI Act ст. 50 с 02.08.2026; США), «end» — короткая фраза в
 # конце (Китай: правила маркировки ИИ-контента с 01.09.2025 — до заключения юриста), «off».
@@ -170,6 +185,82 @@ def email_meta(a: dict) -> dict:
             "from": str(meta.get("from") or "").strip(), "to": to.strip()}
 
 
+# Наши компании-отправители: домен почты → название, которое произносит агент (владелец, 31.10.2026:
+# «имя компании — та, от какой отправлялся запрос»; домены — по холостому прогону 41249254412, где
+# видно, с каких адресов уходят письма поставщикам). Новый домен — строка здесь или секрет
+# CALL_SENDER_COMPANIES; домена нет нигде — по его запросам не звоним.
+НАШИ_ОТПРАВИТЕЛИ: dict[str, dict] = {
+    "anyrotary.com": {"name": "Anyrotary", "city": ""},
+    "varkala.org": {"name": "Varkala", "city": ""},
+    "kvantpro.com": {"name": "Kvant", "city": ""},
+    "bravast.com": {"name": "Bravast", "city": ""},
+    "steza.cn": {"name": "Steza", "city": ""},
+}
+
+_EMAIL = re.compile(r"[A-Za-z0-9._%+'-]+@([A-Za-z0-9.-]+\.[A-Za-z]{2,})")
+_CYR = re.compile(r"[\u0400-\u04FF]")
+
+
+def email_domain(addr) -> str:
+    """«Имя <user@mail.example.ae>» → «mail.example.ae»; без адреса — «»."""
+    m = _EMAIL.search(str(addr or ""))
+    return m.group(1).lower().strip(".") if m else ""
+
+
+def web_domain(url) -> str:
+    s = re.sub(r"^[a-z]+://", "", str(url or "").strip().lower()).split("/")[0].split(":")[0]
+    return s[4:] if s.startswith("www.") else s
+
+
+def sender_map(my_companies: list[dict], override: dict | None = None) -> tuple[dict[str, dict], Counter]:
+    """Домен почты → наша компания {name, city}. Компания, от которой ушёл запрос (владелец,
+    31.10.2026: «имя компании — та, от какой отправлялся запрос»).
+    Источник 1 — компании Битрикса с признаком «Моя компания» (IS_MY_COMPANY): домены их почты и
+    сайта; название — TITLE, если оно латиницей (агент говорит по-английски).
+    Источник 2 — таблица НАШИ_ОТПРАВИТЕЛИ (решение владельца); главнее Битрикса.
+    Источник 3 — закрытая настройка CALL_SENDER_COMPANIES (секрет): {"домен": "Название"} или
+    {"домен": {"name": …, "city": …}}; главнее всех. Домен, который в Битриксе ведёт к двум разным
+    названиям, отбрасывается: агент не должен угадывать."""
+    st: Counter = Counter()
+    seen: dict[str, set] = defaultdict(set)
+    for c in my_companies or []:
+        name = re.sub(r"\s+", " ", str(c.get("TITLE") or "")).strip()
+        if not name:
+            continue
+        if _CYR.search(name):
+            st["наша компания: название не латиницей"] += 1
+            continue
+        doms = {email_domain(v) for v in multifield(c.get("EMAIL"))} | {web_domain(v) for v in multifield(c.get("WEB"))}
+        for d in doms - {""}:
+            seen[d].add(name)
+    out = {}
+    for d, names in seen.items():
+        if len(names) == 1:
+            out[d] = {"name": next(iter(names)), "city": ""}
+        else:
+            st["домен у нескольких наших компаний — отброшен"] += 1
+    st["доменов из Битрикса"] = len(out)
+    out.update({d: dict(v) for d, v in НАШИ_ОТПРАВИТЕЛИ.items()})
+    for d, v in (override or {}).items():
+        dom = str(d or "").strip().lower().lstrip("@")
+        val = v if isinstance(v, dict) else {"name": v}
+        name = re.sub(r"\s+", " ", str(val.get("name") or "")).strip()
+        if dom and name and not _CYR.search(name):
+            out[dom] = {"name": name, "city": re.sub(r"\s+", " ", str(val.get("city") or "")).strip()}
+            st["доменов из настройки"] += 1
+    return out, st
+
+
+def sender_of(email_from, smap: dict[str, dict]) -> dict | None:
+    """Наша компания по адресу отправителя: точный домен, затем родительские (mail.x.ae → x.ae)."""
+    d = email_domain(email_from)
+    while d and "." in d:
+        if d in smap:
+            return smap[d]
+        d = d.split(".", 1)[1]
+    return None
+
+
 def last_emails(acts: list[dict]) -> dict[str, dict]:
     """Карточка → {"out": последнее исходящее, "any": время последнего письма в любую сторону}."""
     out: dict[str, dict] = {}
@@ -204,6 +295,19 @@ def reason(card: dict, mail: dict | None, today: dt.date, workdays, promise_fiel
     return ""
 
 
+def num_id(v) -> str:
+    """Номер записи CRM → строка ASCII-цифр без ведущих нулей или «». Пустое поле, None, 0, «None»,
+    дробь, надстрочные цифры — «»: str(None) == «None» уже валил прогон (карточка без сделки)."""
+    if isinstance(v, bool):
+        return ""
+    if isinstance(v, int):
+        return str(v) if v > 0 else ""
+    s = str(v if v is not None else "").strip()
+    if not re.fullmatch(r"[0-9]{1,18}", s):
+        return ""
+    return str(int(s)) if int(s) > 0 else ""
+
+
 def crm_refs(val) -> tuple[list[str], list[str]]:
     """Значение crm-поля (['CO_5', 'C_7', 'CT_8', '9']) → (компании, контакты) в порядке поля;
     то же правило, что probe_deal_rfq.ссылки_crm и main._crm_ref_ids."""
@@ -217,10 +321,11 @@ def crm_refs(val) -> tuple[list[str], list[str]]:
             conts.append(s[3:])
         elif s.startswith("C_"):
             conts.append(s[2:])
-        elif s.isdigit():
+        else:
             comps.append(s)
-    ok = lambda v: v.isdigit() and v != "0"                                   # noqa: E731
-    return [c for c in dict.fromkeys(comps) if ok(c)], [c for c in dict.fromkeys(conts) if ok(c)]
+    comps = [num_id(c) for c in comps]
+    conts = [num_id(c) for c in conts]
+    return [c for c in dict.fromkeys(comps) if c], [c for c in dict.fromkeys(conts) if c]
 
 
 def supplier_of(card: dict, deal_company: str, contact_company: dict[str, str]) -> tuple[str, list[str]]:
@@ -230,15 +335,15 @@ def supplier_of(card: dict, deal_company: str, contact_company: dict[str, str]) 
     c1, t1 = crm_refs(card.get("ufCrm18Supplier"))
     c2, t2 = crm_refs(card.get("ufCrm18SupplContact"))
     conts = list(dict.fromkeys(t1 + t2))
-    comps = c1 + c2 + [contact_company.get(t, "") for t in conts] + [str(card.get("companyId") or "")]
-    comps = [c for c in dict.fromkeys(comps) if c and c != "0" and c != str(deal_company or "")]
+    comps = c1 + c2 + [num_id(contact_company.get(t)) for t in conts] + [num_id(card.get("companyId"))]
+    comps = [c for c in dict.fromkeys(comps) if c and c != num_id(deal_company)]
     return (comps[0] if comps else ""), conts
 
 
 def rfq_no(card: dict) -> str:
     """Номер запроса, как в теме письма: <сделка>-<карточка> (навык supplier-rfq)."""
-    d = str(card.get("parentId2") or "").strip()
-    return f"{d}-{card.get('id')}" if d and d != "0" else str(card.get("id"))
+    d = num_id(card.get("parentId2"))
+    return f"{d}-{card.get('id')}" if d else str(card.get("id"))
 
 
 МЕСЯЦЫ = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
@@ -254,8 +359,8 @@ def human_date(t: dt.datetime | None) -> str:
 
 
 def agent_vars(call: dict) -> dict:
-    """Переменные для агента (callbot/agent/system_prompt.md). Наша компания, имя агента и номер
-    подставляет обработчик из настроек — в очереди их нет."""
+    """Переменные для агента (callbot/agent/system_prompt.md). Наша компания — та, с чьего адреса
+    ушло письмо (build, senders); имя агента — из настроек."""
     lines = []
     for i, r in enumerate(call["requests"], 1):
         lines.append(f'{i}. RFQ {r["rfq_no"]}, subject "{r["subject"]}", emailed on {r["email_date"]} '
@@ -264,6 +369,8 @@ def agent_vars(call: dict) -> dict:
             "requests_count": str(len(call["requests"])), "requests_block": "\n".join(lines),
             "first_rfq_no": call["requests"][0]["rfq_no"], "first_email_date": call["requests"][0]["email_date"],
             "first_subject": call["requests"][0]["subject"], "first_email_from": call["requests"][0]["email_from"],
+            "our_company": call.get("our_company", ""),
+            "our_company_intro": ", ".join(x for x in (call.get("our_company", ""), call.get("our_city", "")) if x),
             "disclosure": ОБЪЯВЛЕНИЕ.get(call["country"], "off")}
 
 
@@ -298,18 +405,25 @@ def call_texts(call: dict, settings: dict) -> tuple[str, str, list[str]]:
 def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], companies: dict[str, dict],
           today: dt.date, workdays, fields: dict | None = None, settings: dict | None = None,
           arms: list[tuple[str, int]] | None = None,
-          deal_company: dict[str, str] | None = None) -> tuple[list[dict], Counter]:
+          deal_company: dict[str, str] | None = None,
+          countries: frozenset | None = СТРАНЫ_ПИЛОТА,
+          senders: dict[str, dict] | None = None) -> tuple[list[dict], Counter]:
     """Звонки на сегодня и счётчики. contacts — {id: {name, phones:[…], company}};
     companies — {id: {name, phones:[…], dnc}}; deal_company — сделка → её компания (заказчик:
     поставщиком не бывает);
     settings — {our_company, agent_name}: есть — к звонку прикладываются готовые тексты агента;
-    arms — группы слепого сравнения (parse_arms): у звонка поле arm; «control» обработчик не набирает."""
+    arms — группы слепого сравнения (parse_arms): у звонка поле arm; «control» обработчик не набирает;
+    countries — страны пилота по номеру телефона (None — все);
+    senders — домен почты → наша компания (sender_map): от её имени звонит агент. Запрос, чьё письмо
+    ушло с несопоставленного адреса, не звонится. Запросы одному поставщику от разных наших компаний —
+    разные звонки (обработчик разносит их по дням: один звонок в день на компанию).
+    None — без сопоставления (тексты агента тогда не собираются)."""
     f = fields or {}
     arms = arms or parse_arms(ГРУППЫ_ПО_УМОЛЧАНИЮ)
     deal_company = deal_company or {}
     contact_company = {k: str(v.get("company") or "") for k, v in contacts.items()}
     st: Counter = Counter()
-    by_co: dict[str, list[tuple[dict, dict, str, list[str]]]] = defaultdict(list)
+    by_co: dict[tuple[str, str], list[tuple]] = defaultdict(list)
     for c in cards:
         st["карточек"] += 1
         if c.get("_offer"):
@@ -320,27 +434,36 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
         if not why:
             st["нет нашего письма в CRM" if not (m and m.get("out")) else "срок не наступил"] += 1
             continue
-        if f.get("attempts") and int(c.get(f["attempts"]) or 0) >= ПРАВИЛА["попыток_макс"]:
+        if f.get("attempts") and int(num_id(c.get(f["attempts"])) or 0) >= ПРАВИЛА["попыток_макс"]:
             st["попыток исчерпано"] += 1
             continue
-        co, conts = supplier_of(c, deal_company.get(str(c.get("parentId2") or ""), ""), contact_company)
+        co, conts = supplier_of(c, deal_company.get(num_id(c.get("parentId2")), ""), contact_company)
         if not co and not conts:
             st["поставщик не указан"] += 1
             continue
-        if str(c.get("companyId") or "") not in ("", "0", co):
+        if num_id(c.get("companyId")) not in ("", co):
             st["компания карточки — не поставщик (взят из поля Supplier)"] += 1
         co = co or f"ct:{conts[0]}"
         if (companies.get(co) or {}).get("dnc"):
             st["компания: не звонить"] += 1
             continue
+        sender = None
+        if senders is not None:
+            sender = sender_of(((m or {}).get("out") or {}).get("from"), senders)
+            if not sender:
+                st["отправитель письма не сопоставлен с нашей компанией"] += 1
+                continue
         st[f"причина {why}"] += 1
-        by_co[co].append((c, m or {}, why, conts))
+        by_co[(co, sender["name"] if sender else "")].append((c, m or {}, why, conts, sender))
     calls: list[dict] = []
-    for co, items in by_co.items():
+    per_supplier = Counter(co for co, _ in by_co)
+    st["поставщиков с запросами от разных наших компаний"] = sum(1 for n in per_supplier.values() if n > 1)
+    for (co, _sender_name), items in by_co.items():
+        sender = items[0][4]
         comp = companies.get(co) or {}
         phone = None
         contact_name = ""
-        for _, _, _, conts in items:           # телефон контакта поставщика — первым
+        for _, _, _, conts, _ in items:        # телефон контакта поставщика — первым
             for t in conts:
                 ct = contacts.get(t) or {}
                 for p in ct.get("phones") or []:
@@ -361,9 +484,13 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
             st["нет годного телефона (компаний)"] += 1
             continue
         e164, country, tz = phone
+        if countries is not None and country not in countries:
+            st[f"вне пилота: страна {country or '??'}"] += 1
+            st["вне пилота (компаний)"] += 1
+            continue
         items.sort(key=lambda x: (x[1].get("out") or {}).get("t") or dt.datetime.max.replace(tzinfo=MSK))
         reqs = []
-        for c, m, why, _ in items[:ПРАВИЛА["запросов_в_звонке"]]:
+        for c, m, why, _, _ in items[:ПРАВИЛА["запросов_в_звонке"]]:
             o = m.get("out") or {}
             reqs.append({"card": str(c.get("id")), "rfq_no": rfq_no(c), "subject": o.get("subject") or str(c.get("title") or ""),
                          "email_date": human_date(o.get("t")), "email_from": o.get("from", ""), "email_to": o.get("to", ""),
@@ -371,9 +498,10 @@ def build(cards: list[dict], mails: dict[str, dict], contacts: dict[str, dict], 
         st["отложено на завтра (больше 5 в звонке)"] += max(0, len(items) - ПРАВИЛА["запросов_в_звонке"])
         call = {"company_id": co, "company": comp.get("name") or f"company #{co}", "contact_name": contact_name,
                 "phone": e164, "country": country, "tz": tz, "from_pool": ПУЛ_НОМЕРОВ.get(country, ПУЛ_ПО_УМОЛЧАНИЮ),
-                "arm": arm_of(co, arms), "requests": reqs}
+                "arm": arm_of(co, arms), "requests": reqs,
+                "our_company": sender["name"] if sender else "", "our_city": sender["city"] if sender else ""}
         call["agent_vars"] = agent_vars(call)
-        if settings and settings.get("our_company") and settings.get("agent_name"):
+        if settings and settings.get("agent_name") and call["our_company"]:
             call["prompt"], call["voicemail"], miss = call_texts(call, settings)
             if miss:
                 st["тексты: неподставленные переменные"] += 1
@@ -426,6 +554,26 @@ def read_by_ids(client, method: str, flt_key: str, ids: list[str], select: list[
     return out
 
 
+ДОМЕН_ПОРОГ = 10      # домен с меньшим числом писем в журнал не попадает (только в «прочие»)
+
+
+def read_my_companies(client) -> list[dict]:
+    """Компании с признаком «Моя компания» — по ключу >ID, пачками по 50."""
+    out, last = [], 0
+    while True:
+        ch = client.call("crm.company.list", {"filter": {"IS_MY_COMPANY": "Y", ">ID": last},
+                                              "select": ["ID", "TITLE", "EMAIL", "WEB", "IS_MY_COMPANY"],
+                                              "order": {"ID": "ASC"}, "start": -1}) or []
+        if isinstance(ch, dict):
+            ch = list(ch.values())
+        if any(str(x.get("IS_MY_COMPANY") or "") != "Y" for x in ch):
+            raise RuntimeError("фильтр IS_MY_COMPANY crm.company.list не сработал")
+        out += ch
+        if len(ch) < 50:
+            return out
+        last = int(ch[-1]["ID"])
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Очередь звонилки поставщикам → KV callq:v1")
     ap.add_argument("--write", action="store_true", help="записать очередь в KV (без флага — холостой)")
@@ -459,7 +607,7 @@ def main(argv=None) -> int:
         c["_offer"] = bool(c.get(config.RFQ_OFFER_FIELD))
     print(f"карточек в работе за {ПРАВИЛА['возраст_дней']} дн.: {len(cards)}")
 
-    ids = sorted({str(c["id"]) for c in cards if not c["_offer"]}, key=int)
+    ids = sorted({num_id(c.get("id")) for c in cards if not c["_offer"]} - {""}, key=int)
     acts: list[dict] = []
     for part in _parts(ids, max(10, a.parts)):
         acts += read_by_ids(client, "crm.activity.list", "OWNER_ID", part,
@@ -475,30 +623,48 @@ def main(argv=None) -> int:
             cs, ts_ = crm_refs(c.get(fld))
             co_ids |= set(cs)
             ct_ids |= set(ts_)
-        if str(c.get("companyId") or "0") != "0":
-            co_ids.add(str(c.get("companyId")))
+        if num_id(c.get("companyId")):
+            co_ids.add(num_id(c.get("companyId")))
     contacts = {str(x["ID"]): {"name": " ".join(p for p in (x.get("NAME"), x.get("LAST_NAME")) if p).strip(),
-                               "phones": multifield(x.get("PHONE")), "company": str(x.get("COMPANY_ID") or "")}
+                               "phones": multifield(x.get("PHONE")), "company": num_id(x.get("COMPANY_ID"))}
                 for x in read_by_ids(client, "crm.contact.list", "@ID", sorted(ct_ids, key=int),
                                      ["ID", "NAME", "LAST_NAME", "PHONE", "COMPANY_ID"])}
-    co_ids |= {v["company"] for v in contacts.values() if v["company"].isdigit() and v["company"] != "0"}
+    co_ids |= {v["company"] for v in contacts.values() if v["company"]}
     co_ids = sorted(co_ids, key=int)
-    deal_ids = sorted({str(c.get("parentId2")) for c in live if str(c.get("parentId2") or "0").isdigit()
-                       and str(c.get("parentId2")) != "0"}, key=int)
-    deal_company = {d: str(x.get("COMPANY_ID") or "") for d, x in
+    deal_ids = sorted({num_id(c.get("parentId2")) for c in live} - {""}, key=int)
+    print(f"карточек без сделки: {sum(1 for c in live if not num_id(c.get('parentId2')))}")
+    deal_company = {d: num_id(x.get("COMPANY_ID")) for d, x in
                     client.deals_by_ids(deal_ids, select=["ID", "COMPANY_ID"]).items()}
     co_sel = ["ID", "TITLE", "PHONE"] + ([fields["dnc"]] if fields["dnc"] else [])
     companies = {str(x["ID"]): {"name": x.get("TITLE") or "", "phones": multifield(x.get("PHONE")),
                                 "dnc": bool(fields["dnc"]) and str(x.get(fields["dnc"]) or "").upper() in ("Y", "1", "TRUE", "ДА")}
                  for x in read_by_ids(client, "crm.company.list", "@ID", co_ids, co_sel)}
 
-    settings = {"our_company": os.environ.get("CALL_OUR_COMPANY", "").strip(),
-                "agent_name": os.environ.get("CALL_AGENT_NAME", "").strip()}
-    print("тексты агента: " + ("собираются" if all(settings.values()) else
-                               "не собираются — нет CALL_OUR_COMPANY или CALL_AGENT_NAME"))
+    settings = {"agent_name": os.environ.get("CALL_AGENT_NAME", "").strip()}
+    print("тексты агента: " + ("собираются" if all(settings.values()) else "не собираются — нет CALL_AGENT_NAME"))
+    mine = read_my_companies(client)
+    try:
+        override = json.loads(os.environ.get("CALL_SENDER_COMPANIES") or "{}")
+        override = override if isinstance(override, dict) else {}
+    except ValueError:
+        print("::warning::CALL_SENDER_COMPANIES — не JSON, пропущена")
+        override = {}
+    senders, sst = sender_map(mine, override)
+    print(f"наших компаний в Битриксе: {len(mine)}; " + "; ".join(f"{k}: {v}" for k, v in sorted(sst.items())))
+    # с каких доменов уходят наши письма: только домен и число писем (агрегат, правило 17);
+    # домены реже ДОМЕН_ПОРОГ писем — одной строкой «прочие», чтобы не светить единичные адреса
+    doms = Counter(email_domain((m.get("out") or {}).get("from")) or "(адрес не указан)"
+                   for cid, m in mails.items() if m.get("out"))
+    big = [(d, n) for d, n in doms.most_common() if n >= ДОМЕН_ПОРОГ]
+    print("домены отправителя наших писем: " + "; ".join(
+        f"{d} {n}{'' if sender_of('x@' + d, senders) else ' (не сопоставлен)'}" for d, n in big)
+        + f"; прочие: доменов {len(doms) - len(big)}, писем {sum(doms.values()) - sum(n for _, n in big)}")
     arms = parse_arms(os.environ.get("CALL_ARMS", ""))
     print("группы сравнения: " + ", ".join(f"{n} {w}" for n, w in arms))
-    calls, st = build(cards, mails, contacts, companies, today, period.workdays_ru, fields, settings, arms, deal_company)
+    countries = parse_countries(os.environ.get("CALL_COUNTRIES", ""))
+    print("страны пилота: " + ("все" if countries is None else ", ".join(sorted(countries))))
+    calls, st = build(cards, mails, contacts, companies, today, period.workdays_ru, fields, settings, arms, deal_company,
+                      countries, senders)
     # журнал — только счётчики, коды стран и пулов (правило 17)
     for k in sorted(st):
         print(f"  {k}: {st[k]}")
@@ -523,4 +689,8 @@ if __name__ == "__main__":
         sys.exit(main())
     except Exception as e:                     # noqa: BLE001 — в публичный журнал только класс ошибки
         print(f"::error::сбой: {type(e).__name__}" + (f": {e}" if type(e) is RuntimeError else ""))
+        # где упало — только файл, строка и функция, без значений и текста ошибки (правило 17)
+        import traceback
+        for fr in traceback.extract_tb(e.__traceback__)[-6:]:
+            print(f"  в {Path(fr.filename).name}:{fr.lineno} {fr.name}")
         sys.exit(1)
