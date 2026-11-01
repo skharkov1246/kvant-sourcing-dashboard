@@ -1,7 +1,7 @@
 """Шаг 0 «Подтверждение передачи в ОРК» и исполнитель заказа, не переданного в ОРК (решения владельца
 31.10.2026) — в настоящем браузере (Playwright) на странице из придуманного корпуса
-fixture.ПодтверждениеПередачи: путь заказа с открытой задачей начинается с шага 0; строка #wkPre над
-столбцами ведомости — те же числа, что в данных, и её кнопки открывают ровно столько строк; группа
+fixture.ПодтверждениеПередачи: путь заказа с открытой задачей начинается с шага 0; блок #wkPre первым в
+«Таблице 13 шагов» — те же числа, что в данных, и его кнопки открывают ровно столько строк; группа
 s0Over «Что сделать сегодня» открывает ровно свои заказы; у заказа 937/1 (ответственный не из ОРК, в
 поле сделки — руководитель ОРК) исполнитель — ответственный заказа с пометкой «не из ОРК — заказ не
 передан в ОРК»; scripts/validate_dashboard.py на странице — без ошибок; задачи не прочитаны — «Нет
@@ -25,7 +25,8 @@ from tests import fixture  # noqa: E402
 
 ROWS = "#drwBody table.odt tbody tr[data-odk]"
 OUT = "не из ОРК — заказ не передан в ОРК"
-ASSIGN = "назначает менеджера ОРК: рук. ОРК"
+# дело руководителя ОРК у пункта заказа, не переданного в ОРК (outAct = ork.OUT_ACT, решение 31.10.2026)
+ASSIGN = "рук. ОРК: принять заказ и назначить менеджера ОРК"
 
 
 class Глухой(fixture.ПодтверждениеПередачи):
@@ -115,8 +116,8 @@ def test_путь_заказа_с_открытой_задачей_начинае
 
 def test_строка_шага_0_над_столбцами_числа_из_данных(browser, page):
     """#wkPre: заказов на шаге = ledger[0].now, дольше 5 раб. дн. = ledger[0].over (= пунктов s0Over);
-    каждая кнопка открывает ровно столько строк; в столбцах и таблице шагов 4–12 шага 0 нет; счётчик
-    шапки «Заказов: ждут подтверждения передачи в ОРК» — то же число."""
+    каждая кнопка открывает ровно столько строк; в столбцах и таблице шагов 4–12 шага 0 нет; блок — первым
+    в «Таблице 13 шагов» (#wkLedD); своего счётчика в шапке у шага 0 нет (первый экран, приёмка P02)."""
     pg = _open(browser, page)
     W = _week(pg)
     L0 = next(s for s in W["ledger"] if s["no"] == 0)
@@ -132,10 +133,8 @@ def test_строка_шага_0_над_столбцами_числа_из_да�
         if f == "over":
             assert set(keys) == q0
     assert pg.locator('#ctPanel-main :is(#orkLed,.wkhists) [data-od^="w:step/0/"]').count() == 0
-    hdr = pg.locator('#ctPanel-main #wkMore li.wkc:has(button[data-od="w:step/0/now"])')
-    assert hdr.count() == 1 and "ждут подтверждения передачи в" in hdr.inner_text()
-    assert int(hdr.locator('button[data-od="w:step/0/now"]').inner_text()) == L0["now"]
-    assert f"дольше {L0['norm']} раб. дн." in hdr.inner_text()
+    assert pg.locator("#ctPanel-main #wkLedD > #wkPreD #wkPre").count() == 1
+    assert pg.locator('#ctPanel-main #wkMore [data-od^="w:step/0/"]').count() == 0
     # «Кто сколько ведёт»: строка «до передачи в ОРК» — заказы шага 0; Σ «дольше нормы» = W2
     P = W["pulse"]["rows"]
     i = next(k for k, r in enumerate(P) if r["kind"] == "pre")
@@ -208,8 +207,8 @@ def test_валидатор_на_странице_без_ошибок(page, deaf
 
 
 def test_задачи_не_прочитаны_нет_данных(browser, deaf):
-    """Отказ без последствий (plan, раздел 5): строка шага 0 — «Нет данных», кнопок шага 0 нет, счётчик
-    шапки — «—», ни у одного заказа нет шага 0."""
+    """Отказ без последствий (plan, раздел 5): строка шага 0 — «Нет данных», кнопок шага 0 нет, ни у одного
+    заказа нет шага 0."""
     pg = _open(browser, deaf)
     W = _week(pg)
     L0 = next(s for s in W["ledger"] if s["no"] == 0)
@@ -217,4 +216,55 @@ def test_задачи_не_прочитаны_нет_данных(browser, deaf)
     assert "Нет данных" in pg.inner_text("#ctPanel-main #wkPre")
     assert pg.locator('#ctPanel-main [data-od^="w:step/0/"]').count() == 0
     assert not [o for r in pg.evaluate("window.__CONTRACTS__.rows") for o in r["orders"] if o["step"] == 0]
+    assert not pg.errors, pg.errors
+
+
+def _step_row(pg, oid: str, n: int) -> str:
+    """Строка шага n пути заказа oid — раскрытая (_opStep): текст «Вход и выход», «Срок» и т. д."""
+    pg.goto(pg.url.split("#")[0] + f"#contracts/week?o={oid}")
+    pg.wait_for_selector("#drwBody #opRoot")
+    b = pg.locator(f'#drwBody button[data-opstep="{n}"]')
+    if b.get_attribute("aria-expanded") != "true":
+        b.click()
+        pg.wait_for_timeout(200)
+    return pg.inner_text(f"#drwBody #opStep{n}").replace("\xa0", " ")
+
+
+def test_путь_строка_шага_0_по_задаче_а_не_по_стадии(browser, page):
+    """Строка шага 0 пути: вход — создание задачи подтверждения, выход — её закрытие (стадия на шаге 0 не
+    меняется); шаг 0 дольше 5 раб. дн. — «передача в ОРК не подтверждена дольше 5 раб. дн. (на N …)», а не
+    «дольше нормы» ОРК; шаг 1 → 0 — выход «создана новая задача подтверждения передачи»."""
+    pg = _open(browser, page)
+    t = _step_row(pg, "99721", 0)                                  # 942/1: задача закрыта 14.10
+    assert "создана задача подтверждения передачи → 14.10.2026 — закрыта задача подтверждения передачи" in t, t
+    assert "смена стадии" not in t
+    t = _step_row(pg, "99711", 0)                                  # 941/1: открыта 6 раб. дн.
+    assert "передача в ОРК не подтверждена дольше 5 раб. дн. (на 1 раб. дн.)" in t, t
+    assert "дольше нормы на" not in t
+    t = _step_row(pg, "99771", 1)                                  # 947/1: 0 → 1 → 0
+    assert "закрыта задача подтверждения передачи →" in t and "создана новая задача подтверждения передачи" in t, t
+    assert not pg.errors, pg.errors
+
+
+def test_задача_открыта_при_ушедшей_стадии_словами_и_своим_чипом(browser, page):
+    """945/1 (confirmOpen, решение 31.10.2026, а): в «Ошибках в карточках» и в списках — словами, кода
+    «confirmOpen» на странице нет; свой чип «Карточки по видам ошибки» — части складываются в «все»."""
+    pg = _open(browser, page)
+    HY = _week(pg)["hygiene"]
+    assert HY["by"].get("confirmOpen") == 1
+    assert "onfirmOpen" not in pg.eval_on_selector("#ctPanel-main", "e=>e.textContent")
+    pg.evaluate("document.getElementById('orkHyg').open=true")
+    chip = pg.locator('#orkHygN button[data-od="w:hyg/confirmOpen"]')
+    assert chip.count() == 1 and int(chip.inner_text()) == 1
+    assert _rows(pg, chip) == ["99751"]
+    assert "задача подтверждения передачи открыта" in pg.inner_text("#orkHygB")
+    # списки, где строка 945/1 есть: «все карточки с ошибками» и шаг 4 — подпись словами
+    for od in ("w:hyg/all", "w:step/4/now"):
+        b = pg.locator(f'#ctPanel-main button[data-od="{od}"]').first
+        b.scroll_into_view_if_needed()
+        b.click()
+        pg.wait_for_selector("#drw.on")
+        assert "onfirmOpen" not in pg.inner_text("#drwBody"), od
+        pg.keyboard.press("Escape")
+        pg.wait_for_timeout(150)
     assert not pg.errors, pg.errors

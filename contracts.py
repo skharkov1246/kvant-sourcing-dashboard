@@ -1346,11 +1346,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 **({"stepWhoOut": True} if own.get("out") else {}),
                 # исполнитель задачи подтверждения передачи (шаг 0) — у заказа с задачей
                 **({"confirmWho": lo["confirmWho"]} if lo.get("confirm") is not None else {}),
-                # ответственный заказа не из ОРК при пустом менеджере ОРК (заказ не передан в ОРК,
-                # решение владельца 31.10.2026, заказ 968/2): пункт заказа dealctx (чат, договор
-                # поставщика) отдаёт ему, как очередь (ork.owner: out), — только когда так
-                **({"resp": lo["resp"]} if lo["resp"] and not (_nm_or_empty(lo.get("orkMgr"))
-                                                               or _nm_or_empty(d_people["dealOrk"])) else {}),
+                # ответственный заказа не из ОРК при пустом менеджере ОРК — исполнитель заказа, не
+                # переданного в ОРК (решение владельца 31.10.2026, заказ 968/2): пункт заказа dealctx
+                # (чат, договор поставщика) отдаёт ему, как очередь (ork.owner: out), — только когда
+                # так; подпись ответственного из ОРК в строку по-прежнему не идёт (он — orkMgr)
+                **({"respOut": lo["resp"]} if lo["resp"] and not (_nm_or_empty(lo.get("orkMgr"))
+                                                                  or _nm_or_empty(d_people["dealOrk"])) else {}),
             })
             if olive:
                 # путь живого заказа по шагам регламента (ork.path, владелец 29.10.2026: «провалиться

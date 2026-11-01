@@ -2373,7 +2373,10 @@
     #tab-contracts .wk table:not(.wkqt) :is(tbody,tfoot) tr>:first-child{grid-column:1/-1;font-weight:600}
     #tab-contracts .wk table:not(.wkqt) td[data-l]::before{content:attr(data-l);display:block;font-size:13px;font-weight:500;color:var(--wk-sec)}
     #tab-contracts .wk table:not(.wkqt) tfoot td{grid-column:auto}
-    #tab-contracts .wk .wkppl tr.wkpre-r td.wkz{display:none}
+    /* «до передачи в ОРК» (шаг 0) на телефоне карточкой не рисуется: те же числа — в «Таблице 13 шагов»
+       (#wkPre, шаг 0 первым) и в группе s0Over «Что сделать сегодня»; высота «Недели» (P10, 390) запаса
+       на карточку не оставляет */
+    #tab-contracts .wk .wkppl tr.wkpre-r{display:none}
     #tab-contracts .wk .wkbarc{gap:6px}
     #tab-contracts .wk .wkcbw{width:48px}
     #tab-contracts .wk .wkdo{grid-template-columns:minmax(0,1fr)}
@@ -3308,7 +3311,7 @@
     #tab-contracts .rzhd-r1{align-items:center;gap:0 10px}
     #tab-contracts .rzhd-r1 h1{font-size:20px;line-height:1.25}
     #tab-contracts .rzhd-meta{flex-direction:row;flex-wrap:wrap;gap:0 6px;font-size:13px;line-height:1.4;margin-top:2px}
-    #tab-contracts .rzhd-meta .rzasof .rzw-long{display:none}
+    #tab-contracts .rzhd-meta .rzasof .rzw-long,#tab-contracts .rzhd-meta .rzlive .rzlv-w{display:none}
     #tab-contracts .rzbar{margin:2px 0 4px}
     #tab-contracts .rzbar-r{padding:4px 0 0}
     #tab-contracts .rzbar #ctDirs{padding:0}
@@ -5957,7 +5960,7 @@ function _ctdKam(){try{return typeof _rzKam==='function'?String(_rzKam()||''):''
 function _ctdKamOk(it,k){
   if(!k) return true;
   try{if(typeof _rzKamOk==='function') return !!_rzKamOk(it);}catch(e){}
-  return [it&&it.whoId,it&&it.kamId,it&&it.escalateToId].some(v=>v!=null&&v!==''&&String(v)===k);
+  return [it&&it.whoId,it&&it.kamId,it&&it.escalateToId,it&&it.alsoCopyId].some(v=>v!=null&&v!==''&&String(v)===k);
 }
 // род дней в ячейке (спецификация 2.7): «просрочен на 35 дн.», «46 раб. дн. при норме 9»
 function _ctdDays(code,n,norm){
@@ -6089,7 +6092,7 @@ function _ctdWho(q){
   const re=q.role==='confirmResp'?'переназначает автор задачи или КАМ':'назначает рук. ОРК';
   // E25: «не назначен» — ни менеджера ОРК, ни ответственного заказа; ответственный не из ОРК (заказ не
   // передан в ОРК, решение 31.10.2026) — делает он, менеджера ОРК назначает рук. ОРК
-  const who=q.whoOut?`Делает: ${_rzOutWho(q.who,'ctd-amb')}`
+  const who=q.whoOut?`Делает: ${_rzOutWho(q.who,'ctd-amb',q.outAct)}`
     :(!w||w==='не назначен')?`<span class="ctd-amb">${_esc(_orkCap(role||'исполнитель'))} не назначен — ${re}</span>`
     :`${role?_esc(_orkCap(role))+': ':''}${_esc(w)}${_ctdGone(q.who)||q.whoGone?` <span class="ctd-amb">уволен — ${q.role==='confirmResp'?re:'переназначить (рук. ОРК)'}</span>`:''}`;
   const cr=q.copyRole?_ctdRoleLbl(q.copyRole,q):'', ce=_ctdNm(q.escalateTo);
@@ -6603,7 +6606,9 @@ function _ctHeadLive(V,dir,SH){
   const W=((V&&V.ork)||{}).week||{}, n=W.live;
   if(n==null) return '';
   const w=_ctN(+n,'заказ','заказа','заказов').replace(/^\d+\s/,'');
-  return `${_rzNum(n,{of:'w:live',title:'Заказы в работе',rank:'0'})} ${w} в работе${dir==='sep'&&SH?` направления ${_esc(SH.name)}`:''} у ${_rzGloss('ОРК',{first:true,gen:true})}`;
+  // «в работе» на телефоне не пишется (rzlv-w): строка «N заказов … (ОРК)» иначе переносится от одной буквы
+  // («заказ» → «заказа») и сдвигает первый экран (спец. 3.10); подпись числа — «Заказы в работе»
+  return `${_rzNum(n,{of:'w:live',title:'Заказы в работе',rank:'0'})} ${w}<span class="rzlv-w"> в работе</span>${dir==='sep'&&SH?` направления ${_esc(SH.name)}`:''} у ${_rzGloss('ОРК',{first:true,gen:true})}`;
 }
 // тревоги вида под строкой подвкладок — только если не ноль (спец. 2.2): стадия неизвестна
 // регламенту, нет производственного календаря; на «Сделках и деньгах» — сбои курсов
@@ -6960,9 +6965,10 @@ try{ window.CT_GLOSS=CT_GLOSS; }catch(e){}
 // передачи в ОРК, «из 13» к нему не пишется; шаги 1–13 — прежний текст «Шаг N из 13»
 function _rzStepT(n,low){const t=n!=null&&n!==''&&+n===0?'Шаг 0 · до передачи в ОРК':`Шаг ${n} из 13`; return low?'ш'+t.slice(1):t;}
 // исполнитель заказа, не переданного в ОРК (решение владельца 31.10.2026, заказ 968/2): ответственный
-// заказа не из ОРК (whoOut) делает шаг сам, менеджера ОРК назначает рук. ОРК — одна фраза на всю вкладку
-function _rzOutWho(nm,cls){const w=String(nm==null?'':nm), g=/ \(уволен\)$/.test(w);
-  return `${_esc(w.replace(/ \(уволен\)$/,'')||'ответственный заказа')} <span class="${cls}">(не из ОРК — заказ не передан в ОРК)</span>${g?` <span class="${cls}">уволен</span>`:''} · назначает менеджера ОРК: рук. ОРК`;}
+// заказа не из ОРК (whoOut) делает шаг сам, рук. ОРК — дело пункта outAct («принять заказ и назначить
+// менеджера ОРК», ork.OUT_ACT; у строки заказа без пункта — та же фраза) — одна фраза на всю вкладку
+function _rzOutWho(nm,cls,act){const w=String(nm==null?'':nm), g=/ \(уволен\)$/.test(w);
+  return `${_esc(w.replace(/ \(уволен\)$/,'')||'ответственный заказа')} <span class="${cls}">(не из ОРК — заказ не передан в ОРК)</span>${g?` <span class="${cls}">уволен</span>`:''} · рук. ОРК: ${_esc(act||'принять заказ и назначить менеджера ОРК')}`;}
 const _rzE=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // _rzAbbr('ОСС') → <abbr> с подсказкой из словаря (наведение, фокус, нажатие — _rzTipWire)
 function _rzAbbr(term,opt){
@@ -7082,10 +7088,11 @@ function _rzKam(){return _rzKam.v||'';}
 function _rzKamOk(x){
   const k=_rzKam(); if(!k) return true; if(!x) return false;
   const eq=v=>v!=null&&v!==''&&String(v)===k;
-  if(eq(x.whoId)||eq(x.kamId)||eq(x.escalateToId)) return true;
+  // alsoCopyId — рук. ОРК вторым в копии у пункта заказа, не переданного в ОРК (whoOut, решение 31.10.2026)
+  if(eq(x.whoId)||eq(x.kamId)||eq(x.escalateToId)||eq(x.alsoCopyId)) return true;
   if(Array.isArray(x.orders)&&x.deal!=null){          // строка сделки: КАМ сделки или виден её пункт
     const C=window.__CONTRACTS__||{}, Q=[].concat(((C.life||{}).queue)||[],(((C.sep||{}).life||{}).queue)||[]);
-    return Q.some(q=>String(q.deal)===String(x.deal)&&(eq(q.whoId)||eq(q.kamId)||eq(q.escalateToId)));
+    return Q.some(q=>String(q.deal)===String(x.deal)&&(eq(q.whoId)||eq(q.kamId)||eq(q.escalateToId)||eq(q.alsoCopyId)));
   }
   return false;
 }
@@ -7096,7 +7103,7 @@ function _rzPeople(){
   const add=(id,nm,role)=>{if(!id||!nm||nm==='не назначен') return; id=String(id);
     const p=P.get(id)||{id,name:String(nm).replace(/ \(уволен\)$/,''),gone:/\(уволен\)$/.test(nm),role,n:0};
     if((RK[role]!=null?RK[role]:9)<(RK[p.role]!=null?RK[p.role]:9)) p.role=role; p.n++; P.set(id,p);};
-  Q.forEach(q=>{add(q.whoId,q.who,q.role); add(q.kamId,q.kam,'kam'); add(q.escalateToId,q.escalateTo,q.copyRole);});
+  Q.forEach(q=>{add(q.whoId,q.who,q.role); add(q.kamId,q.kam,'kam'); add(q.escalateToId,q.escalateTo,q.copyRole); add(q.alsoCopyId,q.alsoCopy,q.alsoCopyRole);});
   return [...P.values()].sort((a,b)=>((RK[a.role]!=null?RK[a.role]:9)-(RK[b.role]!=null?RK[b.role]:9))||a.name.localeCompare(b.name,'ru'));
 }
 function _rzKamName(k){const p=_rzPeople().find(x=>x.id===String(k)); return p?p.name:'';}
@@ -7342,7 +7349,7 @@ function _rzGlossHtml(o){
 }
 // ==== /R4:WP-A (помощники) ====
 const _ORK_KIND={P50:'середина срока производства — запросить у поставщика статус',P14:'за 14 дней до плановой отгрузки — подтвердить готовность и документы'};
-const _ORK_HYG={old:'доставлено больше года назад, УПД нет — внести УПД или закрыть заказ',behind:'стадию не передвинули: факт уже есть, а стадия отстала — обновить стадию',abandoned:'карточку забросили: больше 60 р.д. на шаге с нормой до 2 р.д. — закрыть заказ или обновить стадию',unknown:'стадия неизвестна регламенту: её нет в таблице «стадия → шаг» — сверить стадию',noMgr:'шаг ждёт менеджера ОРК: он не назначен — назначить сотрудника ОРК'};
+const _ORK_HYG={old:'доставлено больше года назад, УПД нет — внести УПД или закрыть заказ',behind:'стадию не передвинули: факт уже есть, а стадия отстала — обновить стадию',abandoned:'карточку забросили: больше 60 р.д. на шаге с нормой до 2 р.д. — закрыть заказ или обновить стадию',unknown:'стадия неизвестна регламенту: её нет в таблице «стадия → шаг» — сверить стадию',noMgr:'шаг ждёт менеджера ОРК: он не назначен — назначить сотрудника ОРК',confirmOpen:'задача подтверждения передачи открыта, а стадия ушла дальше — закрыть задачу подтверждения или вернуть стадию'};
 // «Реализация», расшифровка (владелец 29.10.2026: «читай как человек… лучше расшифровывать»): подписи
 // пунктов очереди простыми словами поверх подписей данных (life.labels) — коды PO/OC, «даты
 // размещения», «сверка» не понятны без регламента. Только вёрстка: коды и счёт пунктов те же
@@ -7519,7 +7526,7 @@ function _wkWho(x){
   // исполнителя задачи подтверждения передачи (шаг 0) переназначает автор задачи или КАМ, не рук. ОРК
   const re=x.role==='confirmResp'?'переназначает автор задачи или КАМ':`назначает рук. ${_wkAbbr('ОРК')}`;
   // ответственный заказа не из ОРК (whoOut): делает он, менеджера ОРК назначает рук. ОРК (решение 31.10.2026)
-  const main=x.whoOut?_rzOutWho(w,'wkamb')
+  const main=x.whoOut?_rzOutWho(w,'wkamb',x.outAct)
     :!w||w==='не назначен'?`<span class="wkamb">${r?r+' не назначен':'Не назначен'}</span><div class="wkmut">${re}</div>`
     :x.whoGone||/ \(уволен\)$/.test(w)?`${r?r+': ':''}${_orkWho(w)} <span class="wkamb">уволен — ${x.role==='confirmResp'?re:`переназначить (рук. ${_wkAbbr('ОРК')})`}</span>`
     :`${r?r+': ':''}${_orkWho(w)}`;
@@ -7725,12 +7732,11 @@ function _orkWeekHead(C){
   // (ни на сделке, ни у её заказов в работе) или хозяин ушёл — единица сделка; «Заказов без менеджера ОРК» — заказы
   // W1′ — подстрокой W1 (ремонт R4), своей строки-счётчика у него нет
   const NOW=W.noOwner||null; let nOwn=NOW?(NOW.n||0):null; if(KC&&nOwn!=null) nOwn=KC.deals('w:noOwner');
-  // шаг 0 «Подтверждение передачи в ОРК» (решение владельца 31.10.2026): заказы ждут закрытия задачи
-  // подтверждения — счётчиком рядом с W1; дольше 5 раб. дн. — подстрокой; задачи не прочитаны — «—»
-  const L0=(C.LG||[]).find(s=>+s.no===0)||null, nr0=L0&&L0.norm!=null?L0.norm:5;
-  let p0=L0&&!L0.nodata?(L0.now||0):null, p0o=L0&&!L0.nodata?(L0.over||0):null;
-  if(KC&&p0!=null){p0=KC('w:step/0/now'); p0o=KC('w:step/0/over');}
-  const nc=5+(NOW?1:0)+(L0?1:0), w5k=U.oset(U.kOf((W.drill||{}).W5)), w5oId=!KC&&w5k.size&&w5k.size===w5o?_wkFb(W,'w5orders',[...w5k],'order'):'';
+  // шаг 0 «Подтверждение передачи в ОРК» (решение владельца 31.10.2026) своего счётчика в шапке не имеет:
+  // первый экран (спец. 3.10, приёмка P02) запаса на строку не оставляет (1280: 9 px, 390: 13 px) — шаг 0
+  // виден в «Что сделать сегодня» (группа s0Over), в ведомости (#wkPre, «Таблица 13 шагов») и в
+  // «Кто сколько ведёт» (строка «до передачи в ОРК»)
+  const nc=5+(NOW?1:0), w5k=U.oset(U.kOf((W.drill||{}).W5)), w5oId=!KC&&w5k.size&&w5k.size===w5o?_wkFb(W,'w5orders',[...w5k],'order'):'';
   // заказы долга — своим числом и своим списком (заказы), деньги — доля заказов с оговоркой (спец. 1.5)
   // сделки долга — список сделок (drill.unpaidDeals, «d:»), заказы — список заказов (drill.unpaid); без
   // unpaidDeals (старая сборка) w:unpaid — смешанный список, заказы — запасным списком
@@ -7745,9 +7751,6 @@ function _orkWeekHead(C){
     +rec(`Сделок: приёмка дольше ${nw(1)} раб. дн. <span class="rzcode">W1</span>`,w1,'w:W1','Приёмка сделки дольше нормы',{cls:w1?'wkc-warn'+(T1.state==='prelim'?' wkc-pre':''):'',ods:w1s,
       sub:U.w1o?`новые заказы ждут менеджера ${_wkAbbr('ОРК')}: ${_wkN(w1o,'w:W1o','Новый заказ ждёт менеджера ОРК дольше нормы',{cls:w1o?'wkc-warn':''})}`:'',
       def:T1.state==='prelim'?`Мало данных: ${w1n!=null?w1n:T1.n} ${pl(w1n!=null?w1n:+T1.n||0,'сделка','сделки','сделок')} в расчёте — число предварительное.`:'',raw:w1==null?`<span class="rzfinal wkdim" title="${_esc(_orkSt(T1).note)}">—</span>`:null})
-    +(L0?rec(`Заказов: ждут подтверждения передачи в ${_wkAbbr('ОРК')}`,p0,'w:step/0/now','Шаг 0 · Подтверждение передачи в ОРК: заказы на шаге',{step:0,cls:p0o?'wkc-warn':'',
-      sub:p0?`дольше ${nr0} раб. дн.: ${_wkN(p0o,'w:step/0/over',`Шаг 0 · Подтверждение передачи в ОРК: дольше ${nr0} раб. дн.`,{cls:p0o?'wkc-bad':''})}`:'',
-      raw:p0==null?`<span class="rzfinal wkdim" title="${_esc('Нет данных: '+(L0.why||'задачи подтверждения передачи не прочитаны'))}">—</span>`:null}):'')
     +rec('Сделок: клиент не оплатил в срок',UP.deals||0,upId,'Клиент не оплатил в срок',{cls:UP.deals?'wkc-bad':'',sub:upSub})
     +rec(`Заказов: ждём ${_wkAbbr('УПД')} от клиента`,wu,'w:waitUtd','Ждём УПД от клиента',{sub:[(W.waitUtd||{}).unknown?`срок не посчитать: ${_wkN(W.waitUtd.unknown,'w:step/12/unk','Шаг 12: срок УПД не посчитать')} ${uo(W.waitUtd.unknown)}`:''].filter(Boolean).join(' · ')})
     +rec(`Звонков по ${w5==null?'—':w5oId?_wkN(w5o,w5oId,'Звонки поставщикам на неделе — заказы'):w5o} ${pl(w5o||0,'заказу','заказам','заказам')} <span class="rzcode">W5</span>`,w5,'w:W5','Звонки поставщикам на неделе',{raw:w5==null?`<span class="rzfinal wkdim" title="${_esc(_orkSt(T5).note)}">—</span>`:null})
@@ -8083,10 +8086,10 @@ function _orkWeekLedger(C){
         +`<td class="r">${o?`<span class="wkred">${_wkN(o,'w:step/0/over',`${nm}: дольше ${nr} раб. дн.`)}</span>`:'<span class="rzfinal">0</span>'}${L0.overUnknown?`<div class="wkmut">срок не посчитать: ${_wkN(L0.overUnknown,'w:step/0/unk','Шаг 0: срок не посчитать')} ${uo(L0.overUnknown)}</div>`:''}</td>`
         +`<td class="r">${normC(L0)}</td><td class="r">${L0.maxWd!=null?`<span class="rzfinal${o?' wkred':''}">${L0.maxWd}</span>`:'<span class="wkmut">—</span>'}</td>`;
     // свёрнутым (телефон, замер высоты) — строкой-сводкой; таблица — в выгрузку «Заказы — шаг 0»
-    const sm=`Шаг 0 — до передачи в ОРК: ${L0.nodata?'нет данных':`${n} ${uo(n)}${o?` · дольше ${nr} раб. дн.: ${o}`:''}`}`;
+    const sm=`Шаг 0 — до передачи в ОРК: ${L0.nodata?'нет данных':`${n} ${uo(n)}${o?` · дольше ${nr} раб. дн.: ${o}`:''}${L0.partial?' · прочитаны не все задачи':''}`}`;
     return `<details class="wkpred" id="wkPreD" open><summary>${_esc(sm)}</summary><div class="wkpre" id="wkPre"><div class="twrap"><table class="wkled" data-xl-name="Заказы — шаг 0"><caption class="orkvh">Шаг 0 — до передачи в ${_wkAbbr('ОРК')}: заказы</caption>`
       +`<thead><tr><th scope="col">Шаг 0 — до передачи в ${_wkAbbr('ОРК')}</th><th scope="col">Кто делает</th><th scope="col" class="r">Заказов на шаге</th><th scope="col" class="r">Дольше ${nr} раб. дн., заказов</th><th scope="col" class="r">Норма, раб. дн.</th><th scope="col" class="r">Дольше всех, раб. дн.</th></tr></thead>`
-      +`<tbody id="orkLed0"><tr class="wkoth${o&&!L0.nodata?' wkov':''}"><th scope="row"><span class="wkstn">0</span> ${_esc(L0.name||'Подтверждение передачи в ОРК')}<div class="wkmut">задача Битрикса · не срок ${_wkAbbr('ОРК')}</div></th>`
+      +`<tbody id="orkLed0"><tr class="wkoth${o&&!L0.nodata?' wkov':''}"><th scope="row"><span class="wkstn">0</span> ${_esc(L0.name||'Подтверждение передачи в ОРК')}<div class="wkmut">задача Битрикса · не срок ${_wkAbbr('ОРК')}${L0.partial?` · <span class="wkamb" title="${_esc(L0.why||'')}">прочитаны не все задачи</span>`:''}</div></th>`
       +`<td>${_esc(_orkCap(L0.roleName||'исполнитель задачи подтверждения передачи'))}<div class="wkmut">в курсе: ${_wkAbbr('КАМ')}</div></td>${row}</tr></tbody></table></div></div></details>`;})();
   const sumD=LD.reduce((a,s)=>a+dN(s),0);
   const dTop=LD.slice().sort((a,b)=>dN(b)-dN(a))[0];
@@ -8097,9 +8100,11 @@ function _orkWeekLedger(C){
   const footO=`<tfoot><tr><th scope="row" colspan="2">Всего заказов на шагах 4–12</th><td class="r"><b>${idNow?_wkN(sumNow,idNow,'Заказы на шагах 4–12'):`<span class="rzfinal">${sumNow}</span>`}</b></td><td class="r"><b>${idOver?_wkN(sumOver,idOver,'Шаги заказа дольше нормы'):`<span class="rzfinal">${sumOver}</span>`}</b></td><td colspan="4" class="wkmut">${(W.waitUtd||{}).n?`ждём ${_wkAbbr('УПД')} ${_wkN(W.waitUtd.n,'w:waitUtd','Ждём УПД от клиента')} ${uo(W.waitUtd.n)}`:''}${W.unknown?` · стадия неизвестна регламенту ${_wkN(W.unknown,'w:unk','Стадия неизвестна регламенту: сверить в Битриксе')} ${uo(W.unknown)}`:''}</td></tr></tfoot>`;
   const footD=`<tfoot><tr><th scope="row" colspan="2">Всего сделок на шагах 1–3 и 13</th><td class="r"><b><span class="rzfinal">${sumD}</span></b></td><td colspan="4" class="wkmut">каждая сделка — на одном шаге; без заказа или с заказом на приёмке — шаг 1</td></tr></tfoot>`;
   return `<section class="wksec" id="wkLedger" aria-labelledby="wkLedH"><h2 class="wkh2" id="wkLedH">${_esc(ttl)}</h2>`
-    +`<p class="wksub">Шаги сделки (1–3 и 13) — в сделках, шаги заказа (4–12) — в заказах поставщику${L0?', шаг 0 — до передачи в ОРК, отдельно':''}. Где сейчас ${W.live||0} ${uo(W.live||0)} в работе: столбец — шаг регламента, под ним номер шага; <span class="wkred">красная часть</span> — дольше нормы; клик — список шага</p>`
-    +pre+`<div class="wkhists"><div class="wkhg"><h3 class="wkh3">Заказы по шагам 4–12</h3>${histO}</div><div class="wkhg wkhgd"><h3 class="wkh3">${_esc(dTtl)}</h3>${histD}</div></div>`
-    +`<details class="wkledd" id="wkLedD" open><summary>Таблица 13 шагов</summary>`
+    +`<p class="wksub">Шаги сделки (1–3 и 13) — в сделках, шаги заказа (4–12) — в заказах поставщику. Где сейчас ${W.live||0} ${uo(W.live||0)} в работе: столбец — шаг регламента, под ним номер шага; <span class="wkred">красная часть</span> — дольше нормы; клик — список шага</p>`
+    +`<div class="wkhists"><div class="wkhg"><h3 class="wkh3">Заказы по шагам 4–12</h3>${histO}</div><div class="wkhg wkhgd"><h3 class="wkh3">${_esc(dTtl)}</h3>${histD}</div></div>`
+    // шаг 0 — своим блоком первым в «Таблице 13 шагов» (не под подписью «4–12»): на телефоне таблица свёрнута,
+    // и шаг 0 высоты «Недели» не берёт (приёмка P10, 390: ≤ 7000 px); в столбцы гистограмм шаг 0 не входит
+    +`<details class="wkledd" id="wkLedD" open><summary>Таблица 13 шагов</summary>`+pre
     +`<div class="twrap"><table class="wkled" data-xl-name="Заказы — шаги 4–12"><caption class="orkvh">Шаги заказа поставщику 4–12: заказы</caption>${thO}<tbody id="orkLed">${rowsO}</tbody>${footO}</table></div>`
     +`<div class="twrap"><table class="wkled wkledd2" data-xl-name="Сделки — шаги 1–3 и 13"><caption class="orkvh">Шаги сделки 1–3 и 13: сделки</caption>${thD}<tbody id="orkLedD">${rowsD}</tbody>${footD}</table></div>`
     +`<details class="orkexp wkhow"><summary>как считаем</summary><div class="orkhowb"><p>Шаги 1–3 и 13 ведёт сделка: приёмка, договор с заказчиком, закрытие — считаем сделки. Шаги 4–12 ведёт заказ поставщику — считаем заказы. Сделка с заказом на приёмке или без заказа — на шаге 1; шаги 2–3 — по стадии сделки; шаг 13 — сделки к закрытию (оплата получена или все заказы закрыты, а сделка открыта).</p><p>Норма — регламент ${_wkAbbr('ОРК')} в рабочих днях по календарю РФ, паузы не вычтены: их в Битриксе нет. «—» — регламент нормы не задаёт (производство, доставка, шаги ${_wkAbbr('КАМ')}а и логистики); «не меряем» — норма есть, а дат в заказе нет (шаг 6).</p><p>Шаг 12 — ${nw(12)} раб. дн. от доставки до подписанного ${_wkAbbr('УПД')}; дольше — «ждём ${_wkAbbr('УПД')}»: подпись за клиентом, это не просрочка менеджера. Шаг 13 — «клиент не оплатил»: сделки, где у доставленного заказа срок оплаты прошёл, а платёжки нет; урегулирует ${_wkAbbr('КАМ')}.</p>${_wkW1How(C)}<p>«Без обязательных файлов» — разные заказы, уже прошедшие шаг, у которых нет хотя бы одного файла шага (PO, OC, Packing list, ${_wkAbbr('УПД')}…); подпись в файле не проверяем. «Дольше всех» — рабочие дни самого долгого заказа на шаге.</p></div></details></details></section>`;
@@ -8143,7 +8148,8 @@ function _orkWeekPeople(C){
   const tr=r=>{const t=_orkWhoT(r.who), fo=r.kind==='mgr'?foreign(r.who):0, wk=_odWhoKey(r.who);
     const oId=r.byOrd?`w:pulse/${r.pi}/overKeys`:`w:who/${wk}/over`, wId=r.byOrd?`w:pulse/${r.pi}/waitKeys`:`w:who/${wk}/wait`, lId=r.byOrd?r.lateId:`w:who/${wk}/late`;
     // строка «до передачи в ОРК»: «дольше 5 раб. дн.» — под числом заказов; «дольше нормы» и «ждём УПД» у неё
-    // всегда 0 (шаг 0 — не срок ОРК, до доставки) — на телефоне эти ячейки карточки не рисуем (wkz)
+    // всегда 0 (шаг 0 — не срок ОРК, до доставки; wkz); на телефоне строки нет (CSS wkpre-r: те же числа — в
+    // «Таблице 13 шагов» и в группе s0Over)
     const pz=r.kind==='pre', zc=pz?' wkz':'';
     return `<tr${grp(r)?` class="wkside${pz?' wkpre-r':''}"`:''}><th scope="row">${nm(r)}${r.gone?' <span class="wkamb">уволен — переназначить (рук. ОРК)</span>':''}${r.kind==='none'?'<div class="wkmut">назначает рук. ОРК · числа — по этим заказам</div>':r.kind==='out'?'<div class="wkmut">назначить менеджера ОРК · числа — по этим заказам</div>':r.kind==='pre'?'<div class="wkmut">делает исполнитель задачи, в курсе — КАМ</div>':r.kind==='step'&&!r.n?'<div class="wkmut">исполнитель шага</div>':''}</th>`
       +`<td class="r" data-xlv="${r.n}"><span class="wkbarc">${r.pi!=null?_wkN(r.n,`w:pulse/${r.pi}/keys`,t+' · заказы в работе',{sub:hd(r)}):'<span class="rzfinal">0</span>'}<span class="wkcbw" aria-hidden="true"><span class="wkcb" style="width:${Math.round(r.n*80/mx)}px"></span></span></span>${pz&&(r.p||{}).preOver?`<div class="wkmut">дольше ${nr0} раб. дн.: ${_wkN(r.p.preOver,'w:step/0/over',`Шаг 0 · Подтверждение передачи в ОРК: дольше ${nr0} раб. дн.`)}</div>`:''}</td>`
@@ -8219,7 +8225,8 @@ function _orkWeekCp(C){
 function _orkWeekHyg(C){
   const {W,byDeal}=C, HY=W.hygiene||{}, HB=HY.by||{}, HX=HY.byExcl||HB;
   const hyl=k=>_esc((_ORK_HYG[k]||k).split(' — ')[0]);
-  const chips=[['all','все карточки с ошибками',HY.n],['excl','срок не считаем',HY.excluded]].concat(['behind','abandoned','old','unknown'].map(k=>['x'+k,hyl(k)+' — срок не считаем',HX[k]]),[['noMgr','шаг ждёт менеджера ОРК',HB.noMgr]]).filter(x=>x[2]);
+  // confirmOpen (решение 31.10.2026, а) — как noMgr: срок по стадии считаем, карточку поправить
+  const chips=[['all','все карточки с ошибками',HY.n],['excl','срок не считаем',HY.excluded]].concat(['behind','abandoned','old','unknown'].map(k=>['x'+k,hyl(k)+' — срок не считаем',HX[k]]),[['noMgr','шаг ждёт менеджера ОРК',HB.noMgr],['confirmOpen','задача подтверждения передачи открыта',HB.confirmOpen]]).filter(x=>x[2]);
   return `<section class="wksec" id="wkHyg" aria-labelledby="wkHygH"><h2 class="wkh2" id="wkHygH">${HY.n?`Ошибки в карточках Битрикса: ${_wkN(HY.n,'w:hyg/all','Карточки с ошибками')} ${_wkPl(HY.n,'заказ','заказа','заказов')}, не считаем в сроке ${_wkN(HY.excluded||0,'w:hyg/excl','Срок не считаем: карточка с ошибкой')}`:'Ошибок в карточках Битрикса нет'}</h2>`
     +(HY.n?`<p class="wksub">Стадия не отражает факты — срок по ней нечестный. Исправить в Битриксе: обновить стадию, закрыть заказ, назначить менеджера</p>`
       +`<details class="wkhygd" id="orkHyg"><summary>Карточки по видам ошибки</summary><div class="wkchips" id="orkHygN">${chips.map(([k,l,n])=>`<span class="wkchip">${_esc(_orkCap(l))} ${_wkN(n,'w:hyg/'+k,'Карточки с ошибками: '+l)}</span>`).join('')}</div>`
@@ -9621,7 +9628,8 @@ function _odDef(M){
     case 'p80': return 'Заказы в производстве дольше, чем шли 80 % заказов за год, — сигнал, нормы у производства нет.';
     case 'adj': return `Заказы на шагах, где мяч не у ОРК, а у другого отдела или поставщика: ${_ORK_ADJ[p[1]]||p[1]}.`;
     case 'who': return 'Заказы, где человек — исполнитель шага и шаг идёт дольше нормы, и заказы, где ждём УПД от клиента.';
-    case 'hyg': return 'Карточки заказов с ошибками в Битриксе: стадию не передвинули, карточку забросили, доставлено больше года назад без УПД, нет менеджера ОРК.';
+    case 'hyg': return p[1]==='confirmOpen'?'Заказы, у которых задача подтверждения передачи в ОРК открыта, а стадия уже дальше «Заказ создан»: шаг и срок — по стадии, закрыть задачу подтверждения или вернуть стадию.'
+      :'Карточки заказов с ошибками в Битриксе: стадию не передвинули, карточку забросили, доставлено больше года назад без УПД, нет менеджера ОРК, задача подтверждения передачи открыта при ушедшей стадии.';
     case 'noOrder': case 'noOrderOver': return 'Сделки в «Реализации» без заказа поставщику.';
     case 'noOwner': return 'Открытые сделки «Реализации», где нет КАМа, ОСС сделки или менеджера ОРК (ни на сделке, ни у её заказов в работе) или хозяин ушёл. Сделка считается один раз. Заказы этих сделок считаются в заказах и не совпадают со сделками: «Заказов без менеджера ОРК» — заказы, где ответственного нет совсем; заказы с ответственным вне ОРК — строка «ответственный вне ОРК» в «Пульсе ОРК».';
     case 'step': {
@@ -10615,7 +10623,7 @@ function _opMine(x){
   const K=typeof _rzKam==='function'?(()=>{try{return String(_rzKam()||'');}catch(e){return '';}})():'';
   if(!K) return '';
   if(x.whoId!=null&&String(x.whoId)===K) return '<span class="op-me">вы делаете</span> ';
-  if((x.kamId!=null&&String(x.kamId)===K)||(x.escalateToId!=null&&String(x.escalateToId)===K)) return '<span class="op-me">вы в курсе</span> ';
+  if([x.kamId,x.escalateToId,x.alsoCopyId].some(v=>v!=null&&String(v)===K)) return '<span class="op-me">вы в курсе</span> ';
   return '';
 }
 // адрес уровня (WP-A _rzRoute.set(patch,{push})); без него история не трогается
@@ -10760,7 +10768,7 @@ function _opItem(x,lvl,S){
   return `<li class="op-todo-i">`
     +`<p class="op-act">${_opMine(x)}${_opT(_orkCap(_rzRef(x.act||'')))}</p>`
     +`<p class="op-why"><span class="op-mut">Почему:</span> ${_opT(what.charAt(0).toLowerCase()+what.slice(1))}${days?` · ${x.code==='late'?`<span class="op-bad">${days}</span>`:days}`:''}${lvl?' · <span class="op-tag">по сделке целиком</span>':''}</p>`
-    +`<p class="op-who">Делает: ${x.whoOut&&x.who?_rzOutWho(x.who,'op-warn'):_opWho(x.who,x.role||'')}${x.escalateTo?` · <span class="op-mut">в курсе:</span> ${_opWho(x.escalateTo,cr)}`:''}</p></li>`;
+    +`<p class="op-who">Делает: ${x.whoOut&&x.who?_rzOutWho(x.who,'op-warn',x.outAct):_opWho(x.who,x.role||'')}${x.escalateTo?` · <span class="op-mut">в курсе:</span> ${_opWho(x.escalateTo,cr)}`:''}</p></li>`;
 }
 // пункты пути заказа по единице (договор полей 4.3): дела этого заказа и дела его сделки — врозь
 function _opSplit(Q){
@@ -10851,7 +10859,7 @@ function _opTell(o,d,w,Q,D,S){
   }
   // «Делаем» — дело этого заказа; дело сделки клиенту по заказу не называется (спец. E42)
   const f=_opSplit(Q).ord[0];
-  if(f) row('Делаем',`${_opT(_rzRef(f.act||''))} — ${f.whoOut&&f.who?_rzOutWho(f.who,'op-warn'):_opWho(f.who,f.role||'')}`);
+  if(f) row('Делаем',`${_opT(_rzRef(f.act||''))} — ${f.whoOut&&f.who?_rzOutWho(f.who,'op-warn',f.outAct):_opWho(f.who,f.role||'')}`);
   // следующая проверка — ближайшая контрольная точка производства (ork.checkpoint_dates)
   const cp=(o.cps||[]).filter(x=>!asOf||x.date>=asOf).sort((a,b)=>a.date<b.date?-1:1)[0];
   if(cp) row('Следующая проверка',`${_esc(_orkD(cp.date))} — ${cp.kind==='P50'?'середина срока производства: статус у поставщика':'за 14 дней до плановой отгрузки: готовность и документы'}`);
@@ -10865,13 +10873,19 @@ function _opTell(o,d,w,Q,D,S){
 function _opStep(o,n,S,V,D,Q,w){
   const s=S[n]||{}, v=V[n]||[], norm=_opNormOf(s), U=_opWdU(), cur=n===o.step, R=[];
   const row=(k,val)=>R.push(`<div><dt>${k}</dt><dd>${val}</dd></div>`);
+  // шаг 0 (решение 31.10.2026) идёт по задаче, а не по стадии: вход — создание задачи подтверждения,
+  // выход — её закрытие; шаг 1 сразу после шага 0 начат закрытием задачи, шаг 1 → 0 — новой задачей
+  const P=o.path||[], T0='создана задача подтверждения передачи', T1='закрыта задача подтверждения передачи';
+  const after0=d=>P.some((p,i)=>i>0&&p&&+P[i-1][0]===0&&+p[0]===n&&_opIso(p[1])===_opIso(d)), into0=d=>P.some(p=>p&&+p[0]===0&&_opIso(p[1])===_opIso(d));
   if(v.length) v.forEach((x,i)=>{
     const wd=x.cur&&cur&&o.stepWd!=null?o.stepWd:x.wd;
-    const by=x.cur&&cur?(_OP_BY[o.stepFromBy]||o.stepFromBy||'смена стадии'):(n===1&&o.created&&_opIso(o.created)===_opIso(x.from)?'создан заказ':'смена стадии');
-    const out=x.to?`${_esc(_orkD(x.to))}${n===1&&o.asg&&_opIso(o.asg)===_opIso(x.to)?' — назначен менеджер '+_opAb('ОРК'):' — смена стадии'}`:'<b>ещё на шаге</b>';
+    const by=n===0?T0:after0(x.from)?T1:x.cur&&cur?(_OP_BY[o.stepFromBy]||o.stepFromBy||'смена стадии'):(n===1&&o.created&&_opIso(o.created)===_opIso(x.from)?'создан заказ':'смена стадии');
+    const out=x.to?`${_esc(_orkD(x.to))} — ${n===0?T1:into0(x.to)?'создана новая задача подтверждения передачи':n===1&&o.asg&&_opIso(o.asg)===_opIso(x.to)?'назначен менеджер '+_opAb('ОРК'):'смена стадии'}`:'<b>ещё на шаге</b>';
     row(v.length>1?`Заход ${i+1}`:'Вход и выход',`${_esc(_orkD(x.from))} — ${_esc(by)} → ${out}`);
+    // шаг 0 дольше 5 раб. дн. — не «дольше нормы» ОРК: та же фраза, что в «Где застрял»
+    const vd=n===0&&norm!=null&&wd>norm?`<span class="op-bad">передача в ${_opAb('ОРК')} не подтверждена дольше ${norm} ${U}</span> (на ${wd-norm} ${U})`:_opVerdict(wd,norm);
     row(v.length>1?`Срок, заход ${i+1}`:'Срок',wd==null?'<span class="op-mut">не посчитать</span>'
-      :`<b>${wd}</b> ${U}${norm!=null?` при норме ${norm} — `+(_opVerdict(wd,norm)):` · ${s.normState==='nodata'?`норма ${_opT(s.normDoc||'')} — не меряем: дат нет`:'норму регламент не задаёт'}`}`);
+      :`<b>${wd}</b> ${U}${norm!=null?` при норме ${norm} — `+vd:` · ${s.normState==='nodata'?`норма ${_opT(s.normDoc||'')} — не меряем: дат нет`:'норму регламент не задаёт'}`}`);
   });
   else row('Заходов не было',_esc(n<(o.step!=null?o.step:14)?(n===2||n===3?'по сделке целиком — договор с заказчиком ведёт КАМ':'стадия перепрыгнула шаг или история стадий начинается позже'):'шаг впереди'));
   // шаг 1 — по сделке целиком: у первого заказа — приёмка сделки, у следующих — назначение менеджера ОРК
@@ -10906,7 +10920,7 @@ function _opStep(o,n,S,V,D,Q,w){
   if(A.length&&typeof o.art==='string') row('Файлы шага',`<ul class="op-files">${A.map(([a,i])=>{const st=o.art.charAt(i);
     return `<li>${_esc(_orkCap(a.name))} — ${st==='y'?'есть':st==='n'?`<span class="op-bad">нет</span> <span class="op-mut">· обязателен, заказ прошёл шаг</span>`:`<span class="op-mut">${_esc(why0(a))}</span>`}</li>`;}).join('')}</ul>`);
   const QS=(Q.ord||[]).filter(x=>x.step===n);
-  if(QS.length) row('Что сделать по этому шагу',QS.map(x=>`${_opT(_orkCap(_rzRef(x.act||'')))} — ${x.whoOut&&x.who?_rzOutWho(x.who,'op-warn'):_opWho(x.who,x.role||'')}`).join('<br>'));
+  if(QS.length) row('Что сделать по этому шагу',QS.map(x=>`${_opT(_orkCap(_rzRef(x.act||'')))} — ${x.whoOut&&x.who?_rzOutWho(x.who,'op-warn',x.outAct):_opWho(x.who,x.role||'')}`).join('<br>'));
   return `<div class="op-sx" id="opStep${n}"><dl class="op-kv">${R.join('')}</dl></div>`;
 }
 function _opPath(o,S,P,w,D,Q){
