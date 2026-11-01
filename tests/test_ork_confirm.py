@@ -340,6 +340,58 @@ def test_исполнитель_ответственный_не_из_орк():
     assert not contracts_mod._is_ork_head("", "", "", "")
 
 
+def test_заказ_на_шаге_0_не_у_менеджера_орк_и_не_whoout():
+    """Решение 31.10.2026, пп. 1–2: заказ на шаге 0 ещё не в ОРК — пункты менеджера ОРК (срок клиента,
+    производство, чат) у исполнителя задачи, КАМ в копии; «принять заказ и назначить менеджера ОРК»
+    (out) до закрытия задачи не ставится — ни при ответственном не из ОРК, ни при менеджере ОРК."""
+    pp = {"orkMgr": "", "dealOrk": "", "resp": "Сергей (снабжение)", "orkHead": "Роза (рук. ОРК)",
+          "kam": "Анна (КАМ)", "confirmResp": "Вера (снабжение)"}
+    for code in ("late", "risk", "forecast", "prodDev", "planAfterDl", "chatRisk"):
+        it = ork.item_owner(code, 0, pp)
+        assert (it["step"], it["role"], it["who"], it["copyRole"], it["copy"]) == (
+            0, "confirmResp", "Вера (снабжение)", "kam", "Анна (КАМ)"), code
+        assert "out" not in it and "alsoCopy" not in it, code
+        it = ork.item_owner(code, 0, {**pp, "orkMgr": "Олег (ОРК)"})
+        assert it["role"] == "confirmResp" and it["who"] == "Вера (снабжение)", code
+    # договор поставщика (шаг 4 по ITEM) у заказа шага 0 — тоже исполнитель задачи
+    it = ork.item_owner("contractMissing", 0, pp, key="contractMissing:supplier")
+    assert it["role"] == "confirmResp" and "out" not in it
+    # пункты других ролей шаг 0 не трогает (приёмка, сроки без даты — руководитель ОРК)
+    assert ork.item_owner("noDl", 0, pp)["role"] == "orkHead"
+    # тот же пункт на шаге 4 — прежнее правило 968/2
+    it = ork.item_owner("late", 4, pp)
+    assert it["role"] == "orkMgr" and it["who"] == "Сергей (снабжение)" and it["out"] is True
+
+
+def test_пропуск_менеджера_орк_у_сделки_только_шага_0():
+    """orkview.owner_gaps: все живые заказы сделки на шаге 0 и менеджера ОРК нет — пропуска нет
+    (не «ушёл»: all([]) — не повод); заказ шага 0 рядом с заказом вне ОРК — «out» по остальным."""
+    d = {"kam": "Анна", "ossDeal": "Оля", "orkResp": "", "orders": [{"id": "5", "live": True, "orkMgr": ""}]}
+    assert orkview.owner_gaps(d, {"5": "pre"}) == []
+    assert [g["state"] for g in orkview.owner_gaps(d, {"5": "none"})] == ["none"]
+    d2 = {**d, "orders": [{"id": "5", "live": True, "orkMgr": ""}, {"id": "6", "live": True, "orkMgr": ""}]}
+    g = orkview.owner_gaps(d2, {"5": "pre", "6": "out"})
+    assert [(x["role"], x["state"], x["ordOut"], x["ordNone"]) for x in g] == [("orkMgr", "out", 1, 0)]
+    assert [x["state"] for x in orkview.owner_gaps({**d, "orkResp": "Пётр (уволен)"}, {"5": "pre"})] == ["gone"]
+    assert [x["state"] for x in orkview.owner_gaps({**d, "orders": []}, {})] == ["none"]
+
+
+def test_назначение_при_открытой_задаче_и_ушедшей_стадии():
+    """Решение 31.10.2026, а: стадия дальше шага 1 при открытой задаче — шаг по стадии, задача —
+    только замечание confirmOpen; назначение и сегменты — как без задачи (срок шага 4 не сдвигается)."""
+    o = _o(stage="Заказ направлен", stageSince=ts("10-14"), stepSince=ts("10-14"), orkMgr="Олег (ОРК)",
+           assignDate=D(2026, 10, 9))
+    assert ork.assign_at(o) == D(2026, 10, 9) and ork.seg_assign(o) == D(2026, 10, 9)
+    oc = {**o, "confirm": _open("10-07")}
+    assert ork.step_now(oc) == 4 and not ork.pre_open(oc)
+    assert ork.assign_at(oc) == ork.assign_at(o) and ork.seg_assign(oc) == ork.seg_assign(o)
+    assert ork.clock(oc, 4) == ork.clock(o, 4)
+    assert ork.judged(oc, T)["wd"] == ork.judged(o, T)["wd"]
+    # стадия шага 1 и задача открыта — шаг 0: назначения нет
+    o1 = _o(orkMgr="Олег (ОРК)", assignDate=D(2026, 10, 9), confirm=_open("10-07"))
+    assert ork.pre_open(o1) and ork.assign_at(o1) is None and ork.seg_assign(o1) is None
+
+
 # ── сборка целиком: fixture.ПодтверждениеПередачи ─────────────────────────────────────────
 def _build(stub, **kw):
     """contracts.compute (как fixture.build_contracts) и заказы, которые он отдал orkview."""
@@ -639,3 +691,111 @@ def test_без_задач_числа_прежние(monkeypatch):
         old = _strip_new(fixture.build_contracts(confirm_tasks=None))
     d = _diff(now, old)
     assert not d, d[:20]
+
+
+# ── ревью шага 0 (01.11.2026): сборка целиком ─────────────────────────────────────────────
+class ПослеРевью(fixture.ПодтверждениеПередачи):
+    """Поверх ПодтверждениеПередачи — придуманные сделки 935, 936, 950 (6395, 6390, 6396):
+      • 936 — в поле сделки руководитель ОРК, единственный живой заказ на шаге 0 (задача открыта с
+        пт 09.10), ответственный '33' не из ОРК, срок клиента близко: пропуска «менеджер ОРК» нет (не
+        «ушёл»), пункты заказа — у исполнителя задачи, ни одного whoOut;
+      • 935 — заказ шага 4 сверх нормы и заказ шага 0 дольше 5 р.д.: ячейка шага сделки — сверх нормы ОРК;
+      • 950 — задача открыта, стадия «Заказ направлен» с 14.10, назначение 05.10: срок шага 4 — от
+        назначения, как без задачи (стадия сильнее, решение 31.10.2026, а)."""
+
+    def __init__(self):
+        super().__init__()
+        import contracts as ct
+        T_ = lambda m, day, hm="10:00": f"2026-{m}-{day}T{hm}:00+03:00"  # noqa: E731
+        d = lambda a: (fixture.CT_TODAY - dt.timedelta(days=a)).isoformat()  # noqa: E731
+        plan = {ct.PROD_START: d(-5), ct.PROD_END: d(-40), ct.DEL_BUDGET: d(-80), ct.DL_CUSTOMER: d(-90)}
+        for did, seq, title, extra in (("6390", 936, "Не передан, всё на шаге 0", {ct.ORK_RESP: "30"}),
+                                       ("6395", 935, "Сверх нормы и шаг 0", {}),
+                                       ("6396", 950, "Назначен, стадия ушла, задача открыта", {})):
+            self.deals.append({"ID": did, "TITLE": f"{seq}. {title}", "OPPORTUNITY": "30000", "CURRENCY_ID": "EUR",
+                               "COMPANY_ID": "305", "STAGE_ID": "C0:EXECUTING", "STAGE_SEMANTIC_ID": "P",
+                               "CATEGORY_ID": "0", "DATE_CREATE": T_("09", 10), "ASSIGNED_BY_ID": "11",
+                               ct.OSS_DEAL: ["21"], ct.KAM_F: self.KAM, **extra})
+            self.hist[2] += [(did, "C0:NEW", T_("09", 12)), (did, "C0:EXECUTING", T_("09", 14))]
+
+        def order(oid, did, lbl, created, resp="31", stages=(("NEW", None),), **extra):
+            self.orders.append({"id": oid, "title": f"{lbl}. Узел", "companyId": "404", "parentId2": int(did),
+                                "opportunity": 9_000, "currencyId": "EUR", "stageId": f"DT172_26:{stages[-1][0]}",
+                                "createdTime": created, "movedTime": stages[-1][1] or created, ct.OSS_F: "21",
+                                "assignedById": resp, **{**plan, **extra}})
+            for st_, at in stages:
+                self.hist[172].append((str(oid), f"DT172_26:{st_}", at or created))
+
+        order(99901, "6390", "936/1", T_(10, "09"), resp="33", **{ct.DL_CUSTOMER: d(-2), ct.PROD_END: d(-20)})
+        self.tasks.append(fixture.ct_task(5301, 99901, T_(10, "09", "11:00"), resp="33"))
+        order(99951, "6395", "935/1", T_("09", 20), stages=(("NEW", T_("09", 20)), ("SENT", T_(10, "05"))))
+        order(99952, "6395", "935/2", T_(10, "09"))
+        self.tasks.append(fixture.ct_task(5302, 99952, T_(10, "09", "11:00"), resp="33"))
+        order(99961, "6396", "950/1", T_("09", 28), stages=(("NEW", T_("09", 28)), ("SENT", T_(10, 14))),
+              **{ct.ASSIGN_AT: "2026-10-05"})
+        self.tasks.append(fixture.ct_task(5303, 99961, T_("09", 28, "11:00"), resp="33"))
+
+
+@pytest.fixture(scope="module")
+def R():
+    st = ПослеРевью()
+    ct, got = _build(st)
+    без, _g = _build(ПослеРевью(), confirm_tasks=None)
+    return {"ct": ct, "без": без, "lo": {o["id"]: o for o in got["o"]}}
+
+
+def test_ревью_все_заказы_на_шаге_0_без_менеджера_нет_пропуска(R):
+    ct = R["ct"]
+    r = next(r for r in ct["rows"] if r["deal"] == "6390")
+    assert r["orkResp"] == "" and r["orders"][0]["step"] == 0
+    no = ct["ork"]["week"]["noOwner"]
+    assert "d:6390" not in ct["ork"]["week"]["drill"]["noOwner"]["k"]
+    assert not [x for x in no["rows"] if str(x.get("deal")) == "6390"]
+    qs = _q(ct, "99901")
+    assert qs and {q["role"] for q in qs} == {"confirmResp"}, [(q["code"], q["role"]) for q in qs]
+    assert not [q for q in qs if q.get("whoOut") or q.get("outAct")]
+    assert all(q["who"] == "Сергей (снабжение)" and q["copyRole"] == "kam" for q in qs)
+    # ни одного whoOut у заказа шага 0 во всей очереди
+    assert not [q for q in lifecycle.per_order(ct["life"]["queue"]) if q.get("whoOut") and q.get("step") == 0]
+
+
+def test_ревью_ячейка_шага_сверх_нормы_орк_раньше_шага_0(R):
+    c = next(r for r in R["ct"]["rows"] if r["deal"] == "6395")["stepCell"]
+    assert (c["step"], c["over"], c["order"]) == (4, True, "99951")
+    assert _ord(R["ct"], "99952")["stepPreOver"] is True
+
+
+def test_ревью_назначение_при_ушедшей_стадии_как_без_задачи(R):
+    o, o0 = _ord(R["ct"], "99961"), _ord(R["без"], "99961")
+    assert o["step"] == o0["step"] == 4
+    assert (o["stepFrom"], o["stepFromBy"], o["stepWd"]) == (o0["stepFrom"], o0["stepFromBy"], o0["stepWd"])
+    assert o["stepFromBy"] == "назначение" and o["stepFrom"] == "2026-10-05"
+    assert _q(R["ct"], "99961", "confirmOpen")
+
+
+def test_ревью_whoout_руководитель_орк_вторым_в_копии(R):
+    """Решение 31.10.2026 (заказ 968/2): у whoOut-пункта со своей копией (КАМ) руководитель ОРК —
+    вторым в копии с id (alsoCopyId: «Смотреть как» руководителя ОРК пункт не теряет)."""
+    wo = [q for q in lifecycle.per_order(R["ct"]["life"]["queue"]) if q.get("whoOut")]
+    assert wo
+    for q in wo:
+        assert q["outAct"] == ork.OUT_ACT
+        if q["copyRole"] != "orkHead":
+            assert (q["alsoCopy"], q["alsoCopyRole"], q["alsoCopyId"]) == ("Роза (рук. ОРК)", "orkHead", "30"), q["code"]
+
+
+def test_ревью_пункт_заказа_dealctx_не_переданного_в_орк(R):
+    """Решение 31.10.2026 (заказ 968/2) и для пунктов заказа dealctx (чат, договор поставщика):
+    исполнитель — ответственный заказа не из ОРК (respOut строки заказа), whoOut, руководитель ОРК
+    в копии (или вторым в копии), как у пункта очереди s2Over того же заказа."""
+    r = next(r for r in R["ct"]["rows"] if r["deal"] == "6312")
+    o = next(o for o in r["orders"] if o["id"] == "99821")
+    assert o["respOut"] == "Сергей (снабжение)" and o["orkMgr"] == ""
+    ppl = dealctx._people(r, "Роза (рук. ОРК)")
+    own = dealctx._reg("contractMissing", r, ppl, key="contractMissing:supplier", order=o)
+    assert (own["who"], own["whoOut"], own["outAct"], own["copyRole"], own["escalateTo"]) == (
+        "Сергей (снабжение)", True, ork.OUT_ACT, "orkHead", "Роза (рук. ОРК)")
+    own = dealctx._reg("chatDue", r, ppl, key="chatDue", order=o)
+    assert own["whoOut"] and own["copyRole"] == "kam" and own["alsoCopy"] == "Роза (рук. ОРК)"
+    # ответственный из ОРК — подписи в строке нет
+    assert not [x for rr in R["ct"]["rows"] for x in rr["orders"] if x.get("respOut") and x.get("orkMgr")]

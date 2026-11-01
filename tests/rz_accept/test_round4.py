@@ -79,7 +79,10 @@ def test_кнопки_excel_не_лежат_одна_на_другой(open_page
           const L=B.filter(e=>e.closest('#wkLedD')).map(e=>e.getAttribute('aria-label'));
           return {n:B.length, uniq:new Set(k).size, L}}""")
         assert r["n"] == r["uniq"], (w, r)
-        assert len(r["L"]) == 2 and len(set(r["L"])) == 2, (w, r)
+        # «Таблица 13 шагов»: шаги заказа 4–12, шаги сделки 1–3 и 13 и (корпус с шагом 0 — сделка 934) блок
+        # шага 0 «Заказы — шаг 0» первым (решение владельца 31.10.2026) — у каждой таблицы своя кнопка
+        assert r["L"] == ["Скачать в Excel: " + x for x in ("Заказы — шаг 0", "Заказы — шаги 4–12",
+                                                            "Сделки — шаги 1–3 и 13")], (w, r)
 
 
 def test_p09_закрытый_список_не_возвращается(open_page):
