@@ -913,13 +913,13 @@ def run(args) -> int:
               f"менеджеров ОРК в «Месяце» {len(((ork_month_data or {}).get('main') or {}).get('people') or [])}")
         # шаг 0 — подтверждение передачи в ОРК (решение владельца 31.10.2026): только счёт
         _cf = (contracts_data.get("head") or {}).get("confirm") or {}
-        print(f"  шаг 0 (подтверждение передачи в ОРК): задачи "
-              f"{'прочитаны' if _cf.get('read') is True else 'не прочитаны' if _cf.get('read') is False else 'прочитано 0'}; "
+        _cfr = {True: "прочитаны", False: "не прочитаны", "partial": "прочитаны не все"}.get(_cf.get("read"), "прочитано 0")
+        print(f"  шаг 0 (подтверждение передачи в ОРК): задачи {_cfr}; "
               f"живых заказов на шаге 0 {_tr.get('pre', 0)}, сверх {ork.NORM_WD[ork.PRE_STEP]} р.д. "
               f"{(_lc.get('counts') or {}).get('s0Over', 0)}; приёмка (t0) сдвинута закрытием задачи у "
               f"{_cf.get('t0Moved', 0)}, S1 из-за этого «конец раньше начала» у {_cf.get('s1Neg', 0)}; "
               f"задача открыта, а заказ дальше шага 0 — {(_lc.get('counts') or {}).get('confirmOpen', 0)}")
-        if _cf.get("read") == "empty":
+        if _cf.get("read") in ("empty", "partial"):
             print(f"  ⚠ {_cf.get('why')}")
         # приёмка кончается назначением менеджера ОРК (вопрос владельца 29.10.2026) — только счёт
         _t1, _lcc = ((_wk.get("tiles") or {}).get("W1") or {}), (_lc.get("counts") or {})

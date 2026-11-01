@@ -877,10 +877,15 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         # заказа нет (orkview.pulse_who, вид none). Менеджера ОРК нет, а ответственный заказа есть,
         # но не из ОРК, — whoOut, своим счётом: исполнитель шага — он (who, whoId; заказ не передан
         # в ОРК, решение владельца 31.10.2026, заказ 968/2), руководителю ОРК — outAct «принять заказ
-        # и назначить менеджера ОРК» (в копии, если у пункта своей копии нет: ork.owner)
+        # и назначить менеджера ОРК» (в копии, если у пункта своей копии нет, иначе вторым в копии —
+        # alsoCopy: ork.owner). Заказ на шаге 0 (задача подтверждения открыта) — не whoOut: пункт
+        # менеджера ОРК у исполнителя задачи, КАМ в копии (ork.owner: pre)
         if ow.get("out"):
             r["whoOut"] = True
             r["outAct"] = ork.OUT_ACT
+            if ow.get("alsoCopyRole"):
+                r.update(alsoCopy=ow["alsoCopy"], alsoCopyRole=ow["alsoCopyRole"],
+                         alsoCopyId=ork.role_id(ow["alsoCopyRole"], pp, ids))
         return r
 
     def gone(name: str) -> bool:
