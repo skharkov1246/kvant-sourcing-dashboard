@@ -353,9 +353,12 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
         if waits:
             adjacent[waits]["orders"] += len(here)
         # строка 0: задачи подтверждения не прочитаны (или прочитано 0 при живых заказах) — «Нет
-        # данных», а не «на шаге 0 никого» (правило 15)
-        pre_nodata = ({"nodata": True, "why": confirm.get("why") or "задачи подтверждения передачи не прочитаны"}
-                      if no == ork.PRE_STEP and confirm.get("read") is not True else {})
+        # данных», а не «на шаге 0 никого» (правило 15); прочитаны не все (предел страниц, «partial»)
+        # — счёт есть, но с оговоркой: у части заказов шаг 0 может не стоять
+        rd = confirm.get("read")
+        pre_nodata = ({} if no != ork.PRE_STEP or rd is True
+                      else {"partial": True, "why": confirm.get("why") or ""} if rd == "partial"
+                      else {"nodata": True, "why": confirm.get("why") or "задачи подтверждения передачи не прочитаны"})
         ledger.append({"no": no, "name": s["name"], "role": s["role"], "roleName": ork.ROLES[s["role"]],
                        "also": [ork.ROLES[r] for r in s["also"]], "norm": s["norm"], "unit": "order",
                        "now": len(here),
@@ -712,7 +715,7 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
              "respOrk": sum(1 for o in U if o.get("respOrk")),
              "oldNoUtd": sum(1 for o in L if hy[o["id"]].get("old")),
              # шаг 0 (решение владельца 31.10.2026): задачи подтверждения передачи прочитаны (true |
-             # false | "empty") и живых заказов на шаге 0
+             # false | "empty" | "partial") и живых заказов на шаге 0
              "confirmRead": confirm.get("read"),
              "pre": sum(1 for o in L if step[o["id"]] == ork.PRE_STEP)}
     return ({"asOf": today.isoformat(), "trust": trust, "week": week, "quarter": quarter,
@@ -1769,11 +1772,12 @@ def owner_gaps(d: dict, kind_of: dict | None = None) -> list[dict]:
     # заказы на шаге 0 (до передачи в ОРК, решение владельца 31.10.2026) менеджера ОРК не ждут:
     # все живые заказы такие — пропуска «менеджер ОРК» нет
     rest = [k for k in kinds if k != "pre"]
-    if not mgrs and not (kinds and not rest):
-        n_out = sum(1 for k in rest if k == "out")
-        n_none = len(rest) - n_out
-        add("orkMgr", "out" if rest and not n_none else "none")
-        out[-1].update(ordNone=n_none, ordOut=n_out)
+    if not mgrs:
+        if rest or not kinds:
+            n_out = sum(1 for k in rest if k == "out")
+            n_none = len(rest) - n_out
+            add("orkMgr", "out" if rest and not n_none else "none")
+            out[-1].update(ordNone=n_none, ordOut=n_out)
     elif all(_gone_nm(m) for m in mgrs):
         add("orkMgr", "gone")
     if d.get("managerGone"):

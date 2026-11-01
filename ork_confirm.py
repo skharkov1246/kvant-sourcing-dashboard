@@ -39,7 +39,9 @@ ORDER_ENTITY = 172
 ORDER_PREFIX = f"T{ORDER_ENTITY:x}_"         # «Tac_<id>» — привязка задачи к элементу СП-172
 DEAL_PREFIX = "D_"
 CONFIRM_CLOSED = frozenset({"5"})          # «Завершена»; 2, 3, 4 («Ждёт контроля»), 6, 7 — открыта
-MAX_PAGES = 10                             # по 50 задач: нагрузка — 1–5 запросов
+# по 50 задач: 1000 задач с SINCE — около полутора лет при темпе зонда v63 (54 задачи в месяц);
+# нагрузка — 1–20 запросов. Портал отдал не всё (next после MAX_PAGES) — read «partial», а не молча
+MAX_PAGES = 20
 SELECT = ("ID", "TITLE", "STATUS", "CREATED_DATE", "CLOSED_DATE", "RESPONSIBLE_ID", "UF_CRM_TASK")
 # прочитано 0 задач при стольких живых заказах, заведённых с SINCE, — «проверить видимость задач
 # вебхуку» (read = "empty"), а не «задач нет»
@@ -139,22 +141,33 @@ def load(client) -> tuple[dict[str, dict] | None, dict]:
     ошибки}): шага 0 нет, числа прежние."""
     try:
         rows: list[dict] = []
+        info: dict = {}
         for phrase in PHRASES:
             rows += client.tasks_list({"%TITLE": phrase, ">=CREATED_DATE": SINCE}, list(SELECT),
-                                      max_pages=MAX_PAGES)
-        return parse(rows)
+                                      max_pages=MAX_PAGES, info=info)
+        by_order, st = parse(rows)
+        # портал отдал не всё (next после MAX_PAGES): у заказов за пределом шаг 0 не встанет — счёт
+        # обрезан, статус это говорит (правило 15), head — read «partial»
+        if info.get("truncated"):
+            st["truncated"] = True
+        return by_order, st
     except Exception as e:  # noqa: BLE001 — отказ без последствий: шага 0 нет, числа прежние
         return None, {"read": False, "why": type(e).__name__}
 
 
 def head(stats: dict | None, live_since: int = 0) -> dict:
-    """contracts.head.confirm: {read: True | False | "empty", n, orders, open, why}. live_since —
-    живых заказов, заведённых с SINCE: при EMPTY_MIN и больше ноль задач — «empty» (видимость
-    задач вебхуку не проверена), а не «задач нет»."""
+    """contracts.head.confirm: {read: True | False | "empty" | "partial", n, orders, open, why}.
+    live_since — живых заказов, заведённых с SINCE: при EMPTY_MIN и больше ноль задач — «empty»
+    (видимость задач вебхуку не проверена), а не «задач нет». Портал отдал не всё (truncated: next
+    после MAX_PAGES страниц) — «partial»: шаг 0 у прочитанных заказов есть, у части прочих — нет."""
     s = stats or {"read": False, "why": "не читались"}
     if not s.get("read"):
         return {"read": False, "n": None, "orders": None, "open": None,
                 "why": f"задачи подтверждения передачи не прочитаны: {s.get('why') or 'отказ портала'}"}
+    if s.get("truncated"):
+        return {"read": "partial", "n": s.get("n", 0), "orders": s.get("orders", 0), "open": s.get("open", 0),
+                "why": f"прочитаны не все задачи подтверждения передачи: предел {MAX_PAGES} страниц по 50 "
+                       f"с {SINCE[:10]} — у части заказов шаг 0 может не стоять; сдвинуть начало окна"}
     if not s.get("n") and live_since >= EMPTY_MIN:
         return {"read": "empty", "n": 0, "orders": 0, "open": 0,
                 "why": f"задач подтверждения передачи 0 при {live_since} живых заказах с {SINCE[:10]} — "
@@ -167,7 +180,8 @@ def summary(stats: dict | None) -> str:
     s = stats or {}
     if not s.get("read"):
         return f"задачи подтверждения передачи в ОРК: не прочитаны ({s.get('why') or '—'}) — шага 0 нет, числа прежние"
-    return (f"задачи подтверждения передачи в ОРК с {SINCE[:10]}: прочитано {s.get('raw', 0)}, по названию "
+    cut = f"⚠ прочитаны НЕ ВСЕ (предел {MAX_PAGES} страниц) — " if s.get("truncated") else ""
+    return (f"{cut}задачи подтверждения передачи в ОРК с {SINCE[:10]}: прочитано {s.get('raw', 0)}, по названию "
             f"{s.get('n', 0)} (не по названию {s.get('skipped', 0)}); к заказу {s.get('order', 0)}, к сделке "
             f"{s.get('deal', 0)}, к другому {s.get('other', 0)}, без привязки {s.get('none', 0)}; заказов с задачей "
             f"{s.get('orders', 0)} (открыта {s.get('open', 0)}, закрыта {s.get('closed', 0)}, с двумя и больше "

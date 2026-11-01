@@ -490,9 +490,9 @@ class ContractsStub:
     """Ровно те методы клиента, которые зовёт contracts.compute (и ork_confirm.load — задачи
     подтверждения передачи tasks.task.list: тем же кодом постраничности, что у BitrixClient)."""
 
-    def tasks_list(self, filter=None, select=None, *, max_pages=10):
+    def tasks_list(self, filter=None, select=None, *, max_pages=10, info=None):
         from bitrix_client import BitrixClient
-        return BitrixClient.tasks_list(self, filter, select, max_pages=max_pages)
+        return BitrixClient.tasks_list(self, filter, select, max_pages=max_pages, info=info)
 
     def __init__(self):
         import contracts as ct

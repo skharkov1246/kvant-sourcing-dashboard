@@ -1346,6 +1346,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 **({"stepWhoOut": True} if own.get("out") else {}),
                 # исполнитель задачи подтверждения передачи (шаг 0) — у заказа с задачей
                 **({"confirmWho": lo["confirmWho"]} if lo.get("confirm") is not None else {}),
+                # ответственный заказа не из ОРК при пустом менеджере ОРК (заказ не передан в ОРК,
+                # решение владельца 31.10.2026, заказ 968/2): пункт заказа dealctx (чат, договор
+                # поставщика) отдаёт ему, как очередь (ork.owner: out), — только когда так
+                **({"resp": lo["resp"]} if lo["resp"] and not (_nm_or_empty(lo.get("orkMgr"))
+                                                               or _nm_or_empty(d_people["dealOrk"])) else {}),
             })
             if olive:
                 # путь живого заказа по шагам регламента (ork.path, владелец 29.10.2026: «провалиться
@@ -1439,8 +1444,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         _cell_orders = [{"order": x["id"], "lbl": x["lbl"], "step": x["step"]}
                         for x in sorted(_live_st, key=lambda x: (x["step"], x["ordNo"] is None, x["ordNo"] or 0))]
         if _cand and (any(x["stepOver"] or x["stepWaitUtd"] or x["stepPreOver"] for x in _cand) or not paid):
-            # шаг 0 дольше нормы — тоже «почему замедлена» (решение 31.10.2026, г), рядом со «сверх нормы»
-            c = min(_cand, key=lambda x: (not (x["stepOver"] or x["stepPreOver"]), not x["stepWaitUtd"], x["step"]))
+            # шаг 0 дольше нормы — тоже «почему замедлена» (решение 31.10.2026, г), но после «сверх нормы»
+            # ОРК: заказ шага 0 не прячет в ячейке сделки срыв нормы ОРК другого заказа (решение 31.10.2026, п. 1)
+            c = min(_cand, key=lambda x: (not x["stepOver"], not x["stepPreOver"], not x["stepWaitUtd"], x["step"]))
             step_cell = {"step": c["step"], "role": c["stepRole"], "who": c["stepWho"], "wd": c["stepWd"],
                          "norm": c["stepNorm"], "over": c["stepOver"], "waitUtd": c["stepWaitUtd"],
                          "preOver": c["stepPreOver"],

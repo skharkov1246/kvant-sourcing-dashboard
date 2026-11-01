@@ -219,6 +219,13 @@ def confirm_open(order: dict) -> bool:
     """Задача подтверждения передачи заказа в ОРК открыта (ork_confirm, contracts: order["confirm"])."""
     return bool((order.get("confirm") or {}).get("open"))
 
+
+def pre_open(order: dict) -> bool:
+    """Заказ на шаге 0 по задаче: задача подтверждения открыта, стадия — шага 1 и факты шаг не подняли
+    (как step_now). Стадия или факты дальше шага 1 при открытой задаче — не шаг 0 (решение владельца
+    31.10.2026, а: стадия сильнее, замечание confirmOpen): назначение и сегменты — как без задачи."""
+    return confirm_open(order) and bool(order.get("stage")) and step_of(order.get("stage"), order) == 1
+
 # --- сегменты S1–S10 «Системы аналитики» ----------------------------------------------------
 # начало и конец — первый выход заказа на шаг не ниже указанного (по всем переходам);
 # "t0" — max(создание заказа, вход сделки в кат. 0); "delFact"/"utd" — даты фактов. Выход на
@@ -386,10 +393,11 @@ def assign_at(order: dict) -> dt.date | None:
     отброшена при чтении (contracts: на конец окна назначения ещё не было). Дня начала нет —
     None: сверить не с чем.
 
-    Шаг 0 (решение владельца 31.10.2026): пока задача подтверждения передачи открыта — None
-    (приёмки ещё нет); назначение раньше закрытия задачи — с дня закрытия (max(дата, t0)): приёмка
-    идёт с закрытия, раньше неё не кончается."""
-    if confirm_open(order):
+    Шаг 0 (решение владельца 31.10.2026): пока заказ на шаге 0 (pre_open: задача подтверждения
+    открыта, стадия — шага 1) — None (приёмки ещё нет); стадия ушла дальше при открытой задаче —
+    назначение как без задачи (стадия сильнее, решение 31.10.2026, а); назначение раньше закрытия
+    задачи — с дня закрытия (max(дата, t0)): приёмка идёт с закрытия, раньше неё не кончается."""
+    if pre_open(order):
         return None
     a, s = _d(order.get("assignDate")), _start_day(order)
     if not (a and s and a >= s and order.get("orkMgr")):
@@ -400,11 +408,11 @@ def assign_at(order: dict) -> dt.date | None:
 
 def seg_assign(order: dict) -> dt.date | None:
     """«Дата записи нового ответственного» для сегментов S1/S2 (segments, facts.assignAt): нет
-    даты, ответственный не из ОРК или задача подтверждения открыта — None; дата не раньше начала
+    даты, ответственный не из ОРК или заказ на шаге 0 (pre_open) — None; дата не раньше начала
     заказа (t0Raw) — max(дата, t0): с закрытия задачи; раньше — сырая дата (segments сам пометит
     её «раньше начала», assignIgnored). Без задачи — та же дата, что раньше."""
     a = _d(order.get("assignDate"))
-    if a is None or not order.get("orkMgr") or confirm_open(order):
+    if a is None or not order.get("orkMgr") or pre_open(order):
         return None
     s = _start_day(order)
     if s is not None and a >= s:
@@ -1058,7 +1066,7 @@ def role_id(role: str | None, people: dict, ids: dict) -> str:
 
 
 def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP,
-          role: str | None = None) -> dict:
+          role: str | None = None, pre: bool = False) -> dict:
     """Хозяин пункта очереди — исполнитель шага. people — уже найденные люди заказа и
     сделки: orkMgr (ответственный заказа, если он из отдела ОРК), dealOrk (поле сделки
     «Ответственный за реализацию», не руководитель ОРК), resp (ответственный заказа не из ОРК),
@@ -1070,7 +1078,13 @@ def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP,
 
     out (решение владельца 31.10.2026, заказ 968/2): менеджера ОРК нет, исполнитель — ответственный
     заказа не из ОРК (заказ не передан в ОРК, OUT_MARK); копии у пункта нет — в копии руководитель
-    ОРК (ему — OUT_ACT)."""
+    ОРК (ему — OUT_ACT); у пункта своя копия — руководитель ОРК вторым в копии (alsoCopy,
+    alsoCopyRole).
+
+    pre — заказ на шаге 0 (PRE_STEP: задача подтверждения передачи открыта, решение владельца
+    31.10.2026, пп. 1–2): заказ ещё не в ОРК — пункт, который регламент отдаёт менеджеру ОРК (срок
+    клиента, производство, чат, договор поставщика), делает исполнитель задачи подтверждения, КАМ
+    сделки — в копии; «принять заказ и назначить менеджера ОРК» (out) до закрытия задачи не ставится."""
     def nm(*keys):
         for k in keys:
             v = people.get(k)
@@ -1090,17 +1104,23 @@ def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP,
     else:
         role = role or (EXECUTOR.get(step) if step is not None else "orkHead")
         copy_role = (STEP[step]["esc"] if step is not None else None) if esc is _ESC_STEP else esc
+        if pre and role == "orkMgr":
+            role, copy_role = EXECUTOR[PRE_STEP], STEP[PRE_STEP]["esc"]
         if copy_role == role:
             copy_role = None
     who = find[role]() or "не назначен"
     # менеджера ОРК нет ни у заказа, ни у сделки — исполнитель ответственный заказа не из ОРК
-    out = role == "orkMgr" and not nm("orkMgr", "dealOrk") and bool(nm("resp"))
+    out = not pre and role == "orkMgr" and not nm("orkMgr", "dealOrk") and bool(nm("resp"))
     if out and not copy_role:
         copy_role = "orkHead"
     copy = (find[copy_role]() or "не назначен") if copy_role else ""
     res = {"role": role, "who": who, "copy": copy, "copyRole": copy_role or ""}
     if out:
         res["out"] = True
+        # у пункта своя копия (КАМ: срок клиента, производство) — руководитель ОРК вторым в копии:
+        # ему — OUT_ACT, и «Смотреть как» руководителя ОРК пункт не теряет
+        if copy_role != "orkHead":
+            res["alsoCopy"], res["alsoCopyRole"] = find["orkHead"](), "orkHead"
     return res
 
 
@@ -1208,11 +1228,12 @@ STEP_CODES = {st: (code, *(c for c, s in TERM_EXTRA.items() if s == st)) for st,
 def item_owner(code: str, step_now: int | None, people: dict, *, key: str | None = None) -> dict:
     """Хозяин пункта очереди по таблице ITEM: {step, role, who, copy, copyRole}. key —
     строка ITEM с уточнением (вид срока из чата, сторона договора), нет её — по коду. Код не
-    из таблицы — исполнитель текущего шага и его эскалация."""
+    из таблицы — исполнитель текущего шага и его эскалация. step_now — шаг заказа сейчас: шаг 0
+    — пункт менеджера ОРК у исполнителя задачи подтверждения (owner: pre)."""
     k = key if key in ITEM else code
     st, role, copy = ITEM.get(k, (None, None, _ESC_STEP))
     step = st if st is not None else step_now
-    out = owner(step, people, role=role, esc=copy if k in ITEM else _ESC_STEP)
+    out = owner(step, people, role=role, esc=copy if k in ITEM else _ESC_STEP, pre=step_now == PRE_STEP)
     return {"step": step, **out}
 
 
