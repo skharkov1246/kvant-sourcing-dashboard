@@ -100,10 +100,6 @@ EXC = {
     # заказ, добавленный в уже принятую сделку: свой пункт заказа, слова «сделка» в нём нет
     "ordAssign": (4, f"менеджер ОРК на новый заказ не назначен дольше {ork.NORM_WD[1]} р.д.",
                   "назначить менеджера ОРК на новый заказ"),
-    # шаг до приёмки, которого нет в регламенте ОРК (handover, владелец 01.11.2026): крайний срок
-    # задачи «Подтверждение готовности» прошёл, заказ в ОРК не передан — дни рабочие после срока
-    "hoOver": (4, "готовность заказа к передаче в ОРК не подтверждена в срок задачи",
-               "подтвердить готовность заказа к передаче в ОРК: проверка поставщика, свежий оффер, документы"),
     "s2Over": (5, f"договор с поставщиком дольше {ork.NORM_WD[4]} р.д.", "подписать договор или зафиксировать, что ждём"),
     "s3Over": (5, f"PO/OC, спецификация и предоплата дольше {ork.NORM_WD[5]} р.д.", "довести PO, OC, спецификацию и предоплату"),
     "s6Over": (5, f"подготовка к отгрузке дольше {ork.NORM_WD[8]} р.д.", "собрать отгрузочные документы и передать логистике"),
@@ -124,7 +120,7 @@ ACT_CLIENT = {
 # deal — сделка. Пункт сделки, рождённый фактами заказов, несёт их строками ords
 UNIT = {
     **{c: "order" for c in ("late", "risk", "forecast", "planAfterDl", "prodDev", "noUtd",
-                            "s2Over", "s3Over", "s6Over", "ordAssign", "goneOrd", "hoOver",
+                            "s2Over", "s3Over", "s6Over", "ordAssign", "goneOrd",
                             "noDl", "noPlanDates", "noFact")},
     **{c: "deal" for c in ("unpaid", "noPayPlan", "s1Over", "noOrder", "payNoContract",
                            "dealClose", "dealOpen", "gone",
@@ -137,7 +133,7 @@ UNIT = {
 # (решения владельца 30.10.2026, п. 2 и 3: dealClose и noPayPlan — сюда)
 BUCKET = {
     **{c: "exec" for c in ("late", "risk", "forecast", "planAfterDl", "prodDev", "noUtd",
-                           "s2Over", "s3Over", "s6Over", "ordAssign", "hoOver")},
+                           "s2Over", "s3Over", "s6Over", "ordAssign")},
     **{c: "deal" for c in ("unpaid", "noOrder", "s1Over", "payNoContract",
                            "chatReply", "chatRisk", "chatDue", "contractRisk",
                            "contractMissing:customer", "contractMissing:both")},
@@ -174,10 +170,7 @@ PLAN_DATES = (("prodStart", "начало производства"), ("prodEnd"
 # начало счёта срока шага (ork.clock) → как его назвать у пункта: по этой подписи день
 # проверяется в Битриксе (создание заказа, история стадий, «Дата записи нового
 # ответственного», «Customer delivery date, actual»)
-SINCE_WORD = {"назначение": "назначение", "вход в шаг": "вход в шаг", "доставка": "доставка",
-              # приёмка от закрытия задачи «Подтверждение готовности» (handover, 01.11.2026)
-              "подтверждение готовности": "подтверждена готовность",
-              "задача подтверждения": "задача подтверждения готовности"}
+SINCE_WORD = {"назначение": "назначение", "вход в шаг": "вход в шаг", "доставка": "доставка"}
 # кто из хозяев сделки уволен — признаки строки сделки contracts.py (справочник людей). Прежний
 # счёт counts.gone — сделки с любым из трёх; пункты с 30.10.2026 разведены: gone — люди СДЕЛКИ
 # (ответственный, ОСС сделки), goneOrd — ответственный или ОСС ЗАКАЗА (orders[] строки сделки)
@@ -516,10 +509,6 @@ def order_exceptions(o: dict, today: dt.date, fc: dt.date | None = None, *,
             nocal[LEGACY_CODE.get(code, code)] += 1
         if code and (ov["over"] or ov["waitUtd"]):
             out.append((code, ov["wd"]))
-        # ждёт подтверждения готовности к передаче в ОРК (handover): срок задачи прошёл — пункт
-        # исполнителя задачи; сама приёмка не началась (s1Over нет, judged.over None)
-        if ov.get("waitHo") and ov.get("hoOverdue") and in_cat0:
-            out.append(("hoOver", ov.get("hoBy")))
         # закрытие — только у живого заказа и только за CLOSE_DAYS: закрытый заказ
         # закрытие прошёл, а старые доставки без файла платёжки — пробел учёта до
         # появления поля, а не долг клиента
@@ -591,10 +580,6 @@ def order_ref(code: str, o: dict, today: dt.date, *, fc: dt.date | None = None,
         return f"доставлено {_dmy(delivered(o))}"
     if code in ork.TERM_CODES and ov:
         return since_text(ov.get("since"), ov.get("sinceBy") or "", o, today)
-    if code == "hoOver" and ov:
-        d = _date_of(ov.get("hoDl"))
-        return (since_text(ov.get("since"), "задача подтверждения", o, today)
-                + (f", срок задачи {d.strftime('%d.%m')}" if d else ""))
     return ""
 
 
@@ -841,9 +826,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         """Люди заказа и сделки для ork.owner."""
         o, d = o or {}, d or {}
         return {"orkMgr": _nm(o.get("orkMgr")), "dealOrk": _nm(d.get("orkResp")), "orkHead": _nm(ork_head),
-                "kam": _nm(d.get("kam")), "ossOrder": _nm(o.get("oss")), "ossDeal": _nm(d.get("ossDeal")),
-                # исполнитель задачи «Подтверждение готовности» (handover) — хозяин пункта hoOver
-                "hoResp": _nm(o.get("hoWho"))}
+                "kam": _nm(d.get("kam")), "ossOrder": _nm(o.get("oss")), "ossDeal": _nm(d.get("ossDeal"))}
 
     def pid(o: dict | None, d: dict | None) -> dict:
         """id Битрикса людей заказа и сделки — те же ключи, что у ppl (R4, Д-11а)."""
@@ -851,7 +834,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         oi, di = o.get("_pid") or {}, d.get("_pid") or {}
         return {"orkMgr": oi.get("orkMgr"), "dealOrk": di.get("dealOrk"), "orkHead": ork_head_id,
                 "kam": d.get("kamId") or di.get("kam"), "ossOrder": oi.get("ossOrder"),
-                "ossDeal": di.get("ossDeal"), "hoResp": oi.get("hoResp")}
+                "ossDeal": di.get("ossDeal")}
 
     def item(code: str, o: dict | None, d: dict | None) -> dict:
         """Шаг, роль, исполнитель и копия пункта (ork.ITEM): who — хозяин пункта. whoId и
@@ -860,8 +843,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         pp = ppl(o, d)
         ow = ork.item_owner(code, _step_now(o) if o else None, pp)
         ids = pid(o, d)
-        r = {"step": ow["step"], "role": ow["role"],
-             "roleName": ork.ROLES.get(ow["role"]) or ork.ROLES_EXTRA.get(ow["role"], ""),
+        r = {"step": ow["step"], "role": ow["role"], "roleName": ork.ROLES.get(ow["role"], ""),
              "who": ow["who"], "whoGone": gone(ow["who"]),
              "whoId": ork.role_id(ow["role"], pp, ids),
              "escalateTo": ow["copy"], "copyRole": ow["copyRole"],
@@ -898,7 +880,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     # вселенная — та же, что у таблицы сделок: заказы известных сделок, без
     # проигранных; у закрытой (выигранной) сделки сроки заказов уже не отклонения
     СРОКИ = {"late", "risk", "forecast", "prodDev", "planAfterDl", "noDl", "noPlanDates",
-             "s1Over", "s2Over", "s3Over", "s6Over", "hoOver"}
+             "s1Over", "s2Over", "s3Over", "s6Over"}
     ОПЛАТА = {"unpaid", "noPayPlan"}       # у закрытой выигранной сделки оплата получена
     # заказы сделки и принятые сделки (_deal_accept): срок шага 1 заказа принятой сделки — не
     # приёмка, а ordAssign (решение владельца 30.10.2026, п. 1)
@@ -932,7 +914,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         lbl, no = ((o["lbl"], o.get("ordNo")) if o.get("lbl")
                    else ork.order_label(o.get("title"), o.get("id")))
         ov = (ork.judged(o, today, in_cat0=d.get("inCat0", True))
-              if any(c in ork.TERM_CODES or c == "hoOver" for c, _ in exc) else None)
+              if any(c in ork.TERM_CODES for c, _ in exc) else None)
         for code, days in exc:
             # прежний счёт «заказ × код» (counts): ordAssign в нём — s1Over, как до 30.10.2026
             counts[LEGACY_CODE.get(code, code)] += 1
@@ -942,11 +924,11 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
             queue.append({"code": code, "sev": sev, "what": what, "act": act, "days": days,
                           **item(code, o, d),
                           # р.д. — у сроков менеджера по календарю РФ, «без пауз»
-                          "inWd": code in ork.TERM_CODES or code == "hoOver",
+                          "inWd": code in ork.TERM_CODES,
                           # заказ пункта и срок, по которому пункт считан (order_ref): «срок
                           # 01.09.2026», «с 14.10 (назначение)» — проверяется в Битриксе
                           "ordLbl": lbl, "ordNo": no, "ref": order_ref(code, o, today, fc=fc, ov=ov),
-                          "since": ((ov or {}).get("since") or "") if code in ork.TERM_CODES or code == "hoOver" else "",
+                          "since": ((ov or {}).get("since") or "") if code in ork.TERM_CODES else "",
                           # срок оплаты клиента — у строки заказа пункта сделки «не оплатил» (ords)
                           **({"due": _dmy(o.get("payPlan") or (delivered(o) + dt.timedelta(days=PAY_GRACE)))}
                              if code == "unpaid" else {}),

@@ -461,13 +461,10 @@ def ct_fx_loader(codes, days, today):
 
 
 class ContractsStub:
-    """Ровно те методы клиента, которые зовёт contracts.compute. ho=True — задачи «Подтверждение
-    готовности» у первых трёх заказов в «Заказ создан» (handover, 01.11.2026); по умолчанию задач
-    нет — прежний корпус тестов не меняется."""
+    """Ровно те методы клиента, которые зовёт contracts.compute."""
 
-    def __init__(self, *, ho: bool = False):
+    def __init__(self):
         import contracts as ct
-        self.ho = ho
         rnd = random.Random(17)
         now = dt.datetime.fromisoformat(CT_NOW)
 
@@ -740,24 +737,7 @@ class ContractsStub:
 
     def call_envelope(self, method, params=None, **kw):
         """crm.stagehistory.list для дат КП (contracts → зонд v59): ВСЕ входы — в стадии
-        предложения (offer_hist) и в кат. 0 (hist[2], без отсечки HIST_SINCE).
-        tasks.task.list — задачи «Подтверждение готовности» (handover, 01.11.2026) у первых трёх
-        заказов в «Заказ создан»: открыта и просрочена, закрыта, открыта в срок."""
-        if method == "tasks.task.list":
-            if not self.ho:
-                return {"result": {"tasks": []}}
-            news = sorted((o for o in self.orders if str(o.get("stageId")).endswith(":NEW")),
-                          key=lambda o: o["id"])[:3]
-            now = dt.datetime.fromisoformat(CT_NOW)
-            tasks = []
-            for k, o in enumerate(news):
-                c = dt.datetime.fromisoformat(str(o["createdTime"]))
-                tasks.append({"id": str(500 + k), "status": "5" if k == 1 else "2",
-                              "createdDate": c.isoformat(),
-                              "closedDate": min(now, c + dt.timedelta(days=2)).isoformat() if k == 1 else "",
-                              "deadline": (c + dt.timedelta(days=1) if k < 2 else now + dt.timedelta(days=5)).isoformat(),
-                              "responsibleId": "20", "ufCrmTask": [f"Tac_{o['id']}"]})
-            return {"result": {"tasks": tasks}}
+        предложения (offer_hist) и в кат. 0 (hist[2], без отсечки HIST_SINCE)."""
         assert method == "crm.stagehistory.list"
         f = (params or {}).get("filter") or {}
         own = {str(x) for x in f.get("OWNER_ID") or []}

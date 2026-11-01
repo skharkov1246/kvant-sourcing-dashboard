@@ -29,12 +29,6 @@ assign_at. После назначения идёт шаг 4 «Подготов�
 Срок шага и откуда он меряется — clock: шаг 4 — от назначения, и после направления заказа
 («Заказ направлен» — тот же шаг 4), возврат — от повторного входа.
 
-Владелец 01.11.2026 — шаг до приёмки, которого нет в регламенте: задача «Подтверждение
-готовности передачи поставщика в ОРК» (handover.py, зонд v65). Пока она открыта, заказ на шаге 1
-приёмку не начал — judged.waitHo, срок руководителя ОРК не идёт, хозяин — исполнитель задачи (пункт
-hoOver по её крайнему сроку); закрыта позже t0 — приёмка от закрытия (contracts: t0, t0By; t0Base —
-прежнее начало для проверки назначения, _start_day).
-
 Пороги доверия (GATES) — предложение, ждут решения владельца.
 """
 from __future__ import annotations
@@ -43,7 +37,6 @@ import datetime as dt
 import re
 from collections import Counter
 
-import handover
 import period as period_mod
 
 # --- роли (исполнители по регламенту, п. 1.6) -------------------------------------------
@@ -354,11 +347,9 @@ def step_of(stage_name, facts: dict | None = None, *, kind: str = "order",
 
 
 def _start_day(order: dict) -> dt.date | None:
-    """День, с которого назначению менеджера ОРК верим (МСК): max(создание заказа, вход сделки в
-    реализацию) — t0Base; t0, сдвинутый закрытием задачи «Подтверждение готовности» (handover),
-    сюда не идёт: ОРК, назначивший менеджера до подтверждения, приёмку сделал. Без них — день
-    создания заказа."""
-    return _d(order.get("t0Base")) or _d(order.get("t0")) or _d(order.get("created"))
+    """День начала приёмки по МСК: t0 (max(создание заказа, вход сделки в реализацию)), без него
+    — день создания заказа."""
+    return _d(order.get("t0")) or _d(order.get("created"))
 
 
 def assign_at(order: dict) -> dt.date | None:
@@ -519,35 +510,23 @@ def segments(transitions: list, names: dict, workdays_fn=period_mod.workdays_ru,
         prev = st
     reach = _reach(tr, steps)
     facts = facts or {}
-    # задача «Подтверждение готовности» открыта (handover) — приёмка не началась: S1 без начала
-    point = {"t0": ((None, None) if facts.get("hoOpen") else
-                    (_ts(t0), None) if t0 else reach.get(1, (None, None))),
+    point = {"t0": (_ts(t0), None) if t0 else reach.get(1, (None, None)),
              "delFact": (_ts(facts.get("delFact")), None),
              "utdRaw": (_ts(facts.get("utdRaw")), None)}
     # назначение менеджера ОРК раньше выхода из «Заказ создан» (по дню МСК) — выход на шаги 2–4
     soft: dict[int, tuple] = {}
     asg, start = _ts(facts.get("assignAt")), point["t0"][0]
-    # t0 сдвинут закрытием задачи подтверждения (handover): назначению верим от прежнего начала
-    # (t0Base), а ОРК, взявший заказ до подтверждения (назначение или выход на шаг ≥ 2 раньше
-    # закрытия), приёмку сделал — S1 начинается там же, где кончается (0 р.д.), а не «порядок
-    # меток нарушен»
-    base = _ts(facts.get("t0Base")) or start
-    if start is not None and base is not None and base < start:
-        cand = [x for x in (asg, (reach.get(2) or (None,))[0]) if x is not None and x >= base]
-        if cand and min(cand) < start:
-            start = min(cand)
-            point["t0"] = (start, None)
     ignored = False
     if asg is not None:
         day = asg.astimezone(period_mod.MSK).date()
-        if base is None or day < base.astimezone(period_mod.MSK).date():
+        if start is None or day < start.astimezone(period_mod.MSK).date():
             ignored = True
-        elif start is not None:                    # приёмка начата (задача подтверждения не открыта)
+        else:
             asg = max(asg, start)
             r2 = reach.get(2)
             if r2 is None or day < r2[0].astimezone(period_mod.MSK).date():
                 soft = {k: (asg, None) for k in range(2, ASSIGN_FLOOR + 1)}
-    by_pt = {"t0": facts.get("t0By") or "начало приёмки", "delFact": "факт", "utdRaw": "факт"}
+    by_pt = {"t0": "начало приёмки", "delFact": "факт", "utdRaw": "факт"}
 
     def at(p):
         return point[p] if isinstance(p, str) else soft.get(p) or reach.get(p, (None, None))
@@ -641,7 +620,7 @@ def clock(order: dict, step: int | None) -> tuple[dt.date | None, str]:
         return _d(order.get("delFact")), "доставка"
     if step == 1:
         t0 = _d(order.get("t0"))
-        return (t0, order.get("t0By") or "начало приёмки") if t0 else (entry, "вход в шаг")
+        return (t0, "начало приёмки") if t0 else (entry, "вход в шаг")
     if step == ASSIGN_FLOOR:
         a = assign_at(order)
         if a and stage_step(order.get("stage")) == 1:
@@ -684,8 +663,6 @@ def overrun(order: dict, today: dt.date, workdays_fn=None) -> dict:
     if step != 12 and not order.get("stage"):
         out["why"] = "стадии нет — срок шага не посчитать"
         return out
-    if step == 1 and order.get("hoOpen"):
-        return {**out, **wait_handover(order, today, fn)}
     since, since_by = clock(order, step)
     if since is None:
         out["why"] = "нет факта доставки" if step == 12 else "нет даты входа в шаг"
@@ -699,21 +676,6 @@ def overrun(order: dict, today: dt.date, workdays_fn=None) -> dict:
     out["over"] = wd > norm
     out["by"] = wd - norm
     return out
-
-
-def wait_handover(order: dict, today: dt.date, workdays_fn=None) -> dict:
-    """Заказ на шаге 1 ждёт подтверждения готовности к передаче в ОРК (handover, владелец
-    01.11.2026): задача открыта — приёмка не началась. Срок руководителя ОРК не идёт (over None);
-    р.д. — от постановки задачи (hoSince), крайний срок — её DEADLINE (hoDl, по зонду v65 — 1 р.д.);
-    hoOverdue — крайний срок прошёл (по дню МСК), hoBy — р.д. после него (пункт hoOver)."""
-    fn = workdays_fn or period_mod.workdays_ru
-    since, dl = _d(order.get("hoSince")), _d(order.get("hoDl"))
-    wd = fn(since, today) if since else None
-    late = bool(dl and dl < today)
-    return {"waitHo": True, "over": None, "by": None, "wd": wd,
-            "since": since.isoformat() if since else "", "sinceBy": "задача подтверждения",
-            "hoDl": dl.isoformat() if dl else "", "hoOverdue": late,
-            "hoBy": (fn(dl, today) if late else None), "why": handover.WHY}
 
 
 def judged(order: dict, today: dt.date, *, in_cat0: bool = True, workdays_fn=None) -> dict:
@@ -737,11 +699,8 @@ def judged(order: dict, today: dt.date, *, in_cat0: bool = True, workdays_fn=Non
     ov = overrun(order, today, workdays_fn)
     hy = hygiene(order, today, workdays_fn)
     out = {**ov, "rawOver": ov["over"], "hyg": bool(hy["exclude"]), "hygWhy": hy["why"],
-           "counted": False, "termUnknown": False, "waitUtd": False, "waitHo": bool(ov.get("waitHo"))}
+           "counted": False, "termUnknown": False, "waitUtd": False}
     if ov["norm"] is None:
-        return out
-    if out["waitHo"]:
-        # приёмка не началась (handover): ни «сверх нормы», ни «срок неизвестен» — свой счёт
         return out
     if ov["step"] == 1 and not in_cat0:
         out.update(over=None, why="приёмка — только у сделок воронки «Реализация»")
@@ -986,9 +945,7 @@ _ESC_STEP = object()
 # подписи (owner) и у id человека (role_id): «Смотреть как» (R4, Д-11а) отбирает пункты по id, и id
 # обязан быть id того же человека, чьё имя показано. Логистика и поставщик — подписи ролей, без id
 ROLE_KEYS = {"orkMgr": ("orkMgr", "dealOrk"), "orkHead": ("orkHead",), "kam": ("kam",),
-             "oss": ("ossOrder", "ossDeal"), "log": (), "sup": (),
-             # исполнитель задачи «Подтверждение готовности» (handover, 01.11.2026) — человек заказа
-             "hoResp": ("hoResp",)}
+             "oss": ("ossOrder", "ossDeal"), "log": (), "sup": ()}
 
 
 def role_id(role: str | None, people: dict, ids: dict) -> str:
@@ -1022,8 +979,7 @@ def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP,
             "kam": lambda: nm(*ROLE_KEYS["kam"]),
             "oss": lambda: nm(*ROLE_KEYS["oss"]),
             "log": lambda: ROLES["log"],
-            "sup": lambda: ROLES["sup"],
-            "hoResp": lambda: nm(*ROLE_KEYS["hoResp"])}
+            "sup": lambda: ROLES["sup"]}
     if debt:
         role, copy_role = "kam", "oss"
     else:
@@ -1056,9 +1012,6 @@ ITEM = {
     "dealOpen": (13, "oss", None),
     "dealClose": (13, "oss", None),
     "noOrder": (1, "orkHead", "kam"),
-    # шаг до приёмки (handover, владелец 01.11.2026; в регламенте ОРК его нет): крайний срок задачи
-    # «Подтверждение готовности» прошёл — подтверждает тот, кто передаёт заказ; руководитель ОРК в копии
-    "hoOver": (1, "hoResp", "orkHead"),
     # приёмка — одна на сделку (решение владельца 30.10.2026, п. 1): пункт сделки у руководителя
     # ОРК, КАМ в копии; заказ, добавленный в уже принятую сделку, — пункт заказа ordAssign
     # «назначить менеджера ОРК на новый заказ» у руководителя ОРК, без КАМа (не разговор с клиентом)
@@ -1106,7 +1059,7 @@ ITEM = {
 }
 # роли пунктов, которых регламент не описывает (чаты, договоры, экономика — dealctx): хозяин —
 # человек сделки, подпись роли — для отбора очереди по роли
-ROLES_EXTRA = {"dealResp": "ответственный сделки", "src": "сорсинг", "hoResp": handover.ROLE}
+ROLES_EXTRA = {"dealResp": "ответственный сделки", "src": "сорсинг"}
 # «сверх нормы» шага ОРК → код пункта (срок работы менеджера: W2, «Сверх нормы по менеджерам»,
 # ведомость, «Замедлено»)
 OVER_CODE = {1: "s1Over", 4: "s2Over", 5: "s3Over", 8: "s6Over"}

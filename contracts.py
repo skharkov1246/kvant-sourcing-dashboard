@@ -36,7 +36,6 @@ from collections import Counter, defaultdict
 
 import chat_activity
 import dealctx
-import handover
 import lifecycle
 import ork
 import orkview
@@ -858,15 +857,6 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         """Сотрудник отдела ОРК (или его дочернего отдела) по справочнику людей."""
         return bool(uid) and bool(set((people.get(uid) or {}).get("depts") or []) & ork_ids)
 
-    # задачи «Подтверждение готовности передачи поставщика в ОРК» (handover.py, владелец
-    # 01.11.2026): шаг до приёмки, которого нет в регламенте. Один отбор по названию (≈ 2 запроса);
-    # отказ — пусто, вкладка считает как до 01.11.2026 (состояние — в week.handover.read)
-    HO, ho_state = handover.read(client)
-
-    def _mskd(v) -> dt.date | None:
-        t = _parse_dt(v) if v else None
-        return t.astimezone(_MSK).date() if t else None
-
     # вход сделки в реализацию (кат. 0) — первый переход её истории; шаг сделки по стадии
     # (ork.STAGE_STEP["deal"]) и наибольший шаг по всем её переходам
     deal_cat0 = {did: tl[0][1] for did, tl in dhist.items() if tl}
@@ -926,13 +916,6 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         # вход в текущую стадию; иначе — вход в стадию
         _since = ork.step_since(tr, ostages)[1] if (_ol and _ol[0] == osid and tr) else ""
         t0 = _t0(str(o.get("createdTime") or ""), deal_cat0.get(did, ""))
-        # задача подтверждения готовности закрыта позже начала приёмки — приёмка от её закрытия
-        # (handover); t0Base — прежнее начало: от него верим назначению менеджера ОРК (ork._start_day)
-        t0_base, t0_by = t0, ""
-        _ho = HO.get(oid)
-        _ho_closed = _ho["closed"] if _ho and not _ho["open"] else ""
-        if _ho_closed and (not t0 or _parse_dt(_ho_closed) > _parse_dt(t0)):
-            t0, t0_by = _ho_closed, "подтверждение готовности"
         utd_raw = _pdate(o.get(UTD_DATE))            # сырая дата УПД — без подстановки
         _rs = [x for x in (ork.stage_step(ostages.get(sid, sid)) for sid, _ in tr) if x is not None]
         # номер заказа, как его пишет портал («900/1»), — у пункта очереди, в таблицах недели,
@@ -954,7 +937,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             # id Битрикса тех же людей — отбор «Смотреть как» (R4, Д-11а); в страницу не идёт
             # (life_orders — внутренний список)
             "_pid": {"orkMgr": uid_of(o.get("assignedById")) if _ork_mgr else "",
-                     "ossOrder": uid_of(o.get(OSS_F)), "hoResp": (_ho or {}).get("resp") or ""},
+                     "ossOrder": uid_of(o.get(OSS_F))},
             "live": sm == "P", "success": sm == "S", "closedRecent": bool(sm == "S" and moved and moved >= recent_from),
             "created": _pdate(o.get("createdTime")), "dl": _pdate(o.get(DL_CUSTOMER)),
             "shipPlan": _pdate(o.get(SHIP_PLAN)), "shipFact": _pdate(o.get(SHIP_FACT)),
@@ -972,12 +955,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "scheme": schemes.get(str(o.get(SCHEME_F) or ""), ""),
             # регламент ОРК: стадия, вход в неё и в шаг, начало приёмки, вход сделки в реализацию
             "stage": _stage_name(osid), "stageId": osid, "stageSince": oin, "stepSince": _since or oin,
-            "t0": t0, "dealCat0": deal_cat0.get(did, ""), "t0Base": t0_base, "t0By": t0_by,
-            # подтверждение готовности к передаче в ОРК (handover): задача открыта — приёмка не
-            # началась (ork.judged.waitHo); постановка, крайний срок, закрытие (МСК) и исполнитель
-            "hoOpen": bool(_ho and _ho["open"]), "hoSince": _mskd(_ho["created"]) if _ho else None,
-            "hoDl": _mskd(_ho["deadline"]) if _ho else None, "hoClosed": _mskd(_ho_closed),
-            "hoWho": who(_ho["resp"])[0] if _ho else "",
+            "t0": t0, "dealCat0": deal_cat0.get(did, ""),
             "reachMax": max(_rs) if _rs else None,
             "kamOrder": who(o.get(KAM_ORDER))[0], "direction": str(o.get(DIRECTION_F) or ""),
             # «Дата записи нового ответственного»: приёмка кончается назначением, если оно раньше
@@ -990,12 +968,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             # назначение — в сегменты только у ответственного из ОРК (то же правило, что ork.assign_at)
             "_segs": ork.segments(tr, ostages, t0=t0 or None,
                                   facts={"delFact": _pdate(o.get(DEL_FACT)), "utdRaw": utd_raw,
-                                         "assignAt": assign if _ork_mgr else None,
-                                         # подтверждение готовности (handover): открыта — S1 не
-                                         # начат; закрыта позже — S1 от закрытия, назначению
-                                         # верим от прежнего начала
-                                         "hoOpen": bool(_ho and _ho["open"]), "t0Base": t0_base or None,
-                                         "t0By": t0_by}),
+                                         "assignAt": assign if _ork_mgr else None}),
         }
         a = lo["art"]
         a["planDates"] = bool(lo["prodStart"] and lo["prodEnd"])
@@ -1282,13 +1255,6 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "stepOver": ov["over"] if ojudge else None,
                 # шаг 12 больше 10 р.д. без УПД — «ждём УПД от клиента», не «сверх нормы»
                 "stepWaitUtd": bool(ojudge and ov["waitUtd"]),
-                # шаг 1, а задача «Подтверждение готовности» открыта (handover, 01.11.2026): приёмка
-                # не началась, срок руководителя ОРК не идёт; р.д. — от постановки задачи, крайний
-                # срок задачи, просрочено ли и на сколько р.д., исполнитель задачи
-                "stepWaitHo": bool(ojudge and ov.get("waitHo")),
-                **({"hoWho": lo.get("hoWho") or "не назначен", "hoSince": ov.get("since") or "",
-                    "hoDl": ov.get("hoDl") or "", "hoOverdue": bool(ov.get("hoOverdue")),
-                    "hoBy": ov.get("hoBy")} if ojudge and ov.get("waitHo") else {}),
                 # шаг живого заказа закрытой сделки вне счёта (не шаг 12 выигранной) — подпись
                 # «сделка закрыта, не в счёте» вместо оценки срока
                 "stepClosed": ostep_closed,
@@ -1402,23 +1368,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 # шаг сделки 1 «Приёмка сделки»: один на сделку, её заказы на шаге 1 ждут менеджера
                 # ОРК — счётом рядом (accept), срок — худший из них (E3)
                 _acc = [x for x in _live_st if x.get("stepAcc")]
-                # заказ, ждущий подтверждения готовности (handover), приёмку не начал: его р.д.
-                # — не срок приёмки; все такие — ячейка «ждём подтверждения готовности» (waitHo)
-                _run = [x for x in _acc if not x.get("stepWaitHo")]
-                _wds = [x["stepWd"] for x in _run if x["stepWd"] is not None]
+                _wds = [x["stepWd"] for x in _acc if x["stepWd"] is not None]
                 step_cell.update(unit="deal", order="", lbl="", accept=len(_acc),
                                  wd=max(_wds) if _wds else None,
-                                 over=any(x["stepOver"] for x in _run) if _wds else (c["stepOver"] if _run else None),
-                                 waitHo=len(_acc) - len(_run))
-            if c.get("stepWaitHo") and not step_cell.get("accept"):
-                step_cell["waitHo"] = 1
-            if step_cell.get("waitHo") and not (_run if c.get("stepAcc") else []):
-                # все заказы приёмки ждут подтверждения: хозяин — исполнитель задачи, р.д. — от
-                # постановки задачи, норма — её крайний срок
-                step_cell.update(role="hoResp", who=c.get("hoWho") or "не назначен", wd=c["stepWd"],
-                                 norm=None, over=None, hoDl=c.get("hoDl") or "",
-                                 hoOverdue=bool(c.get("hoOverdue")), hoBy=c.get("hoBy"),
-                                 why=handover.WHY)
+                                 over=any(x["stepOver"] for x in _acc) if _wds else c["stepOver"])
         elif paid or _all_done:
             _o = ork.owner(13, d_people)
             step_cell = {"step": 13, "role": _o["role"], "who": _o["who"], "wd": None, "norm": None,
@@ -1928,8 +1881,6 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                                                   measure=life_orders, otd=life_v.get("otd"),
                                                   ork_head=ork_head)
             ork_v["slowCmp"] = slow_cmp
-            # задачи подтверждения готовности прочитаны («ок») или код отказа — правило 15
-            ork_v["week"]["handover"]["read"] = ho_state
 
         return {
             "funnel": funnel,
