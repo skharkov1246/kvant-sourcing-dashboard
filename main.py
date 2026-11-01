@@ -40,6 +40,8 @@ import period as period_mod
 import presale as presale_mod
 import reps as reps_mod
 from bitrix_client import BitrixClient, chat_reader_client, drop_lost, без_вебхука
+import reqlines as reqlines_mod
+import stages as stages_mod
 from stages import classify_stage
 
 RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
@@ -53,7 +55,9 @@ RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "move
               "categoryId", "title", "companyId", "ufCrm18Supplier", "ufCrm18SupplContact",
               # файлы КП со стороны поставщика: по ним считается «получено КП».
               # Маска "*" файловых полей не возвращает — только поимённо.
-              *config.RFQ_QUOTE_FIELDS]
+              *config.RFQ_QUOTE_FIELDS,
+              # строки запроса (reqlines.py): «Request file» и «Individual letter text»
+              "ufCrm18_1727423346", "ufCrm18_1724931823290"]
 
 SUPPLIER_CRM_FIELDS = ("ufCrm18Supplier", "ufCrm18SupplContact")
 
@@ -253,6 +257,11 @@ def _mail_activities(client: BitrixClient, start_iso: str, end_iso: str) -> list
                 "to": _email_to(a.get("SETTINGS")),
                 "body": _email_preview(a.get("DESCRIPTION")),
                 "file": _has_attachment(a),
+                # строки запроса (reqlines.py): таблица позиций в исходящем письме — строк и хэш текста
+                **(dict(zip(("tr", "tk"), reqlines_mod.table_rows(a.get("DESCRIPTION"))))
+                   if str(a.get("DIRECTION") or "") == "2" and "<tr" in str(a.get("DESCRIPTION") or "").lower() else {}),
+                # и номера файлов вложений исходящего письма (читаются только вебхуком файлов)
+                **({"fa": _fa} if str(a.get("DIRECTION") or "") == "2" and (_fa := reqlines_mod.attach_ids(a.get("FILES"))) else {}),
                 "dt": (a.get("CREATED") or "")[:16].replace("T", " "),
                 "dtx": a.get("CREATED") or "",
             })
@@ -260,6 +269,33 @@ def _mail_activities(client: BitrixClient, start_iso: str, end_iso: str) -> list
         if len(ch) < 50:
             break
     return out
+
+
+def _attach_fetcher(client: BitrixClient, bt):
+    """Чтение вложения письма по номеру файла Диска — только вебхуком файлов (BITRIX_FILES_WEBHOOK_URL).
+
+    Основной вебхук на Дисках ящиков получает ACCESS_DENIED (зонд 25.09.2026), вебхук файлов —
+    файл (зонд v64 31.10.2026: disk.file.get 168 из 171). Нет секрета в сборке — None: вложения не
+    читаются, строки ручных карточек — из текста письма (reqlines.py). Очередь частоты — основного
+    клиента: второй клиент со своей очередью удвоил бы частоту сверх 2 запросов/с на портал."""
+    url = os.environ.get("BITRIX_FILES_WEBHOOK_URL", "").strip()
+    if not url:
+        return None
+    files = BitrixClient(url)
+    files._throttle = client._throttle
+
+    def fetch(fid: str):
+        for method in ("disk.file.get", "disk.attachedObject.get"):
+            try:
+                r = files.call(method, {"id": fid}, retries=1) or {}
+            except Exception:                                # noqa: BLE001 — отказ по файлу (правило 13)
+                continue
+            link = r.get("DOWNLOAD_URL") if isinstance(r, dict) else ""
+            if link:
+                body, _why, name = bt.fetch(link)
+                return body, name
+        return None, ""
+    return fetch
 
 
 def _inbound_mail(acts: list[dict]) -> list[dict]:
@@ -628,6 +664,45 @@ def run(args) -> int:
     print("• Отправлено vs создано (письма)…")
     m["send"] = _send_stats(_acts, rfqs, m["sourcersA"], dept_a_ids)
 
+    # КП по когортам недель: первый вход карточки в стадию КП (Price at Work, Selected, не выбран,
+    # прежняя «КП получено») по истории стадий — дней от заведения (определения зонда «не расценено
+    # через месяц», scripts/probe_unpriced.py). Фильтр STAGE_ID, с начала окна (≈ 1 запрос на 50 входов).
+    # Не прочитана — поля нет: на странице «—», а не «ноль КП»
+    _kp_first: dict[str, str] | None = None
+    try:
+        _kh = client.stage_history(166, since=p.start.isoformat(), stage_ids=stages_mod.kp_stage_ids())
+        _kp_first = {cid: min(t for _s, t in ent if t) for cid, ent in _kh.items() if any(t for _s, t in ent)}
+        print(f"• Когорты КП: карточек с входом в стадию КП с {p.start.isoformat()} — {len(_kp_first)}")
+        m["kpHist"] = True                                   # история прочитана: нет kpd у карточки — КП не было
+    except Exception as e:                                   # noqa: BLE001
+        print(f"  ⚠ история стадий КП не прочитана — когорты КП не считаются: {type(e).__name__}: {без_вебхука(e)}")
+
+    # Строки запроса (reqlines.py, решение владельца 31.10.2026): строк у карточки и группа сквозного
+    # счёта. Файлы «Request file» — один раз, кэш строк в закрытом ключе KV reqlines:v1 (шаги deploy.yml:
+    # REQLINES_PATH до сборки, REQLINES_OUT — после); за сборку — не больше reqlines.БЮДЖЕТ новых файлов
+    _rl: dict = {}
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent / "gt" / "tools"))
+        import bitrix_tkp as _bt
+        _bt._ОЧЕРЕДЬ = client                                # закачки — через общую очередь портала
+        _first_out: dict[str, dict] = {}
+        for a in sorted((a for a in _acts if a["dir"] == "2"), key=lambda a: a["dtx"]):
+            _first_out.setdefault(a["cid"], {k: a[k] for k in ("tr", "tk", "fa") if k in a})
+        _cache = reqlines_mod.load_cache(os.environ.get("REQLINES_PATH"))
+        _rl, _rl_new, _rl_st = reqlines_mod.build(rfqs, _first_out, _cache, fetch=_bt.fetch, parse=_bt.parse,
+                                                  fetch_attach=_attach_fetcher(client, _bt))
+        m["reqLines"] = _rl_st
+        _out = os.environ.get("REQLINES_OUT")
+        if _out:
+            Path(_out).write_text(json.dumps({"v": 1, "f": {**_cache["f"], **_rl_new}}, ensure_ascii=False), encoding="utf-8")
+        print(f"• Строки запроса: карточек {_rl_st['cards']}, групп {_rl_st['groups']}, источники {_rl_st['src']}; "
+              f"файлов {_rl_st['files']}, скачано {_rl_st['fetched']}, в очереди {_rl_st['pending']}; "
+              f"вложений писем {_rl_st['att']}, прочитано {_rl_st['attFetched']} (без файла {_rl_st['attMiss']}), "
+              f"в очереди {_rl_st['attPending']}{' · вебхук файлов не отдаёт файлы — вложения отложены' if _rl_st['attBroken'] else ''}")
+    except Exception as e:                                   # noqa: BLE001
+        print(f"  ⚠ строки запроса не посчитаны: {type(e).__name__}: {без_вебхука(e)}")
+        _rl = {}
+
     # обогащаем детали каждого сорсера письмами (тема · получатель · превью · вложение)
     _by_card = m["send"].pop("byCard", {})
     _mail_cards = 0
@@ -635,6 +710,25 @@ def run(args) -> int:
         for d in s.get("details", []):
             mails = _by_card.get(str(d.get("id"))) or []
             d["mailN"] = len(mails)
+            _g = _rl.get(str(d.get("id")))
+            if _g:
+                # lg — группа сквозного счёта; ln — строк (нет поля — 1); ls — источник (нет — «одна строка»)
+                d["lg"] = _g[0]
+                if _g[1] is None:
+                    d["ls"] = "u"
+                else:
+                    if _g[1] != 1:
+                        d["ln"] = _g[1]
+                    if _g[2] != "o":
+                        d["ls"] = _g[2]
+            if _kp_first is not None:
+                # kpd — дней от заведения до первого входа в стадию КП; входа нет — поля нет
+                _k = _kp_first.get(str(d.get("id")))
+                if _k and d.get("dt"):
+                    try:
+                        d["kpd"] = max(0, (dt.date.fromisoformat(_k[:10]) - dt.date.fromisoformat(str(d["dt"])[:10])).days)
+                    except ValueError:
+                        pass
             # регламент сорсера (v1.4): ответа нет — повторное письмо на 2-й раб. день, звонок на 3-й,
             # на 10-й — «Ответ не получен (в срок)». Рабочих дней от ПЕРВОГО письма (письма — новые
             # сверху) по день сборки; писем нет — от создания карточки (письмо ушло не из Битрикса)

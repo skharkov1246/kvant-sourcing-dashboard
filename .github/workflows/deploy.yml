@@ -50,6 +50,8 @@ on:
       - "dealdigest.py"         # сводка по сделке для модели → KV dealdigest:v1 (25.10.2026)
       - "rzhist.py"             # история счётов «Реализации» → KV rzhist:v1 (30.10.2026)
       - "scripts/realization_hist_kv.py"  # чтение и запись ключа rzhist:v1 — шаги до и после сборки
+      - "reqlines.py"           # строки запроса — сквозной счёт КП по строкам (31.10.2026)
+      - "scripts/reqlines_kv.py"  # чтение и запись ключа reqlines:v1 — шаги до и после сборки
       - "kamqueue.py"
       - "kaminc.py"
       - "history.py"
@@ -181,6 +183,17 @@ jobs:
           python scripts/realization_hist_kv.py --fetch "$RUNNER_TEMP/rzhist.json" \
             || echo "::warning::история счётов «Реализации» не прочитана — «за неделю» без прошлых точек"
 
+      # Строки запроса «Сорсинга» — сквозной счёт КП по строкам (решение владельца 31.10.2026):
+      # закрытый ключ reqlines:v1 — строк в каждом файле «Request file» (номер файла → число и хэш), чтобы
+      # файл разбирался один раз. Нет ключа — сборка разберёт до 300 новых файлов сама.
+      - name: Строки запроса «Сорсинга» (KV reqlines:v1)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python scripts/reqlines_kv.py --fetch "$RUNNER_TEMP/reqlines.json" \
+            || echo "::warning::кэш строк запроса не прочитан — сборка разберёт файлы заново (до 300)"
+
       - name: Генерация дашборда (окно 01.05.2026 → сегодня)
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
@@ -197,6 +210,12 @@ jobs:
           # после деплоя кладёт в ключ rzhist:v1
           RZHIST_PATH: ${{ runner.temp }}/rzhist.json
           RZHIST_OUT: ${{ runner.temp }}/rzhist_today.json
+          # строки запроса: прочитанный кэш (reqlines.json) и кэш сборки — его шаг после деплоя кладёт в reqlines:v1
+          REQLINES_PATH: ${{ runner.temp }}/reqlines.json
+          REQLINES_OUT: ${{ runner.temp }}/reqlines_out.json
+          # вебхук файлов — только чтение вложений первого письма запроса (строки «a», reqlines.py;
+          # решение владельца 31.10.2026); нет — вложения не читаются, строки — из текста письма
+          BITRIX_FILES_WEBHOOK_URL: ${{ secrets.BITRIX_FILES_WEBHOOK_URL }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           # Идентификаторы служебных учётных записей портала через запятую
           # (Settings → Secrets and variables → Actions → Variables). Их карточки
@@ -275,6 +294,17 @@ jobs:
         run: |
           python scripts/realization_hist_kv.py --publish "$RUNNER_TEMP/rzhist_today.json" \
             || echo "::warning::история счётов «Реализации» не записана — точка дня допишется следующей сборкой"
+
+      # Строки файлов «Request file» — в закрытый ключ reqlines:v1 ПОСЛЕ деплоя: ключ читается заново и
+      # сливается (новые номера файлов дописываются). Не вышло — предупреждение: следующая сборка разберёт
+      # эти файлы ещё раз.
+      - name: Строки запроса в закрытый ключ (KV reqlines:v1)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python scripts/reqlines_kv.py --publish "$RUNNER_TEMP/reqlines_out.json" \
+            || echo "::warning::кэш строк запроса не записан — следующая сборка разберёт эти файлы ещё раз"
 
       - name: Причина падения (в сводку прогона)
         if: failure()

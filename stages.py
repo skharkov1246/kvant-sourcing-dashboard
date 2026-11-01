@@ -58,6 +58,13 @@ _SPA_STAGE_BUCKET = {
 LEGACY_KP_STAGE = "DT166_24:1"                 # «КП получено» — отменена правилом 19.10.2026
 
 
+def kp_stage_ids() -> list[str]:
+    """Коды стадий воронки СП-166, которые засчитываются как «КП получено» (KP_STAGES и прежняя
+    «КП получено»): по первому входу в любую из них считается когорта «КП за N дней» (зонд
+    scripts/probe_unpriced.py — те же стадии)."""
+    return sorted(s for s, b in _SPA_STAGE_BUCKET.items() if b in KP_STAGES)
+
+
 def classify_stage(stage_id: str) -> str:
     if stage_id in _SPA_STAGE_BUCKET:
         return _SPA_STAGE_BUCKET[stage_id]
