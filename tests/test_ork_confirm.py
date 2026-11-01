@@ -53,8 +53,8 @@ class Клиент:
         self.calls += 1
         return fixture.ct_tasks_page(self.tasks, params)
 
-    def tasks_list(self, filter=None, select=None, *, max_pages=10):
-        return BitrixClient.tasks_list(self, filter, select, max_pages=max_pages)
+    def tasks_list(self, filter=None, select=None, *, max_pages=10, info=None):
+        return BitrixClient.tasks_list(self, filter, select, max_pages=max_pages, info=info)
 
 
 def test_задачи_постранично_по_next_и_по_названию():
@@ -115,6 +115,26 @@ def test_статус_4_открыта_и_закрыта_только_5():
     assert by["601"]["open"] is True and by["603"]["open"] is True
     assert by["602"]["open"] is False and by["602"]["at"] == "" and by["602"]["spans"] == []
     assert ork_confirm.CONFIRM_CLOSED == {"5"}
+
+
+def test_предел_страниц_не_молчит(monkeypatch):
+    """Правило 15: портал отдал не всё (next после MAX_PAGES страниц) — stats.truncated, head read
+    «partial» с оговоркой, строка журнала предупреждает; прочитанные задачи шаг 0 дают."""
+    monkeypatch.setattr(ork_confirm, "MAX_PAGES", 2)
+    tasks = [fixture.ct_task(100 + i, 8000 + i, ts("10-05")) for i in range(120)]
+    c = Клиент(tasks)
+    by, st = ork_confirm.load(c)
+    assert c.calls == 2 and st["raw"] == 100 and st["truncated"] is True and len(by) == 100
+    h = ork_confirm.head(st, 50)
+    assert h["read"] == "partial" and h["n"] == 100 and "не все" in h["why"]
+    assert "НЕ ВСЕ" in ork_confirm.summary(st)
+    # всё уместилось — обрезки нет
+    by, st = ork_confirm.load(Клиент(tasks[:90]))
+    assert "truncated" not in st and ork_confirm.head(st, 50)["read"] is True
+    # строка 0 ведомости при «partial» — счёт с оговоркой, не «Нет данных»
+    led, _m = orkview.build([], [], [], T, confirm=h)
+    l0 = next(x for x in led["week"]["ledger"] if x["no"] == 0)
+    assert l0.get("partial") is True and "nodata" not in l0 and l0["why"] == h["why"]
 
 
 @pytest.mark.parametrize("err", [BitrixError("ACCESS_DENIED"), BitrixLimitError("лимит"), AssertionError("заглушка"),
@@ -292,8 +312,9 @@ def test_пункт_сделки_заказа_шаг_0_у_dealctx():
     """dealctx: пункт заказа на шаге 0 — хозяин исполнитель задачи (confirmWho строки заказа)."""
     r = {"deal": "1", "kam": "Анна (КАМ)", "orders": []}
     ppl = dealctx._people(r, "Роза (рук. ОРК)")
-    own = dealctx._reg("chatRisk", r, ppl, order={"step": 0, "confirmWho": "Сергей (снабжение)"})
-    assert own["step"] == 0 and own["role"] == "orkMgr"           # chatRisk — менеджеру ОРК по ITEM
+    # chatRisk — менеджеру ОРК по ITEM, но заказ на шаге 0 ещё не в ОРК: исполнитель задачи, КАМ в копии
+    own = dealctx._reg("chatRisk", r, ppl, order={"step": 0, "confirmWho": "Сергей (снабжение)", "orkMgr": "Олег (ОРК)"})
+    assert (own["step"], own["role"], own["who"], own["copyRole"]) == (0, "confirmResp", "Сергей (снабжение)", "kam")
     own = dealctx._reg("s0Over", r, ppl, order={"step": 0, "confirmWho": "Сергей (снабжение)"})
     assert (own["role"], own["who"], own["copyRole"], own["escalateTo"]) == ("confirmResp", "Сергей (снабжение)",
                                                                              "kam", "Анна (КАМ)")
@@ -307,6 +328,9 @@ def test_исполнитель_ответственный_не_из_орк():
     assert ork.role_id("orkMgr", pp, {"resp": "33"}) == "33"
     late = ork.item_owner("late", 7, pp)                       # своя копия у пункта (КАМ) — остаётся
     assert late["who"] == "Сергей (снабжение)" and late["out"] and late["copyRole"] == "kam"
+    # руководитель ОРК — вторым в копии (ему — «принять заказ и назначить менеджера ОРК»)
+    assert (late["alsoCopy"], late["alsoCopyRole"]) == ("Роза (рук. ОРК)", "orkHead")
+    assert "alsoCopy" not in ow and "alsoCopy" not in ork.owner(4, pp)
     # менеджер ОРК в поле сделки — менеджер заказа, как прежде
     ow = ork.owner(4, {**pp, "dealOrk": "Пётр (ОРК)"})
     assert ow["who"] == "Пётр (ОРК)" and "out" not in ow
