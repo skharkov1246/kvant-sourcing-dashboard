@@ -1,8 +1,18 @@
 {
- "updated": "2026-10-29",
+ "updated": "2026-11-02",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
+  {
+   "id": "24360",
+   "title": "Л-ЭС / Solar / Усинск",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C32:PREPARATION",
+   "created": "2026-10-30",
+   "rfqs": []
+  },
   {
    "id": "24280",
    "title": "390-317 Закупка Сопловой секции 1ст на Taurus-60 г.Казань",
@@ -12,6 +22,50 @@
    "stage": "C2:NEW",
    "created": "2026-10-28",
    "rfqs": []
+  },
+  {
+   "id": "24278",
+   "title": "RFQ-20261028-ADE00-SIEME Siemens Power Generation (sgt-100/200)",
+   "models": [
+    "SGT-100"
+   ],
+   "stage": "C32:EXECUTING",
+   "created": "2026-10-28",
+   "rfqs": [
+    {
+     "id": "54226",
+     "title": "wtt sgt-100/200 зип",
+     "created": "2026-10-28",
+     "supplier": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "54232",
+     "title": "Skyline sgt-100/200 зип",
+     "created": "2026-10-28",
+     "supplier": "Skyline Turbine Services b.v.",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "54236",
+     "title": "ASH Precision sgt-100/200 зип",
+     "created": "2026-10-28",
+     "supplier": "ASH Precision",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-100"
+     ]
+    }
+   ]
   },
   {
    "id": "24204",
@@ -29,7 +83,7 @@
    "models": [
     "Centaur 40"
    ],
-   "stage": "C2:4",
+   "stage": "C2:2",
    "created": "2026-10-23",
    "rfqs": [
     {
@@ -95,7 +149,7 @@
    "models": [
     "ГТУ (модель уточнить)"
    ],
-   "stage": "C2:NEW",
+   "stage": "C2:15",
    "created": "2026-10-19",
    "rfqs": []
   },
@@ -1133,6 +1187,17 @@
      "created": "2026-08-28",
      "supplier": "Scientific Glass Technology Singapore Pte Ltd",
      "stage": "Selected",
+     "sourcer": "Maria Sukhovarova",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    },
+    {
+     "id": "54464",
+     "title": "rfq sgt",
+     "created": "2026-10-29",
+     "supplier": "Gulf Bio Analytical LLC",
+     "stage": "Price at Work",
      "sourcer": "Maria Sukhovarova",
      "models": [
       "Siemens (модель уточнить)"
@@ -9514,6 +9579,18 @@
      "n": 2
     },
     {
+     "name": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
+     "n": 1
+    },
+    {
+     "name": "Skyline Turbine Services b.v.",
+     "n": 1
+    },
+    {
+     "name": "ASH Precision",
+     "n": 1
+    },
+    {
      "name": "Camis Electronics Limited",
      "n": 1
     },
@@ -9915,6 +9992,10 @@
     },
     {
      "name": "Scientific Glass Technology Singapore Pte Ltd",
+     "n": 1
+    },
+    {
+     "name": "Gulf Bio Analytical LLC",
      "n": 1
     },
     {
